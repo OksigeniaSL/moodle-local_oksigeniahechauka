@@ -1,69 +1,396 @@
 {
   "contract": 1,
-  "etag": "demo-1",
+  "etag": "demo-2",
   "generated": 1793577600,
   "horizon": "2026-11-15",
   "sample": true,
-  "screen": {"id": 1, "name": "Biblioteca", "width": 1920, "height": 1080, "timezone": "Atlantic/Canary", "lang": "es"},
+  "screen": {
+    "id": 1,
+    "name": "Biblioteca",
+    "width": 1920,
+    "height": 1080,
+    "timezone": "Atlantic/Canary",
+    "lang": "es"
+  },
   "template": "zones",
   "theme": {
     "mode": "light",
-    "vars": {"--hk-primario": "#1f5f8b", "--hk-acento": "#e8a33a"},
-    "logo": {"id": 1, "url": "media/logo-claro.svg", "sha1": "b574431ad41ecdd6285a4d403dff53b376d83886", "mime": "image/svg+xml"},
-    "logo_dark": {"id": 2, "url": "media/logo-oscuro.svg", "sha1": "6d38334090681a62db5adb463fa373f17f8be1f2", "mime": "image/svg+xml"}
+    "vars": {
+      "--hk-primario": "#1f5f8b",
+      "--hk-acento": "#e8a33a"
+    },
+    "logo": {
+      "id": 1,
+      "url": "media/logo-claro.svg",
+      "sha1": "b574431ad41ecdd6285a4d403dff53b376d83886",
+      "mime": "image/svg+xml"
+    },
+    "logo_dark": {
+      "id": 2,
+      "url": "media/logo-oscuro.svg",
+      "sha1": "6d38334090681a62db5adb463fa373f17f8be1f2",
+      "mime": "image/svg+xml"
+    }
   },
-  "labels": {"menu": "Menú de hoy", "notices": "Avisos", "events": "Hoy en el centro", "ticker": "Al día"},
+  "labels": {
+    "menu": "Menú de hoy",
+    "notices": "Avisos",
+    "events": "Hoy en el centro",
+    "ticker": "Al día",
+    "upcoming": "Próximos días",
+    "today": "Hoy",
+    "tomorrow": "Mañana",
+    "days": "días"
+  },
   "items": [
     {
-      "id": "i1", "type": "image", "zone": "main", "order": 1, "duration": 10, "fit": "cover",
-      "media": {"id": 3, "url": "media/huerto.jpg", "sha1": "d6f065413bda8a8a46c81deef3d271992546c981", "mime": "image/jpeg", "width": 1152, "height": 768},
-      "caption": {"title": "El huerto, listo para la siembra de otoño", "text": "Esta semana plantan las clases de 3.º de Primaria"}
+      "id": "i1",
+      "type": "image",
+      "zone": "main",
+      "order": 1,
+      "duration": 10,
+      "fit": "cover",
+      "media": {
+        "id": 3,
+        "url": "media/huerto.jpg",
+        "sha1": "d6f065413bda8a8a46c81deef3d271992546c981",
+        "mime": "image/jpeg",
+        "width": 1152,
+        "height": 768
+      },
+      "caption": {
+        "title": "El huerto, listo para la siembra de otoño",
+        "text": "Esta semana plantan las clases de 3.º de Primaria"
+      }
     },
     {
-      "id": "i2", "type": "image", "zone": "main", "order": 2, "duration": 8, "fit": "blur",
-      "media": {"id": 4, "url": "media/huerto-vertical.jpg", "sha1": "a970bd87e5ca46d6300ab19825821cec30fab55c", "mime": "image/jpeg", "width": 576, "height": 1024},
-      "caption": {"title": "Una foto en vertical, entera", "text": "Sobre un fondo difuminado de sí misma"}
+      "id": "i2",
+      "type": "image",
+      "zone": "main",
+      "order": 2,
+      "duration": 8,
+      "fit": "blur",
+      "media": {
+        "id": 4,
+        "url": "media/huerto-vertical.jpg",
+        "sha1": "a970bd87e5ca46d6300ab19825821cec30fab55c",
+        "mime": "image/jpeg",
+        "width": 576,
+        "height": 1024
+      },
+      "caption": {
+        "title": "Una foto en vertical, entera",
+        "text": "Sobre un fondo difuminado de sí misma"
+      }
     },
     {
-      "id": "i3", "type": "video", "zone": "main", "order": 3, "fit": "blur",
-      "media": {"id": 5, "url": "media/clip-vertical.mp4", "sha1": "clip-vertical", "mime": "video/mp4", "width": 1080, "height": 1920, "duration": 12},
-      "poster": {"id": 6, "url": "media/clip-vertical.jpg", "sha1": "clip-vertical-poster", "mime": "image/jpeg"},
-      "caption": {"title": "Un vídeo grabado con el móvil", "text": "Solo si se ha generado: demo/make-videos.sh"}
+      "id": "i4",
+      "type": "image",
+      "zone": "main",
+      "order": 3,
+      "duration": 8,
+      "fit": "blur",
+      "media": {
+        "id": 4,
+        "url": "media/huerto-vertical.jpg",
+        "sha1": "a970bd87e5ca46d6300ab19825821cec30fab55c",
+        "mime": "image/jpeg",
+        "width": 576,
+        "height": 1024
+      },
+      "caption": {
+        "title": "El huerto, de cerca",
+        "text": "La segunda vertical va junto a la primera"
+      }
     },
     {
-      "id": "m1", "type": "menu", "zone": "side", "date": "2026-11-02",
-      "when": {"from": "2026-11-02", "until": "2026-11-02", "times": [["00:00", "16:00"]]},
+      "id": "i3",
+      "type": "video",
+      "zone": "main",
+      "order": 3,
+      "fit": "blur",
+      "media": {
+        "id": 5,
+        "url": "media/clip-vertical.mp4",
+        "sha1": "clip-vertical",
+        "mime": "video/mp4",
+        "width": 1080,
+        "height": 1920,
+        "duration": 12
+      },
+      "poster": {
+        "id": 6,
+        "url": "media/clip-vertical.jpg",
+        "sha1": "clip-vertical-poster",
+        "mime": "image/jpeg"
+      },
+      "caption": {
+        "title": "Un vídeo grabado con el móvil",
+        "text": "Solo si se ha generado: demo/make-videos.sh"
+      }
+    },
+    {
+      "id": "m1",
+      "type": "menu",
+      "zone": "side",
+      "date": "2026-11-02",
+      "when": {
+        "from": "2026-11-02",
+        "until": "2026-11-02",
+        "times": [
+          [
+            "00:00",
+            "16:00"
+          ]
+        ]
+      },
       "menus": [
-        {"name": "Menú A", "courses": [
-          {"label": "Primero", "dishes": ["Crema de calabaza"]},
-          {"label": "Segundo", "dishes": ["Merluza al horno con patatas"]},
-          {"label": "Postre", "dishes": ["Fruta de temporada"]}
-        ]},
-        {"name": "Menú B", "courses": [
-          {"label": "Primero", "dishes": ["Ensalada de garbanzos"]},
-          {"label": "Segundo", "dishes": ["Tortilla de patatas"]},
-          {"label": "Postre", "dishes": ["Yogur natural"]}
-        ]}
+        {
+          "name": "Menú A",
+          "courses": [
+            {
+              "label": "Primero",
+              "dishes": [
+                "Crema de calabaza"
+              ]
+            },
+            {
+              "label": "Segundo",
+              "dishes": [
+                "Merluza al horno con patatas"
+              ]
+            },
+            {
+              "label": "Postre",
+              "dishes": [
+                "Fruta de temporada"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Menú B",
+          "courses": [
+            {
+              "label": "Primero",
+              "dishes": [
+                "Ensalada de garbanzos"
+              ]
+            },
+            {
+              "label": "Segundo",
+              "dishes": [
+                "Tortilla de patatas"
+              ]
+            },
+            {
+              "label": "Postre",
+              "dishes": [
+                "Yogur natural"
+              ]
+            }
+          ]
+        }
       ]
     },
     {
-      "id": "m2", "type": "menu", "zone": "side", "date": "2026-11-03", "label": "Menú de mañana",
-      "when": {"from": "2026-11-02", "until": "2026-11-02", "times": [["16:00", "23:59"]]},
-      "menus": [{"name": "Menú A", "courses": [
-        {"label": "Primero", "dishes": ["Lentejas con verduras"]},
-        {"label": "Segundo", "dishes": ["Pollo asado"]},
-        {"label": "Postre", "dishes": ["Natillas"]}
-      ]}]
+      "id": "m2",
+      "type": "menu",
+      "zone": "side",
+      "date": "2026-11-03",
+      "label": "Menú de mañana",
+      "when": {
+        "from": "2026-11-02",
+        "until": "2026-11-02",
+        "times": [
+          [
+            "16:00",
+            "23:59"
+          ]
+        ]
+      },
+      "menus": [
+        {
+          "name": "Menú A",
+          "courses": [
+            {
+              "label": "Primero",
+              "dishes": [
+                "Lentejas con verduras"
+              ]
+            },
+            {
+              "label": "Segundo",
+              "dishes": [
+                "Pollo asado"
+              ]
+            },
+            {
+              "label": "Postre",
+              "dishes": [
+                "Natillas"
+              ]
+            }
+          ]
+        }
+      ]
     },
-    {"id": "n1", "type": "notice", "zone": "side", "order": 1, "title": "Fotos de grupo", "body": "Martes y miércoles, con el uniforme"},
-    {"id": "n2", "type": "notice", "zone": "side", "order": 2, "title": "Biblioteca en el recreo", "body": "De 11:00 a 11:30, con préstamo"},
-    {"id": "n3", "type": "notice", "zone": "side", "order": 3, "title": "Torneo de ajedrez", "body": "Inscripciones hasta el viernes, en secretaría"},
-    {"id": "n4", "type": "notice", "zone": "side", "order": 4, "tone": "important", "title": "Salida temprana el viernes", "body": "Las clases acaban a las 13:00"},
-    {"id": "e1", "type": "event", "zone": "side", "title": "Teatro en inglés", "detail": "3.º y 4.º de Primaria", "start": "2026-11-02T10:30", "end": "2026-11-02T11:30", "color": 2},
-    {"id": "e2", "type": "event", "zone": "side", "title": "Charla de orientación", "detail": "4.º de ESO", "start": "2026-11-02T12:00", "end": "2026-11-02T13:00", "color": 3},
-    {"id": "e3", "type": "event", "zone": "side", "title": "Reunión de familias", "detail": "Infantil", "start": "2026-11-02T17:00", "end": "2026-11-02T18:00", "color": 1},
-    {"id": "t1", "type": "ticker", "zone": "ticker", "order": 1, "text": "Mañana, salida al Museo de la Ciencia con 5.º de Primaria"},
-    {"id": "t2", "type": "ticker", "zone": "ticker", "order": 2, "text": "El viernes, festival de otoño en el patio a las 16:00"},
-    {"id": "t3", "type": "ticker", "zone": "ticker", "order": 3, "text": "Abiertas las inscripciones para el torneo de ajedrez"}
-  ]
+    {
+      "id": "n1",
+      "type": "notice",
+      "zone": "side",
+      "order": 1,
+      "title": "Fotos de grupo",
+      "body": "Martes y miércoles, con el uniforme"
+    },
+    {
+      "id": "n2",
+      "type": "notice",
+      "zone": "side",
+      "order": 2,
+      "title": "Biblioteca en el recreo",
+      "body": "De 11:00 a 11:30, con préstamo"
+    },
+    {
+      "id": "n3",
+      "type": "notice",
+      "zone": "side",
+      "order": 3,
+      "title": "Torneo de ajedrez",
+      "body": "Inscripciones hasta el viernes, en secretaría"
+    },
+    {
+      "id": "n4",
+      "type": "notice",
+      "zone": "side",
+      "order": 4,
+      "tone": "important",
+      "title": "Salida temprana el viernes",
+      "body": "Las clases acaban a las 13:00"
+    },
+    {
+      "id": "e1",
+      "type": "event",
+      "zone": "side",
+      "title": "Teatro en inglés",
+      "detail": "3.º y 4.º de Primaria",
+      "start": "2026-11-02T10:30",
+      "end": "2026-11-02T11:30",
+      "color": 2
+    },
+    {
+      "id": "e2",
+      "type": "event",
+      "zone": "side",
+      "title": "Charla de orientación",
+      "detail": "4.º de ESO",
+      "start": "2026-11-02T12:00",
+      "end": "2026-11-02T13:00",
+      "color": 3
+    },
+    {
+      "id": "e3",
+      "type": "event",
+      "zone": "side",
+      "title": "Reunión de familias",
+      "detail": "Infantil",
+      "start": "2026-11-02T17:00",
+      "end": "2026-11-02T18:00",
+      "color": 1
+    },
+    {
+      "id": "t1",
+      "type": "ticker",
+      "zone": "ticker",
+      "order": 1,
+      "text": "Mañana, salida al Museo de la Ciencia con 5.º de Primaria"
+    },
+    {
+      "id": "t2",
+      "type": "ticker",
+      "zone": "ticker",
+      "order": 2,
+      "text": "El viernes, festival de otoño en el patio a las 16:00"
+    },
+    {
+      "id": "t3",
+      "type": "ticker",
+      "zone": "ticker",
+      "order": 3,
+      "text": "Abiertas las inscripciones para el torneo de ajedrez"
+    },
+    {
+      "id": "e4",
+      "type": "event",
+      "zone": "side",
+      "title": "3º ESO - Acampada",
+      "start": "2026-11-05T08:00",
+      "end": "2026-11-07T16:00",
+      "color": 2,
+      "when": {
+        "from": "2026-11-05",
+        "until": "2026-11-07"
+      }
+    },
+    {
+      "id": "e5",
+      "type": "event",
+      "zone": "side",
+      "title": "4º Pri C - Residencia",
+      "start": "2026-11-03T10:00",
+      "end": "2026-11-03T13:00",
+      "color": 3,
+      "when": {
+        "from": "2026-11-03",
+        "until": "2026-11-03"
+      }
+    },
+    {
+      "id": "e6",
+      "type": "event",
+      "zone": "side",
+      "title": "📚 Celebración del libro",
+      "start": "2026-11-06T00:00",
+      "allday": true,
+      "color": 4,
+      "when": {
+        "from": "2026-11-06",
+        "until": "2026-11-06"
+      }
+    },
+    {
+      "id": "e7",
+      "type": "event",
+      "zone": "side",
+      "title": "Día del deporte",
+      "start": "2026-11-06T09:00",
+      "end": "2026-11-06T14:00",
+      "color": 1,
+      "when": {
+        "from": "2026-11-06",
+        "until": "2026-11-06"
+      }
+    }
+  ],
+  "weather": {
+    "now": {
+      "symbol": "fair_day",
+      "temp": 22
+    },
+    "today": {
+      "symbol": "partlycloudy_day",
+      "max": 24,
+      "min": 18,
+      "rain": 40,
+      "text": "Intervalos nubosos"
+    },
+    "tomorrow": {
+      "symbol": "lightrain",
+      "max": 21,
+      "min": 17,
+      "rain": 70,
+      "text": "Lluvia débil"
+    },
+    "credit": "Datos de MET Norway"
+  }
 }

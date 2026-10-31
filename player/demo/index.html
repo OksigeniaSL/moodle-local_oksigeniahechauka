@@ -6,8 +6,11 @@
 <title>Hechauka · demo</title>
 <!-- The player with a static manifest and its media (mode «demo»): for development, captures and trying a device
      without a server. ?at=2026-11-02T10:45 fixes the clock (by default, Monday 2 November 2026, the day of the
-     example data); ?at=now uses the real one; ?tema=oscuro forces the dark theme. -->
+     example data); ?at=now uses the real one; ?tema=oscuro forces the dark theme. All of it is example data. -->
 <link rel="stylesheet" href="../hechauka.css">
+<link rel="stylesheet" href="../composiciones.css">
+<link rel="stylesheet" href="../tiempo.css">
+<link rel="stylesheet" href="../proximos-dias.css">
 </head>
 <body>
 <div id="hechauka"></div>
@@ -27,7 +30,13 @@
     "closed": "Hoy no hay comedor",
     "days": ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"],
     "months": ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"],
-    "date_format": "{d} de {m}"
+    "date_format": "{d} de {m}",
+    "days_short": ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"],
+    "months_short": ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"],
+    "upcoming": "Próximos días",
+    "today": "Hoy",
+    "tomorrow": "Mañana",
+    "days_word": "días"
   }
 }
 </script>
@@ -42,6 +51,7 @@
     }
   }());
 </script>
+<script src="../tiempo-iconos.js"></script>
 <script src="../build/hechauka.js"></script>
 </body>
 </html>

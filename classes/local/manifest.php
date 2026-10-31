@@ -68,6 +68,10 @@ class manifest {
                 'notices' => get_string('label_notices', 'local_oksigeniahechauka'),
                 'events' => get_string('label_events', 'local_oksigeniahechauka'),
                 'ticker' => get_string('label_ticker', 'local_oksigeniahechauka'),
+                'upcoming' => get_string('label_upcoming', 'local_oksigeniahechauka'),
+                'today' => get_string('label_today', 'local_oksigeniahechauka'),
+                'tomorrow' => get_string('label_tomorrow', 'local_oksigeniahechauka'),
+                'days' => get_string('label_days', 'local_oksigeniahechauka'),
             ],
             'items' => [],
         ];

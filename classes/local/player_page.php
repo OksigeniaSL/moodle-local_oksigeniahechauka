@@ -47,6 +47,12 @@ class player_page {
             'closed' => get_string('closed', $c),
             'days' => explode(',', get_string('days', $c)),
             'months' => explode(',', get_string('months', $c)),
+            'days_short' => explode(',', get_string('days_abbr', $c)),
+            'months_short' => explode(',', get_string('months_abbr', $c)),
+            'upcoming' => get_string('label_upcoming', $c),
+            'today' => get_string('label_today', $c),
+            'tomorrow' => get_string('label_tomorrow', $c),
+            'days_word' => get_string('label_days', $c),
             'date_format' => get_string('date_format', $c),
         ];
     }
@@ -122,8 +128,15 @@ class player_page {
     public static function html(array $boot): string {
         global $SITE;
         $v = self::build();
-        $css = (new \moodle_url('/local/oksigeniahechauka/player/hechauka.css', ['v' => $v]))->out(false);
-        $js = (new \moodle_url('/local/oksigeniahechauka/player/build/hechauka.js', ['v' => $v]))->out(false);
+        $url = function (string $file) use ($v): string {
+            return s((new \moodle_url('/local/oksigeniahechauka/player/' . $file, ['v' => $v]))->out(false));
+        };
+        // The templates, the compositions, the weather and the coming days, in this order; the weather icons before
+        // the player, which takes them from the page.
+        $sheets = '';
+        foreach (['hechauka.css', 'composiciones.css', 'tiempo.css', 'proximos-dias.css'] as $file) {
+            $sheets .= '<link rel="stylesheet" href="' . $url($file) . '">';
+        }
         $json = json_encode($boot, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP);
         return '<!doctype html>' . "\n" .
             '<html lang="' . s($boot['lang']) . '" data-tema="claro">' .
@@ -132,11 +145,12 @@ class player_page {
             '<meta name="robots" content="noindex, nofollow">' .
             '<title>' . s(format_string($SITE->shortname, true, ['context' => \context_system::instance()])) .
             '</title>' .
-            '<link rel="stylesheet" href="' . s($css) . '">' .
+            $sheets .
             '</head><body>' .
             '<div id="hechauka"></div>' .
             '<script id="hechauka-boot" type="application/json">' . $json . '</script>' .
-            '<script src="' . s($js) . '"></script>' .
+            '<script src="' . $url('tiempo-iconos.js') . '"></script>' .
+            '<script src="' . $url('build/hechauka.js') . '"></script>' .
             '</body></html>';
     }
 

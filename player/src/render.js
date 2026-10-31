@@ -1,10 +1,13 @@
-// Paints the screen with the templates of the art direction (hechauka.css): header, the media zone, the «Today»
-// column and the ticker. It builds the markup once and then only changes what changed, so a screen that runs for
-// months does not pile up nodes.
+// Paints the screen with the templates and the compositions of the art direction (hechauka.css, composiciones.css,
+// tiempo.css, proximos-dias.css): a header, a stage where each slide puts its composition in a layer of its own, the
+// ticker, and a layer over everything for a picture at full screen. The frame is built once; layers come and go, so a
+// screen that runs for months does not pile up nodes.
 
-import {pageAt} from './rotator.js';
+import {shapeOf} from './compose.js';
+import {buildToday, fitToday, turnPages} from './today.js';
 
-const PAGE_SECONDS = 12;
+const CAPTION_MS = 2800;
+const PASS_MS = 1000;
 
 function el(tag, cls, text) {
     const e = document.createElement(tag);
@@ -32,6 +35,17 @@ function safeValue(v) {
     return typeof v === 'string' && v.length < 200 && !/[;{}<>]|url\(|expression/i.test(v);
 }
 
+function quiet(promise) {
+    if (promise && promise.catch) {
+        promise.catch(function () {
+            return null;
+        });
+    }
+}
+
+const DROP = '<svg viewBox="0 0 16 21" aria-hidden="true"><path d="M8 0C9.5 3.6 16 9.6 16 13a8 8 0 0 1-16 0C0 9.6 ' +
+    '6.5 3.6 8 0z"/></svg>';
+
 export class Screen {
     /**
      * @param {HTMLElement} root
@@ -44,44 +58,25 @@ export class Screen {
         this.s = strings || {};
         this.media = media;
         this.hooks = hooks;
-        this.slide = null;
-        this.sideKey = '';
+        this.sky = window.HK_TIEMPO || null;
+        this.layer = null;
+        this.comp = null;
+        this.shapes = '';
+        this.todayKey = '';
+        this.headers = [];
+        this.weather = null;
         this.tickerText = null;
         this.minute = '';
+        this.lastDate = null;
+        this.sound = false;
         this.build();
     }
 
     build() {
         clear(this.root);
-        this.frame = el('div', 'hk');
-        const head = el('header', 'hk-cabecera');
-        this.logo = el('img', 'hk-logo-claro');
-        this.logo.alt = '';
-        this.logoDark = el('img', 'hk-logo-oscuro');
-        this.logoDark.alt = '';
-        this.place = el('p', 'hk-lugar');
-        const hour = el('div', 'hk-hora');
-        const date = el('p', 'hk-fecha');
-        this.day = el('b');
-        this.date = el('span');
-        date.appendChild(this.day);
-        date.appendChild(document.createTextNode(' '));
-        date.appendChild(this.date);
-        this.clock = el('p', 'hk-reloj');
-        hour.appendChild(date);
-        hour.appendChild(this.clock);
-        head.appendChild(this.logo);
-        head.appendChild(this.logoDark);
-        head.appendChild(this.place);
-        head.appendChild(hour);
-
-        const body = el('main', 'hk-cuerpo');
-        this.main = el('section', 'hk-medio');
-        this.sample = el('span', 'hk-muestra', this.s.sample || 'Sample data');
-        this.side = el('aside', 'hk-hoy');
-        body.appendChild(this.main);
-        body.appendChild(this.side);
-
+        this.frame = el('div', 'hk hk-horizontal');
+        this.frame.appendChild(this.header());
+        this.stage = el('main', 'hk-escena');
         this.ticker = el('footer', 'hk-cinta');
         this.tickerLabel = el('b');
         const track = el('div', 'hk-cinta-pista');
@@ -89,36 +84,73 @@ export class Screen {
         track.appendChild(this.tickerTrack);
         this.ticker.appendChild(this.tickerLabel);
         this.ticker.appendChild(track);
-
-        this.frame.appendChild(head);
-        this.frame.appendChild(body);
+        this.full = el('div', 'hk-completa hk-sobre-foto');
+        this.credit = el('p', 'hk-credito-tiempo');
+        this.sample = el('span', 'hk-muestra', this.s.sample || 'Sample data');
+        this.frame.appendChild(this.stage);
         this.frame.appendChild(this.ticker);
+        this.frame.appendChild(this.full);
         this.dark = el('div', 'hk-apagada');
         this.root.appendChild(this.frame);
         this.root.appendChild(this.dark);
     }
 
-    /** What does not change with the clock: layout, identity, labels. */
+    // A header: the logos, the place, the weather and the clock. The full-screen layer has one of its own.
+    header() {
+        const h = el('header', 'hk-cabecera');
+        const logo = el('img', 'hk-logo-claro');
+        logo.alt = '';
+        const logoDark = el('img', 'hk-logo-oscuro');
+        logoDark.alt = '';
+        const place = el('p', 'hk-lugar');
+        const weather = el('div', 'hk-tiempo');
+        const hour = el('div', 'hk-hora');
+        const date = el('p', 'hk-fecha');
+        const day = el('b');
+        const rest = el('span');
+        date.appendChild(day);
+        date.appendChild(document.createTextNode(' '));
+        date.appendChild(rest);
+        const clock = el('p', 'hk-reloj');
+        hour.appendChild(date);
+        hour.appendChild(clock);
+        h.appendChild(logo);
+        h.appendChild(logoDark);
+        h.appendChild(place);
+        h.appendChild(weather);
+        h.appendChild(hour);
+        const parts = {node: h, logo, logoDark, place, weather, day, rest, clock};
+        this.headers.push(parts);
+        if (this.identity) {
+            this.paintHeader(parts);
+        }
+        return h;
+    }
+
+    /** What does not change with each slide: shape, identity, labels, weather. */
     configure(manifest) {
         const scr = manifest.screen || {};
         // The page knows its own shape better than the manifest: a screen turned on its side, a LED wall.
         const w = window.innerWidth || scr.width || 1920;
         const h = window.innerHeight || scr.height || 1080;
-        this.frame.className = 'hk ' + (h > w ? 'hk-vertical' : 'hk-horizontal') +
-            (manifest.template === 'full' ? ' hk-completa' : '');
-        this.vertical = h > w;
-        this.place.textContent = scr.name || '';
-        this.place.style.display = scr.name ? '' : 'none';
+        this.horizontal = w >= h;
+        this.frame.classList.toggle('hk-horizontal', this.horizontal);
+        this.frame.classList.toggle('hk-vertical', !this.horizontal);
+        this.frame.classList.toggle('hk-quieto', !!scr.still);
+        this.noToday = manifest.template === 'full';
+        this.sound = !!scr.sound;
         this.labels = manifest.labels || {};
         this.tickerLabel.textContent = this.labels.ticker || this.s.ticker || '';
         this.tickerLabel.style.display = this.tickerLabel.textContent ? '' : 'none';
         if (manifest.sample) {
-            this.main.appendChild(this.sample);
+            this.frame.appendChild(this.sample);
         } else if (this.sample.parentNode) {
             this.sample.parentNode.removeChild(this.sample);
         }
+        this.identity = {name: scr.name || ''};
         this.applyTheme(manifest.theme || {});
-        this.sideKey = '';
+        this.setWeather(manifest.weather || null);
+        this.todayKey = '';
     }
 
     applyTheme(theme) {
@@ -129,20 +161,32 @@ export class Screen {
                 style.setProperty(name, vars[name]);
             }
         });
-        const light = this.media.url(theme.logo);
-        const dark = this.media.url(theme.logo_dark) || light;
-        this.logo.style.display = light ? '' : 'none';
-        this.frame.classList.toggle('hk-sin-logo', !light);
-        if (light && this.logo.src !== light) {
-            this.logo.src = light;
-        }
-        if (dark && this.logoDark.src !== dark) {
-            this.logoDark.src = dark;
-        }
-        if (!dark) {
-            this.logoDark.removeAttribute('src');
-        }
+        this.identity = this.identity || {name: ''};
+        this.identity.light = this.media.url(theme.logo);
+        this.identity.dark = this.media.url(theme.logo_dark) || this.identity.light;
+        this.frame.classList.toggle('hk-sin-logo', !this.identity.light);
+        this.headers.forEach((p) => this.paintHeader(p));
         this.fonts(theme.fonts || []);
+    }
+
+    paintHeader(p) {
+        const id = this.identity;
+        p.place.textContent = id.name;
+        p.place.style.display = id.name ? '' : 'none';
+        p.logo.style.display = id.light ? '' : 'none';
+        if (id.light && p.logo.src !== id.light) {
+            p.logo.src = id.light;
+        }
+        if (id.dark && p.logoDark.src !== id.dark) {
+            p.logoDark.src = id.dark;
+        }
+        if (!id.dark) {
+            p.logoDark.removeAttribute('src');
+        }
+        this.paintWeather(p);
+        if (this.lastDate) {
+            this.paintClock(p, this.lastDate);
+        }
     }
 
     // The client's fonts, from the media cache, so they work without a network too.
@@ -165,6 +209,46 @@ export class Screen {
         }
     }
 
+    // --- The weather ------------------------------------------------------------------------------------------------
+
+    setWeather(w) {
+        this.weather = w && w.now && w.today && this.sky ? w : null;
+        this.headers.forEach((p) => this.paintWeather(p));
+        this.credit.textContent = this.weather ? (this.weather.credit || 'MET Norway') : '';
+        if (this.weather && !this.credit.parentNode) {
+            this.frame.appendChild(this.credit);
+        } else if (!this.weather && this.credit.parentNode) {
+            this.credit.parentNode.removeChild(this.credit);
+        }
+    }
+
+    paintWeather(p) {
+        const w = this.weather;
+        clear(p.weather);
+        p.node.classList.toggle('hk-con-tiempo', !!w);
+        if (!w) {
+            p.weather.style.display = 'none';
+            return;
+        }
+        p.weather.style.display = '';
+        const icon = el('span', 'hk-tiempo-icono');
+        icon.innerHTML = this.sky.svg(w.now.symbol);
+        p.weather.appendChild(icon);
+        p.weather.appendChild(el('span', 'hk-tiempo-grados', w.now.temp + '°'));
+        const range = el('span', 'hk-tiempo-extremos');
+        range.appendChild(el('b', '', w.today.max + '°'));
+        range.appendChild(document.createTextNode(w.today.min + '°'));
+        p.weather.appendChild(range);
+        if (w.today.rain >= 30) {
+            const r = el('span', 'hk-tiempo-lluvia');
+            r.innerHTML = DROP;
+            r.appendChild(document.createTextNode(w.today.rain + ' %'));
+            p.weather.appendChild(r);
+        }
+    }
+
+    // --- Theme, power and clock -------------------------------------------------------------------------------------
+
     setDark(dark) {
         const want = dark ? 'oscuro' : 'claro';
         if (document.documentElement.getAttribute('data-tema') !== want) {
@@ -174,12 +258,11 @@ export class Screen {
 
     setPower(on) {
         this.dark.style.display = on ? 'none' : 'block';
-        const v = this.slide && this.slide.video;
-        if (v) {
-            if (on && v.paused) {
-                v.play().catch(function () {
-                    return null;
-                });
+        const videos = this.frame.querySelectorAll('video');
+        for (let i = 0; i < videos.length; i++) {
+            const v = videos[i];
+            if (on && v.paused && v.hkStarted) {
+                quiet(v.play());
             } else if (!on && !v.paused) {
                 v.pause();
             }
@@ -192,142 +275,73 @@ export class Screen {
             return;
         }
         this.minute = key;
-        clear(this.clock);
-        this.clock.appendChild(document.createTextNode(two(d.getHours())));
-        this.clock.appendChild(el('span', '', ':'));
-        this.clock.appendChild(document.createTextNode(two(d.getMinutes())));
+        this.lastDate = d;
+        this.headers.forEach((p) => this.paintClock(p, d));
+    }
+
+    paintClock(p, d) {
+        clear(p.clock);
+        p.clock.appendChild(document.createTextNode(two(d.getHours())));
+        p.clock.appendChild(el('span', '', ':'));
+        p.clock.appendChild(document.createTextNode(two(d.getMinutes())));
         const days = this.s.days;
         const months = this.s.months;
         if (days && days.length === 7 && months && months.length === 12) {
-            this.day.textContent = days[d.getDay()];
-            this.date.textContent = (this.s.date_format || '{d} {m}')
+            p.day.textContent = days[d.getDay()];
+            p.rest.textContent = (this.s.date_format || '{d} {m}')
                 .replace('{d}', d.getDate()).replace('{m}', months[d.getMonth()]);
         } else {
             const lang = document.documentElement.lang || 'en';
             const name = d.toLocaleDateString(lang, {weekday: 'long'});
-            this.day.textContent = name.charAt(0).toUpperCase() + name.slice(1);
-            this.date.textContent = d.toLocaleDateString(lang, {day: 'numeric', month: 'long'});
+            p.day.textContent = name.charAt(0).toUpperCase() + name.slice(1);
+            p.rest.textContent = d.toLocaleDateString(lang, {day: 'numeric', month: 'long'});
         }
     }
 
-    // --- The media zone ---------------------------------------------------------------------------------------------
+    // --- The slides -------------------------------------------------------------------------------------------------
 
-    /** Shows an item in the media zone, cross-fading from the one before. */
-    showMain(item) {
-        if (!item) {
-            this.dropSlide(this.slide);
-            this.slide = null;
-            this.main.classList.add('hk-medio-vacio');
-            return;
-        }
-        this.main.classList.remove('hk-medio-vacio');
-        if (this.slide && this.slide.item.id === item.id && this.slide.video) {
-            // The same video again (it is alone in the zone): start over without a fade.
-            this.slide.video.currentTime = 0;
-            this.slide.video.play().catch(function () {
-                return null;
-            });
-            return;
-        }
-        const old = this.slide;
-        const slide = this.makeSlide(item);
-        this.slide = slide;
-        const self = this;
-        let shown = false;
-        function reveal() {
-            if (shown || self.slide !== slide) {
-                return;
-            }
-            shown = true;
-            slide.node.classList.add('hk-visible');
-            setTimeout(function () {
-                self.dropSlide(old);
-            }, 900);
-        }
-        if (slide.video) {
-            slide.video.addEventListener('playing', reveal);
-            slide.video.addEventListener('ended', function () {
-                if (self.slide === slide) {
-                    self.hooks.videoEnded(item);
-                }
-            });
-            slide.video.addEventListener('error', function () {
-                if (self.slide === slide) {
-                    self.hooks.mediaFailed(item);
-                }
-            });
-            slide.video.play().catch(function () {
-                return null;
-            });
-        } else if (slide.img) {
-            if (slide.img.complete && slide.img.naturalWidth) {
-                reveal();
-            } else {
-                slide.img.onload = reveal;
-                slide.img.onerror = function () {
-                    if (self.slide === slide) {
-                        self.hooks.mediaFailed(item);
-                    }
-                };
-            }
-        } else {
-            reveal();
-        }
-        // Whatever happens, never stay on a black zone.
-        setTimeout(reveal, 3000);
-        if (this.sample.parentNode === this.main) {
-            this.main.appendChild(this.sample);
-        }
-    }
-
-    makeSlide(item) {
-        const node = el('div', 'hk-diapo');
-        const fit = item.fit || 'cover';
+    /** A picture or a video with its caption. A video shows its caption over the still, then plays clean. */
+    slide(item) {
+        const d = el('div', 'hk-diapo');
+        d.hkItem = item;
+        const contain = item.fit === 'contain';
         const src = this.media.url(item.media);
-        const slide = {item, node, img: null, video: null};
-        if (fit === 'blur' || fit === 'contain') {
-            const back = el('div', 'hk-diapo-fondo');
-            let bg = null;
-            if (item.type === 'video') {
-                bg = this.media.url(item.backdrop);
-                if (!bg) {
-                    bg = this.media.url(item.poster);
-                    back.classList.add('hk-difuminar');
-                }
-            } else {
-                bg = src;
-                back.classList.add('hk-difuminar');
-            }
-            if (fit === 'blur' && bg) {
-                back.style.backgroundImage = 'url("' + bg + '")';
-            }
-            node.appendChild(back);
-        }
         if (item.type === 'video') {
             const v = el('video');
-            v.muted = true;
-            v.setAttribute('muted', '');
+            v.muted = !this.sound;
+            if (!this.sound) {
+                v.setAttribute('muted', '');
+            }
             v.setAttribute('playsinline', '');
-            v.autoplay = true;
             v.preload = 'auto';
             const poster = this.media.url(item.poster);
             if (poster) {
                 v.poster = poster;
             }
             v.src = src;
-            v.style.objectFit = fit === 'cover' ? 'cover' : 'contain';
-            slide.video = v;
-            node.appendChild(v);
-        } else if (item.type === 'image') {
+            v.style.objectFit = contain ? 'contain' : 'cover';
+            const self = this;
+            v.addEventListener('ended', function () {
+                self.hooks.videoEnded(item);
+            });
+            v.addEventListener('error', function () {
+                self.hooks.mediaFailed(item);
+            });
+            d.appendChild(v);
+            d.hkVideo = v;
+        } else {
             const img = el('img');
             img.alt = '';
+            const self = this;
+            img.onerror = function () {
+                self.hooks.mediaFailed(item);
+            };
             img.src = src;
-            img.style.objectFit = fit === 'cover' ? 'cover' : 'contain';
-            if (fit === 'cover' && item.focus && item.focus.length === 2) {
+            img.style.objectFit = contain ? 'contain' : 'cover';
+            if (!contain && item.focus && item.focus.length === 2) {
                 img.style.objectPosition = Math.round(item.focus[0] * 100) + '% ' + Math.round(item.focus[1] * 100) + '%';
             }
-            slide.img = img;
-            node.appendChild(img);
+            d.appendChild(img);
         }
         const cap = item.caption;
         if (cap && (cap.title || cap.text)) {
@@ -338,172 +352,226 @@ export class Screen {
             if (cap.text) {
                 pie.appendChild(el('p', '', cap.text));
             }
-            node.appendChild(pie);
+            d.appendChild(pie);
         }
-        this.main.appendChild(node);
-        return slide;
+        return d;
     }
 
-    dropSlide(slide) {
-        if (!slide) {
+    // A video waits a moment with its caption over the still, then plays and the caption goes.
+    startVideo(d) {
+        if (!d.hkVideo) {
             return;
         }
-        if (slide.video) {
-            slide.video.pause();
-            slide.video.removeAttribute('src');
-            slide.video.load();
-        }
-        if (slide.node.parentNode) {
-            slide.node.parentNode.removeChild(slide.node);
+        d.hkTimer = setTimeout(function () {
+            d.classList.add('hk-reproduciendo');
+            d.hkVideo.hkStarted = true;
+            quiet(d.hkVideo.play());
+        }, CAPTION_MS);
+    }
+
+    stopSlide(slide) {
+        clearTimeout(slide.hkTimer);
+        if (slide.hkVideo) {
+            slide.hkVideo.pause();
+            slide.hkVideo.removeAttribute('src');
+            slide.hkVideo.load();
         }
     }
 
-    // --- The «Today» column -----------------------------------------------------------------------------------------
+    stopSlides(node) {
+        const slides = node.querySelectorAll('.hk-diapo');
+        for (let i = 0; i < slides.length; i++) {
+            this.stopSlide(slides[i]);
+        }
+    }
+
+    // Empties the full-screen layer; its header stops getting the clock.
+    clearFull() {
+        this.stopSlides(this.full);
+        clear(this.full);
+        this.headers = this.headers.filter(function (p) {
+            return p.node.parentNode !== null;
+        });
+    }
+
+    slot(item, comp) {
+        const s = el('section', 'hk-medio' + (item.fit === 'contain' ? ' hk-medio-contener' : ''));
+        const shape = shapeOf(item);
+        if (shape && comp !== 'foto-hoy' && comp !== 'foto-sola') {
+            s.setAttribute('data-forma', shape);
+        }
+        const d = this.slide(item);
+        d.classList.add('hk-visible');
+        s.appendChild(d);
+        this.startVideo(d);
+        return s;
+    }
+
+    // --- The compositions -------------------------------------------------------------------------------------------
+
+    makeLayer(comp, items, today) {
+        const c = el('div', 'hk-cuerpo hk-capa');
+        c.setAttribute('data-composicion', comp);
+        if (comp === 'dos-verticales') {
+            const pair = el('div', 'hk-pareja');
+            pair.setAttribute('data-forma', shapeOf(items[0]) || '2x3');
+            pair.appendChild(this.slot(items[0], comp));
+            pair.appendChild(this.slot(items[1], comp));
+            c.appendChild(pair);
+        } else if (comp !== 'solo-hoy') {
+            c.appendChild(this.slot(items[0], comp));
+        }
+        if (comp !== 'foto-sola' && !this.noToday) {
+            const aside = buildToday(today, this.labelsFull(), comp === 'solo-hoy', this.horizontal,
+                this.weather ? this.sky : null);
+            if (aside) {
+                c.appendChild(aside);
+            }
+            c.hkToday = aside;
+        }
+        return c;
+    }
+
+    labelsFull() {
+        const l = this.labels || {};
+        const s = this.s;
+        return {
+            notices: l.notices || s.notices || '',
+            events: l.events || s.events || '',
+            upcoming: l.upcoming || s.upcoming || '',
+            today: l.today || s.today || '',
+            tomorrow: l.tomorrow || s.tomorrow || '',
+            days: l.days || s.days_word || '',
+        };
+    }
+
+    // The picture at full screen: its slide, a veil, a header of its own, its caption and the weather's credit.
+    fillFull(item) {
+        this.clearFull();
+        const d = this.slide(item);
+        const pie = d.querySelector('.hk-pie');
+        if (pie) {
+            d.removeChild(pie);
+        }
+        d.classList.add('hk-visible');
+        this.full.appendChild(d);
+        this.full.appendChild(el('div', 'hk-completa-velo'));
+        this.full.appendChild(this.header());
+        if (pie) {
+            this.full.appendChild(pie);
+        }
+        if (this.weather) {
+            this.full.appendChild(el('p', 'hk-credito-tiempo', this.credit.textContent));
+        }
+        if (d.hkVideo) {
+            d.hkTimer = setTimeout(function () {
+                if (pie) {
+                    pie.style.opacity = '0';
+                }
+                d.hkVideo.hkStarted = true;
+                quiet(d.hkVideo.play());
+            }, CAPTION_MS + 400);
+        }
+    }
 
     /**
-     * @param {object[]} menus live menu items
-     * @param {object[]} notices live notices
-     * @param {object[]} events live events
-     * @param {number} now milliseconds, to turn pages
+     * Shows a slide. The same composition with the same shapes: only the pictures change, with the slides' own fade,
+     * so «Today» does not blink. Another one: a new layer comes in while the old one leaves.
+     *
+     * @param {{comp: string, items: object[]}} choice
+     * @param {object} today the data of «Today»
      */
-    showSide(menus, notices, events, now) {
-        const perEvents = this.vertical ? 3 : 2;
-        // Every menu of the day is a page of its own (Meals may offer several, and a closed day is one page).
-        const menuPages = [];
-        menus.forEach(function (item) {
-            if (item.closed || !item.menus || !item.menus.length) {
-                menuPages.push({item, menu: null, many: false});
-            } else {
-                item.menus.forEach(function (menu) {
-                    menuPages.push({item, menu, many: item.menus.length > 1});
-                });
-            }
-        });
-        const menuPage = pageAt(menuPages.length, 1, now, PAGE_SECONDS);
-        const evenEvents = Math.ceil(events.length / Math.ceil(events.length / perEvents)) || perEvents;
-        const eventPage = pageAt(events.length, evenEvents, now, PAGE_SECONDS);
-        const key = JSON.stringify([menus, notices, events]) + '|' + menuPage + '|' + eventPage + '|' +
-            Math.floor(now / 1000 / PAGE_SECONDS);
-        if (key === this.sideKey) {
+    show(choice, today) {
+        const comp = choice.comp;
+        const items = choice.items;
+        const wasFull = this.frame.getAttribute('data-composicion') === 'foto-completa';
+        if (comp === 'foto-completa') {
+            this.fillFull(items[0]);
+            this.frame.setAttribute('data-composicion', comp);
+            this.comp = comp;
             return;
         }
-        const blocks = [];
-        if (menuPages.length) {
-            blocks.push(this.menuBlock(menuPages[menuPage]));
-        }
-        const eventBlock = events.length ?
-            this.eventBlock(events.slice(eventPage * evenEvents, eventPage * evenEvents + evenEvents)) : null;
-        const noticeBlock = notices.length ? this.noticeBlock() : null;
-        if (this.vertical) {
-            if (eventBlock) {
-                blocks.push(eventBlock);
+        const shapes = items.map(shapeOf).join(',');
+        const todayKey = JSON.stringify(today);
+        if (this.layer && this.comp === comp && this.shapes === shapes && comp !== 'solo-hoy' && !wasFull) {
+            const slots = this.layer.querySelectorAll('.hk-medio');
+            for (let i = 0; i < slots.length; i++) {
+                const slot = slots[i];
+                const old = slot.querySelector('.hk-diapo');
+                const fresh = this.slide(items[i]);
+                slot.appendChild(fresh);
+                void slot.offsetWidth;
+                fresh.classList.add('hk-visible');
+                this.startVideo(fresh);
+                const self = this;
+                setTimeout(function () {
+                    if (old && old.parentNode) {
+                        self.stopSlide(old);
+                        old.parentNode.removeChild(old);
+                    }
+                }, 900);
             }
-            if (noticeBlock) {
-                blocks.push(noticeBlock);
+            if (todayKey !== this.todayKey) {
+                this.refreshToday(comp, today);
             }
-        } else {
-            if (noticeBlock) {
-                blocks.push(noticeBlock);
-            }
-            if (eventBlock) {
-                blocks.push(eventBlock);
-            }
+            this.todayKey = todayKey;
+            return;
         }
-        clear(this.side);
-        blocks.forEach((b) => this.side.appendChild(b));
-        this.frame.classList.toggle('hk-sin-hoy', !blocks.length);
-        if (noticeBlock) {
-            this.fillNotices(noticeBlock, notices, now);
-        }
-        this.sideKey = key;
-    }
-
-    block(cls, label, color) {
-        const b = el('section', 'hk-bloque' + (cls ? ' ' + cls : ''));
-        b.style.setProperty('--hk-color', 'var(--hk-' + color + ')');
-        b.style.setProperty('--hk-color-oscuro', 'var(--hk-' + (color === 'acento-texto' ? 'acento' : color + '-oscuro') + ')');
-        b.appendChild(el('h3', 'hk-etiqueta', label));
-        return b;
-    }
-
-    menuBlock(page) {
-        const item = page.item;
-        const menu = page.menu;
-        const label = item.label || this.labels.menu || this.s.menu || '';
-        const b = this.block('', page.many && menu.name ? label + ' · ' + menu.name : label, 'marca-2');
-        if (!menu) {
-            b.appendChild(el('p', 'hk-nota', item.title || this.s.closed || ''));
-            return b;
-        }
-        (menu.courses || []).forEach(function (c) {
-            const p = el('p', 'hk-plato');
-            p.appendChild(el('small', '', c.label || ''));
-            p.appendChild(el('span', '', (c.dishes || []).join(', ')));
-            b.appendChild(p);
+        const old = this.layer;
+        const layer = this.makeLayer(comp, items, today);
+        this.stage.appendChild(layer);
+        layer.hkPaging = turnPages(fitToday(layer.hkToday));
+        void layer.offsetWidth;
+        requestAnimationFrame(function () {
+            layer.classList.add('hk-dentro');
         });
-        if (item.note) {
-            b.appendChild(el('p', 'hk-nota', item.note));
+        if (old) {
+            this.leave(old);
         }
-        return b;
-    }
-
-    eventBlock(list) {
-        const b = this.block('', this.labels.events || this.s.events || '', 'marca-3');
-        list.forEach(function (ev) {
-            const p = el('p', 'hk-evento');
-            const n = ev.color >= 1 && ev.color <= 4 ? ev.color : 1;
-            p.style.setProperty('--hk-ev', 'var(--hk-marca-' + n + ')');
-            p.style.setProperty('--hk-sobre-ev', 'var(--hk-sobre-marca-' + n + ')');
-            const t = el('time', '', ev.allday || !ev.start ? '·' : ev.start.slice(11, 16));
-            const span = el('span', '', ev.title || '');
-            if (ev.detail) {
-                span.appendChild(el('small', '', ev.detail));
-            }
-            p.appendChild(t);
-            p.appendChild(span);
-            b.appendChild(p);
-        });
-        return b;
-    }
-
-    noticeBlock() {
-        return this.block('hk-bloque-crece', this.labels.notices || this.s.notices || '', 'acento-texto');
-    }
-
-    // The notices that fit, a page at a time: they are measured once they are in the page.
-    fillNotices(block, notices, now) {
-        const make = function (n) {
-            const d = el('div', 'hk-aviso' + (n.tone === 'important' ? ' hk-aviso-importante' : ''));
-            d.appendChild(el('h3', '', n.title || ''));
-            if (n.body) {
-                d.appendChild(el('p', '', n.body));
-            }
-            return d;
-        };
-        const fit = this.noticesThatFit(block, notices.map(make));
-        // Even pages: four notices where three fit go as two and two, never three and a lonely one.
-        const per = Math.ceil(notices.length / Math.ceil(notices.length / fit));
-        const page = pageAt(notices.length, per, now, PAGE_SECONDS);
-        const nodes = notices.slice(page * per, page * per + per).map(make);
-        while (block.childNodes.length > 1) {
-            block.removeChild(block.lastChild);
+        if (wasFull) {
+            const self = this;
+            setTimeout(function () {
+                if (self.frame.getAttribute('data-composicion') !== 'foto-completa') {
+                    self.clearFull();
+                }
+            }, PASS_MS + 200);
         }
-        nodes.forEach(function (n) {
-            block.appendChild(n);
-        });
+        this.frame.setAttribute('data-composicion', comp);
+        this.comp = comp;
+        this.shapes = shapes;
+        this.layer = layer;
+        this.todayKey = todayKey;
     }
 
-    noticesThatFit(block, nodes) {
-        const limit = block.clientHeight;
-        let count = 0;
-        for (let i = 0; i < nodes.length; i++) {
-            block.appendChild(nodes[i]);
-            if (nodes[i].offsetTop + nodes[i].offsetHeight > limit && count > 0) {
-                break;
+    leave(layer) {
+        layer.classList.add('hk-fuera');
+        clearInterval(layer.hkPaging);
+        const self = this;
+        setTimeout(function () {
+            self.stopSlides(layer);
+            if (layer.parentNode) {
+                layer.parentNode.removeChild(layer);
             }
-            count++;
+        }, PASS_MS);
+    }
+
+    // «Today» changed under the same composition (a notice published, the menu of the afternoon): only it is rebuilt.
+    refreshToday(comp, today) {
+        const layer = this.layer;
+        if (!layer || this.noToday || comp === 'foto-sola') {
+            return;
         }
-        return Math.max(1, count);
+        clearInterval(layer.hkPaging);
+        if (layer.hkToday && layer.hkToday.parentNode) {
+            layer.hkToday.parentNode.removeChild(layer.hkToday);
+        }
+        const aside = buildToday(today, this.labelsFull(), comp === 'solo-hoy', this.horizontal,
+            this.weather ? this.sky : null);
+        if (aside) {
+            layer.appendChild(aside);
+        }
+        layer.hkToday = aside;
+        layer.hkPaging = turnPages(fitToday(aside));
     }
 
     // --- The ticker -------------------------------------------------------------------------------------------------
@@ -533,8 +601,17 @@ export class Screen {
     /** What is on the screen now, for the heartbeat. */
     showing() {
         const out = [];
-        if (this.slide) {
-            out.push({zone: 'main', item: this.slide.item.id});
+        const scope = this.comp === 'foto-completa' ? this.full : this.layer;
+        if (scope) {
+            const slides = scope.querySelectorAll('.hk-diapo');
+            for (let i = 0; i < slides.length; i++) {
+                if (slides[i].hkItem) {
+                    out.push({zone: 'main', item: slides[i].hkItem.id});
+                }
+            }
+        }
+        if (this.comp) {
+            out.push({zone: 'composition', item: this.comp});
         }
         return out;
     }

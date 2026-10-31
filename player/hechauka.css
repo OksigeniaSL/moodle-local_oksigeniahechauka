@@ -478,8 +478,7 @@ body {
 .hk-medio-vacio {
     background: var(--hk-superficie);
 }
-.hk-sin-hoy .hk-hoy,
-.hk-completa .hk-hoy {
+.hk-sin-hoy .hk-hoy {
     display: none;
 }
 .hk-sin-cinta .hk-cinta {

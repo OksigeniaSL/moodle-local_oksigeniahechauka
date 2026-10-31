@@ -1,0 +1,91 @@
+/* «Próximos días» inside «Hoy» (Gaudí, 31 October 2026, for Hechauka). Goes after composiciones.css.
+ *
+ * Markup, after today's events in the same column:
+ *   <section class="hk-bloque hk-proximos">
+ *     <h2 class="hk-etiqueta">Próximos días</h2>
+ *     <div class="hk-cuenta" style="--hk-ev: <stage colour>">            (optional, at most one)
+ *       <b>4</b><small>días</small><span>Acampada</span>
+ *     </div>
+ *     <div class="hk-evento hk-proximo" style="--hk-ev: <stage colour>">
+ *       <time>Mañana</time><span>Acampada<small>3º ESO</small></span>
+ *     </div>
+ *     <div class="hk-evento hk-proximo hk-mismo-dia">…</div>           (same day as the row above: no day shown)
+ *   </section>
+ *
+ * Today's events keep their filled pill with the hour; the coming days get an outlined pill with the day and a bar in
+ * the stage colour, so today reads first and the rest as «what's coming». The stage colour never carries text (it
+ * would fail contrast on some themes): text stays in --hk-texto. Flex only, no grid or gap (Chrome 56). Sizes in em of
+ * the column, so data-escala scales it with the rest. */
+
+.hk-hoy-col .hk-proximos .hk-evento {
+    margin-top: .9em;
+}
+.hk-hoy-col .hk-proximos .hk-etiqueta + .hk-evento,
+.hk-hoy-col .hk-proximos .hk-cuenta + .hk-evento {
+    margin-top: 0;
+}
+.hk-hoy-col .hk-proximos .hk-mismo-dia {
+    margin-top: .5em;
+}
+.hk-hoy-col .hk-proximo time {
+    width: 4.6em;                          /* «Mañana» and «Mié 12» fit at 2.8em */
+    margin-right: .7em;
+    padding: .15em 0;
+    border: .07em solid var(--hk-linea);
+    border-left: .32em solid var(--hk-ev, var(--hk-primario));
+    border-radius: .35em;
+    background: transparent;
+    color: var(--hk-texto);
+    font-size: 2.8em;
+    text-align: center;
+}
+.hk-hoy-col .hk-mismo-dia time {
+    border-color: transparent;             /* only the bar of its stage shows: the day is the one above */
+    border-left-color: var(--hk-ev, var(--hk-primario));
+    color: transparent;
+}
+.hk-hoy-col .hk-proximo span {
+    font-size: 3.2em;
+}
+.hk-hoy-col .hk-proximo small {
+    font-size: .78em;
+}
+
+/* The countdown to the big one: one line, the number large in a disc of its stage colour. */
+.hk-hoy-col .hk-cuenta {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1em;
+}
+.hk-hoy-col .hk-cuenta b {
+    flex: none;
+    width: 1.6em;
+    height: 1.6em;
+    margin-right: .25em;
+    border-radius: 50%;
+    background: var(--hk-ev, var(--hk-primario));
+    color: var(--hk-sobre-ev, #fff);
+    font-size: 3.6em;
+    line-height: 1.6em;
+    text-align: center;
+}
+.hk-hoy-col .hk-cuenta small {
+    flex: none;
+    margin-right: .8em;
+    color: var(--hk-texto-suave);
+    font-size: 2.6em;
+    font-weight: 700;
+}
+.hk-hoy-col .hk-cuenta span {
+    font-size: 3.6em;
+    font-weight: 700;
+    line-height: 1.12;
+}
+
+/* The countdown's day and group under its title, small: «Jue 5 · 3º ESO» (Gaudí, 31 October 2026). */
+.hk-hoy-col .hk-cuenta span small {
+    display: block;
+    color: var(--hk-texto-suave);
+    font-size: .6em;
+    font-weight: 600;
+}

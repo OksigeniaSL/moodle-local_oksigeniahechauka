@@ -1,0 +1,528 @@
+/* Oksigenia Hechauka: the compositions (Gaudí, 31 October 2026). Over hechauka.css (the templates of the same day),
+ * which it does not change: the header, the ticker, the blocks of «Today», the tokens of the client and the two themes
+ * stay as they are. What this sheet adds:
+ *
+ * 1. Compositions that change with each slide, by the shape of what is shown and by how much «Today» has. The player
+ *    puts each one in its own layer, <div class="hk-cuerpo hk-capa" data-composicion="…">, inside .hk-escena, and also
+ *    writes the current one on .hk (data-composicion), for what changes around the layer:
+ *      foto-hoy        a landscape photo or video and «Today» beside it (under it on a vertical screen)
+ *      vertical-hoy    a portrait photo or video in a slot of its shape, and a wider «Today»
+ *      dos-verticales  two portrait photos together, and «Today»
+ *      foto-sola       the photo or video in the whole body (no «Today», or a 9:16 one on a vertical screen)
+ *      solo-hoy        «Today» alone, the menu big, and the weather for today and tomorrow
+ *      foto-completa   the photo or video over the whole screen with its caption (the .hk-completa layer)
+ * 2. «Today» that fills its slot: two columns (.hk-hoy-col), side by side when the composition gives «Today» a wide
+ *    slot and one under the other when it is narrow, and a scale (data-escala 0–7 on each column) that the player
+ *    raises while it fits and no dish or notice takes three lines.
+ * 3. The pass from one composition to the next: the new layer rises and fades in while the old one fades out
+ *    (transform and opacity only); with .hk-quieto on .hk, only the fade.
+ * 4. Videos without a caption while they play: the caption shows over the still for a moment and then leaves.
+ *
+ * Chromium 56 (Samsung, Tizen 4): flexbox only, margins instead of gap, no grid, no aspect-ratio, no inset, no
+ * :is()/:where(), no clamp()/min()/max(). Every feature used, with the Chrome version it needs, in LEEME.md.
+ */
+
+/* --- The stage and its layers ------------------------------------------------------------------------------------ */
+.hk {
+    position: relative;                   /* the full-screen layer covers .hk, padding included */
+}
+.hk-escena {
+    position: relative;
+    flex: 1 1 auto;
+    min-height: 0;
+}
+.hk-escena > .hk-cuerpo {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    justify-content: center;              /* without «Today», the photo's slot stays in the middle */
+}
+.hk-escena .hk-hoy {
+    min-width: 0;
+    min-height: 0;                        /* «Today» never grows out of its slot: its columns scale or turn pages */
+}
+.hk-pareja {
+    display: flex;
+    flex: none;
+}
+.hk-pareja > .hk-medio + .hk-medio {
+    margin-left: 2.4rem;
+}
+/* A picture that must not be cropped (a poster, a cover: fit «contain»): in a slot of its shape the bands are thin,
+   and they take the surface's colour, not a blurred copy. */
+.hk-medio-contener,
+.hk-medio-contener .hk-diapo-fondo {
+    background: var(--hk-superficie);
+}
+
+/* --- «Today» in two columns ---------------------------------------------------------------------------------------
+ * Column 1: the menu (and, in solo-hoy on a vertical screen, the weather first). Column 2: the weather in solo-hoy on
+ * a horizontal screen, then the notices and the events. The player leaves out a column that has nothing.
+ * Every size inside is in em of the column, so data-escala scales the whole column at once. */
+.hk-hoy-col {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+    font-size: 1rem;
+}
+.hk-hoy-col + .hk-hoy-col {
+    margin-top: 2rem;
+}
+.hk-hoy-col[data-escala="1"] { font-size: 1.15rem; }
+.hk-hoy-col[data-escala="2"] { font-size: 1.32rem; }
+.hk-hoy-col[data-escala="3"] { font-size: 1.52rem; }
+.hk-hoy-col[data-escala="4"] { font-size: 1.75rem; }
+.hk-hoy-col[data-escala="5"] { font-size: 2rem; }
+.hk-hoy-col[data-escala="6"] { font-size: 2.35rem; }   /* one or two things in a big slot: an announcement, like a poster */
+.hk-hoy-col[data-escala="7"] { font-size: 2.75rem; }
+
+/* Wide «Today»: the two columns side by side. The composition decides it, not the player: on a horizontal screen
+   in vertical-hoy and solo-hoy; on a vertical one in vertical-hoy and dos-verticales (a band under the photos). */
+.hk-horizontal .hk-cuerpo[data-composicion="vertical-hoy"] > .hk-hoy,
+.hk-horizontal .hk-cuerpo[data-composicion="solo-hoy"] > .hk-hoy,
+.hk-vertical .hk-cuerpo[data-composicion="vertical-hoy"] > .hk-hoy,
+.hk-vertical .hk-cuerpo[data-composicion="dos-verticales"] > .hk-hoy {
+    flex-direction: row;
+}
+.hk-horizontal .hk-cuerpo[data-composicion="vertical-hoy"] > .hk-hoy > .hk-hoy-col,
+.hk-horizontal .hk-cuerpo[data-composicion="solo-hoy"] > .hk-hoy > .hk-hoy-col,
+.hk-vertical .hk-cuerpo[data-composicion="vertical-hoy"] > .hk-hoy > .hk-hoy-col,
+.hk-vertical .hk-cuerpo[data-composicion="dos-verticales"] > .hk-hoy > .hk-hoy-col {
+    flex: 1 1 0px;
+}
+.hk-horizontal .hk-cuerpo[data-composicion="vertical-hoy"] > .hk-hoy > .hk-hoy-col + .hk-hoy-col,
+.hk-horizontal .hk-cuerpo[data-composicion="solo-hoy"] > .hk-hoy > .hk-hoy-col + .hk-hoy-col,
+.hk-vertical .hk-cuerpo[data-composicion="vertical-hoy"] > .hk-hoy > .hk-hoy-col + .hk-hoy-col,
+.hk-vertical .hk-cuerpo[data-composicion="dos-verticales"] > .hk-hoy > .hk-hoy-col + .hk-hoy-col {
+    margin-top: 0;
+    margin-left: 2.4rem;
+}
+
+/* The blocks share the column's height: each grows by the same amount and keeps what it shows together in the
+   middle (auto margins, which give way to the top when there is no room, so nothing is cut above). */
+.hk-hoy-col > .hk-bloque {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-height: 0;
+    margin-bottom: 2em;
+    padding: 2.2em 3em 2.4em 3.6em;
+    overflow: hidden;
+}
+.hk-hoy-col > .hk-bloque:last-child {
+    margin-bottom: 0;
+}
+.hk-hoy-col > .hk-bloque > * {
+    flex: none;
+}
+.hk-hoy-col > .hk-bloque > :first-child {
+    margin-top: auto;
+}
+.hk-hoy-col > .hk-bloque > :last-child {
+    margin-bottom: auto;
+}
+.hk-hoy-col .hk-bloque::before {
+    top: 2.2em;
+    bottom: 2.2em;
+}
+/* The sizes of hechauka.css, in em: at data-escala 0 they are the same. */
+.hk-hoy-col .hk-etiqueta {
+    margin-bottom: .5em;                  /* 1.4rem on its 2.8rem */
+    font-size: 2.8em;
+}
+.hk-hoy-col .hk-plato {
+    margin-top: .8em;
+}
+.hk-hoy-col .hk-plato:first-of-type {
+    margin-top: 0;
+}
+.hk-hoy-col .hk-plato small {
+    width: 4.786em;                       /* 13.4rem on 2.8rem */
+    font-size: 2.8em;
+    line-height: 1.2;
+}
+.hk-hoy-col .hk-plato span {
+    font-size: 4em;
+}
+.hk-hoy-col .hk-nota {
+    margin-top: .5333em;
+    font-size: 3em;
+}
+.hk-hoy-col .hk-aviso {
+    margin-top: 1.8em;
+    padding-top: 1.8em;
+}
+.hk-hoy-col .hk-aviso:first-of-type {
+    margin-top: 0;
+    padding-top: 0;
+}
+.hk-hoy-col .hk-aviso h3 {
+    font-size: 4em;
+}
+.hk-hoy-col .hk-aviso p {
+    margin-top: .1875em;
+    font-size: 3.2em;
+}
+.hk-hoy-col .hk-evento {
+    margin-top: 1.2em;
+}
+.hk-hoy-col .hk-evento:first-of-type {
+    margin-top: 0;
+}
+.hk-hoy-col .hk-evento time {
+    width: 4.0625em;
+    margin-right: .625em;
+    padding: .1875em 0;
+    border-radius: .375em;
+    font-size: 3.2em;
+}
+.hk-hoy-col .hk-evento span {
+    font-size: 3.6em;
+}
+.hk-hoy-col .hk-evento small {
+    font-size: .7778em;
+}
+/* A block that turns pages: small dots after its label, the current one filled. */
+.hk-paginas {
+    display: inline-block;
+    margin-left: .6em;
+    vertical-align: .12em;
+}
+.hk-paginas i {
+    display: inline-block;
+    width: .36em;
+    height: .36em;
+    margin-left: .25em;
+    border: .08em solid currentColor;
+    border-radius: 50%;
+}
+.hk-paginas i.hk-pagina-actual {
+    background: currentColor;
+}
+
+/* --- The compositions on a horizontal screen ---------------------------------------------------------------------
+ * The body is 184 × 81.8 rem with the ticker (89.6 without it). foto-hoy is hechauka.css as it was. */
+
+/* vertical-hoy: the slot takes the photo's shape; «Today» takes the rest, wide. data-forma is the nearest shape;
+   the player may also set the exact width (height of the body × the photo's width / height). */
+.hk-horizontal .hk-cuerpo[data-composicion="vertical-hoy"] > .hk-medio,
+.hk-horizontal .hk-pareja > .hk-medio {
+    flex: none;
+}
+.hk-horizontal .hk-medio[data-forma="9x16"] { width: 46rem; }
+.hk-horizontal .hk-medio[data-forma="2x3"] { width: 55rem; }
+.hk-horizontal .hk-medio[data-forma="3x4"] { width: 62rem; }
+.hk-horizontal .hk-medio[data-forma="1x1"] { width: 80rem; }
+.hk-horizontal.hk-sin-cinta .hk-medio[data-forma="9x16"] { width: 50.4rem; }
+.hk-horizontal.hk-sin-cinta .hk-medio[data-forma="2x3"] { width: 60rem; }
+.hk-horizontal.hk-sin-cinta .hk-medio[data-forma="3x4"] { width: 67.2rem; }
+.hk-horizontal.hk-sin-cinta .hk-medio[data-forma="1x1"] { width: 86rem; }
+/* two portraits: never wider than a pair of 2:3, so «Today» keeps 66 rem or more */
+.hk-horizontal .hk-pareja > .hk-medio[data-forma="3x4"],
+.hk-horizontal .hk-pareja > .hk-medio[data-forma="1x1"] {
+    width: 55rem;
+}
+.hk-horizontal.hk-sin-cinta .hk-pareja > .hk-medio[data-forma="3x4"],
+.hk-horizontal.hk-sin-cinta .hk-pareja > .hk-medio[data-forma="1x1"] {
+    width: 57rem;
+}
+.hk-horizontal .hk-cuerpo[data-composicion="vertical-hoy"] > .hk-hoy,
+.hk-horizontal .hk-cuerpo[data-composicion="dos-verticales"] > .hk-hoy {
+    flex: 1 1 auto;
+    width: auto;
+    min-width: 0;
+}
+.hk-horizontal .hk-cuerpo[data-composicion="dos-verticales"] > .hk-hoy {
+    margin-left: 3.2rem;
+}
+/* solo-hoy: «Today» over the whole body */
+.hk-cuerpo[data-composicion="solo-hoy"] > .hk-hoy {
+    flex: 1 1 auto;
+    width: auto;
+    margin: 0;
+}
+.hk-horizontal .hk-cuerpo[data-composicion="solo-hoy"] > .hk-hoy > .hk-hoy-col-1,
+.hk-vertical .hk-cuerpo[data-composicion="vertical-hoy"] > .hk-hoy > .hk-hoy-col-1 {
+    flex-grow: 1.2;                      /* the menu's column a little wider than the other */
+}
+
+/* --- The compositions on a vertical screen -----------------------------------------------------------------------
+ * The body is 100 × 162.8 rem with the ticker. foto-hoy is hechauka.css as it was: the photo on top at 16:9. */
+.hk-vertical .hk-cuerpo[data-composicion="vertical-hoy"] > .hk-medio {
+    flex: none;
+    height: 104rem;                       /* a portrait photo at full width, cropped (focus point); «Today» keeps 56 */
+}
+.hk-vertical .hk-cuerpo[data-composicion="vertical-hoy"] > .hk-medio[data-forma="1x1"] {
+    height: 100rem;
+}
+.hk-vertical .hk-cuerpo[data-composicion="vertical-hoy"] > .hk-medio-contener {
+    align-self: center;                   /* a poster: its own width (104 rem × its shape), centred */
+}
+.hk-vertical .hk-cuerpo[data-composicion="vertical-hoy"] > .hk-medio-contener[data-forma="9x16"] { width: 58.5rem; }
+.hk-vertical .hk-cuerpo[data-composicion="vertical-hoy"] > .hk-medio-contener[data-forma="2x3"] { width: 69.3rem; }
+.hk-vertical .hk-cuerpo[data-composicion="vertical-hoy"] > .hk-medio-contener[data-forma="3x4"] { width: 78rem; }
+.hk-vertical .hk-pareja {
+    height: 76rem;
+}
+.hk-vertical .hk-pareja[data-forma="9x16"] {
+    height: 86.8rem;
+}
+.hk-vertical .hk-pareja > .hk-medio {
+    flex: 1 1 0px;
+    height: auto;
+}
+.hk-vertical .hk-cuerpo[data-composicion="foto-sola"] > .hk-medio {
+    flex: 1 1 auto;
+    height: auto;
+}
+.hk-horizontal .hk-cuerpo[data-composicion="foto-sola"] > .hk-medio {
+    flex: 1 1 auto;
+}
+
+/* --- Captions ------------------------------------------------------------------------------------------------------ */
+/* A darker fade than hechauka.css's under every caption, and a soft shadow: AA (large text) even over a white photo,
+   whatever the client's font and however the title wraps. */
+.hk-pie {
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, .5) 35%, rgba(0, 0, 0, .82));
+    text-shadow: 0 .2rem 1.2rem rgba(0, 0, 0, .45);
+}
+/* A narrow slot (a portrait, or one of two) carries a smaller caption: still 4.4 rem, read from 10 m. */
+.hk-cuerpo[data-composicion="vertical-hoy"] .hk-pie,
+.hk-pareja .hk-pie {
+    padding: 10rem 3.2rem 3rem;
+}
+.hk-horizontal .hk-cuerpo[data-composicion="vertical-hoy"] .hk-pie h2,
+.hk-pareja .hk-pie h2 {
+    font-size: 4.4rem;
+}
+.hk-horizontal .hk-cuerpo[data-composicion="vertical-hoy"] .hk-pie p,
+.hk-pareja .hk-pie p {
+    font-size: 3rem;
+}
+/* A video: its caption over the still for a moment (the player waits about 3 s before play()), then it leaves and the
+   video plays clean. The player adds .hk-reproduciendo to the slide when the video starts. */
+.hk-diapo .hk-pie {
+    -webkit-transition: opacity .6s ease, -webkit-transform .6s ease;
+    transition: opacity .6s ease, transform .6s ease;
+}
+.hk-diapo.hk-reproduciendo .hk-pie {
+    opacity: 0;
+    -webkit-transform: translate3d(0, 2rem, 0);
+    transform: translate3d(0, 2rem, 0);
+}
+
+/* --- The full-screen photo ------------------------------------------------------------------------------------------
+ * <div class="hk-completa hk-sobre-foto"> with its slide, a header of its own (the logo for the dark theme, the
+ * place, the weather and the clock, in white over a dark fade) and the caption. The player keeps its clock with the
+ * other one. Around it, while it shows, the header, the stage and the ticker leave. */
+.hk-completa {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 5;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #000;
+    color: #fff;
+    opacity: 0;
+    pointer-events: none;
+    -webkit-transition: opacity .9s ease;
+    transition: opacity .9s ease;
+}
+.hk[data-composicion="foto-completa"] .hk-completa {
+    opacity: 1;
+}
+.hk-completa .hk-diapo {
+    opacity: 1;
+}
+.hk-completa .hk-diapo img,
+.hk-completa .hk-diapo video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+/* the photo settles in slowly, a hair larger at first */
+.hk-completa .hk-diapo img {
+    -webkit-transform: scale(1.035);
+    transform: scale(1.035);
+    -webkit-transition: -webkit-transform 9s cubic-bezier(.2, .6, .3, 1);
+    transition: transform 9s cubic-bezier(.2, .6, .3, 1);
+}
+.hk[data-composicion="foto-completa"] .hk-completa .hk-diapo img {
+    -webkit-transform: none;
+    transform: none;
+}
+.hk-completa-velo {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 30rem;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, .8), rgba(0, 0, 0, .55) 45%, rgba(0, 0, 0, 0));
+}
+.hk-vertical .hk-completa-velo {
+    height: 40rem;
+}
+.hk-completa .hk-cabecera {
+    position: absolute;
+    top: 3rem;
+    left: 4rem;
+    right: 4rem;
+    margin: 0;
+}
+.hk-completa .hk-lugar {
+    border-left-color: rgba(255, 255, 255, .45);
+    color: #fff;
+}
+.hk-completa .hk-fecha,
+.hk-completa .hk-fecha b,
+.hk-completa .hk-reloj,
+.hk-completa .hk-tiempo-grados,
+.hk-completa .hk-tiempo-extremos,
+.hk-completa .hk-tiempo-extremos b,
+.hk-completa .hk-tiempo-lluvia {
+    color: #fff;
+}
+.hk-completa .hk-tiempo {
+    border-right-color: rgba(255, 255, 255, .45);
+}
+.hk-completa .hk-logo-claro {
+    display: none;
+}
+.hk-completa .hk-logo-oscuro {
+    display: block;
+}
+.hk-completa .hk-pie {
+    padding: 22rem 6rem 6rem;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, .5) 35%, rgba(0, 0, 0, .82));
+    -webkit-transform: translate3d(0, 3rem, 0);
+    transform: translate3d(0, 3rem, 0);
+    opacity: 0;
+    -webkit-transition: opacity .8s ease .5s, -webkit-transform 1s cubic-bezier(.2, .7, .2, 1) .5s;
+    transition: opacity .8s ease .5s, transform 1s cubic-bezier(.2, .7, .2, 1) .5s;
+}
+.hk[data-composicion="foto-completa"] .hk-completa .hk-pie {
+    -webkit-transform: none;
+    transform: none;
+    opacity: 1;
+}
+.hk-completa .hk-pie h2 {
+    font-size: 7.6rem;
+    line-height: 1.04;
+}
+.hk-completa .hk-pie p {
+    margin-top: 1.6rem;
+    font-size: 4.2rem;
+}
+.hk-vertical .hk-completa .hk-pie {
+    padding: 26rem 5rem 7rem;
+}
+.hk-vertical .hk-completa .hk-pie h2 {
+    font-size: 7rem;
+}
+/* while the full-screen photo shows, the rest steps back: the header and the stage fade, the ticker goes down */
+.hk-cabecera,
+.hk-escena {
+    -webkit-transition: opacity .7s ease;
+    transition: opacity .7s ease;
+}
+.hk-cinta {
+    -webkit-transition: opacity .7s ease, -webkit-transform .8s cubic-bezier(.4, 0, .2, 1);
+    transition: opacity .7s ease, transform .8s cubic-bezier(.4, 0, .2, 1);
+}
+.hk[data-composicion="foto-completa"] > .hk-cabecera,
+.hk[data-composicion="foto-completa"] > .hk-escena {
+    opacity: 0;
+}
+.hk[data-composicion="foto-completa"] > .hk-cinta {
+    opacity: 0;
+    -webkit-transform: translate3d(0, 100%, 0);
+    transform: translate3d(0, 100%, 0);
+}
+
+/* --- From one composition to the next -----------------------------------------------------------------------------
+ * The player adds the new layer with .hk-capa (hidden, a little low), and on the next frame adds .hk-dentro: it rises
+ * and fades in, its parts one after the other. The old one takes .hk-fuera: it fades out rising a little, and leaves
+ * the page after 1 s. When the composition stays the same, only the photo changes (the slides' fade, as before). */
+.hk-capa {
+    opacity: 0;
+    -webkit-transition: opacity .7s ease;
+    transition: opacity .7s ease;
+}
+.hk-capa > * {
+    -webkit-transform: translate3d(0, 2.4rem, 0);
+    transform: translate3d(0, 2.4rem, 0);
+    -webkit-transition: -webkit-transform .9s cubic-bezier(.2, .7, .2, 1);
+    transition: transform .9s cubic-bezier(.2, .7, .2, 1);
+}
+.hk-capa > :nth-child(2) {
+    -webkit-transition-delay: .12s;
+    transition-delay: .12s;
+}
+.hk-capa > :nth-child(3) {
+    -webkit-transition-delay: .24s;
+    transition-delay: .24s;
+}
+.hk-capa.hk-dentro {
+    opacity: 1;
+}
+.hk-capa.hk-dentro > * {
+    -webkit-transform: none;
+    transform: none;
+}
+.hk-capa.hk-fuera {
+    opacity: 0;
+    -webkit-transition-duration: .5s;
+    transition-duration: .5s;
+}
+.hk-capa.hk-fuera > * {
+    -webkit-transform: translate3d(0, -1.2rem, 0);
+    transform: translate3d(0, -1.2rem, 0);
+    -webkit-transition-delay: 0s;
+    transition-delay: 0s;
+    -webkit-transition-duration: .5s;
+    transition-duration: .5s;
+}
+
+/* Still: the same passes, without movement (only the fade). The player sets .hk-quieto on .hk when the screen asks
+   for it; Chromium 56 knows no prefers-reduced-motion, newer browsers also take it from the system. */
+.hk-quieto .hk-capa > *,
+.hk-quieto .hk-capa.hk-fuera > *,
+.hk-quieto .hk-completa .hk-diapo img,
+.hk-quieto .hk-completa .hk-pie,
+.hk-quieto .hk-diapo.hk-reproduciendo .hk-pie,
+.hk-quieto.hk[data-composicion="foto-completa"] > .hk-cinta {
+    -webkit-transform: none;
+    transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+    .hk .hk-capa > *,
+    .hk .hk-capa.hk-fuera > *,
+    .hk .hk-completa .hk-diapo img,
+    .hk .hk-completa .hk-pie,
+    .hk .hk-diapo.hk-reproduciendo .hk-pie,
+    .hk[data-composicion="foto-completa"] > .hk-cinta {
+        -webkit-transform: none;
+        transform: none;
+    }
+}
+
+/* Only in the demo and the mock-ups: the «example data» mark, once for the whole screen. */
+.hk > .hk-muestra {
+    top: .3rem;
+    left: 4rem;
+    z-index: 6;
+    padding: .3rem 1.2rem;
+    border-radius: .8rem;
+    font-size: 2rem;
+    line-height: 2rem;
+}

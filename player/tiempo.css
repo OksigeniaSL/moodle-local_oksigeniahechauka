@@ -1,0 +1,242 @@
+/* Oksigenia Hechauka: the weather (Gaudí, 31 October 2026). Over hechauka.css and composiciones.css, with the same
+ * rules: flexbox only, sizes in rem (or in em inside «Today», which scales), nothing newer than Chromium 56.
+ *
+ * Two places:
+ * - .hk-tiempo, in the header, before the date and the clock: the sky now (icon), the temperature now, and today's
+ *   highest and lowest. The chance of rain only when it is 30 % or more.
+ * - .hk-bloque-tiempo, a block of «Today» that only goes in the «Today» moment (solo-hoy), in column 1 (under the
+ *   menu on a horizontal screen, over it on a vertical one): today and tomorrow side by side, each with its icon, its
+ *   highest and lowest, the sky in words and the chance of rain.
+ * The data: MET Norway (api.met.no), whose terms ask for the credit: .hk-credito-tiempo, «Datos de MET Norway»,
+ * small in the top right corner of the screen (and of the full-screen photo) whenever the weather shows.
+ * The icons come from tiempo-iconos.js (inline SVG, classes t-*, one per group of MET Norway's symbol_code); their
+ * colours are the variables below, so a client can change them like any other colour.
+ */
+
+/* --- The icons' colours, light and dark ------------------------------------------------------------------------ */
+:root {
+    --hk-tiempo-sol: #ffc533;
+    --hk-tiempo-sol-trazo: #a86400;
+    --hk-tiempo-rayos: #c27700;
+    --hk-tiempo-luna: #ffe08a;
+    --hk-tiempo-luna-trazo: #7c6312;
+    --hk-tiempo-estrella: #977511;
+    --hk-tiempo-nube: #ffffff;
+    --hk-tiempo-nube-trazo: #56667b;
+    --hk-tiempo-nube-fondo: #c5cfdb;
+    --hk-tiempo-gota: #1f6fd1;
+    --hk-tiempo-copo: #1f73b8;
+    --hk-tiempo-niebla: #5f6e82;
+}
+/* the dark theme, and anything over a photo (the full-screen header) */
+[data-tema="oscuro"],
+.hk-sobre-foto {
+    --hk-tiempo-sol: #ffc533;
+    --hk-tiempo-sol-trazo: #ffc533;
+    --hk-tiempo-rayos: #ffc533;
+    --hk-tiempo-luna: #f6dc8c;
+    --hk-tiempo-luna-trazo: #f6dc8c;
+    --hk-tiempo-estrella: #f6dc8c;
+    --hk-tiempo-nube: #e3e9f1;
+    --hk-tiempo-nube-trazo: #93a3b8;
+    --hk-tiempo-nube-fondo: #7d8da3;
+    --hk-tiempo-gota: #6db3ff;
+    --hk-tiempo-copo: #a9dcff;
+    --hk-tiempo-niebla: #a3b0c2;
+}
+.hk-icono-tiempo {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}
+.hk-icono-tiempo .t-sol { fill: var(--hk-tiempo-sol); stroke: var(--hk-tiempo-sol-trazo); }
+.hk-icono-tiempo .t-rayos { stroke: var(--hk-tiempo-rayos); }
+.hk-icono-tiempo .t-luna { fill: var(--hk-tiempo-luna); stroke: var(--hk-tiempo-luna-trazo); }
+.hk-icono-tiempo .t-estrella { fill: var(--hk-tiempo-estrella); }
+.hk-icono-tiempo .t-nube { fill: var(--hk-tiempo-nube); stroke: var(--hk-tiempo-nube-trazo); }
+.hk-icono-tiempo .t-nube-fondo { fill: var(--hk-tiempo-nube-fondo); stroke: var(--hk-tiempo-nube-trazo); }
+.hk-icono-tiempo .t-gota { fill: var(--hk-tiempo-gota); }
+.hk-icono-tiempo .t-trazo-gota { stroke: var(--hk-tiempo-gota); }
+.hk-icono-tiempo .t-copo { stroke: var(--hk-tiempo-copo); }
+.hk-icono-tiempo .t-niebla { stroke: var(--hk-tiempo-niebla); }
+.hk-icono-tiempo .t-chispa { fill: var(--hk-tiempo-sol); stroke: var(--hk-tiempo-sol-trazo); }
+
+/* --- In the header ------------------------------------------------------------------------------------------- */
+.hk-tiempo {
+    display: flex;
+    flex: none;
+    align-items: center;
+    margin-left: auto;
+    margin-right: 3.2rem;
+    padding-right: 3.2rem;
+    border-right: .3rem solid var(--hk-linea);
+}
+.hk-tiempo + .hk-hora {
+    margin-left: 0;
+}
+.hk-tiempo-icono {
+    flex: none;
+    width: 10rem;
+    height: 10rem;
+    margin-right: 1.2rem;
+}
+.hk-tiempo-grados {
+    color: var(--hk-texto);
+    font-family: var(--hk-letra-titulos);
+    font-size: 7.6rem;
+    font-weight: 800;
+    line-height: .9;
+    letter-spacing: -.02em;
+}
+/* today's highest over its lowest, small, beside the temperature now */
+.hk-tiempo-extremos {
+    margin-left: 1.8rem;
+    color: var(--hk-texto-suave);
+    font-size: 3rem;
+    font-weight: 700;
+    line-height: 1.15;
+}
+.hk-tiempo-extremos b {
+    display: block;
+    color: var(--hk-texto);
+    font-weight: 800;
+}
+/* the chance of rain: a drop and the percentage, only from 30 % */
+.hk-tiempo-lluvia {
+    display: flex;
+    align-items: center;
+    margin-left: 2.4rem;
+    color: var(--hk-texto);
+    font-size: 3.4rem;
+    font-weight: 800;
+    line-height: 1;
+}
+.hk-tiempo-lluvia svg {
+    width: 3.2rem;
+    height: 4.2rem;
+    margin-right: .6rem;
+    fill: var(--hk-tiempo-gota);
+}
+/* On a vertical screen the header is narrower (100 rem): the temperature now and its icon (the rest goes in the
+   «Today» moment), and the place's name moves under the logo. The player sets .hk-con-tiempo on the header when the
+   weather shows. */
+.hk-vertical .hk-tiempo-extremos,
+.hk-vertical .hk-tiempo-lluvia {
+    display: none;
+}
+.hk-vertical .hk-tiempo {
+    margin-right: 2.8rem;
+    padding-right: 2.8rem;
+}
+.hk-vertical .hk-tiempo-icono {
+    width: 9rem;
+    height: 9rem;
+}
+.hk-vertical .hk-tiempo-grados {
+    font-size: 7rem;
+}
+.hk-vertical .hk-hora {
+    flex: none;
+}
+.hk-vertical > .hk-cabecera.hk-con-tiempo {
+    position: relative;                   /* (the full-screen header is already absolute) */
+}
+.hk-vertical .hk-con-tiempo img {
+    -webkit-align-self: flex-start;
+    align-self: flex-start;
+    height: 7rem;
+    margin-top: .4rem;
+}
+.hk-vertical .hk-con-tiempo .hk-lugar {
+    position: absolute;
+    top: 8.6rem;
+    left: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: 3rem;
+}
+
+/* --- The block of the «Today» moment: today and tomorrow ------------------------------------------------------ */
+.hk-hoy-col > .hk-bloque-tiempo {
+    flex-direction: row;
+    align-items: center;
+    flex-grow: 0;
+    font-size: 1.1rem;                    /* its own size: the column's scale is for the menu beside it */
+}
+.hk-dia-tiempo {
+    display: flex;
+    flex: 1 1 0px;
+    align-items: center;
+    min-width: 0;
+}
+.hk-dia-tiempo + .hk-dia-tiempo {
+    margin-left: 2.4em;
+    padding-left: 2.4em;
+    border-left: .2rem solid var(--hk-linea);
+}
+.hk-dia-tiempo .hk-tiempo-icono {
+    width: 10em;
+    height: 10em;
+    margin-right: 1.6em;
+}
+.hk-dia-tiempo-texto {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+.hk-dia-tiempo .hk-etiqueta {
+    margin-bottom: .3571em;                /* 1rem on its 2.8rem */
+}
+.hk-dia-tiempo-grados {
+    font-family: var(--hk-letra-titulos);
+    font-size: 5.6em;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -.01em;
+    white-space: nowrap;
+}
+.hk-dia-tiempo-grados small {
+    color: var(--hk-texto-suave);
+    font-size: .64em;
+    font-weight: 700;
+}
+.hk-dia-tiempo-cielo {
+    margin-top: .25em;
+    font-size: 3.2em;
+    font-weight: 700;
+    line-height: 1.15;
+}
+.hk-dia-tiempo-lluvia {
+    display: flex;
+    align-items: center;
+    margin-top: .25em;
+    color: var(--hk-texto-suave);
+    font-size: 3.2em;
+    font-weight: 700;
+    line-height: 1.1;
+}
+.hk-dia-tiempo-lluvia svg {
+    width: .8em;
+    height: 1.05em;
+    margin-right: .25em;
+    fill: var(--hk-tiempo-gota);
+}
+
+/* --- The credit: small but legible (2.2 rem, AA on the page and over the photo's dark fade) ---------------------- */
+.hk-credito-tiempo {
+    position: absolute;
+    top: .5rem;
+    right: 4rem;
+    z-index: 2;
+    margin: 0;
+    color: var(--hk-texto-suave);
+    font-size: 2.2rem;
+    font-weight: 600;
+    line-height: 2.2rem;
+    white-space: nowrap;
+}
+.hk-completa .hk-credito-tiempo {
+    color: #fff;
+    opacity: .9;
+}

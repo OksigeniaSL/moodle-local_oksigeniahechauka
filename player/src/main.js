@@ -8,13 +8,15 @@ import {makeApi} from './api.js';
 import {realClock, simulatedClock} from './clock.js';
 import {MediaStore, mediaOf} from './media.js';
 import {pair} from './pairing.js';
-import {Rotator} from './rotator.js';
+import {countdown, dayLabel, splitTitle, upcoming} from './agenda.js';
+import {Composer} from './compose.js';
 import {isDark, isLive, isPowerOn, liveItems} from './rules.js';
 import {Screen} from './render.js';
 import {store} from './store.js';
+import {countToday} from './today.js';
 
-const VERSION = '0.4.3';
-const DEFAULT_SECONDS = {main: 10, side: 12, ticker: 0};
+const VERSION = '0.5.0';
+const COMING_DAYS = 7;
 const HEARTBEAT_MS = 60000;
 const REFRESH_MS = 15 * 60000;
 
@@ -50,10 +52,9 @@ class Player {
         this.api = makeApi(boot.endpoints || {}, function () {
             return store.key();
         }, this.mode === 'preview');
-        const self = this;
-        this.rotator = new Rotator(function (item) {
-            return self.durationOf(item);
-        });
+        this.composer = new Composer();
+        this.timer = null;
+        this.menuTurn = 0;
     }
 
     start() {
@@ -72,13 +73,19 @@ class Player {
         const self = this;
         this.media = new MediaStore(this.mode === 'screen' ? this.api : null);
         this.screen = new Screen(this.root, this.strings, this.media, {
-            videoEnded: function () {
-                self.advanceMain();
+            videoEnded: function (item) {
+                if (self.isShowing(item)) {
+                    self.next();
+                }
             },
             mediaFailed: function (item) {
-                self.note('item ' + item.id + ': the file does not play');
+                if (!self.bad[item.id]) {
+                    self.note('item ' + item.id + ': the file does not play');
+                }
                 self.bad[item.id] = Date.now();
-                self.advanceMain();
+                if (self.isShowing(item)) {
+                    self.next();
+                }
             },
         });
         if (this.mode === 'screen') {
@@ -166,18 +173,6 @@ class Player {
         });
     }
 
-    durationOf(item) {
-        if (item.duration > 0) {
-            return item.duration;
-        }
-        if (item.type === 'video') {
-            // Until the video ends; the length, if known, only as a safety net.
-            const len = item.media && item.media.duration;
-            return len > 0 ? len + 5 : 600;
-        }
-        return DEFAULT_SECONDS[item.zone] || 10;
-    }
-
     mainList(wall) {
         const media = this.media;
         const bad = this.bad;
@@ -190,12 +185,114 @@ class Player {
         });
     }
 
-    advanceMain() {
+    isShowing(item) {
+        return this.screen.showing().some(function (s) {
+            return s.zone === 'main' && s.item === item.id;
+        });
+    }
+
+    // The menu of the day as one block: a page per menu when there are several, one more at each slide.
+    menuOf(menus) {
+        const pages = [];
+        const labels = this.manifest.labels || {};
+        const s = this.strings;
+        menus.forEach(function (item) {
+            const label = item.label || labels.menu || s.menu || '';
+            if (item.closed || !item.menus || !item.menus.length) {
+                pages.push({label, closed: item.title || s.closed || ''});
+            } else {
+                item.menus.forEach(function (menu) {
+                    pages.push({label, name: item.menus.length > 1 ? menu.name : '', courses: menu.courses || [],
+                        note: item.note || ''});
+                });
+            }
+        });
+        return pages.length ? pages[this.menuTurn % pages.length] : null;
+    }
+
+    /** What «Today» has now: the menu, the notices, today's events, the coming days and the weather. */
+    todayOf(wall) {
+        const items = this.manifest.items || [];
+        const side = items.filter(function (it) {
+            return it.zone === 'side' && isLive(it, wall);
+        });
+        const byOrder = function (a, b) {
+            return (a.order || 0) - (b.order || 0);
+        };
+        const byStart = function (a, b) {
+            return (a.start || '') < (b.start || '') ? -1 : (a.start || '') > (b.start || '') ? 1 : 0;
+        };
+        const notices = side.filter(function (it) {
+            return it.type === 'notice';
+        }).sort(function (a, b) {
+            // The important ones first.
+            return (b.tone === 'important') - (a.tone === 'important') || byOrder(a, b);
+        }).map(function (n) {
+            return {title: n.title || '', body: n.body || '', tone: n.tone || 'normal'};
+        });
+        const events = side.filter(function (it) {
+            return it.type === 'event';
+        }).sort(byStart).map(function (ev) {
+            const parts = splitTitle(ev.title);
+            return {time: ev.allday || !ev.start ? '·' : ev.start.slice(11, 16), title: parts.title,
+                group: parts.group || ev.detail || '', color: ev.color};
+        });
+        const menu = this.menuOf(side.filter(function (it) {
+            return it.type === 'menu';
+        }).sort(byOrder));
+        const all = items.filter(function (it) {
+            return it.type === 'event';
+        });
+        const labels = this.manifest.labels || {};
+        const names = {tomorrow: labels.tomorrow || this.strings.tomorrow, days_short: this.strings.days_short,
+            months_short: this.strings.months_short};
+        const big = countdown(all, wall.date, 14);
+        if (big) {
+            big.day = dayLabel(big.date, wall.date, names);
+        }
+        return {
+            menu,
+            notices,
+            events,
+            // The event of the countdown is not repeated among the coming days.
+            upcoming: upcoming(all.filter(function (ev) {
+                return !big || ev.id !== big.id;
+            }), wall.date, COMING_DAYS, names),
+            countdown: big,
+            weather: this.manifest.weather || null,
+        };
+    }
+
+    /** The next slide: the composition the rules choose, shown, and the one after it in its seconds. */
+    next() {
+        clearTimeout(this.timer);
         if (!this.manifest) {
             return;
         }
-        const r = this.rotator.advance(this.mainList(this.clock.wall()), this.clock.now());
-        this.screen.showMain(r.item);
+        if (this.reloadAt) {
+            location.reload();
+            return;
+        }
+        const m = this.manifest;
+        const wall = this.clock.wall();
+        const self = this;
+        if (!isPowerOn(m.power, wall)) {
+            this.timer = setTimeout(function () {
+                self.next();
+            }, 30000);
+            return;
+        }
+        const today = this.todayOf(wall);
+        const coming = today.upcoming.length || today.countdown ? 1 : 0;
+        const choice = this.composer.next(this.mainList(wall), countToday(today) + coming, this.screen.horizontal,
+            {menu: !!today.menu, noToday: m.template === 'full'});
+        this.menuTurn++;
+        this.screen.show(choice, today);
+        this.timer = setTimeout(function () {
+            self.next();
+        }, choice.seconds * 1000 + (choice.items.some(function (it) {
+            return it.type === 'video';
+        }) ? 5000 : 0));
     }
 
     tick() {
@@ -204,7 +301,6 @@ class Player {
         }
         const m = this.manifest;
         const wall = this.clock.wall();
-        const now = this.clock.now();
         const on = isPowerOn(m.power, wall);
         this.screen.setPower(on);
         if (!on) {
@@ -212,42 +308,16 @@ class Player {
         }
         this.screen.setDark(this.forcedTheme !== undefined ? this.forcedTheme : isDark(m.theme, wall));
         this.screen.setClock(this.clock.date());
-
-        const r = this.rotator.pick(this.mainList(wall), now);
-        if (this.reloadAt && (r.changed || Date.now() - this.reloadAt > 30000)) {
+        if (!this.screen.comp) {
+            this.next();
+        }
+        if (this.reloadAt && Date.now() - this.reloadAt > 30000) {
             location.reload();
             return;
         }
-        if (r.changed) {
-            this.screen.showMain(r.item);
-        }
-
-        const items = m.items || [];
-        const side = items.filter(function (it) {
-            return it.zone === 'side' && isLive(it, wall);
-        });
-        const byOrder = function (a, b) {
-            return (a.order || 0) - (b.order || 0);
-        };
-        const menus = side.filter(function (it) {
-            return it.type === 'menu';
-        }).sort(byOrder);
-        const notices = side.filter(function (it) {
-            return it.type === 'notice';
-        }).sort(function (a, b) {
-            // The important ones first.
-            return (b.tone === 'important') - (a.tone === 'important') || byOrder(a, b);
-        });
-        const events = side.filter(function (it) {
-            return it.type === 'event';
-        }).sort(function (a, b) {
-            return (a.start || '') < (b.start || '') ? -1 : (a.start || '') > (b.start || '') ? 1 : 0;
-        });
-        this.screen.showSide(menus, notices, events, now);
-        this.screen.showTicker(liveItems(items, 'ticker', wall).map(function (it) {
+        this.screen.showTicker(liveItems(m.items || [], 'ticker', wall).map(function (it) {
             return it.text;
         }).filter(Boolean));
-
         this.nightly(wall);
     }
 
