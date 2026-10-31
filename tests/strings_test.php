@@ -38,11 +38,30 @@ final class strings_test extends \advanced_testcase {
         $checked = 0;
         foreach ($files as $file) {
             $path = $file->getPathname();
-            if ($file->getExtension() !== 'php' || preg_match('#/(lang|tests|node_modules|vendor)/#', $path)) {
+            if (preg_match('#/(lang|tests|node_modules|vendor)/#', $path)) {
+                continue;
+            }
+            if ($file->getExtension() === 'mustache') {
+                // The strings of the templates: {{#str}}identifier, component{{/str}}.
+                preg_match_all(
+                    '/\\{\\{#str\\}\\}\\s*([a-z0-9_]+)\\s*,\\s*([a-z0-9_]+)/',
+                    file_get_contents($path),
+                    $calls,
+                    PREG_SET_ORDER
+                );
+                foreach ($calls as $call) {
+                    $checked++;
+                    if (!$manager->string_exists($call[1], $call[2])) {
+                        $missing[] = $call[1] . ' / ' . $call[2] . ' in ' . substr($path, strlen($root) + 1);
+                    }
+                }
+                continue;
+            }
+            if ($file->getExtension() !== 'php') {
                 continue;
             }
             preg_match_all(
-                "/get_string\(\s*'([^']+)'\s*(?:,\s*(?:'([^']+)'|(\\\$\w+)))?/",
+                "/get_string\(\s*'([^']+)'\s*(?:,\s*(?:'([^']+)'|(\\\$\w+|self::C)))?/",
                 file_get_contents($path),
                 $calls,
                 PREG_SET_ORDER

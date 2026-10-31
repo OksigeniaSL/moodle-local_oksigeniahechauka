@@ -1,0 +1,2474 @@
+/* Oksigenia Hechauka: the panel's own styles, what goes to the plugin's styles.css. The rest
+ * of the page is Moodle's: buttons (.btn-*), fields (.form-control, .form-select), switches (.form-switch), dialogs
+ * and menus come from the theme and are not restyled here. Everything is under .hkp, with tokens taken from the
+ * theme's variables: Bootstrap 5 in Moodle 5.x (--bs-*), Bootstrap 4 in Moodle 4.5 (--primary, --success…), and
+ * Boost's values as the last fallback. Light and dark follow <html data-bs-theme>.
+ *
+ * Its own look comes from what it handles: screens. Each screen is a small television (a bezel with its status light),
+ * the content on it is drawn with the screens' own pieces (the notice with its stripe, the time chip of an event, the
+ * ticker band), and «Cuándo» is said in words and shown on a two-week strip. Nothing of Oksigenia's and nothing of a
+ * school's: the panel wears the site's theme. Docs: DESIGN.md, next to this file. */
+
+.hkp {
+    /* stylelint-disable-next-line csstree/validator */
+    container: hkp / inline-size;
+    /* The theme's colours. */
+    --hkp-ink: var(--bs-body-color, #1d2125);
+    --hkp-muted: var(--bs-secondary-color, #555b61);
+    --hkp-page: var(--bs-body-bg, #f8f9fa);
+    --hkp-card: var(--bs-white, var(--white, #fff));
+    --hkp-sunk: var(--bs-tertiary-bg, #f8f9fa);
+    --hkp-line: var(--bs-border-color, #dee2e6);
+    --hkp-edge: color-mix(in srgb, var(--hkp-ink) 58%, var(--hkp-card));
+    --hkp-accent: var(--bs-primary, var(--primary, #0f6cbf));
+    --hkp-link: var(--bs-link-color, var(--primary, #0f6cbf));
+    --hkp-accent-edge: var(--hkp-accent);
+    --hkp-ok: var(--bs-success, var(--success, #357a32));
+    --hkp-warn: var(--bs-warning, var(--warning, #f0ad4e));
+    --hkp-bad: var(--bs-danger, var(--danger, #ca3120));
+    /* Text on a tint of each colour: darker in light mode, the theme's emphasis colour in dark mode. */
+    --hkp-accent-ink: color-mix(in srgb, var(--hkp-accent) 82%, #000);
+    --hkp-ok-ink: color-mix(in srgb, var(--hkp-ok) 78%, #000);
+    --hkp-warn-ink: var(--bs-warning-text-emphasis, #60451f);
+    --hkp-bad-ink: color-mix(in srgb, var(--hkp-bad) 84%, #000);
+    --hkp-ok-dot: var(--hkp-ok);
+    --hkp-bad-dot: var(--hkp-bad);
+    --hkp-warn-dot: color-mix(in srgb, var(--hkp-warn) 72%, #000);
+    --hkp-tint-p: 9%;
+    --hkp-line-p: 40%;
+    --hkp-accent-tint: color-mix(in srgb, var(--hkp-accent) var(--hkp-tint-p), var(--hkp-card));
+    --hkp-accent-line: color-mix(in srgb, var(--hkp-accent) var(--hkp-line-p), var(--hkp-card));
+    --hkp-ok-tint: color-mix(in srgb, var(--hkp-ok) var(--hkp-tint-p), var(--hkp-card));
+    --hkp-bad-tint: color-mix(in srgb, var(--hkp-bad) var(--hkp-tint-p), var(--hkp-card));
+    --hkp-bad-line: color-mix(in srgb, var(--hkp-bad) var(--hkp-line-p), var(--hkp-card));
+    --hkp-warn-tint: color-mix(in srgb, var(--hkp-warn) 16%, var(--hkp-card));
+    --hkp-chip: color-mix(in srgb, var(--hkp-ink) 5%, var(--hkp-card));
+    --hkp-wall: color-mix(in srgb, var(--hkp-ink) 5%, var(--hkp-page));
+    /* The things that are not the theme: a screen is a black object with a light on it, in both modes; the urgent
+     notice is the screens' own red. */
+    --hkp-bezel: #121417;
+    --hkp-bezel-edge: #30353b;
+    --hkp-led-on: #3ddc6f;
+    --hkp-led-off: #6c737b;
+    --hkp-led-down: #ff5a47;
+    --hkp-led-warn: #ffb21f;
+    --hkp-urgent: #9f1d16;
+    /* The four colours of the stages, from the plugin's settings (the defaults of the screens). */
+    --hkp-stage-0: var(--hkp-muted);
+    --hkp-stage-1: #1f5f8b;
+    --hkp-stage-2: #2f8a55;
+    --hkp-stage-3: #c9842a;
+    --hkp-stage-4: #b23a48;
+    /* Shape and depth. */
+    --hkp-radius: calc(var(--bs-border-radius-lg, .6rem) * 1.4);
+    --hkp-radius-sm: var(--bs-border-radius, .5rem);
+    --hkp-shadow: 0 1px 2px rgba(0, 0, 0, .05), 0 6px 18px -10px rgba(0, 0, 0, .18);
+    --hkp-ease: cubic-bezier(.2, .7, .2, 1);
+    color: var(--hkp-ink);
+}
+[data-bs-theme="dark"] .hkp {
+    --hkp-accent-ink: color-mix(in srgb, var(--bs-link-color, #6fa7d9) 72%, #fff);
+    --hkp-accent-edge: var(--bs-link-color, #6fa7d9);
+    --hkp-ok-ink: color-mix(in srgb, var(--bs-success-text-emphasis, #86af84) 72%, #fff);
+    --hkp-warn-ink: var(--bs-warning-text-emphasis, #f6ce95);
+    --hkp-bad-ink: color-mix(in srgb, var(--bs-danger-text-emphasis, #df8379) 75%, #fff);
+    --hkp-ok-dot: var(--bs-success-text-emphasis, #86af84);
+    --hkp-bad-dot: var(--bs-danger-text-emphasis, #df8379);
+    --hkp-warn-dot: var(--hkp-warn);
+    --hkp-tint-p: 16%;
+    --hkp-line-p: 55%;
+    --hkp-warn-tint: color-mix(in srgb, var(--hkp-warn) 18%, var(--hkp-card));
+    --hkp-chip: color-mix(in srgb, var(--hkp-ink) 9%, var(--hkp-card));
+    --hkp-wall: color-mix(in srgb, #000 22%, var(--hkp-page));
+    --hkp-bezel: #0b0c0e;
+    --hkp-bezel-edge: #50565d;
+    --hkp-stage-1: #6aa6d6;
+    --hkp-stage-2: #6cc79a;
+    --hkp-stage-3: #f0b452;
+    --hkp-stage-4: #f08a96;
+    --hkp-shadow: none;
+}
+.hkp *,
+.hkp *::before,
+.hkp *::after {
+    box-sizing: border-box;
+}
+.hkp svg.hkp-i {
+    width: 1.15em;
+    height: 1.15em;
+    flex: none;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    vertical-align: -.2em;
+}
+.hkp :focus-visible {
+    outline: 3px solid var(--bs-focus-ring-color, rgba(15, 108, 191, .75));
+    outline-offset: 2px;
+}
+.hkp a:not(.btn) {
+    color: var(--hkp-link);
+}
+/* The stage of an event, from the site's settings: its colour marks, it never carries text (any colour can be chosen). */
+.hkp [data-stage="0"] {
+    --hkp-ev: var(--hkp-stage-0);
+}
+.hkp [data-stage="1"] {
+    --hkp-ev: var(--hkp-stage-1);
+}
+.hkp [data-stage="2"] {
+    --hkp-ev: var(--hkp-stage-2);
+}
+.hkp [data-stage="3"] {
+    --hkp-ev: var(--hkp-stage-3);
+}
+.hkp [data-stage="4"] {
+    --hkp-ev: var(--hkp-stage-4);
+}
+.hkp .tnum,
+.hkp time {
+    font-variant-numeric: tabular-nums;
+}
+
+/* --- The page header: the title, the sample label and the one main action -------------------------------------- */
+.hkp-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: .75rem 1.5rem;
+    margin: 0 0 1rem;
+}
+.hkp-head-title {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .4rem .9rem;
+    min-width: 0;
+}
+.hkp-head h1 {
+    font-size: 2rem;
+    letter-spacing: -.01em;
+    /* stylelint-disable-next-line csstree/validator */
+    text-wrap: balance;
+}
+.hkp-head-sub {
+    flex-basis: 100%;
+    color: var(--hkp-muted);
+}
+.hkp-head-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+}
+.hkp-sample {
+    display: inline-flex;
+    align-items: center;
+    padding: .1rem .6rem;
+    border: 1px dashed var(--hkp-edge);
+    border-radius: 999px;
+    color: var(--hkp-muted);
+    font-size: .8125rem;
+    font-weight: 600;
+}
+.hkp-back {
+    display: inline-flex;
+    align-items: center;
+    gap: .3rem;
+    margin: 0 0 .5rem;
+    color: var(--hkp-link);
+    font-weight: 500;
+    text-decoration: none;
+}
+.hkp-back:hover {
+    text-decoration: underline;
+}
+
+/* The sections of the panel, for whoever has more than one: a row of tabs as Moodle's tertiary navigation. */
+.hkp-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .25rem;
+    margin: 0 0 1.25rem;
+    padding: 0 0 .5rem;
+    border-bottom: 1px solid var(--hkp-line);
+}
+.hkp-tabs a {
+    display: inline-flex;
+    align-items: center;
+    gap: .45rem;
+    min-height: 2.5rem;
+    padding: .3rem .9rem;
+    border-radius: var(--hkp-radius-sm);
+    color: var(--hkp-ink);
+    font-weight: 500;
+    text-decoration: none;
+}
+.hkp-tabs a:hover {
+    background: var(--hkp-chip);
+}
+.hkp-tabs a[aria-current="page"] {
+    background: var(--hkp-accent-tint);
+    color: var(--hkp-accent-ink);
+    font-weight: 700;
+    box-shadow: inset 0 -3px 0 var(--hkp-accent);
+}
+
+/* --- How the screens are: one line when all is well, a box when one needs someone -------------------------------- */
+.hkp-health {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .5rem 1rem;
+    margin: 0 0 1rem;
+    color: var(--hkp-muted);
+}
+.hkp-health b {
+    color: var(--hkp-ink);
+}
+.hkp-health[data-state="down"] {
+    padding: .75rem 1rem;
+    border: 1px solid var(--hkp-bad-line);
+    border-radius: var(--hkp-radius);
+    background: var(--hkp-bad-tint);
+    color: var(--hkp-ink);
+}
+.hkp-health[data-state="down"] .hkp-health-icon {
+    color: var(--hkp-bad-ink);
+}
+.hkp-health p {
+    flex: 1 1 18rem;
+    min-width: 0;
+}
+.hkp-health-icon {
+    display: inline-grid;
+    place-items: center;
+    flex: none;
+}
+.hkp-health-icon .hkp-i {
+    width: 1.5rem;
+    height: 1.5rem;
+}
+
+/* The urgent notice that is on: the screens' red, with its way off always in reach. */
+.hkp-urgent-on {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .75rem 1.25rem;
+    margin: 0 0 1rem;
+    padding: 1rem 1.25rem;
+    border-radius: var(--hkp-radius);
+    background: var(--hkp-urgent);
+    color: #fff;
+    position: relative;
+    overflow: hidden;
+}
+.hkp-urgent-on::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 6px;
+    background: repeating-linear-gradient(-45deg, #fff 0 6px, transparent 6px 12px);
+    opacity: .85;
+}
+.hkp-urgent-on .hkp-i {
+    width: 1.9rem;
+    height: 1.9rem;
+}
+.hkp-urgent-on div {
+    flex: 1 1 16rem;
+    min-width: 0;
+}
+.hkp-urgent-on .k {
+    font-size: .875rem;
+    font-weight: 600;
+}
+.hkp-urgent-on .t {
+    font-size: 1.35rem;
+    font-weight: 800;
+    line-height: 1.2;
+}
+.hkp-urgent-on .btn {
+    background: #fff;
+    border-color: #fff;
+    color: #7a150f;
+    font-weight: 700;
+}
+.hkp-urgent-on .btn:hover {
+    background: #ffe3e0;
+}
+
+/* --- The wall: what each screen shows now ------------------------------------------------------------------------- */
+.hkp-sec-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .5rem 1rem;
+    margin: 0 0 .75rem;
+}
+.hkp-sec-head h2 {
+    font-size: 1.3rem;
+}
+.hkp-sec-head .hkp-sec-tools {
+    margin-left: auto;
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+    align-items: center;
+}
+.hkp-count {
+    display: inline-grid;
+    place-items: center;
+    min-width: 1.6em;
+    height: 1.6em;
+    padding: 0 .4em;
+    border-radius: 999px;
+    background: var(--hkp-chip);
+    color: var(--hkp-ink);
+    font-size: .8125rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+.hkp-wall {
+    display: grid;
+    /* stylelint-disable-next-line csstree/validator */
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));
+    gap: 1rem;
+    margin: 0 0 2rem;
+    padding: 0;
+    list-style: none;
+}
+.hkp-screen {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    border: 1px solid var(--hkp-line);
+    border-radius: var(--hkp-radius);
+    background: var(--hkp-card);
+    box-shadow: var(--hkp-shadow);
+    overflow: hidden;
+    transition: transform .2s var(--hkp-ease), border-color .2s;
+}
+.hkp-screen:hover {
+    border-color: var(--hkp-edge);
+    transform: translateY(-2px);
+}
+.hkp-screen[data-state="down"] {
+    border-color: var(--hkp-bad-line);
+}
+/* The slot: a piece of wall the screen hangs on. Every slot is 16:9, so a vertical screen keeps the row even. */
+.hkp-slot {
+    position: relative;
+    display: grid;
+    place-items: center;
+    aspect-ratio: 16 / 9;
+    padding: .7rem .8rem .9rem;
+    background: var(--hkp-wall);
+}
+.hkp-slot > .hkp-bezel.is-v {
+    position: absolute;
+    top: .7rem;
+    bottom: .9rem;
+    left: 50%;
+    height: auto;
+    transform: translateX(-50%);
+}
+.hkp-bezel {
+    position: relative;
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    padding: 4px 4px 9px;
+    border-radius: .55rem;
+    background: var(--hkp-bezel);
+    box-shadow: 0 0 0 1px var(--hkp-bezel-edge), 0 8px 16px -10px rgba(0, 0, 0, .55);
+}
+.hkp-bezel.is-v {
+    width: auto;
+    height: 100%;
+    aspect-ratio: 9 / 16;
+    padding: 4px 4px 9px;
+}
+.hkp-bezel > img,
+.hkp-bezel > iframe,
+.hkp-bezel > .hkp-bezel-off {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    border-radius: 3px;
+    object-fit: cover;
+    background: #000;
+}
+/* The status light on the frame: on (green), off by schedule (grey), no signal (red), a warning (amber). */
+.hkp-led {
+    position: absolute;
+    left: 50%;
+    bottom: 2px;
+    width: 5px;
+    height: 5px;
+    margin-left: -2.5px;
+    border-radius: 50%;
+    background: var(--hkp-led-on);
+    box-shadow: 0 0 6px 1px color-mix(in srgb, var(--hkp-led-on) 70%, transparent);
+}
+[data-state="off"] .hkp-led {
+    background: var(--hkp-led-off);
+    box-shadow: none;
+}
+[data-state="down"] .hkp-led {
+    background: var(--hkp-led-down);
+    box-shadow: 0 0 6px 1px color-mix(in srgb, var(--hkp-led-down) 70%, transparent);
+}
+[data-state="warn"] .hkp-led {
+    background: var(--hkp-led-warn);
+    box-shadow: 0 0 6px 1px color-mix(in srgb, var(--hkp-led-warn) 70%, transparent);
+}
+[data-state="new"] .hkp-led {
+    background: transparent;
+    box-shadow: inset 0 0 0 1px var(--hkp-led-off);
+}
+/* Off: the last picture, dimmed, with the moon. No signal: the last picture without colour and the time of it. */
+.hkp-bezel[data-state="off"] > img {
+    filter: brightness(.38) saturate(.6);
+}
+.hkp-bezel[data-state="down"] > img {
+    filter: grayscale(1) brightness(.55);
+}
+.hkp-over {
+    position: absolute;
+    inset: 4px 4px 9px;
+    display: grid;
+    place-items: center;
+    padding: .3rem;
+}
+.hkp-over > span {
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+    padding: .2rem .6rem;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, .72);
+    color: #fff;
+    font-size: .8125rem;
+    font-weight: 600;
+    line-height: 1.3;
+    text-align: center;
+}
+.hkp-over .hkp-i {
+    width: 1rem;
+    height: 1rem;
+}
+.hkp-screen-body {
+    display: grid;
+    gap: .2rem;
+    padding: .7rem .9rem .3rem;
+    min-width: 0;
+}
+.hkp-screen h3 {
+    font-size: 1.05rem;
+}
+.hkp-screen h3 a {
+    color: var(--hkp-ink);
+    text-decoration: none;
+}
+.hkp-screen h3 a:hover {
+    text-decoration: underline;
+}
+/* A link that covers the card, for whoever opens a screen's sheet; the buttons stay above it. */
+.hkp-screen h3 a::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+}
+.hkp-screen-actions {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-wrap: wrap;
+    gap: .35rem;
+    margin-top: auto;
+    padding: .4rem .7rem .75rem;
+}
+.hkp-now {
+    overflow: hidden;
+    color: var(--hkp-muted);
+    font-size: .875rem;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+.hkp-now b {
+    color: var(--hkp-ink);
+    font-weight: 600;
+}
+
+/* The state: a dot shaped by the state (full, hollow, crossed), a word and, when it helps, since when. */
+.hkp-state {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .1rem .45rem;
+    font-size: .875rem;
+    font-weight: 600;
+}
+.hkp-state .hkp-meta {
+    color: var(--hkp-muted);
+    font-weight: 400;
+}
+.hkp-dot {
+    position: relative;
+    flex: none;
+    width: .7rem;
+    height: .7rem;
+    border-radius: 50%;
+    background: var(--hkp-ok-dot);
+}
+.hkp-state[data-state="on"] {
+    color: var(--hkp-ok-ink);
+}
+.hkp-state[data-state="off"] {
+    color: var(--hkp-muted);
+}
+.hkp-state[data-state="off"] .hkp-dot {
+    background: transparent;
+    border: 2px solid var(--hkp-edge);
+}
+.hkp-state[data-state="down"] {
+    color: var(--hkp-bad-ink);
+}
+.hkp-state[data-state="down"] .hkp-dot {
+    background: var(--hkp-bad-dot);
+}
+.hkp-state[data-state="down"] .hkp-dot::after {
+    content: "";
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    border: 2px solid var(--hkp-bad);
+    opacity: 0;
+    animation: hkp-ping 1.6s var(--hkp-ease) 2;
+}
+.hkp-state[data-state="down"] .hkp-dot::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 18%;
+    bottom: 18%;
+    width: 2px;
+    margin-left: -1px;
+    background: var(--hkp-card);
+    transform: rotate(45deg);
+}
+.hkp-state[data-state="warn"] {
+    color: var(--hkp-warn-ink);
+}
+.hkp-state[data-state="warn"] .hkp-dot {
+    background: var(--hkp-warn-dot);
+    border-radius: 2px;
+    transform: rotate(45deg) scale(.85);
+}
+.hkp-state[data-state="new"] {
+    color: var(--hkp-muted);
+}
+.hkp-state[data-state="new"] .hkp-dot {
+    background: transparent;
+    border: 2px dashed var(--hkp-edge);
+}
+
+@keyframes hkp-ping {
+    0% {
+        opacity: .9;
+        transform: scale(.6);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(1.6);
+    }
+}
+
+/* The card that adds a screen, at the end of the wall. */
+.hkp-screen.is-add {
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: .5rem;
+    min-height: 14rem;
+    padding: 1.25rem;
+    border: 2px dashed var(--hkp-edge);
+    background: transparent;
+    box-shadow: none;
+    text-align: center;
+    color: var(--hkp-ink);
+    cursor: pointer;
+}
+.hkp-screen.is-add:hover {
+    border-color: var(--hkp-accent);
+    background: var(--hkp-accent-tint);
+}
+.hkp-screen.is-add .hkp-i {
+    width: 2.2rem;
+    height: 2.2rem;
+    color: var(--hkp-accent-ink);
+}
+.hkp-screen.is-add b {
+    font-size: 1.05rem;
+}
+.hkp-screen.is-add span {
+    color: var(--hkp-muted);
+    font-size: .875rem;
+}
+
+/* --- What is on the screens: three groups, a row each ---------------------------------------------------------------- */
+.hkp-content {
+    margin: 0 0 2rem;
+}
+.hkp-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .4rem;
+}
+.hkp-group-title {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    margin: 1.25rem 0 .6rem;
+    font-size: 1rem;
+    font-weight: 700;
+}
+.hkp-onair {
+    width: .6rem;
+    height: .6rem;
+    border-radius: 50%;
+    background: var(--hkp-bad);
+    box-shadow: 0 0 0 3px var(--hkp-bad-tint);
+}
+.hkp-items {
+    display: grid;
+    gap: .5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+.hkp-item {
+    display: grid;
+    grid-template-columns: 6rem minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, .9fr) auto;
+    align-items: center;
+    gap: .5rem 1.1rem;
+    padding: .6rem .75rem .6rem .6rem;
+    border: 1px solid var(--hkp-line);
+    border-radius: var(--hkp-radius);
+    background: var(--hkp-card);
+}
+.hkp-item:hover {
+    border-color: var(--hkp-edge);
+}
+.hkp-item-main {
+    min-width: 0;
+}
+.hkp-item-title {
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.3;
+    overflow-wrap: anywhere;
+}
+.hkp-item-title a {
+    color: var(--hkp-ink);
+    text-decoration: none;
+}
+.hkp-item-title a:hover {
+    text-decoration: underline;
+}
+.hkp-item-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .15rem .6rem;
+    margin-top: .15rem;
+    color: var(--hkp-muted);
+    font-size: .875rem;
+}
+.hkp-type {
+    display: inline-flex;
+    align-items: center;
+    gap: .3rem;
+}
+.hkp-flag {
+    display: inline-flex;
+    align-items: center;
+    gap: .25rem;
+    padding: 0 .45rem;
+    border-radius: 999px;
+    background: var(--hkp-warn-tint);
+    color: var(--hkp-warn-ink);
+    font-weight: 700;
+    font-size: .8125rem;
+}
+.hkp-item-when,
+.hkp-item-where {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 0 .45rem;
+    align-items: start;
+    font-size: .9375rem;
+    min-width: 0;
+}
+.hkp-item-when .hkp-i,
+.hkp-item-where .hkp-i {
+    margin-top: .2rem;
+    color: var(--hkp-muted);
+}
+.hkp-item-when b {
+    font-weight: 600;
+}
+.hkp-item-when small,
+.hkp-item-where small {
+    grid-column: 2;
+    color: var(--hkp-muted);
+    font-size: .8125rem;
+}
+.hkp-item-when small.is-soon {
+    color: var(--hkp-warn-ink);
+    font-weight: 600;
+}
+.hkp-item-actions {
+    display: flex;
+    gap: .35rem;
+    justify-content: flex-end;
+}
+.hkp-done {
+    margin-top: 1.25rem;
+}
+.hkp-done > summary {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    min-height: 2.5rem;
+    padding: .25rem .5rem .25rem 0;
+    font-weight: 700;
+    cursor: pointer;
+    list-style: none;
+}
+.hkp-done > summary::-webkit-details-marker {
+    display: none;
+}
+.hkp-done > summary .hkp-i {
+    transition: transform .2s var(--hkp-ease);
+}
+.hkp-done[open] > summary .hkp-i {
+    transform: rotate(90deg);
+}
+.hkp-done .hkp-item {
+    opacity: .82;
+}
+.hkp-done .hkp-thumb {
+    filter: grayscale(.7);
+}
+
+/* The thumbnail of each kind: the photo itself, or the piece of the screen it becomes (drawn, not written). */
+.hkp-thumb {
+    position: relative;
+    display: block;
+    width: 6rem;
+    aspect-ratio: 16 / 9;
+    border-radius: .4rem;
+    overflow: hidden;
+    background: var(--hkp-sunk);
+    box-shadow: inset 0 0 0 1px var(--hkp-line);
+}
+.hkp-thumb img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.hkp-thumb.is-v {
+    background: #15181c;
+}
+.hkp-thumb.is-v img {
+    object-fit: contain;
+}
+.hkp-thumb .hkp-play {
+    position: absolute;
+    left: .3rem;
+    bottom: .3rem;
+    display: inline-flex;
+    align-items: center;
+    gap: .15rem;
+    padding: 0 .3rem;
+    border-radius: .3rem;
+    background: rgba(0, 0, 0, .72);
+    color: #fff;
+    font-size: .75rem;
+    font-weight: 700;
+    line-height: 1.4;
+}
+.hkp-thumb .hkp-play svg {
+    width: .6rem;
+    height: .6rem;
+    fill: #fff;
+}
+.hkp-thumb[data-type="notice"] {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: .3rem;
+    padding: .45rem .55rem .45rem .8rem;
+    background: var(--hkp-card);
+}
+.hkp-thumb[data-type="notice"]::before {
+    content: "";
+    position: absolute;
+    left: .4rem;
+    top: .45rem;
+    bottom: .45rem;
+    width: 3px;
+    border-radius: 2px;
+    background: #e8a33a;
+}
+.hkp-thumb i {
+    display: block;
+    height: .32rem;
+    border-radius: 1px;
+    background: color-mix(in srgb, var(--hkp-ink) 70%, transparent);
+}
+.hkp-thumb i + i {
+    width: 62%;
+    height: .22rem;
+    background: color-mix(in srgb, var(--hkp-ink) 32%, transparent);
+}
+.hkp-thumb[data-type="notice"].is-important i:first-child {
+    background: #b5711a;
+}
+[data-bs-theme="dark"] .hkp-thumb[data-type="notice"].is-important i:first-child {
+    background: #f0b452;
+}
+.hkp-thumb[data-type="event"] {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: 0 .45rem;
+    padding: .35rem .5rem;
+    background: var(--hkp-card);
+}
+.hkp-thumb[data-type="event"] b {
+    grid-row: span 2;
+    display: grid;
+    place-items: center;
+    min-width: 2.1rem;
+    padding: .1rem .25rem;
+    border-radius: .3rem;
+    background: color-mix(in srgb, var(--hkp-ev, var(--hkp-stage-0)) 16%, var(--hkp-card));
+    color: var(--hkp-ink);
+    box-shadow: inset 0 3px 0 var(--hkp-ev, var(--hkp-stage-0));
+    font-size: .75rem;
+    font-weight: 800;
+    line-height: 1.2;
+    text-align: center;
+}
+.hkp-thumb[data-type="event"] i {
+    width: 100%;
+}
+.hkp-thumb[data-type="ticker"] {
+    background: var(--hkp-card);
+}
+.hkp-thumb[data-type="ticker"] span {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    gap: .35rem;
+    height: 42%;
+    padding: 0 .35rem 0 0;
+    background: #1f5f8b;
+}
+.hkp-thumb[data-type="ticker"] span::before {
+    content: "";
+    align-self: stretch;
+    width: 1.2rem;
+    background: #e8a33a;
+}
+.hkp-thumb[data-type="ticker"] span i {
+    flex: 1;
+    height: .22rem;
+    background: rgba(255, 255, 255, .85);
+}
+.hkp-thumb[data-type="ticker"] span i + i {
+    flex: .6;
+    width: auto;
+}
+.hkp-thumb[data-type="ticker"]::before {
+    content: "";
+    position: absolute;
+    left: .45rem;
+    right: .45rem;
+    top: .45rem;
+    height: 34%;
+    border-radius: .2rem;
+    background: color-mix(in srgb, var(--hkp-ink) 10%, transparent);
+}
+.hkp-thumb[data-type="agenda"] {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    align-content: center;
+    gap: .18rem;
+    padding: .4rem .55rem;
+    background: var(--hkp-card);
+}
+.hkp-thumb[data-type="agenda"] u {
+    display: block;
+    height: .38rem;
+    border-radius: 1px;
+    background: color-mix(in srgb, var(--hkp-ink) 12%, transparent);
+}
+.hkp-thumb[data-type="agenda"] u.s1 {
+    background: var(--hkp-stage-1);
+}
+.hkp-thumb[data-type="agenda"] u.s2 {
+    background: var(--hkp-stage-2);
+}
+.hkp-thumb[data-type="agenda"] u.s3 {
+    background: var(--hkp-stage-3);
+}
+.hkp-thumb[data-type="agenda"] u.s4 {
+    background: var(--hkp-stage-4);
+}
+
+/* Chips: toggles (aria-pressed) and choices (a radio inside a label); the chosen one with a tick, not only colour. */
+.hkp-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .45rem;
+}
+.hkp-chip {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    min-height: 2.5rem;
+    padding: .3rem .85rem;
+    border: 1px solid var(--hkp-edge);
+    border-radius: 999px;
+    background: var(--hkp-card);
+    color: var(--hkp-ink);
+    font-weight: 500;
+    line-height: 1.25;
+    cursor: pointer;
+    user-select: none;
+    touch-action: manipulation;
+    transition: background-color .15s, border-color .15s;
+}
+.hkp-chip:hover {
+    border-color: var(--hkp-accent-edge);
+    background: var(--hkp-accent-tint);
+}
+.hkp-chip input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+.hkp-chip:has(input:focus-visible) {
+    outline: 3px solid var(--bs-focus-ring-color, rgba(15, 108, 191, .75));
+    outline-offset: 2px;
+}
+.hkp-chip[aria-pressed="true"],
+.hkp-chip:has(input:checked) {
+    border-color: var(--hkp-accent-edge);
+    background: var(--hkp-accent-tint);
+    color: var(--hkp-accent-ink);
+    font-weight: 700;
+    box-shadow: inset 0 0 0 1px var(--hkp-accent-edge);
+}
+.hkp-chip[aria-pressed="true"]::before,
+.hkp-chip:has(input:checked)::before {
+    content: "";
+    width: .8em;
+    height: .45em;
+    margin: -.2em .05em 0 -.15em;
+    border-left: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
+    transform: rotate(-45deg);
+}
+.hkp-chip small {
+    color: var(--hkp-muted);
+    font-weight: 600;
+    font-size: .8125rem;
+}
+.hkp-chip[aria-pressed="true"] small,
+.hkp-chip:has(input:checked) small {
+    color: inherit;
+}
+.hkp-chip.is-small {
+    min-height: 2.25rem;
+    padding: .2rem .7rem;
+    font-size: .875rem;
+}
+.hkp-chip[aria-disabled="true"] {
+    opacity: .55;
+    cursor: default;
+}
+
+/* Segmented: two to four choices joined (De todos / Lo mío; Vista previa / Lo que enseña de verdad). */
+.hkp-seg {
+    display: inline-flex;
+    padding: 3px;
+    border: 1px solid var(--hkp-line);
+    border-radius: 999px;
+    background: var(--hkp-sunk);
+}
+.hkp-seg button {
+    min-height: 2.25rem;
+    padding: .2rem .85rem;
+    border: 0;
+    border-radius: 999px;
+    background: none;
+    color: var(--hkp-ink);
+    font-weight: 500;
+    cursor: pointer;
+}
+.hkp-seg button[aria-pressed="true"] {
+    background: var(--hkp-card);
+    color: var(--hkp-accent-ink);
+    font-weight: 700;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, .12), inset 0 0 0 1px var(--hkp-accent-line);
+}
+
+/* --- Adding: the form on the left, the screen on the right ---------------------------------------------------------- */
+.hkp-compose {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(22rem, .95fr);
+    grid-template-areas: "types preview" "what preview" "when preview" "where preview" "foot preview";
+    gap: 1.25rem 2rem;
+    align-items: start;
+}
+.hkp-compose > .hkp-types {
+    grid-area: types;
+}
+.hkp-compose > .hkp-what {
+    grid-area: what;
+}
+.hkp-compose > .hkp-when {
+    grid-area: when;
+}
+.hkp-compose > .hkp-where {
+    grid-area: where;
+}
+.hkp-compose > .hkp-foot {
+    grid-area: foot;
+}
+.hkp-compose > .hkp-preview {
+    grid-area: preview;
+    position: sticky;
+    top: calc(61px + 1rem);
+}
+.hkp-types {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(5.5rem, 1fr));
+    gap: .3rem;
+    padding: .3rem;
+    border: 1px solid var(--hkp-line);
+    border-radius: calc(var(--hkp-radius) + .2rem);
+    background: var(--hkp-sunk);
+}
+.hkp-types label {
+    position: relative;
+    display: grid;
+}
+.hkp-types input {
+    position: absolute;
+    opacity: 0;
+}
+.hkp-types span {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: .25rem;
+    min-height: 4rem;
+    padding: .45rem .5rem;
+    border-radius: var(--hkp-radius);
+    color: var(--hkp-ink);
+    font-size: .9375rem;
+    font-weight: 600;
+    line-height: 1.2;
+    text-align: center;
+    cursor: pointer;
+}
+.hkp-types span .hkp-i {
+    width: 1.4rem;
+    height: 1.4rem;
+}
+.hkp-types span:hover {
+    background: var(--hkp-chip);
+}
+.hkp-types input:checked + span {
+    background: var(--hkp-card);
+    color: var(--hkp-accent-ink);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, .12), inset 0 0 0 1px var(--hkp-accent-line);
+}
+.hkp-types input:focus-visible + span {
+    outline: 3px solid var(--bs-focus-ring-color, rgba(15, 108, 191, .75));
+    outline-offset: 2px;
+}
+.hkp-fs {
+    min-width: 0;
+    margin: 0;
+    padding: 1.1rem 1.25rem 1.25rem;
+    border: 1px solid var(--hkp-line);
+    border-radius: var(--hkp-radius);
+    background: var(--hkp-card);
+}
+.hkp-fs > legend {
+    float: left;
+    width: 100%;
+    margin: 0 0 .75rem;
+    padding: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+.hkp-fs > legend + * {
+    clear: left;
+}
+.hkp-field + .hkp-field {
+    margin-top: 1rem;
+}
+.hkp-field .form-control.is-big {
+    min-height: 3rem;
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+.hkp-hint {
+    margin-top: .35rem;
+    color: var(--hkp-muted);
+    font-size: .875rem;
+}
+.hkp-hint.is-warn {
+    color: var(--hkp-warn-ink);
+    font-weight: 600;
+}
+.hkp-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .75rem 1rem;
+    align-items: end;
+}
+.hkp-row > .hkp-field {
+    margin: 0;
+    flex: 1 1 10rem;
+}
+.hkp-switch {
+    margin-top: 1rem;
+    padding: .75rem .9rem;
+    border-radius: var(--hkp-radius-sm);
+    background: var(--hkp-sunk);
+}
+.hkp-switch label {
+    font-weight: 600;
+    cursor: pointer;
+}
+.hkp-switch p {
+    color: var(--hkp-muted);
+    font-size: .875rem;
+}
+.hkp-drop {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: .9rem;
+    padding: .75rem;
+    border: 2px dashed var(--hkp-edge);
+    border-radius: var(--hkp-radius);
+    background: var(--hkp-sunk);
+}
+.hkp-drop .hkp-thumb {
+    width: 8.5rem;
+}
+.hkp-drop b {
+    display: block;
+    overflow-wrap: anywhere;
+}
+.hkp-drop span {
+    color: var(--hkp-muted);
+    font-size: .875rem;
+}
+.hkp-stages {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .45rem;
+}
+.hkp-stages .hkp-chip i {
+    width: .8rem;
+    height: .8rem;
+    border-radius: 3px;
+    background: var(--hkp-ev);
+}
+.hkp-foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .6rem;
+    padding: .25rem 0;
+}
+/* The form's buttons stay in sight while the form is: the next step never needs scrolling to. */
+.hkp-compose > .hkp-foot {
+    position: sticky;
+    bottom: 0;
+    z-index: 5;
+    padding: .75rem;
+    border: 1px solid var(--hkp-line);
+    border-radius: var(--hkp-radius);
+    background: var(--hkp-card);
+    box-shadow: 0 -8px 20px -14px rgba(0, 0, 0, .35);
+}
+.hkp-foot .hkp-hint {
+    flex-basis: 100%;
+    margin: 0;
+}
+
+/* «Cuándo»: the shortcuts, the sentence it makes and the two weeks it covers. */
+.hkp-sentence {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: .35rem .75rem;
+    align-items: start;
+    margin-top: .9rem;
+    padding: .85rem 1rem;
+    border-radius: var(--hkp-radius-sm);
+    background: var(--hkp-accent-tint);
+    border: 1px solid var(--hkp-accent-line);
+}
+.hkp-sentence > .hkp-i {
+    width: 1.4rem;
+    height: 1.4rem;
+    color: var(--hkp-accent-ink);
+    margin-top: .1rem;
+}
+.hkp-sentence p {
+    font-size: 1.05rem;
+    font-weight: 600;
+    line-height: 1.4;
+}
+.hkp-strip {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr)) .6rem repeat(7, minmax(0, 1fr));
+    gap: .25rem;
+    margin-top: .3rem;
+}
+.hkp-strip span {
+    display: grid;
+    justify-items: center;
+    padding: .2rem 0 .25rem;
+    border-radius: .4rem;
+    background: var(--hkp-card);
+    color: var(--hkp-muted);
+    font-size: .8125rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.2;
+}
+.hkp-strip span small {
+    font-size: .75rem;
+    font-weight: 500;
+}
+.hkp-strip span.is-on {
+    background: var(--hkp-accent);
+    color: #fff;
+}
+.hkp-strip span.is-today {
+    box-shadow: inset 0 0 0 2px var(--hkp-ink);
+}
+.hkp-strip span.is-on.is-today {
+    box-shadow: inset 0 0 0 2px var(--hkp-card), 0 0 0 2px var(--hkp-accent);
+}
+.hkp-strip span.is-weekend:not(.is-on) {
+    background: transparent;
+}
+.hkp-strip b {
+    display: block;
+}
+.hkp-strip-more {
+    grid-column: 1 / -1;
+    color: var(--hkp-muted);
+    font-size: .8125rem;
+}
+.hkp-fine {
+    margin-top: .9rem;
+    border-top: 1px solid var(--hkp-line);
+    padding-top: .5rem;
+}
+.hkp-fine > summary {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    min-height: 2.5rem;
+    color: var(--hkp-link);
+    font-weight: 600;
+    cursor: pointer;
+    list-style: none;
+}
+.hkp-fine > summary::-webkit-details-marker {
+    display: none;
+}
+.hkp-fine[open] > summary .hkp-i {
+    transform: rotate(90deg);
+}
+.hkp-fine-body {
+    display: grid;
+    gap: 1rem;
+    padding: .5rem 0 .25rem;
+}
+.hkp-days {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .35rem;
+}
+.hkp-days button {
+    width: 2.75rem;
+    height: 2.75rem;
+    border: 1px solid var(--hkp-edge);
+    border-radius: 50%;
+    background: var(--hkp-card);
+    color: var(--hkp-ink);
+    font-weight: 700;
+    cursor: pointer;
+}
+.hkp-days button[aria-pressed="true"] {
+    background: var(--hkp-accent);
+    border-color: var(--hkp-accent-edge);
+    color: #fff;
+}
+.hkp-time {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+}
+.hkp-time .form-control {
+    width: 7.5rem;
+}
+
+/* --- The preview pane: the screen as it will look, always beside the form ---------------------------------------- */
+.hkp-preview {
+    display: grid;
+    gap: .75rem;
+    padding: 1rem;
+    border: 1px solid var(--hkp-line);
+    border-radius: calc(var(--hkp-radius) + .2rem);
+    background: var(--hkp-card);
+    box-shadow: var(--hkp-shadow);
+}
+.hkp-preview-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: .4rem .75rem;
+}
+.hkp-preview-head h2 {
+    font-size: 1.1rem;
+}
+.hkp-clock {
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+    color: var(--hkp-muted);
+    font-size: .875rem;
+    font-weight: 600;
+}
+.hkp-stage {
+    display: grid;
+    place-items: center;
+    padding: 1rem;
+    border-radius: var(--hkp-radius);
+    background: var(--hkp-wall);
+}
+.hkp-stage .hkp-bezel {
+    padding: 6px 6px 14px;
+    border-radius: .7rem;
+}
+.hkp-stage .hkp-bezel .hkp-led {
+    width: 6px;
+    height: 6px;
+    bottom: 4px;
+    margin-left: -3px;
+}
+.hkp-stage .hkp-bezel.is-v {
+    /* stylelint-disable-next-line csstree/validator */
+    height: min(30rem, 62vh);
+}
+.hkp-preview-note {
+    color: var(--hkp-muted);
+    font-size: .875rem;
+}
+.hkp-preview-note b {
+    color: var(--hkp-ink);
+    font-weight: 600;
+}
+.hkp-preview-tools {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* --- Dialogs: the urgent notice, the preview of a screen, a new screen ------------------------------------------- */
+.hkp-dialog {
+    /* stylelint-disable-next-line csstree/validator */
+    width: min(100%, 60rem);
+    border-radius: calc(var(--hkp-radius) + .2rem);
+    background: var(--hkp-card);
+    color: var(--hkp-ink);
+    box-shadow: 0 1.5rem 3rem rgba(0, 0, 0, .35);
+    overflow: hidden;
+}
+.hkp-dialog.is-narrow {
+    /* stylelint-disable-next-line csstree/validator */
+    width: min(100%, 36rem);
+}
+.hkp-dialog > header {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--hkp-line);
+}
+.hkp-dialog > header h2 {
+    flex: 1;
+    font-size: 1.3rem;
+}
+.hkp-dialog-body {
+    padding: 1.25rem;
+}
+.hkp-dialog > footer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .6rem;
+    align-items: center;
+    padding: 1rem 1.25rem;
+    border-top: 1px solid var(--hkp-line);
+    background: var(--hkp-sunk);
+}
+.hkp-dialog.is-urgent > header {
+    background: var(--hkp-urgent);
+    color: #fff;
+    border: 0;
+    position: relative;
+}
+.hkp-dialog.is-urgent > header::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 5px;
+    background: repeating-linear-gradient(-45deg, #fff 0 5px, transparent 5px 10px);
+    opacity: .8;
+}
+.hkp-dialog.is-urgent > header .btn-icon {
+    color: #fff;
+}
+.hkp-dialog.is-urgent > header .hkp-i {
+    width: 1.6rem;
+    height: 1.6rem;
+}
+.hkp-lead {
+    font-size: 1.05rem;
+    margin: 0 0 1rem;
+}
+.hkp-two {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    gap: 1.25rem;
+    align-items: start;
+}
+.hkp-two.is-wide-left {
+    grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+}
+.hkp-label {
+    display: block;
+    margin: 0 0 .4rem;
+    font-weight: 700;
+}
+.hkp-two .hkp-field + .hkp-label,
+.hkp-block + .hkp-block {
+    margin-top: 1rem;
+}
+
+/* --- A screen's sheet ---------------------------------------------------------------------------------------------- */
+.hkp-sheet {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    gap: 1.5rem;
+    align-items: start;
+}
+.hkp-sheet-screen {
+    position: sticky;
+    top: calc(61px + 1rem);
+    display: grid;
+    gap: .9rem;
+}
+.hkp-sheet-settings {
+    display: grid;
+    gap: 1rem;
+}
+.hkp-card {
+    padding: 1.1rem 1.25rem;
+    border: 1px solid var(--hkp-line);
+    border-radius: var(--hkp-radius);
+    background: var(--hkp-card);
+}
+.hkp-card > h2 {
+    margin: 0 0 .7rem;
+    font-size: 1.1rem;
+}
+.hkp-card.is-danger {
+    border-color: var(--hkp-bad-line);
+}
+.hkp-card p + p {
+    margin-top: .5rem;
+}
+.hkp-facts {
+    display: grid;
+    /* stylelint-disable-next-line csstree/validator */
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 11rem), 1fr));
+    gap: .6rem 1rem;
+    margin: 0;
+}
+.hkp-facts div {
+    min-width: 0;
+}
+.hkp-facts dt {
+    color: var(--hkp-muted);
+    font-size: .8125rem;
+    font-weight: 600;
+}
+.hkp-facts dd {
+    margin: 0;
+    font-weight: 600;
+}
+.hkp-power {
+    display: grid;
+    grid-template-columns: 2rem minmax(0, 1fr);
+    gap: .3rem .5rem;
+    align-items: center;
+    margin-top: 1rem;
+    font-size: .8125rem;
+}
+.hkp-power b {
+    color: var(--hkp-muted);
+    font-weight: 700;
+}
+.hkp-power span {
+    position: relative;
+    height: .7rem;
+    border-radius: 999px;
+    background: var(--hkp-chip);
+}
+.hkp-power span i {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    border-radius: 999px;
+    background: var(--hkp-ok);
+}
+.hkp-power-scale {
+    grid-column: 2;
+    display: flex;
+    justify-content: space-between;
+    color: var(--hkp-muted);
+    font-variant-numeric: tabular-nums;
+}
+.hkp-savebar {
+    position: sticky;
+    bottom: 0;
+    z-index: 5;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .6rem 1rem;
+    margin-top: 1.5rem;
+    padding: .75rem 1rem;
+    border: 1px solid var(--hkp-accent-line);
+    border-radius: var(--hkp-radius);
+    background: var(--hkp-card);
+    box-shadow: 0 -6px 18px -12px rgba(0, 0, 0, .3);
+}
+.hkp-savebar p {
+    flex: 1 1 12rem;
+    font-weight: 600;
+}
+
+/* --- Groups and who publishes in each ----------------------------------------------------------------------------- */
+.hkp-glist {
+    display: grid;
+    gap: .5rem;
+    margin: 0 0 2rem;
+    padding: 0;
+    list-style: none;
+}
+.hkp-glist li {
+    display: grid;
+    grid-template-columns: 4.5rem minmax(0, 1fr) minmax(0, 1fr) auto;
+    gap: .5rem 1rem;
+    align-items: center;
+    padding: .5rem .75rem .5rem .5rem;
+    border: 1px solid var(--hkp-line);
+    border-radius: var(--hkp-radius);
+    background: var(--hkp-card);
+}
+.hkp-glist .hkp-bezel {
+    padding: 2px 2px 5px;
+    border-radius: .35rem;
+}
+.hkp-glist .hkp-bezel .hkp-led {
+    width: 3px;
+    height: 3px;
+    bottom: 1px;
+    margin-left: -1.5px;
+}
+.hkp-glist .hkp-mini {
+    display: grid;
+    place-items: center;
+    height: 2.6rem;
+}
+.hkp-glist .hkp-bezel {
+    width: 4.4rem;
+}
+.hkp-glist .hkp-bezel.is-v {
+    width: auto;
+    height: 2.6rem;
+}
+.hkp-glist .hkp-over {
+    display: none;
+}
+.hkp-glist li > span:nth-child(2) {
+    display: grid;
+    gap: .1rem;
+    min-width: 0;
+}
+.hkp-groups {
+    display: grid;
+    /* stylelint-disable-next-line csstree/validator */
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 22rem), 1fr));
+    gap: 1rem;
+}
+.hkp-group {
+    display: grid;
+    gap: .9rem;
+    align-content: start;
+    padding: 1.1rem 1.25rem 1.25rem;
+    border: 1px solid var(--hkp-line);
+    border-radius: var(--hkp-radius);
+    background: var(--hkp-card);
+    box-shadow: var(--hkp-shadow);
+}
+.hkp-group > header {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+}
+.hkp-group > header h3 {
+    flex: 1;
+    font-size: 1.15rem;
+}
+.hkp-group.is-all {
+    background: var(--hkp-sunk);
+    box-shadow: none;
+    border-style: dashed;
+}
+.hkp-k {
+    display: block;
+    margin: 0 0 .35rem;
+    color: var(--hkp-muted);
+    font-size: .8125rem;
+    font-weight: 700;
+}
+.hkp-people {
+    display: grid;
+    gap: .35rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+.hkp-person {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: .6rem;
+    min-height: 2.75rem;
+    padding: .2rem .25rem .2rem .3rem;
+    border-radius: var(--hkp-radius-sm);
+}
+.hkp-person:hover {
+    background: var(--hkp-chip);
+}
+.hkp-person small {
+    display: block;
+    color: var(--hkp-muted);
+    font-size: .8125rem;
+}
+.hkp-av {
+    display: inline-grid;
+    place-items: center;
+    width: 2.1rem;
+    height: 2.1rem;
+    border-radius: 50%;
+    background: var(--hkp-accent-tint);
+    color: var(--hkp-accent-ink);
+    font-size: .8125rem;
+    font-weight: 700;
+    box-shadow: inset 0 0 0 1px var(--hkp-accent-line);
+}
+.hkp-search {
+    position: relative;
+}
+.hkp-search > .hkp-i {
+    position: absolute;
+    left: .75rem;
+    top: .78rem;
+    color: var(--hkp-muted);
+    pointer-events: none;
+}
+.hkp-search .form-control {
+    padding-left: 2.4rem;
+}
+.hkp-listbox {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: calc(100% + 4px);
+    z-index: 10;
+    margin: 0;
+    padding: .35rem;
+    list-style: none;
+    border: 1px solid var(--hkp-line);
+    border-radius: var(--hkp-radius-sm);
+    background: var(--hkp-card);
+    box-shadow: 0 .75rem 1.5rem rgba(0, 0, 0, .18);
+}
+.hkp-listbox li {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: .6rem;
+    min-height: 2.75rem;
+    padding: .3rem .5rem;
+    border-radius: calc(var(--hkp-radius-sm) - .1rem);
+    cursor: pointer;
+}
+.hkp-listbox li[aria-selected="true"],
+.hkp-listbox li:hover {
+    background: var(--hkp-accent-tint);
+}
+.hkp-listbox li[aria-disabled="true"] {
+    cursor: default;
+    color: var(--hkp-muted);
+}
+.hkp-listbox li small {
+    display: block;
+    color: var(--hkp-muted);
+    font-size: .8125rem;
+}
+.hkp-listbox mark {
+    background: none;
+    color: inherit;
+    font-weight: 800;
+    text-decoration: underline;
+    text-decoration-color: var(--hkp-accent);
+    text-underline-offset: 2px;
+}
+
+/* --- Empty: a drawing, a sentence and the next step --------------------------------------------------------------- */
+.hkp-empty {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 1rem 1.5rem;
+    align-items: center;
+    padding: 1.5rem;
+    border: 1px dashed var(--hkp-edge);
+    border-radius: var(--hkp-radius);
+    background: var(--hkp-card);
+}
+.hkp-empty img {
+    width: 9rem;
+    height: auto;
+}
+.hkp-empty h3 {
+    font-size: 1.15rem;
+    margin: 0 0 .3rem;
+}
+.hkp-empty p {
+    color: var(--hkp-muted);
+}
+.hkp-empty .hkp-chips {
+    margin-top: .9rem;
+}
+
+/* --- A new screen from the phone ------------------------------------------------------------------------------------ */
+.hkp-claim {
+    /* stylelint-disable-next-line csstree/validator */
+    width: min(100%, 34rem);
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.1rem;
+}
+.hkp-claim-step {
+    color: var(--hkp-muted);
+    font-size: .875rem;
+    font-weight: 600;
+}
+.hkp-found {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: .1rem .9rem;
+    align-items: center;
+    padding: .9rem 1rem;
+    border-radius: var(--hkp-radius);
+    background: var(--hkp-ok-tint);
+    border: 1px solid color-mix(in srgb, var(--hkp-ok) 40%, var(--hkp-card));
+}
+.hkp-found .hkp-bezel {
+    grid-row: 1 / span 2;
+    width: 4.6rem;
+    padding: 3px 3px 6px;
+    border-radius: .4rem;
+}
+.hkp-found b {
+    grid-column: 2;
+}
+.hkp-found .hkp-bezel .hkp-led {
+    width: 3px;
+    height: 3px;
+    bottom: 1.5px;
+    margin-left: -1.5px;
+}
+.hkp-found .hkp-bezel-off {
+    /* stylelint-disable-next-line declaration-no-important */
+    display: grid !important;
+    place-items: center;
+    color: #fff;
+    font: 700 .75rem/1 system-ui, sans-serif;
+    letter-spacing: .04em;
+}
+.hkp-found b {
+    color: var(--hkp-ok-ink);
+}
+.hkp-found span {
+    grid-column: 2;
+    color: var(--hkp-muted);
+    font-size: .875rem;
+}
+.hkp-pick {
+    display: grid;
+    gap: .5rem;
+}
+.hkp-pick label {
+    position: relative;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: .1rem .75rem;
+    align-items: start;
+    padding: .8rem .9rem;
+    border: 1px solid var(--hkp-edge);
+    border-radius: var(--hkp-radius);
+    background: var(--hkp-card);
+    cursor: pointer;
+}
+.hkp-pick input {
+    margin: .3rem 0 0;
+    width: 1.15rem;
+    height: 1.15rem;
+    accent-color: var(--hkp-accent);
+}
+.hkp-pick label:has(input:checked) {
+    border-color: var(--hkp-accent);
+    background: var(--hkp-accent-tint);
+    box-shadow: inset 0 0 0 1px var(--hkp-accent);
+}
+.hkp-pick b {
+    font-size: 1.05rem;
+}
+.hkp-pick span {
+    grid-column: 2;
+    color: var(--hkp-muted);
+    font-size: .875rem;
+}
+.hkp-pick .hkp-state {
+    grid-column: 2;
+}
+.hkp-claim .btn-lg {
+    width: 100%;
+}
+.hkp-done-screen {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+    gap: .75rem;
+    text-align: center;
+}
+.hkp-done-screen .hkp-slot {
+    width: 100%;
+    border-radius: var(--hkp-radius);
+}
+.hkp-done-screen h2 {
+    font-size: 1.45rem;
+    /* stylelint-disable-next-line csstree/validator */
+    text-wrap: balance;
+}
+.hkp-done-screen p {
+    color: var(--hkp-muted);
+}
+.hkp-done-screen .hkp-foot {
+    justify-content: center;
+    width: 100%;
+}
+.hkp-done-screen .btn {
+    white-space: normal;
+    flex: 1 1 14rem;
+}
+
+/* --- «Tu centro»: the place for the weather, the colours and the logo, with the screen beside --------------------- */
+.hkp-centre {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(22rem, .95fr);
+    gap: 1.5rem 2rem;
+    align-items: start;
+}
+.hkp-centre-form {
+    display: grid;
+    gap: 1rem;
+    min-width: 0;
+}
+.hkp-centre > .hkp-preview {
+    position: sticky;
+    top: calc(61px + 1rem);
+}
+.hkp-find {
+    display: flex;
+    gap: .5rem;
+}
+.hkp-find .hkp-search {
+    flex: 1;
+    min-width: 0;
+}
+.hkp-place {
+    display: grid;
+    grid-template-columns: minmax(0, 14rem) minmax(0, 1fr);
+    gap: .9rem 1.25rem;
+    align-items: start;
+    margin-top: 1rem;
+    padding: 1rem;
+    border: 1px solid color-mix(in srgb, var(--hkp-ok) 40%, var(--hkp-card));
+    border-radius: var(--hkp-radius);
+    background: var(--hkp-ok-tint);
+}
+.hkp-place h3 {
+    font-size: 1.2rem;
+    line-height: 1.25;
+}
+.hkp-place-where {
+    color: var(--hkp-muted);
+}
+.hkp-place-coords {
+    margin-top: .2rem;
+    color: var(--hkp-muted);
+    font-size: .8125rem;
+    font-variant-numeric: tabular-nums;
+}
+.hkp-place-ok {
+    display: flex;
+    gap: .45rem;
+    align-items: start;
+    margin-top: .75rem;
+    color: var(--hkp-ok-ink);
+    font-weight: 700;
+}
+.hkp-place-ok .hkp-i {
+    margin-top: .15rem;
+}
+.hkp-place-check {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .6rem 1.25rem;
+    padding-top: .9rem;
+    border-top: 1px solid color-mix(in srgb, var(--hkp-ok) 30%, var(--hkp-card));
+}
+.hkp-place-check .hkp-weather,
+.hkp-place-check .hkp-place-ok {
+    margin: 0;
+}
+.hkp-place-check .hkp-place-ok {
+    flex: 1 1 12rem;
+}
+.hkp-place .hkp-foot {
+    margin-top: .75rem;
+    padding: 0;
+}
+/* The locator: land and sea from a public-domain outline drawn by the plugin, a grid of degrees and the point. */
+.hkp-map {
+    position: relative;
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    border-radius: var(--hkp-radius-sm);
+    overflow: hidden;
+    box-shadow: inset 0 0 0 1px var(--hkp-line);
+}
+.hkp-map svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+.hkp-map .sea {
+    fill: color-mix(in srgb, var(--hkp-accent) 12%, var(--hkp-card));
+}
+.hkp-map .grid {
+    stroke: color-mix(in srgb, var(--hkp-accent) 28%, var(--hkp-card));
+    stroke-width: .6;
+    fill: none;
+}
+.hkp-map .land {
+    fill: var(--hkp-card);
+    stroke: color-mix(in srgb, var(--hkp-ink) 45%, var(--hkp-card));
+    stroke-width: .8;
+    stroke-linejoin: round;
+}
+.hkp-map .grid-over {
+    stroke: color-mix(in srgb, var(--hkp-ink) 10%, transparent);
+    stroke-width: .5;
+    fill: none;
+}
+[data-bs-theme="dark"] .hkp-map .sea {
+    fill: color-mix(in srgb, var(--hkp-accent) 30%, var(--hkp-page));
+}
+[data-bs-theme="dark"] .hkp-map .land {
+    fill: color-mix(in srgb, var(--hkp-ink) 30%, var(--hkp-card));
+    stroke: color-mix(in srgb, var(--hkp-ink) 70%, var(--hkp-card));
+}
+.hkp-map .pin {
+    fill: var(--hkp-bad);
+    stroke: var(--hkp-card);
+    stroke-width: 2.2;
+}
+.hkp-map .ring {
+    fill: none;
+    stroke: var(--hkp-bad);
+    stroke-width: 1.5;
+    opacity: .45;
+}
+.hkp-map .scale {
+    stroke: var(--hkp-ink);
+    stroke-width: 1.5;
+}
+.hkp-map-scale {
+    position: absolute;
+    left: calc(3.1% + 1px);
+    bottom: 12%;
+    padding: 0 .3rem;
+    border-radius: .25rem;
+    background: color-mix(in srgb, var(--hkp-card) 80%, transparent);
+    color: var(--hkp-ink);
+    font-size: .75rem;
+    font-weight: 700;
+    line-height: 1.5;
+}
+/* The weather of the place, drawn as the screens' header draws it: the sky, the temperature, today's highest and lowest. */
+.hkp-weather {
+    display: inline-flex;
+    align-items: center;
+    gap: .6rem;
+    margin-top: .75rem;
+    padding: .5rem .85rem .5rem .6rem;
+    border-radius: var(--hkp-radius-sm);
+    background: var(--hkp-card);
+    box-shadow: inset 0 0 0 1px var(--hkp-line);
+    --hk-tiempo-sol: #ffc533;
+    --hk-tiempo-sol-trazo: #a86400;
+    --hk-tiempo-rayos: #c27700;
+    --hk-tiempo-luna: #ffe08a;
+    --hk-tiempo-luna-trazo: #7c6312;
+    --hk-tiempo-estrella: #977511;
+    --hk-tiempo-nube: #fff;
+    --hk-tiempo-nube-trazo: #56667b;
+    --hk-tiempo-nube-fondo: #c5cfdb;
+    --hk-tiempo-gota: #1f6fd1;
+    --hk-tiempo-copo: #1f73b8;
+    --hk-tiempo-niebla: #5f6e82;
+}
+[data-bs-theme="dark"] .hkp-weather {
+    --hk-tiempo-sol-trazo: #ffc533;
+    --hk-tiempo-rayos: #ffc533;
+    --hk-tiempo-luna-trazo: #f6dc8c;
+    --hk-tiempo-estrella: #f6dc8c;
+    --hk-tiempo-nube: #e3e9f1;
+    --hk-tiempo-nube-trazo: #93a3b8;
+    --hk-tiempo-nube-fondo: #7d8da3;
+    --hk-tiempo-gota: #6db3ff;
+    --hk-tiempo-copo: #a9dcff;
+    --hk-tiempo-niebla: #a3b0c2;
+}
+.hkp-weather-icon {
+    width: 3rem;
+    height: 3rem;
+}
+.hkp-weather .hk-icono-tiempo {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}
+.hkp-weather .t-sol {
+    fill: var(--hk-tiempo-sol);
+    stroke: var(--hk-tiempo-sol-trazo);
+}
+.hkp-weather .t-rayos {
+    stroke: var(--hk-tiempo-rayos);
+}
+.hkp-weather .t-luna {
+    fill: var(--hk-tiempo-luna);
+    stroke: var(--hk-tiempo-luna-trazo);
+}
+.hkp-weather .t-estrella {
+    fill: var(--hk-tiempo-estrella);
+}
+.hkp-weather .t-nube {
+    fill: var(--hk-tiempo-nube);
+    stroke: var(--hk-tiempo-nube-trazo);
+}
+.hkp-weather .t-nube-fondo {
+    fill: var(--hk-tiempo-nube-fondo);
+    stroke: var(--hk-tiempo-nube-trazo);
+}
+.hkp-weather .t-gota {
+    fill: var(--hk-tiempo-gota);
+}
+.hkp-weather .t-trazo-gota,
+.hkp-weather .t-copo {
+    stroke: var(--hk-tiempo-gota);
+}
+.hkp-weather .t-niebla {
+    stroke: var(--hk-tiempo-niebla);
+}
+.hkp-weather-deg {
+    font-size: 2.1rem;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -.02em;
+    font-variant-numeric: tabular-nums;
+}
+.hkp-weather-ext {
+    display: grid;
+    font-size: .8125rem;
+    font-weight: 700;
+    line-height: 1.15;
+    font-variant-numeric: tabular-nums;
+}
+.hkp-weather-ext span {
+    color: var(--hkp-muted);
+    font-weight: 600;
+}
+.hkp-weather-sky {
+    margin-left: .35rem;
+    padding-left: .75rem;
+    border-left: 1px solid var(--hkp-line);
+    font-size: .875rem;
+    line-height: 1.3;
+}
+.hkp-weather-sky small {
+    display: block;
+    color: var(--hkp-muted);
+    font-size: .8125rem;
+}
+.hkp-colours {
+    display: grid;
+    /* stylelint-disable-next-line csstree/validator */
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 12.5rem), 1fr));
+    gap: .6rem;
+}
+.hkp-colour {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 0 .65rem;
+    align-items: center;
+    padding: .5rem .6rem;
+    border: 1px solid var(--hkp-line);
+    border-radius: var(--hkp-radius-sm);
+    background: var(--hkp-card);
+}
+.hkp-colour input[type="color"] {
+    grid-row: span 2;
+    width: 2.6rem;
+    height: 2.6rem;
+    padding: 0;
+    border: 1px solid var(--hkp-edge);
+    border-radius: .45rem;
+    background: none;
+    cursor: pointer;
+}
+.hkp-colour b {
+    font-size: .9375rem;
+}
+.hkp-colour span {
+    color: var(--hkp-muted);
+    font-size: .8125rem;
+    font-variant-numeric: tabular-nums;
+}
+.hkp-logos {
+    display: grid;
+    /* stylelint-disable-next-line csstree/validator */
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 14rem), 1fr));
+    gap: .75rem;
+}
+.hkp-logo {
+    display: grid;
+    gap: .5rem;
+    padding: .75rem;
+    border: 1px solid var(--hkp-line);
+    border-radius: var(--hkp-radius-sm);
+    background: var(--hkp-card);
+}
+.hkp-logo-art {
+    display: grid;
+    place-items: center;
+    height: 4.5rem;
+    padding: .6rem;
+    border-radius: .4rem;
+    background: #f3f5f8;
+}
+.hkp-logo-art.is-dark {
+    background: #0f141b;
+}
+.hkp-logo-art img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+.hkp-logo b {
+    font-size: .9375rem;
+}
+.hkp-logo .btn {
+    justify-self: start;
+}
+
+/* --- Narrower containers: a screen's row and the forms stack -------------------------------------------------------- */
+/* stylelint-disable-next-line csstree/validator */
+@container hkp (max-width: 70rem) {
+    .hkp-item {
+        grid-template-columns: 6rem minmax(0, 1fr) auto;
+        grid-template-areas: "thumb main actions" "thumb when actions" "thumb where actions";
+    }
+    .hkp-item > .hkp-thumb {
+        grid-area: thumb;
+        align-self: start;
+    }
+    .hkp-item-main {
+        grid-area: main;
+    }
+    .hkp-item-when {
+        grid-area: when;
+    }
+    .hkp-item-where {
+        grid-area: where;
+    }
+    .hkp-item-actions {
+        grid-area: actions;
+        align-self: start;
+    }
+}
+
+/* stylelint-disable-next-line csstree/validator */
+@container hkp (max-width: 60rem) {
+    .hkp-compose,
+    .hkp-centre {
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-areas: "types" "what" "preview" "when" "where" "foot";
+    }
+    .hkp-compose > .hkp-preview,
+    .hkp-centre > .hkp-preview {
+        position: static;
+    }
+    .hkp-sheet {
+        grid-template-columns: minmax(0, 1fr);
+    }
+    .hkp-sheet-screen {
+        position: static;
+    }
+    .hkp-glist li {
+        grid-template-columns: 4.5rem minmax(0, 1fr) auto;
+        grid-template-areas: "mini name act" "mini groups act";
+    }
+    .hkp-glist li > :nth-child(1) {
+        grid-area: mini;
+    }
+    .hkp-glist li > :nth-child(2) {
+        grid-area: name;
+    }
+    .hkp-glist li > :nth-child(3) {
+        grid-area: groups;
+    }
+    .hkp-glist li > :nth-child(4) {
+        grid-area: act;
+    }
+}
+
+/* stylelint-disable-next-line csstree/validator */
+@container hkp (max-width: 46rem) {
+    .hkp-two,
+    .hkp-two.is-wide-left {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+/* stylelint-disable-next-line csstree/validator */
+@container hkp (max-width: 36rem) {
+    .hkp-head h1 {
+        font-size: 1.6rem;
+    }
+    .hkp-head-actions {
+        width: 100%;
+    }
+    .hkp-head-actions .btn {
+        flex: 1 1 auto;
+    }
+    .hkp-wall {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: .6rem;
+    }
+    .hkp-slot {
+        padding: .5rem .55rem .65rem;
+    }
+    .hkp-screen-body {
+        padding: .55rem .6rem .2rem;
+    }
+    .hkp-screen h3 {
+        font-size: .95rem;
+    }
+    .hkp-now {
+        display: none;
+    }
+    .hkp-screen-actions {
+        padding: .3rem .5rem .55rem;
+    }
+    .hkp-screen-actions .btn .hkp-lbl {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+    }
+    .hkp-screen-actions .btn {
+        width: 2.5rem;
+        padding: 0;
+    }
+    .hkp-screen.is-add {
+        min-height: 0;
+    }
+    .hkp-item {
+        grid-template-columns: 4.75rem minmax(0, 1fr) auto;
+        gap: .35rem .75rem;
+        padding: .55rem;
+    }
+    .hkp-thumb {
+        width: 4.75rem;
+    }
+    .hkp-item-actions .btn:not(.btn-icon) {
+        display: none;
+    }
+    .hkp-fs {
+        padding: .9rem 1rem 1rem;
+    }
+    .hkp-types span {
+        min-height: 2.6rem;
+        padding: .3rem .55rem;
+        font-size: .9375rem;
+    }
+    .hkp-compose > .hkp-foot {
+        padding-bottom: calc(.75rem + env(safe-area-inset-bottom));
+    }
+    .hkp-sheet-screen .hkp-seg {
+        display: flex;
+        width: 100%;
+    }
+    .hkp-sheet-screen .hkp-seg button {
+        flex: 1 1 0;
+    }
+    .hkp-foot .btn-primary {
+        flex: 1 1 100%;
+    }
+    .hkp-drop {
+        grid-template-columns: auto minmax(0, 1fr);
+    }
+    .hkp-drop .btn {
+        grid-column: 1 / -1;
+    }
+    .hkp-drop .hkp-thumb {
+        width: 6rem;
+    }
+    .hkp-place {
+        grid-template-columns: minmax(0, 1fr);
+    }
+    .hkp-empty {
+        grid-template-columns: minmax(0, 1fr);
+        justify-items: start;
+    }
+    .hkp-empty img {
+        width: 7rem;
+    }
+    .hkp-sec-head .hkp-sec-tools {
+        margin-left: 0;
+    }
+    .hkp-dialog-body,
+    .hkp-dialog > header,
+    .hkp-dialog > footer {
+        padding-inline: 1rem;
+    }
+}
+
+/* --- Still: no lift, no ping, no turning arrow ---------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+    .hkp *,
+    .hkp *::before,
+    .hkp *::after {
+        /* stylelint-disable-next-line declaration-no-important */
+        animation: none !important;
+        /* stylelint-disable-next-line declaration-no-important */
+        transition: none !important;
+    }
+    .hkp-screen:hover {
+        transform: none;
+    }
+}
+
+/* Hechauka: the plugin's own additions to the art direction's panel.css (tools build styles.css from both). */
+
+/* The pages of the panel take the whole width (DESIGN.md: Moodle's standard page, no limited width). */
+body.hkp-page #page.drawers .main-inner {
+    max-width: 100%;
+}
+
+/* A screen drawn by its preview (no picture from the screen yet) dims and greys like a picture does. */
+.hkp-bezel[data-state="off"] > iframe {
+    filter: brightness(.38) saturate(.6);
+}
+
+.hkp-bezel[data-state="down"] > iframe {
+    filter: grayscale(1) brightness(.55);
+}
+
+/* The preview inside a card is a picture: it takes no clicks (the card's link does). */
+.hkp-slot iframe {
+    pointer-events: none;
+}

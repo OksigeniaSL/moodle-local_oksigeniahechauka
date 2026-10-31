@@ -88,8 +88,12 @@ final class access_test extends \advanced_testcase {
                 $this->assertSame(in_array($capability, $capabilities), $given, $shortname . ' ' . $capability);
             }
         }
-        // Made twice, still two.
+        // Made twice, still two; one left without its capabilities gets them back.
         $this->assertSame(0, access::create_roles());
+        $publisher = (int) $DB->get_field('role', 'id', ['shortname' => access::PUBLISHER]);
+        $DB->delete_records('role_capabilities', ['roleid' => $publisher]);
+        $this->assertSame(0, access::create_roles());
+        $this->assertSame(2, $DB->count_records('role_capabilities', ['roleid' => $publisher]));
         $manager = $DB->get_field('role', 'id', ['shortname' => 'manager']);
         $this->assertTrue($DB->record_exists('role_allow_assign', ['roleid' => $manager,
             'allowassign' => $DB->get_field('role', 'id', ['shortname' => access::PUBLISHER])]));

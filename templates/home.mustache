@@ -1,0 +1,100 @@
+{{!
+    This file is part of Moodle - https://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_oksigeniahechauka/home
+
+    The home of the panel: the screens first, each with its light and what it shows now, and a line that says
+    whether one needs someone; then what is on them, in three groups. Who only publishes sees their own content
+    first, and the screens of their groups after it.
+
+    Example context (json):
+    {
+        "style": "",
+        "title": "Pantallas",
+        "sub": "",
+        "hasactions": true,
+        "actions": [{"url": "https://example.com/local/oksigeniahechauka/edit.php", "label": "Añadir", "icon": "", "primary": true}],
+        "hastabs": false,
+        "tabs": [],
+        "health": {"ok": true, "title": "Las 2 pantallas, bien", "detail": "última señal hace 1 min"},
+        "minefirst": false,
+        "wall": {"title": "Ahora en cada pantalla", "count": 0, "screens": [], "reloadall": "", "reloadicon": "",
+            "add": "", "addicon": ""},
+        "content": {
+            "empty": {"title": "Tus pantallas ya enseñan el menú", "text": "Llegan solos.", "add": [], "section": "Lo que sale"}
+        }
+    }
+}}
+<div class="hkp" id="hkp-home"{{#style}} style="{{style}}"{{/style}}>
+    <header class="hkp-head">
+        <div class="hkp-head-title">
+            <h1>{{title}}</h1>
+            {{#sub}}<p class="hkp-head-sub">{{sub}}</p>{{/sub}}
+        </div>
+        {{#hasactions}}
+        <div class="hkp-head-actions">
+            {{#actions}}<a class="btn {{#primary}}btn-primary{{/primary}}{{^primary}}btn-outline-danger{{/primary}}" href="{{url}}">{{{icon}}}{{label}}</a>{{/actions}}
+        </div>
+        {{/hasactions}}
+    </header>
+    {{#hastabs}}
+    <nav class="hkp-tabs" aria-label="{{#str}}tabs_label, local_oksigeniahechauka{{/str}}">
+        {{#tabs}}<a href="{{url}}"{{#current}} aria-current="page"{{/current}}>{{{icon}}}{{label}}</a>{{/tabs}}
+    </nav>
+    {{/hastabs}}
+    {{#health}}
+        {{#ok}}<p class="hkp-health" data-state="ok" role="status"><span class="hkp-state" data-state="on"><span class="hkp-dot" aria-hidden="true"></span>{{title}}</span>{{#detail}}<span>{{detail}}</span>{{/detail}}</p>{{/ok}}
+        {{^ok}}<section class="hkp-health" data-state="down" role="status"><span class="hkp-health-icon">{{{icon}}}</span><p><b>{{bold}}</b> {{detail}}</p>{{#see}}<a class="btn btn-sm btn-outline-secondary" href="{{see}}">{{#str}}health_see, local_oksigeniahechauka{{/str}}</a>{{/see}}</section>{{/ok}}
+    {{/health}}
+    {{#minefirst}}{{> local_oksigeniahechauka/home_content}}{{> local_oksigeniahechauka/home_wall}}{{/minefirst}}
+    {{^minefirst}}{{> local_oksigeniahechauka/home_wall}}{{> local_oksigeniahechauka/home_content}}{{/minefirst}}
+</div>
+{{#js}}
+(function() {
+    var root = document.getElementById('hkp-home');
+    if (!root) {
+        return;
+    }
+    var type = 'all';
+    var scope = 'all';
+    var apply = function() {
+        root.querySelectorAll('.hkp-item').forEach(function(row) {
+            var show = (type === 'all' || row.getAttribute('data-type') === type) &&
+                (scope === 'all' || row.getAttribute('data-mine') === '1');
+            row.hidden = !show;
+        });
+    };
+    root.querySelectorAll('[data-filter]').forEach(function(chip) {
+        chip.addEventListener('click', function() {
+            type = chip.getAttribute('data-filter');
+            root.querySelectorAll('[data-filter]').forEach(function(other) {
+                other.setAttribute('aria-pressed', other === chip ? 'true' : 'false');
+            });
+            apply();
+        });
+    });
+    root.querySelectorAll('[data-scope]').forEach(function(button) {
+        button.addEventListener('click', function() {
+            scope = button.getAttribute('data-scope');
+            root.querySelectorAll('[data-scope]').forEach(function(other) {
+                other.setAttribute('aria-pressed', other === button ? 'true' : 'false');
+            });
+            apply();
+        });
+    });
+})();
+{{/js}}

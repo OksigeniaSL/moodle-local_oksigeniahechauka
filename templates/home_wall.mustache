@@ -1,0 +1,40 @@
+{{!
+    This file is part of Moodle - https://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_oksigeniahechauka/home_wall
+
+    The wall of screens on the home of the panel, and the card to add one for who runs them.
+
+    Example context (json):
+    {
+        "wall": {"title": "Ahora en cada pantalla", "count": 0, "screens": [], "reloadall": "", "reloadicon": "",
+            "add": "https://example.com/local/oksigeniahechauka/screens.php#add", "addicon": ""}
+    }
+}}
+{{#wall}}
+<section aria-labelledby="hkp-h-wall">
+    <div class="hkp-sec-head">
+        <h2 id="hkp-h-wall">{{title}}</h2>
+        <span class="hkp-count">{{count}}</span>
+        {{#reloadall}}<div class="hkp-sec-tools"><a class="btn btn-sm btn-outline-secondary" href="{{reloadall}}">{{{reloadicon}}}{{#str}}reloadall, local_oksigeniahechauka{{/str}}</a></div>{{/reloadall}}
+    </div>
+    <ul class="hkp-wall">
+        {{#screens}}{{> local_oksigeniahechauka/screen_card}}{{/screens}}
+        {{#add}}<li class="hkp-screen is-add">{{{addicon}}}<h3><a href="{{add}}">{{#str}}addscreen_card, local_oksigeniahechauka{{/str}}</a></h3><span>{{#str}}addscreen_card_sub, local_oksigeniahechauka{{/str}}</span></li>{{/add}}
+    </ul>
+</section>
+{{/wall}}

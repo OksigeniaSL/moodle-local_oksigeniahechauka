@@ -97,7 +97,16 @@ class access {
         $system = \context_system::instance();
         $made = 0;
         foreach (self::ROLES as $shortname => $capabilities) {
-            if ($DB->record_exists('role', ['shortname' => $shortname])) {
+            $id = (int) $DB->get_field('role', 'id', ['shortname' => $shortname]);
+            if ($id) {
+                // There already: completed only if an install cut short left it without any capability of ours.
+                $some = $DB->record_exists_select('role_capabilities', 'roleid = ? AND ' .
+                    $DB->sql_like('capability', '?'), [$id, 'local/oksigeniahechauka:%']);
+                if (!$some) {
+                    foreach ($capabilities as $capability) {
+                        assign_capability('local/oksigeniahechauka:' . $capability, CAP_ALLOW, $id, $system->id, true);
+                    }
+                }
                 continue;
             }
             $id = create_role(

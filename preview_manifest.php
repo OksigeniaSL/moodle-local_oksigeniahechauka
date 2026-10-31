@@ -44,8 +44,12 @@ $screen = $screenid ? $DB->get_record('local_oksigeniahechauka_screen', ['id' =>
     'lastinfo' => null,
 ];
 $m = manifest::build($screen, time());
-// The preview shows everything, whatever the power hours say.
+// The preview shows everything, whatever the power hours say, and never sounds: the panel can have several screens
+// open at once.
 unset($m['power']);
+if (isset($m['screen'])) {
+    $m['screen']['sound'] = false;
+}
 
 // Every media object gets the address of the panel, which goes with the session, instead of the screens' one.
 $fs = get_file_storage();

@@ -1,0 +1,20 @@
+/* Hechauka: the plugin's own additions to the art direction's panel.css (tools build styles.css from both). */
+
+/* The pages of the panel take the whole width (DESIGN.md: Moodle's standard page, no limited width). */
+body.hkp-page #page.drawers .main-inner {
+    max-width: 100%;
+}
+
+/* A screen drawn by its preview (no picture from the screen yet) dims and greys like a picture does. */
+.hkp-bezel[data-state="off"] > iframe {
+    filter: brightness(.38) saturate(.6);
+}
+
+.hkp-bezel[data-state="down"] > iframe {
+    filter: grayscale(1) brightness(.55);
+}
+
+/* The preview inside a card is a picture: it takes no clicks (the card's link does). */
+.hkp-slot iframe {
+    pointer-events: none;
+}

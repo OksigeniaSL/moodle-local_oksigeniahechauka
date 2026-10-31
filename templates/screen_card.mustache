@@ -1,0 +1,62 @@
+{{!
+    This file is part of Moodle - https://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_oksigeniahechauka/screen_card
+
+    A screen on the wall of the panel: a small television with its light, its picture (what it sent, or the player
+    itself as the preview draws it), its state and what it shows now.
+
+    Example context (json):
+    {
+        "id": 3,
+        "name": "Entrada",
+        "url": "https://example.com/local/oksigeniahechauka/screen.php?id=3",
+        "vertical": false,
+        "shape": "h",
+        "state": "on",
+        "label": "En marcha",
+        "meta": "señal hace 1 min",
+        "image": "https://example.com/pix/screen.png",
+        "frame": "",
+        "alt": "Lo que enseña Entrada",
+        "over": "",
+        "now": "El huerto, listo para la siembra de otoño",
+        "preview": "https://example.com/local/oksigeniahechauka/preview.php?screen=3",
+        "previewicon": "",
+        "reload": "https://example.com/local/oksigeniahechauka/index.php?action=reload&id=3",
+        "reloadicon": ""
+    }
+}}
+<li class="hkp-screen" data-state="{{state}}" data-shape="{{shape}}">
+    <div class="hkp-slot">
+        <span class="hkp-bezel{{#vertical}} is-v{{/vertical}}" data-state="{{state}}" role="img" aria-label="{{alt}}">
+            {{#image}}<img src="{{image}}" alt="" loading="lazy">{{/image}}
+            {{#frame}}<iframe src="{{frame}}" title="{{alt}}" loading="lazy" tabindex="-1" aria-hidden="true"></iframe>{{/frame}}
+            {{#over}}<span class="hkp-over"><span>{{{over}}}</span></span>{{/over}}
+            <span class="hkp-led" aria-hidden="true"></span>
+        </span>
+    </div>
+    <div class="hkp-screen-body">
+        <h3>{{#url}}<a href="{{url}}">{{name}}</a>{{/url}}{{^url}}{{name}}{{/url}}</h3>
+        <p class="hkp-state" data-state="{{state}}"><span class="hkp-dot" aria-hidden="true"></span>{{label}}{{#meta}} <span class="hkp-meta">· {{meta}}</span>{{/meta}}</p>
+        {{#now}}<p class="hkp-now">{{#str}}now_label, local_oksigeniahechauka{{/str}} <b>{{now}}</b></p>{{/now}}
+    </div>
+    <div class="hkp-screen-actions">
+        <a class="btn btn-sm btn-outline-secondary" href="{{preview}}">{{{previewicon}}}<span class="hkp-lbl">{{#str}}preview, local_oksigeniahechauka{{/str}}</span></a>
+        {{#reload}}<a class="btn btn-sm btn-outline-secondary" href="{{reload}}">{{{reloadicon}}}<span class="hkp-lbl">{{#str}}reload, local_oksigeniahechauka{{/str}}</span></a>{{/reload}}
+    </div>
+</li>

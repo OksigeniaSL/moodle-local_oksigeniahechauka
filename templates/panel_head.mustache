@@ -1,0 +1,51 @@
+{{!
+    This file is part of Moodle - https://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_oksigeniahechauka/panel_head
+
+    The head of a page of the panel that is not the home: its title, its main actions and the tabs of the panel.
+
+    Example context (json):
+    {
+        "style": "",
+        "title": "Pantallas",
+        "sub": "",
+        "hasactions": false,
+        "actions": [],
+        "hastabs": true,
+        "tabs": [{"url": "https://example.com/local/oksigeniahechauka/index.php", "label": "Lo que sale", "icon": "", "current": false},
+            {"url": "https://example.com/local/oksigeniahechauka/screens.php", "label": "Pantallas y grupos", "icon": "", "current": true}]
+    }
+}}
+<div class="hkp"{{#style}} style="{{style}}"{{/style}}>
+    <header class="hkp-head">
+        <div class="hkp-head-title">
+            <h1>{{title}}</h1>
+            {{#sub}}<p class="hkp-head-sub">{{sub}}</p>{{/sub}}
+        </div>
+        {{#hasactions}}
+        <div class="hkp-head-actions">
+            {{#actions}}<a class="btn {{#primary}}btn-primary{{/primary}}{{^primary}}btn-outline-secondary{{/primary}}" href="{{url}}">{{{icon}}}{{label}}</a>{{/actions}}
+        </div>
+        {{/hasactions}}
+    </header>
+    {{#hastabs}}
+    <nav class="hkp-tabs" aria-label="{{#str}}tabs_label, local_oksigeniahechauka{{/str}}">
+        {{#tabs}}<a href="{{url}}"{{#current}} aria-current="page"{{/current}}>{{{icon}}}{{label}}</a>{{/tabs}}
+    </nav>
+    {{/hastabs}}
+</div>

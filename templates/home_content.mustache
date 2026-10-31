@@ -1,0 +1,68 @@
+{{!
+    This file is part of Moodle - https://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_oksigeniahechauka/home_content
+
+    What is on the screens, on the home of the panel: filters by type, «De todos / Lo mío» for the office, and three
+    groups (on the screens now, later, no longer, folded). Nothing yet: what already works and the next step.
+
+    Example context (json):
+    {
+        "content": {"title": "Lo que sale", "filters": [], "scope": false, "now": [], "nowcount": 0, "later": [],
+            "latercount": 0, "done": [], "donecount": 0, "clockicon": "", "chevicon": ""}
+    }
+}}
+{{#content}}
+{{#empty}}
+<section class="hkp-content">
+    <div class="hkp-sec-head"><h2>{{section}}</h2></div>
+    <div class="hkp-empty">
+        <svg class="hkp-empty-art" viewBox="0 0 144 104" width="144" height="104" aria-hidden="true" focusable="false"><rect x="14" y="10" width="116" height="70" rx="8" fill="currentColor" opacity=".12"/><rect x="22" y="18" width="100" height="54" rx="3" fill="currentColor" opacity=".18"/><path d="M58 92h28M72 80v12" stroke="currentColor" stroke-width="4" stroke-linecap="round" opacity=".35"/></svg>
+        <div>
+            <h3>{{title}}</h3>
+            <p>{{text}}</p>
+            {{#hasadd}}<div class="hkp-chips">{{#add}}<a class="btn {{#primary}}btn-primary{{/primary}}{{^primary}}btn-outline-secondary{{/primary}}" href="{{url}}">{{{icon}}}{{label}}</a>{{/add}}</div>{{/hasadd}}
+        </div>
+    </div>
+</section>
+{{/empty}}
+{{^empty}}
+<section class="hkp-content" aria-labelledby="hkp-h-content">
+    <div class="hkp-sec-head">
+        <h2 id="hkp-h-content">{{title}}</h2>
+        <div class="hkp-sec-tools">
+            {{#hasfilters}}<div class="hkp-filters" role="group" aria-label="{{#str}}filters_label, local_oksigeniahechauka{{/str}}">{{#filters}}<button type="button" class="hkp-chip is-small" aria-pressed="{{#pressed}}true{{/pressed}}{{^pressed}}false{{/pressed}}" data-filter="{{type}}">{{label}} <small>{{count}}</small></button>{{/filters}}</div>{{/hasfilters}}
+            {{#scope}}<div class="hkp-seg" role="group" aria-label="{{#str}}scope_label, local_oksigeniahechauka{{/str}}"><button type="button" aria-pressed="true" data-scope="all">{{#str}}scope_all, local_oksigeniahechauka{{/str}}</button><button type="button" aria-pressed="false" data-scope="mine">{{#str}}scope_mine, local_oksigeniahechauka{{/str}}</button></div>{{/scope}}
+        </div>
+    </div>
+    {{#nowcount}}
+    <h3 class="hkp-group-title"><span class="hkp-onair" aria-hidden="true"></span>{{#str}}group_now, local_oksigeniahechauka{{/str}} <span class="hkp-count">{{nowcount}}</span></h3>
+    <ul class="hkp-items">{{#now}}{{> local_oksigeniahechauka/item_row}}{{/now}}</ul>
+    {{/nowcount}}
+    {{#latercount}}
+    <h3 class="hkp-group-title">{{{clockicon}}}{{#str}}group_later, local_oksigeniahechauka{{/str}} <span class="hkp-count">{{latercount}}</span></h3>
+    <ul class="hkp-items">{{#later}}{{> local_oksigeniahechauka/item_row}}{{/later}}</ul>
+    {{/latercount}}
+    {{#donecount}}
+    <details class="hkp-done">
+        <summary>{{{chevicon}}}{{#str}}group_done, local_oksigeniahechauka{{/str}} <span class="hkp-count">{{donecount}}</span></summary>
+        <ul class="hkp-items">{{#done}}{{> local_oksigeniahechauka/item_row}}{{/done}}</ul>
+    </details>
+    {{/donecount}}
+</section>
+{{/empty}}
+{{/content}}
