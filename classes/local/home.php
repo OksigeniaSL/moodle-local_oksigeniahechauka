@@ -225,6 +225,8 @@ class home {
                 ['action' => 'reload', 'id' => $s->id, 'sesskey' => sesskey()]
             ))->out(false) : '',
             'reloadicon' => icons::svg('reload'),
+            'previewlabel' => get_string('preview_of', $c, $name),
+            'reloadlabel' => get_string('reload_of', $c, $name),
             'lastseen' => (int) $s->lastseen,
             'drift' => $state['drift'],
         ];

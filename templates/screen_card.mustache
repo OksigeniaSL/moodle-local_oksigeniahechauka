@@ -38,7 +38,9 @@
         "preview": "https://example.com/local/oksigeniahechauka/preview.php?screen=3",
         "previewicon": "",
         "reload": "https://example.com/local/oksigeniahechauka/index.php?action=reload&id=3",
-        "reloadicon": ""
+        "reloadicon": "",
+        "previewlabel": "Vista previa de Entrada",
+        "reloadlabel": "Recargar Entrada"
     }
 }}
 <div class="hkp-slot">
@@ -51,10 +53,10 @@
 </div>
 <div class="hkp-screen-body">
     <h3>{{#url}}<a href="{{url}}">{{name}}</a>{{/url}}{{^url}}{{name}}{{/url}}</h3>
-    <p class="hkp-state" data-state="{{state}}"><span class="hkp-dot" aria-hidden="true"></span>{{label}}{{#meta}} <span class="hkp-meta">· {{meta}}</span>{{/meta}}</p>
+    <p class="hkp-state" data-state="{{state}}"><span class="hkp-state-word"><span class="hkp-dot" aria-hidden="true"></span>{{label}}</span>{{#meta}} <span class="hkp-meta">· {{meta}}</span>{{/meta}}</p>
     {{#now}}<p class="hkp-now">{{#str}}now_label, local_oksigeniahechauka{{/str}} <b>{{now}}</b></p>{{/now}}
 </div>
 <div class="hkp-screen-actions">
-    <a class="btn btn-sm btn-outline-secondary" href="{{preview}}">{{{previewicon}}}<span class="hkp-lbl">{{#str}}preview, local_oksigeniahechauka{{/str}}</span></a>
-    {{#reload}}<a class="btn btn-sm btn-outline-secondary" href="{{reload}}">{{{reloadicon}}}<span class="hkp-lbl">{{#str}}reload, local_oksigeniahechauka{{/str}}</span></a>{{/reload}}
+    <a class="btn btn-sm btn-outline-secondary" href="{{preview}}" aria-label="{{previewlabel}}" title="{{previewlabel}}">{{{previewicon}}}<span class="hkp-lbl">{{#str}}preview, local_oksigeniahechauka{{/str}}</span></a>
+    {{#reload}}<a class="btn btn-sm btn-outline-secondary" href="{{reload}}" aria-label="{{reloadlabel}}" title="{{reloadlabel}}">{{{reloadicon}}}<span class="hkp-lbl">{{#str}}reload, local_oksigeniahechauka{{/str}}</span></a>{{/reload}}
 </div>

@@ -18,3 +18,33 @@ body.hkp-page #page.drawers .main-inner {
 .hkp-slot iframe {
     pointer-events: none;
 }
+
+/* A state keeps its dot and its word together; only what follows («· se enciende el jueves…») wraps. */
+.hkp-state-word {
+    display: inline-flex;
+    align-items: center;
+    gap: .45rem;
+    white-space: nowrap;
+}
+
+/* The names of the screens look the same for everyone: the text's colour, bold, underlined only on hover or focus
+   (the theme's own link colours would otherwise win for who may open the sheet). */
+.hkp .hkp-screen .hkp-screen-body h3 a,
+.hkp .hkp-screen .hkp-screen-body h3 a:visited {
+    color: var(--hkp-ink);
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.hkp .hkp-screen .hkp-screen-body h3 a:hover,
+.hkp .hkp-screen .hkp-screen-body h3 a:focus-visible {
+    text-decoration: underline;
+}
+
+/* Moodle's dark mode underlines every link of the page's content; the links the panel draws as pieces (the names of
+   the screens, the tabs, the card to add a screen) keep the design's look, underlined only on hover or focus. */
+[data-bs-theme] #region-main .hkp .hkp-screen-body h3 a:not(.btn):not(:hover):not(:focus-visible),
+[data-bs-theme] #region-main .hkp .hkp-tabs a:not(.btn):not(:hover):not(:focus-visible),
+[data-bs-theme] #region-main .hkp .hkp-screen.is-add a:not(.btn):not(:hover):not(:focus-visible) {
+    text-decoration: none;
+}
