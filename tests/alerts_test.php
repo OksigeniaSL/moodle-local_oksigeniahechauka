@@ -49,7 +49,7 @@ final class alerts_test extends \advanced_testcase {
      * @param string $when
      * @return int
      */
-    protected function at(string $when): int {
+    protected function moment(string $when): int {
         return (new \DateTime($when, new \DateTimeZone('Europe/Madrid')))->getTimestamp();
     }
 
@@ -73,7 +73,7 @@ final class alerts_test extends \advanced_testcase {
         $this->resetAfterTest();
         $this->setTimezone('Europe/Madrid');
         $manager = $this->manager();
-        $now = $this->at('2026-11-02 10:00');
+        $now = $this->moment('2026-11-02 10:00');
         $id = $this->screen('Library', ['lastseen' => $now - 60]);
         $sink = $this->redirectMessages();
 
@@ -100,15 +100,15 @@ final class alerts_test extends \advanced_testcase {
         $this->setTimezone('Europe/Madrid');
         $this->manager();
         $power = json_encode([['days' => [1, 2, 3, 4, 5], 'on' => '07:30', 'off' => '18:30']]);
-        $friday = $this->at('2026-11-06 18:29');
+        $friday = $this->moment('2026-11-06 18:29');
         $this->screen('Hall', ['lastseen' => $friday, 'power' => $power]);
         $this->screen('Gym', ['lastseen' => $friday, 'power' => $power, 'alerts' => 0]);
         $this->screen('Old', ['lastseen' => $friday, 'power' => $power, 'keyhash' => null]);
         $sink = $this->redirectMessages();
 
-        $this->assertSame(['down' => 0, 'back' => 0], alerts::check($this->at('2026-11-06 22:00')));
-        $this->assertSame(['down' => 0, 'back' => 0], alerts::check($this->at('2026-11-09 07:40')));
-        $this->assertSame(['down' => 1, 'back' => 0], alerts::check($this->at('2026-11-09 07:50')));
+        $this->assertSame(['down' => 0, 'back' => 0], alerts::check($this->moment('2026-11-06 22:00')));
+        $this->assertSame(['down' => 0, 'back' => 0], alerts::check($this->moment('2026-11-09 07:40')));
+        $this->assertSame(['down' => 1, 'back' => 0], alerts::check($this->moment('2026-11-09 07:50')));
         $this->assertCount(1, $sink->get_messages());
     }
 }
