@@ -46,5 +46,15 @@ function xmldb_local_oksigeniahechauka_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026103102, 'local', 'oksigeniahechauka');
     }
 
+    if ($oldversion < 2026103106) {
+        // What a screen does at its next heartbeat: reload, from the panel.
+        $table = new xmldb_table('local_oksigeniahechauka_screen');
+        $field = new xmldb_field('command', XMLDB_TYPE_CHAR, '20', null, null, null, null, 'alerted');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        upgrade_plugin_savepoint(true, 2026103106, 'local', 'oksigeniahechauka');
+    }
+
     return true;
 }

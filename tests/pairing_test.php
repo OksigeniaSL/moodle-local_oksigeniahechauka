@@ -94,4 +94,27 @@ final class pairing_test extends \advanced_testcase {
         $this->assertSame('KM7Q4X', keys::clean_code(' km7-q4x '));
         $this->assertSame(43, strlen(keys::new_key()));
     }
+
+    /**
+     * A command from the panel reaches a screen once; «every screen» means the paired ones.
+     */
+    public function test_commands(): void {
+        global $DB;
+        $this->resetAfterTest();
+        $one = (int) $DB->insert_record('local_oksigeniahechauka_screen', (object) ['name' => 'Hall', 'template' => 'zones',
+            'theme' => 'site', 'keyhash' => sha1('a')]);
+        $two = (int) $DB->insert_record('local_oksigeniahechauka_screen', (object) ['name' => 'Gym', 'template' => 'zones',
+            'theme' => 'site', 'keyhash' => sha1('b')]);
+        $old = (int) $DB->insert_record('local_oksigeniahechauka_screen', (object) ['name' => 'Old', 'template' => 'zones',
+            'theme' => 'site', 'keyhash' => null]);
+        $this->assertSame([], screens::take_commands($one));
+        screens::ask($one, 'reload');
+        $this->assertSame(['reload'], screens::take_commands($one));
+        $this->assertSame([], screens::take_commands($one));
+        $this->assertSame([], screens::take_commands($two));
+        screens::ask(0, 'reload');
+        $this->assertSame(['reload'], screens::take_commands($one));
+        $this->assertSame(['reload'], screens::take_commands($two));
+        $this->assertSame([], screens::take_commands($old));
+    }
 }

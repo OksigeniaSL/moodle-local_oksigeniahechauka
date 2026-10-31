@@ -31,6 +31,7 @@ require(__DIR__ . '/../../../config.php');
 
 use local_oksigeniahechauka\local\endpoint;
 use local_oksigeniahechauka\local\manifest;
+use local_oksigeniahechauka\local\player_page;
 use local_oksigeniahechauka\local\screens;
 
 endpoint::method('POST');
@@ -38,4 +39,8 @@ $screen = endpoint::screen();
 $now = time();
 screens::heartbeat($screen, endpoint::body(), $now);
 $screen = $DB->get_record('local_oksigeniahechauka_screen', ['id' => $screen->id]);
-endpoint::send(['manifest' => manifest::build($screen, $now)['etag'], 'commands' => []]);
+endpoint::send([
+    'manifest' => manifest::build($screen, $now)['etag'],
+    'commands' => screens::take_commands((int) $screen->id),
+    'build' => player_page::build(),
+]);

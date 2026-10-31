@@ -72,8 +72,19 @@ class player_page {
                 'screenshot' => $api('screenshot'),
             ],
             'sw' => (new \moodle_url('/local/oksigeniahechauka/player/sw.js'))->out(false),
+            'build' => self::build(),
             'strings' => self::strings(),
         ];
+    }
+
+    /**
+     * The build of the player on the server: the version of the plugin. A screen that runs another one reloads.
+     *
+     * @return int
+     */
+    public static function build(): int {
+        $plugin = \core_plugin_manager::instance()->get_plugin_info('local_oksigeniahechauka');
+        return $plugin ? (int) $plugin->versiondisk : 0;
     }
 
     /**
@@ -110,8 +121,7 @@ class player_page {
      */
     public static function html(array $boot): string {
         global $SITE;
-        $plugin = \core_plugin_manager::instance()->get_plugin_info('local_oksigeniahechauka');
-        $v = $plugin ? $plugin->versiondisk : 0;
+        $v = self::build();
         $css = (new \moodle_url('/local/oksigeniahechauka/player/hechauka.css', ['v' => $v]))->out(false);
         $js = (new \moodle_url('/local/oksigeniahechauka/player/build/hechauka.js', ['v' => $v]))->out(false);
         $json = json_encode($boot, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP);

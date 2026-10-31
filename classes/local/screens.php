@@ -240,6 +240,38 @@ class screens {
     }
 
     /**
+     * Asks screens to do something at their next heartbeat.
+     *
+     * @param int $screenid a screen, or 0 for every screen
+     * @param string $command reload
+     * @return void
+     */
+    public static function ask(int $screenid, string $command): void {
+        global $DB;
+        if ($screenid) {
+            $DB->set_field('local_oksigeniahechauka_screen', 'command', $command, ['id' => $screenid]);
+        } else {
+            $DB->set_field_select('local_oksigeniahechauka_screen', 'command', $command, 'keyhash IS NOT NULL');
+        }
+    }
+
+    /**
+     * What a screen has been asked to do, once: it is forgotten as it is handed out.
+     *
+     * @param int $screenid
+     * @return string[]
+     */
+    public static function take_commands(int $screenid): array {
+        global $DB;
+        $command = (string) $DB->get_field('local_oksigeniahechauka_screen', 'command', ['id' => $screenid]);
+        if ($command === '') {
+            return [];
+        }
+        $DB->set_field('local_oksigeniahechauka_screen', 'command', null, ['id' => $screenid]);
+        return [$command];
+    }
+
+    /**
      * Revokes the key of a screen: it goes back to showing a code.
      *
      * @param int $screenid

@@ -42,6 +42,9 @@ its own:
 
 - `mode`: `screen` for a real screen; `preview` inside the management panel (see «Preview»).
 - `strings`: the few texts the player shows on its own (pairing, «no connection»), in the language of the site.
+- `build`: the build of the player this page carries (see «Heartbeat»).
+- The page, its script and its styles are kept on the device (a service worker), and used when the network fails or
+  the server answers with an error, for example while the site is being updated.
 
 ## Pairing
 
@@ -203,11 +206,14 @@ All fields are optional; an item without `when` is always on.
 Answer:
 
 ```json
-{"manifest": "9f2c…", "commands": []}
+{"manifest": "9f2c…", "commands": ["reload"], "build": 2026103106}
 ```
 
-When `manifest` differs from the etag the player holds, it fetches the manifest again. `commands` is empty in version
-1; it is where restart, reload and «screenshot now» will go.
+- When `manifest` differs from the etag the player holds, it fetches the manifest again.
+- `commands`: what the screen was asked to do, handed out once. `reload`: the page loads again (at its next change of
+  slide). Restart and «screenshot now» will go here too.
+- `build`: the build of the player on the server, the same value as `build` in the boot block. A screen whose page
+  came with another build reloads, at its next change of slide, to pick up the new player.
 
 ## Screenshot
 

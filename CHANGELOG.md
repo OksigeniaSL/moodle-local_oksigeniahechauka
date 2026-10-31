@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.4.3 (2026-10-31)
+
+- Fixed: a screen that reloaded while its site was being updated showed Moodle's maintenance page and stayed there.
+  The service worker now keeps going with its copy of the player when the server answers with an error, as it does
+  without a network; with no copy yet, the screen shows black and tries again every half minute.
+- «Reload» on each screen of the panel, and «Reload every screen»: the screen reloads at its next heartbeat, within a
+  minute, at its next change of slide.
+- A screen reloads by itself when the server has a new player (the heartbeat says its build), instead of waiting for
+  the night.
 ## 0.4.2 (2026-10-31)
 
 - Fixed: the all-day events of a calendar subscription (a school's Google calendar, for example) never reached the

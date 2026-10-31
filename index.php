@@ -94,6 +94,11 @@ if ($action !== '' && confirm_sesskey()) {
                 die();
             }
             break;
+        case 'reload':
+        case 'reloadall':
+            screens::ask($action === 'reload' ? $id : 0, 'reload');
+            redirect($url, get_string($action . '_done', $c), null, \core\output\notification::NOTIFY_SUCCESS);
+            break;
         case 'addgroup':
             $name = trim(optional_param('name', '', PARAM_TEXT));
             if ($name !== '') {
@@ -176,6 +181,13 @@ if (has_capability('moodle/site:config', $context)) {
 
 // The screens: whether each is on, and what it shows.
 echo $OUTPUT->heading(get_string('screens', $c), 3, 'mt-4');
+if (count($screens) > 1) {
+    echo html_writer::tag('p', html_writer::link(
+        new moodle_url($url, ['action' => 'reloadall', 'sesskey' => sesskey()]),
+        get_string('reloadall', $c),
+        ['class' => 'btn btn-outline-secondary btn-sm']
+    ));
+}
 echo html_writer::start_div('d-flex flex-wrap');
 foreach ($screens as $s) {
     $info = json_decode((string) $s->lastinfo, true) ?: [];
@@ -222,6 +234,11 @@ foreach ($screens as $s) {
         new moodle_url('/local/oksigeniahechauka/preview.php', ['screen' => $s->id]),
         get_string('preview', $c),
         ['class' => 'btn btn-primary btn-sm me-2']
+    );
+    echo html_writer::link(
+        new moodle_url($url, ['action' => 'reload', 'id' => $s->id, 'sesskey' => sesskey()]),
+        get_string('reload', $c),
+        ['class' => 'btn btn-outline-secondary btn-sm me-2']
     );
     echo html_writer::link($screenurl, get_string('edit'), ['class' => 'btn btn-outline-secondary btn-sm me-2']);
     echo html_writer::link(

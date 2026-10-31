@@ -13,7 +13,7 @@ import {isDark, isLive, isPowerOn, liveItems} from './rules.js';
 import {Screen} from './render.js';
 import {store} from './store.js';
 
-const VERSION = '0.3.0';
+const VERSION = '0.4.3';
 const DEFAULT_SECONDS = {main: 10, side: 12, ticker: 0};
 const HEARTBEAT_MS = 60000;
 const REFRESH_MS = 15 * 60000;
@@ -214,6 +214,10 @@ class Player {
         this.screen.setClock(this.clock.date());
 
         const r = this.rotator.pick(this.mainList(wall), now);
+        if (this.reloadAt && (r.changed || Date.now() - this.reloadAt > 30000)) {
+            location.reload();
+            return;
+        }
         if (r.changed) {
             this.screen.showMain(r.item);
         }
@@ -275,6 +279,12 @@ class Player {
             self.errors = [];
             if (r && r.manifest && (!m || r.manifest !== m.etag)) {
                 self.refresh();
+            }
+            // Asked from the panel, or a new player on the server: reload at the next change of slide.
+            const asked = r && r.commands && r.commands.indexOf('reload') !== -1;
+            const newer = r && r.build && self.boot.build && r.build !== self.boot.build;
+            if ((asked || newer) && !self.reloadAt) {
+                self.reloadAt = Date.now();
             }
         }, function (e) {
             if (e && e.revoked) {
