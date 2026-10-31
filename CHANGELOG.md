@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.4.1 (2026-10-31)
+
+- Fixed: «Picture or video» failed to open on a site where the page had not loaded the file constants of the
+  repositories (`FILE_INTERNAL`). The form loads them itself now, and a test checks that every file using them does.
+- A test builds every form of the panel for every kind of content.
 ## 0.4.0 (2026-10-31)
 
 - When an item shows, said as people say it: always, a single day, between two dates, from a date on or every day until

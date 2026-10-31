@@ -27,6 +27,7 @@ namespace local_oksigeniahechauka\form;
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir . '/formslib.php');
+require_once($CFG->dirroot . '/repository/lib.php'); // FILE_INTERNAL, which a page does not always have loaded.
 
 use local_oksigeniahechauka\local\schedule;
 
