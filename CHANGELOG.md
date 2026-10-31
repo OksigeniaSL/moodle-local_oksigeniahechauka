@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.4.2 (2026-10-31)
+
+- Fixed: the all-day events of a calendar subscription (a school's Google calendar, for example) never reached the
+  screens. Moodle keeps them at midnight lasting nothing, and the screen took them as over as soon as they started. An
+  event from midnight that lasts nothing, or up to another midnight, is now a whole day and lasts until the end of its
+  last day.
 ## 0.4.1 (2026-10-31)
 
 - Fixed: «Picture or video» failed to open on a site where the page had not loaded the file constants of the

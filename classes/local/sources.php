@@ -151,9 +151,15 @@ class sources {
             200
         );
         $items = [];
+        $zone = \core_date::get_server_timezone();
         foreach ($records as $ev) {
             $start = (int) $ev->timestart;
             $end = $start + (int) $ev->timeduration;
+            // A whole day, the way a calendar subscription leaves it: from midnight, lasting nothing or up to another
+            // midnight. It lasts until the end of its last day.
+            $allday = usergetmidnight($start, $zone) === $start
+                && ($ev->timeduration == 0 || usergetmidnight($end, $zone) === $end);
+            $last = $allday && $ev->timeduration > 0 ? $end - 60 : $end;
             $item = [
                 'id' => 'event-' . $ev->id,
                 'type' => 'event',
@@ -161,10 +167,13 @@ class sources {
                 'title' => self::line($ev->name, 80),
                 'start' => schedule::stamp($start),
                 'color' => 1,
-                'when' => ['from' => schedule::day($start), 'until' => schedule::day($end)],
+                'when' => ['from' => schedule::day($start), 'until' => schedule::day($last)],
             ];
+            if ($allday) {
+                $item['allday'] = true;
+            }
             if ($ev->timeduration > 0) {
-                $item['end'] = schedule::stamp($end);
+                $item['end'] = schedule::stamp($last);
             }
             if (trim((string) $ev->location) !== '') {
                 $item['detail'] = self::line($ev->location, 60);
