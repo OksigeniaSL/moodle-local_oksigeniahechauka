@@ -35,7 +35,7 @@ final class ical_test extends \advanced_testcase {
      * @param string $when
      * @return int
      */
-    protected function at(string $when): int {
+    protected function moment(string $when): int {
         return (new \DateTime($when, new \DateTimeZone('Atlantic/Canary')))->getTimestamp();
     }
 
@@ -73,8 +73,8 @@ final class ical_test extends \advanced_testcase {
             "END:VCALENDAR\r\n";
         $events = ical::events(
             $ics,
-            $this->at('2026-10-31 00:00'),
-            $this->at('2026-11-14 23:59'),
+            $this->moment('2026-10-31 00:00'),
+            $this->moment('2026-11-14 23:59'),
             new \DateTimeZone('Atlantic/Canary')
         );
         $this->assertSame([
@@ -103,8 +103,8 @@ final class ical_test extends \advanced_testcase {
             "END:VCALENDAR\n";
         $events = ical::events(
             $ics,
-            $this->at('2026-11-01 00:00'),
-            $this->at('2026-11-14 23:59'),
+            $this->moment('2026-11-01 00:00'),
+            $this->moment('2026-11-14 23:59'),
             new \DateTimeZone('Atlantic/Canary')
         );
         $this->assertSame([

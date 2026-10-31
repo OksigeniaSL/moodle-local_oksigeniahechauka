@@ -79,4 +79,18 @@ final class forms_test extends \advanced_testcase {
         }
         $this->assertSame([], $missing);
     }
+
+    /**
+     * No test names a method of its own «at»: PHPUnit 9 (Moodle 4.5) has a static one with that name, and the whole run
+     * stops with a fatal error.
+     */
+    public function test_no_helper_named_at(): void {
+        $clash = [];
+        foreach (glob(__DIR__ . '/*_test.php') as $path) {
+            if (preg_match('/function\s+at\s*\(/', file_get_contents($path))) {
+                $clash[] = basename($path);
+            }
+        }
+        $this->assertSame([], $clash);
+    }
 }
