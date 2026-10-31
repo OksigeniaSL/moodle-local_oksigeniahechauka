@@ -51,16 +51,16 @@
     </div>
     {{#nowcount}}
     <h3 class="hkp-group-title"><span class="hkp-onair" aria-hidden="true"></span>{{#str}}group_now, local_oksigeniahechauka{{/str}} <span class="hkp-count">{{nowcount}}</span></h3>
-    <ul class="hkp-items">{{#now}}{{> local_oksigeniahechauka/item_row}}{{/now}}</ul>
+    <ul class="hkp-items">{{#now}}<li class="hkp-item" data-type="{{type}}" data-mine="{{#mine}}1{{/mine}}{{^mine}}0{{/mine}}">{{> local_oksigeniahechauka/item_row}}</li>{{/now}}</ul>
     {{/nowcount}}
     {{#latercount}}
     <h3 class="hkp-group-title">{{{clockicon}}}{{#str}}group_later, local_oksigeniahechauka{{/str}} <span class="hkp-count">{{latercount}}</span></h3>
-    <ul class="hkp-items">{{#later}}{{> local_oksigeniahechauka/item_row}}{{/later}}</ul>
+    <ul class="hkp-items">{{#later}}<li class="hkp-item" data-type="{{type}}" data-mine="{{#mine}}1{{/mine}}{{^mine}}0{{/mine}}">{{> local_oksigeniahechauka/item_row}}</li>{{/later}}</ul>
     {{/latercount}}
     {{#donecount}}
     <details class="hkp-done">
         <summary>{{{chevicon}}}{{#str}}group_done, local_oksigeniahechauka{{/str}} <span class="hkp-count">{{donecount}}</span></summary>
-        <ul class="hkp-items">{{#done}}{{> local_oksigeniahechauka/item_row}}{{/done}}</ul>
+        <ul class="hkp-items">{{#done}}<li class="hkp-item" data-type="{{type}}" data-mine="{{#mine}}1{{/mine}}{{^mine}}0{{/mine}}">{{> local_oksigeniahechauka/item_row}}</li>{{/done}}</ul>
     </details>
     {{/donecount}}
 </section>

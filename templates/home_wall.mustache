@@ -33,7 +33,7 @@
         {{#reloadall}}<div class="hkp-sec-tools"><a class="btn btn-sm btn-outline-secondary" href="{{reloadall}}">{{{reloadicon}}}{{#str}}reloadall, local_oksigeniahechauka{{/str}}</a></div>{{/reloadall}}
     </div>
     <ul class="hkp-wall">
-        {{#screens}}{{> local_oksigeniahechauka/screen_card}}{{/screens}}
+        {{#screens}}<li class="hkp-screen" data-state="{{state}}" data-shape="{{shape}}">{{> local_oksigeniahechauka/screen_card}}</li>{{/screens}}
         {{#add}}<li class="hkp-screen is-add">{{{addicon}}}<h3><a href="{{add}}">{{#str}}addscreen_card, local_oksigeniahechauka{{/str}}</a></h3><span>{{#str}}addscreen_card_sub, local_oksigeniahechauka{{/str}}</span></li>{{/add}}
     </ul>
 </section>

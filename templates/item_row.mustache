@@ -17,8 +17,8 @@
 {{!
     @template local_oksigeniahechauka/item_row
 
-    A piece of content in the list: drawn with the screens' own pieces, then its title and meta, when it shows, where,
-    and what the person may do with it.
+    A piece of content in the list, inside its list item: drawn with the screens' own pieces, then its title and meta,
+    when it shows, where, and what the person may do with it.
 
     Example context (json):
     {
@@ -41,13 +41,11 @@
         "menu": ""
     }
 }}
-<li class="hkp-item" data-type="{{type}}" data-mine="{{#mine}}1{{/mine}}{{^mine}}0{{/mine}}">
-    {{#thumb}}{{> local_oksigeniahechauka/item_thumb}}{{/thumb}}
-    <div class="hkp-item-main">
-        <h4 class="hkp-item-title">{{title}}</h4>
-        <p class="hkp-item-meta"><span class="hkp-type">{{{kindicon}}}{{kind}}</span>{{#meta}}{{#flag}}<span class="hkp-flag">{{{icon}}}{{text}}</span>{{/flag}}{{^flag}}<span>{{text}}</span>{{/flag}}{{/meta}}</p>
-    </div>
-    <p class="hkp-item-when">{{{clockicon}}}<span class="visually-hidden sr-only">{{#str}}when_label, local_oksigeniahechauka{{/str}} </span><b>{{when}}</b>{{#whensmall}}<small{{#soon}} class="is-soon"{{/soon}}>{{whensmall}}</small>{{/whensmall}}</p>
-    <p class="hkp-item-where">{{{screensicon}}}<span class="visually-hidden sr-only">{{#str}}where_label, local_oksigeniahechauka{{/str}} </span><span>{{where}}</span>{{#wheresmall}}<small>{{wheresmall}}</small>{{/wheresmall}}</p>
-    <div class="hkp-item-actions">{{#actions}}<a class="btn btn-sm btn-outline-secondary" href="{{url}}">{{{icon}}}{{label}}</a>{{/actions}}{{{menu}}}</div>
-</li>
+{{#thumb}}{{> local_oksigeniahechauka/item_thumb}}{{/thumb}}
+<div class="hkp-item-main">
+    <h4 class="hkp-item-title">{{title}}</h4>
+    <p class="hkp-item-meta"><span class="hkp-type">{{{kindicon}}}{{kind}}</span>{{#meta}}{{#flag}}<span class="hkp-flag">{{{icon}}}{{text}}</span>{{/flag}}{{^flag}}<span>{{text}}</span>{{/flag}}{{/meta}}</p>
+</div>
+<p class="hkp-item-when">{{{clockicon}}}<span class="visually-hidden sr-only">{{#str}}when_label, local_oksigeniahechauka{{/str}} </span><b>{{when}}</b>{{#whensmall}}<small{{#soon}} class="is-soon"{{/soon}}>{{whensmall}}</small>{{/whensmall}}</p>
+<p class="hkp-item-where">{{{screensicon}}}<span class="visually-hidden sr-only">{{#str}}where_label, local_oksigeniahechauka{{/str}} </span><span>{{where}}</span>{{#wheresmall}}<small>{{wheresmall}}</small>{{/wheresmall}}</p>
+<div class="hkp-item-actions">{{#actions}}<a class="btn btn-sm btn-outline-secondary" href="{{url}}">{{{icon}}}{{label}}</a>{{/actions}}{{{menu}}}</div>

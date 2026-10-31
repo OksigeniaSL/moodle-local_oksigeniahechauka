@@ -17,8 +17,8 @@
 {{!
     @template local_oksigeniahechauka/screen_card
 
-    A screen on the wall of the panel: a small television with its light, its picture (what it sent, or the player
-    itself as the preview draws it), its state and what it shows now.
+    A screen on the wall of the panel, inside its list item: a small television with its light, its picture (what it
+    sent, or the player itself as the preview draws it), its state and what it shows now.
 
     Example context (json):
     {
@@ -41,22 +41,20 @@
         "reloadicon": ""
     }
 }}
-<li class="hkp-screen" data-state="{{state}}" data-shape="{{shape}}">
-    <div class="hkp-slot">
-        <span class="hkp-bezel{{#vertical}} is-v{{/vertical}}" data-state="{{state}}" role="img" aria-label="{{alt}}">
-            {{#image}}<img src="{{image}}" alt="" loading="lazy">{{/image}}
-            {{#frame}}<iframe src="{{frame}}" title="{{alt}}" loading="lazy" tabindex="-1" aria-hidden="true"></iframe>{{/frame}}
-            {{#over}}<span class="hkp-over"><span>{{{over}}}</span></span>{{/over}}
-            <span class="hkp-led" aria-hidden="true"></span>
-        </span>
-    </div>
-    <div class="hkp-screen-body">
-        <h3>{{#url}}<a href="{{url}}">{{name}}</a>{{/url}}{{^url}}{{name}}{{/url}}</h3>
-        <p class="hkp-state" data-state="{{state}}"><span class="hkp-dot" aria-hidden="true"></span>{{label}}{{#meta}} <span class="hkp-meta">· {{meta}}</span>{{/meta}}</p>
-        {{#now}}<p class="hkp-now">{{#str}}now_label, local_oksigeniahechauka{{/str}} <b>{{now}}</b></p>{{/now}}
-    </div>
-    <div class="hkp-screen-actions">
-        <a class="btn btn-sm btn-outline-secondary" href="{{preview}}">{{{previewicon}}}<span class="hkp-lbl">{{#str}}preview, local_oksigeniahechauka{{/str}}</span></a>
-        {{#reload}}<a class="btn btn-sm btn-outline-secondary" href="{{reload}}">{{{reloadicon}}}<span class="hkp-lbl">{{#str}}reload, local_oksigeniahechauka{{/str}}</span></a>{{/reload}}
-    </div>
-</li>
+<div class="hkp-slot">
+    <span class="hkp-bezel{{#vertical}} is-v{{/vertical}}" data-state="{{state}}" role="img" aria-label="{{alt}}">
+        {{#image}}<img src="{{image}}" alt="" loading="lazy">{{/image}}
+        {{#frame}}<iframe src="{{frame}}" title="{{alt}}" loading="lazy" tabindex="-1" aria-hidden="true"></iframe>{{/frame}}
+        {{#over}}<span class="hkp-over"><span>{{{over}}}</span></span>{{/over}}
+        <span class="hkp-led" aria-hidden="true"></span>
+    </span>
+</div>
+<div class="hkp-screen-body">
+    <h3>{{#url}}<a href="{{url}}">{{name}}</a>{{/url}}{{^url}}{{name}}{{/url}}</h3>
+    <p class="hkp-state" data-state="{{state}}"><span class="hkp-dot" aria-hidden="true"></span>{{label}}{{#meta}} <span class="hkp-meta">· {{meta}}</span>{{/meta}}</p>
+    {{#now}}<p class="hkp-now">{{#str}}now_label, local_oksigeniahechauka{{/str}} <b>{{now}}</b></p>{{/now}}
+</div>
+<div class="hkp-screen-actions">
+    <a class="btn btn-sm btn-outline-secondary" href="{{preview}}">{{{previewicon}}}<span class="hkp-lbl">{{#str}}preview, local_oksigeniahechauka{{/str}}</span></a>
+    {{#reload}}<a class="btn btn-sm btn-outline-secondary" href="{{reload}}">{{{reloadicon}}}<span class="hkp-lbl">{{#str}}reload, local_oksigeniahechauka{{/str}}</span></a>{{/reload}}
+</div>
