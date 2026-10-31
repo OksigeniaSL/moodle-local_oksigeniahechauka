@@ -464,12 +464,78 @@
             tools.appendChild(seg);
         }
 
-        // The type: another kind of content is another page.
+        // The type: another kind of content is another page, and what was written goes with it (a notice that turns out
+        // to be an event is not written twice).
+        const CARRY = 'hkp-compose-carry';
         qa('input[name="kind"]').forEach(function (r) {
             r.addEventListener('change', function () {
+                const keep = {title: value('#hkp-title'), body: value('#hkp-body'), from: value('#hkp-from'),
+                    to: value('#hkp-to'), every: value('#hkp-every'), when: (q('input[name="when"]:checked') || {}).value,
+                    days: state().days, hours: q('#hkp-hours') && q('#hkp-hours').checked,
+                    hf0: value('#hkp-hf0'), ht0: value('#hkp-ht0'),
+                    where: qa('input[data-where]').filter(function (x) {
+                        return x.checked;
+                    }).map(function (x) {
+                        return x.name + '=' + x.value;
+                    })};
+                try {
+                    window.sessionStorage.setItem(CARRY, JSON.stringify(keep));
+                } catch (e) {
+                    // Without storage, the new type starts empty.
+                }
                 location.href = r.getAttribute('data-url');
             });
         });
+        let carried = null;
+        try {
+            carried = JSON.parse(window.sessionStorage.getItem(CARRY) || 'null');
+            window.sessionStorage.removeItem(CARRY);
+        } catch (e) {
+            carried = null;
+        }
+        if (carried && !cfg.id) {
+            const put = function (sel, v) {
+                if (q(sel) && v !== undefined && v !== null && v !== '') {
+                    q(sel).value = v;
+                }
+            };
+            put('#hkp-title', carried.title);
+            put('#hkp-body', carried.body);
+            put('#hkp-from', carried.from);
+            put('#hkp-to', carried.to);
+            put('#hkp-every', carried.every);
+            put('#hkp-hf0', carried.hf0);
+            put('#hkp-ht0', carried.ht0);
+            const when = carried.when && q('input[name="when"][value="' + carried.when + '"]');
+            if (when) {
+                when.checked = true;
+                q('#hkp-dates').hidden = carried.when !== 'dates';
+            }
+            if (carried.days && carried.days.length) {
+                qa('[data-day]').forEach(function (b) {
+                    b.setAttribute('aria-pressed', carried.days.indexOf(Number(b.getAttribute('data-day'))) >= 0 ?
+                        'true' : 'false');
+                });
+                const box = q('#hkp-days-inputs');
+                box.textContent = '';
+                carried.days.forEach(function (d) {
+                    const input = doc.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'days[]';
+                    input.value = d;
+                    box.appendChild(input);
+                });
+            }
+            if (q('#hkp-hours') && carried.hours) {
+                q('#hkp-hours').checked = true;
+                q('#hkp-hours-rows').hidden = false;
+            }
+            if (carried.where && carried.where.length) {
+                qa('input[data-where]').forEach(function (x) {
+                    x.checked = carried.where.indexOf(x.name + '=' + x.value) >= 0;
+                });
+            }
+        }
         // When.
         qa('input[name="when"]').forEach(function (r) {
             r.addEventListener('change', function () {
