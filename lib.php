@@ -42,7 +42,7 @@ function local_oksigeniahechauka_pluginfile($course, $cm, $context, $filearea, $
         return false;
     }
     require_login();
-    require_capability('local/oksigeniahechauka:manage', $context);
+    require_capability('local/oksigeniahechauka:view', $context);
     $itemid = (int) array_shift($args);
     $filename = array_pop($args);
     $filepath = $args ? '/' . implode('/', $args) . '/' : '/';

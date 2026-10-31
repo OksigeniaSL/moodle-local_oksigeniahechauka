@@ -32,7 +32,7 @@ use local_oksigeniahechauka\local\screens;
 $id = required_param('id', PARAM_INT);
 $context = context_system::instance();
 require_login(null, false);
-require_capability('local/oksigeniahechauka:manage', $context);
+require_capability('local/oksigeniahechauka:managescreens', $context);
 
 $c = 'local_oksigeniahechauka';
 $screen = $DB->get_record('local_oksigeniahechauka_screen', ['id' => $id], '*', MUST_EXIST);

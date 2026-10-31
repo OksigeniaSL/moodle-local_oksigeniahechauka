@@ -25,23 +25,43 @@
 require(__DIR__ . '/../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
 
+use local_oksigeniahechauka\local\access;
 use local_oksigeniahechauka\local\files;
 use local_oksigeniahechauka\local\items;
 use local_oksigeniahechauka\local\schedule;
 use local_oksigeniahechauka\local\screens;
 
-admin_externalpage_setup('local_oksigeniahechauka_panel');
-$context = context_system::instance();
-require_capability('local/oksigeniahechauka:manage', $context);
-
 $c = 'local_oksigeniahechauka';
 $url = new moodle_url('/local/oksigeniahechauka/index.php');
+$context = context_system::instance();
+require_login(null, false);
+access::require_cap('view');
+$PAGE->set_context($context);
+$PAGE->set_url($url);
+$PAGE->set_pagelayout('standard');
+$PAGE->set_title(get_string('manage', $c));
+$PAGE->set_heading(get_string('manage', $c));
+$PAGE->set_primary_active_tab('local_oksigeniahechauka');
 $action = optional_param('action', '', PARAM_ALPHA);
 $now = time();
+$limited = access::limited();
+$managescreens = access::can('managescreens');
+$publishall = access::can('publishall');
 
 // The actions of the panel, each with its sesskey.
 if ($action !== '' && confirm_sesskey()) {
     $id = optional_param('id', 0, PARAM_INT);
+    // Each action with who may do it: the screens and groups, who runs them; an item, who may change it.
+    if (in_array($action, ['removescreen', 'reload', 'reloadall', 'addgroup', 'deletegroup'])) {
+        access::require_cap('managescreens');
+    } else if (in_array($action, ['up', 'down'])) {
+        access::require_cap('publishall');
+    } else if (in_array($action, ['show', 'hide', 'delete'])) {
+        $item = $DB->get_record('local_oksigeniahechauka_item', ['id' => $id], '*', MUST_EXIST);
+        if (!access::may_edit($item)) {
+            throw new required_capability_exception($context, 'local/oksigeniahechauka:publishall', 'nopermissions', '');
+        }
+    }
     switch ($action) {
         case 'show':
         case 'hide':
@@ -67,7 +87,6 @@ if ($action !== '' && confirm_sesskey()) {
             if (optional_param('confirm', 0, PARAM_BOOL)) {
                 items::delete($id);
             } else {
-                $item = $DB->get_record('local_oksigeniahechauka_item', ['id' => $id], '*', MUST_EXIST);
                 echo $OUTPUT->header();
                 echo $OUTPUT->confirm(
                     get_string('confirmdelete', $c, format_string($item->title)),
@@ -107,6 +126,7 @@ if ($action !== '' && confirm_sesskey()) {
             }
             break;
         case 'deletegroup':
+            access::forget_group($id);
             $DB->delete_records('local_oksigeniahechauka_member', ['groupid' => $id]);
             $DB->delete_records('local_oksigeniahechauka_target', ['groupid' => $id]);
             $DB->delete_records('local_oksigeniahechauka_group', ['id' => $id]);
@@ -176,7 +196,8 @@ function local_oksigeniahechauka_when_text(stdClass $item): string {
 
 $screens = $DB->get_records('local_oksigeniahechauka_screen', null, 'sortorder, name');
 $groups = $DB->get_records_menu('local_oksigeniahechauka_group', null, 'sortorder, name', 'id, name');
-$items = $DB->get_records('local_oksigeniahechauka_item', null, 'sortorder, id');
+// Who publishes only in some groups sees only what they made.
+$items = $DB->get_records('local_oksigeniahechauka_item', $limited ? ['createdby' => $USER->id] : null, 'sortorder, id');
 
 echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('manage', $c));
@@ -189,7 +210,7 @@ if (has_capability('moodle/site:config', $context)) {
 
 // The screens: whether each is on, and what it shows.
 echo $OUTPUT->heading(get_string('screens', $c), 3, 'mt-4');
-if (count($screens) > 1) {
+if ($managescreens && count($screens) > 1) {
     echo html_writer::tag('p', html_writer::link(
         new moodle_url($url, ['action' => 'reloadall', 'sesskey' => sesskey()]),
         get_string('reloadall', $c),
@@ -228,7 +249,11 @@ foreach ($screens as $s) {
     }
     echo html_writer::start_div('card-body');
     $screenurl = new moodle_url('/local/oksigeniahechauka/screen.php', ['id' => $s->id]);
-    echo html_writer::tag('h4', html_writer::link($screenurl, format_string($s->name)), ['class' => 'h5 card-title mb-1']);
+    echo html_writer::tag(
+        'h4',
+        $managescreens ? html_writer::link($screenurl, format_string($s->name)) : format_string($s->name),
+        ['class' => 'h5 card-title mb-1']
+    );
     echo html_writer::tag(
         'p',
         html_writer::tag('span', '●', ['class' => $on ? 'text-success' : ($resting ? 'text-muted' : 'text-danger'),
@@ -243,50 +268,59 @@ foreach ($screens as $s) {
         get_string('preview', $c),
         ['class' => 'btn btn-primary btn-sm me-2']
     );
-    echo html_writer::link(
-        new moodle_url($url, ['action' => 'reload', 'id' => $s->id, 'sesskey' => sesskey()]),
-        get_string('reload', $c),
-        ['class' => 'btn btn-outline-secondary btn-sm me-2']
-    );
-    echo html_writer::link($screenurl, get_string('edit'), ['class' => 'btn btn-outline-secondary btn-sm me-2']);
-    echo html_writer::link(
-        new moodle_url($url, ['action' => 'removescreen', 'id' => $s->id, 'sesskey' => sesskey()]),
-        get_string('remove', $c),
-        ['class' => 'btn btn-outline-secondary btn-sm']
-    );
+    if ($managescreens) {
+        echo html_writer::link(
+            new moodle_url($url, ['action' => 'reload', 'id' => $s->id, 'sesskey' => sesskey()]),
+            get_string('reload', $c),
+            ['class' => 'btn btn-outline-secondary btn-sm me-2']
+        );
+        echo html_writer::link($screenurl, get_string('edit'), ['class' => 'btn btn-outline-secondary btn-sm me-2']);
+        echo html_writer::link(
+            new moodle_url($url, ['action' => 'removescreen', 'id' => $s->id, 'sesskey' => sesskey()]),
+            get_string('remove', $c),
+            ['class' => 'btn btn-outline-secondary btn-sm']
+        );
+    }
     echo html_writer::end_div();
     echo html_writer::end_div();
 }
 
 // Adding a screen: the address it opens, and its code.
 $player = (new moodle_url('/local/oksigeniahechauka/player/'))->out(false);
-echo html_writer::start_div('card mb-3', ['style' => 'width: 24rem;']);
-echo html_writer::start_div('card-body');
-echo html_writer::tag('h4', get_string('addscreen', $c), ['class' => 'h5 card-title']);
-echo html_writer::tag('p', get_string('addscreen_help', $c));
-echo html_writer::tag('p', html_writer::tag('code', s($player), ['class' => 'user-select-all']));
-echo html_writer::start_tag('form', ['method' => 'get', 'action' => (new moodle_url('/local/oksigeniahechauka/claim.php'))
+if ($managescreens) {
+    echo html_writer::start_div('card mb-3', ['style' => 'width: 24rem;']);
+    echo html_writer::start_div('card-body');
+    echo html_writer::tag('h4', get_string('addscreen', $c), ['class' => 'h5 card-title']);
+    echo html_writer::tag('p', get_string('addscreen_help', $c));
+    echo html_writer::tag('p', html_writer::tag('code', s($player), ['class' => 'user-select-all']));
+    echo html_writer::start_tag('form', ['method' => 'get', 'action' => (new moodle_url('/local/oksigeniahechauka/claim.php'))
     ->out(false), 'class' => 'd-flex align-items-end']);
-echo html_writer::start_div('me-2');
-echo html_writer::label(get_string('addscreen_code', $c), 'hk-code', true, ['class' => 'd-block']);
-echo html_writer::empty_tag('input', ['type' => 'text', 'name' => 'code', 'id' => 'hk-code', 'size' => 8,
+    echo html_writer::start_div('me-2');
+    echo html_writer::label(get_string('addscreen_code', $c), 'hk-code', true, ['class' => 'd-block']);
+    echo html_writer::empty_tag('input', ['type' => 'text', 'name' => 'code', 'id' => 'hk-code', 'size' => 8,
     'autocomplete' => 'off', 'class' => 'form-control text-uppercase', 'placeholder' => 'KM7 Q4X']);
-echo html_writer::end_div();
-echo html_writer::tag('button', get_string('addscreen_go', $c), ['type' => 'submit', 'class' => 'btn btn-primary']);
-echo html_writer::end_tag('form');
-echo html_writer::end_div();
-echo html_writer::end_div();
+    echo html_writer::end_div();
+    echo html_writer::tag('button', get_string('addscreen_go', $c), ['type' => 'submit', 'class' => 'btn btn-primary']);
+    echo html_writer::end_tag('form');
+    echo html_writer::end_div();
+    echo html_writer::end_div();
+}
 echo html_writer::end_div();
 
 // The content.
 echo $OUTPUT->heading(get_string('content', $c), 3, 'mt-4');
 echo html_writer::start_div('mb-3');
-foreach (items::TYPES as $type) {
-    echo html_writer::link(
-        new moodle_url('/local/oksigeniahechauka/edit.php', ['type' => $type]),
-        '+ ' . get_string('add_' . $type, $c),
-        ['class' => 'btn btn-secondary me-2 mb-2']
-    );
+$destinations = access::destinations();
+if ($limited && !$destinations['groups']) {
+    echo $OUTPUT->notification(get_string('publish_nogroups', $c), 'info', false);
+} else if (access::publishes()) {
+    foreach (items::TYPES as $type) {
+        echo html_writer::link(
+            new moodle_url('/local/oksigeniahechauka/edit.php', ['type' => $type]),
+            '+ ' . get_string('add_' . $type, $c),
+            ['class' => 'btn btn-secondary me-2 mb-2']
+        );
+    }
 }
 echo html_writer::link(
     new moodle_url('/local/oksigeniahechauka/preview.php'),
@@ -350,14 +384,17 @@ if (!$items) {
             return html_writer::link(new moodle_url($url, ['action' => $action, 'id' => $item->id,
                 'sesskey' => sesskey()]), $label, ['class' => 'me-2']);
         };
-        $actions = html_writer::link(
-            new moodle_url('/local/oksigeniahechauka/edit.php', ['id' => $item->id]),
-            get_string('edit'),
-            ['class' => 'me-2']
-        ) .
-            $act($item->visible ? 'hide' : 'show', get_string($item->visible ? 'hide' : 'show')) .
-            $act('up', '↑') . $act('down', '↓') .
-            $act('delete', get_string('delete'));
+        $actions = '';
+        if (access::may_edit($item)) {
+            $actions = html_writer::link(
+                new moodle_url('/local/oksigeniahechauka/edit.php', ['id' => $item->id]),
+                get_string('edit'),
+                ['class' => 'me-2']
+            ) .
+                $act($item->visible ? 'hide' : 'show', get_string($item->visible ? 'hide' : 'show')) .
+                ($publishall ? $act('up', '↑') . $act('down', '↓') : '') .
+                $act('delete', get_string('delete'));
+        }
         $row = new html_table_row([$thumb, $name, s(local_oksigeniahechauka_when_text($item)), s($where), $actions]);
         if (!$item->visible) {
             $row->attributes['class'] = 'dimmed_text';
@@ -367,14 +404,23 @@ if (!$items) {
     echo html_writer::table($table);
 }
 
-// The groups.
+// The groups, and who publishes in each: for who runs the screens.
+if (!$managescreens) {
+    echo $OUTPUT->footer();
+    die();
+}
 echo $OUTPUT->heading(get_string('groups', $c), 3, 'mt-4');
 if (!$groups) {
     echo html_writer::tag('p', get_string('groups_none', $c), ['class' => 'text-muted']);
 } else {
     echo html_writer::start_tag('ul', ['class' => 'list-unstyled']);
     foreach ($groups as $id => $name) {
-        echo html_writer::tag('li', format_string($name) . ' ' . html_writer::link(
+        $editors = array_map('fullname', access::editors((int) $id));
+        echo html_writer::tag('li', format_string($name) . ' ' . html_writer::tag(
+            'span',
+            $editors ? s(get_string('group_editors', $c, implode(', ', $editors))) : get_string('group_noeditors', $c),
+            ['class' => 'text-muted small ms-2']
+        ) . ' ' . html_writer::link(
             new moodle_url(
                 $url,
                 ['action' => 'deletegroup', 'id' => $id, 'sesskey' => sesskey()]

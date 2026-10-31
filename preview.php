@@ -28,7 +28,7 @@ use local_oksigeniahechauka\local\player_page;
 
 require_login(null, false);
 $context = context_system::instance();
-require_capability('local/oksigeniahechauka:manage', $context);
+require_capability('local/oksigeniahechauka:view', $context);
 
 $screenid = optional_param('screen', 0, PARAM_INT);
 $at = optional_param('at', '', PARAM_RAW_TRIMMED);

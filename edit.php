@@ -25,6 +25,7 @@
 require(__DIR__ . '/../../config.php');
 
 use local_oksigeniahechauka\form\item_form;
+use local_oksigeniahechauka\local\access;
 use local_oksigeniahechauka\local\agendas;
 use local_oksigeniahechauka\local\files;
 use local_oksigeniahechauka\local\items;
@@ -35,10 +36,16 @@ $id = optional_param('id', 0, PARAM_INT);
 $type = optional_param('type', 'media', PARAM_ALPHA);
 $context = context_system::instance();
 require_login(null, false);
-require_capability('local/oksigeniahechauka:manage', $context);
+if (!access::publishes()) {
+    access::require_cap('publish');
+}
 
 $c = 'local_oksigeniahechauka';
 $item = $id ? $DB->get_record('local_oksigeniahechauka_item', ['id' => $id], '*', MUST_EXIST) : null;
+if ($item && !access::may_edit($item)) {
+    throw new required_capability_exception($context, 'local/oksigeniahechauka:publishall', 'nopermissions', '');
+}
+$destinations = access::destinations();
 if ($item) {
     $type = $item->type;
 }
@@ -53,7 +60,7 @@ $PAGE->set_title(get_string('type_' . $type, $c));
 $PAGE->set_heading(get_string('manage', $c));
 navigation_node::override_active_url($panel);
 
-$form = new item_form(null, ['type' => $type]);
+$form = new item_form(null, ['type' => $type, 'destinations' => $destinations]);
 $fileoptions = ['subdirs' => 0, 'maxfiles' => 1, 'accepted_types' => ['image', 'video']];
 
 // What the form shows when the item already exists.
@@ -108,8 +115,23 @@ if ($form->is_cancelled()) {
     redirect($panel);
 }
 if ($data = $form->get_data()) {
+    $groups = [];
+    foreach ((array) ($data->groups ?? []) as $g => $on) {
+        if ($on) {
+            $groups[] = (int) $g;
+        }
+    }
+    $screens = [];
+    foreach ((array) ($data->screens ?? []) as $s => $on) {
+        if ($on) {
+            $screens[] = (int) $s;
+        }
+    }
+    if (!access::may_target((bool) ($destinations['all'] && !empty($data->targetall)), $groups, $screens)) {
+        throw new required_capability_exception($context, 'local/oksigeniahechauka:publishall', 'nopermissions', '');
+    }
     $now = time();
-    $record = $item ?: (object) ['type' => $type, 'timecreated' => $now,
+    $record = $item ?: (object) ['type' => $type, 'timecreated' => $now, 'createdby' => $USER->id,
         'sortorder' => (int) $DB->get_field_sql('SELECT COALESCE(MAX(sortorder), 0) + 1
                                                    FROM {local_oksigeniahechauka_item}')];
     $extra = $item ? items::data($item) : [];
@@ -117,7 +139,7 @@ if ($data = $form->get_data()) {
     $record->body = trim($data->body ?? '');
     $record->duration = max(0, (int) ($data->duration ?? 0));
     $record->visible = empty($data->visible) ? 0 : 1;
-    $record->targetall = empty($data->targetall) ? 0 : 1;
+    $record->targetall = $destinations['all'] && !empty($data->targetall) ? 1 : 0;
     $ymd = function ($time): string {
         return userdate((int) $time, '%Y-%m-%d', 99, false);
     };
@@ -176,18 +198,6 @@ if ($data = $form->get_data()) {
         }
         // A new video is made ready for the screens; until then they do not get it.
         video::queue((int) $record->id);
-    }
-    $groups = [];
-    foreach ((array) ($data->groups ?? []) as $g => $on) {
-        if ($on) {
-            $groups[] = (int) $g;
-        }
-    }
-    $screens = [];
-    foreach ((array) ($data->screens ?? []) as $s => $on) {
-        if ($on) {
-            $screens[] = (int) $s;
-        }
     }
     items::set_targets((int) $record->id, $record->targetall ? [] : $groups, $record->targetall ? [] : $screens);
     if ($type === 'agenda') {

@@ -24,7 +24,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-if ($hassiteconfig || has_capability('local/oksigeniahechauka:manage', context_system::instance())) {
+if ($hassiteconfig) {
+    // The panel also has its own link in the main bar, for who runs the screens without being an administrator.
     $ADMIN->add('localplugins', new admin_category(
         'local_oksigeniahechauka',
         get_string('pluginname', 'local_oksigeniahechauka')
@@ -33,7 +34,7 @@ if ($hassiteconfig || has_capability('local/oksigeniahechauka:manage', context_s
         'local_oksigeniahechauka_panel',
         get_string('manage', 'local_oksigeniahechauka'),
         new moodle_url('/local/oksigeniahechauka/index.php'),
-        'local/oksigeniahechauka:manage'
+        'local/oksigeniahechauka:view'
     ));
 }
 

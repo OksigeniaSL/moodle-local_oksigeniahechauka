@@ -25,13 +25,43 @@
 defined('MOODLE_INTERNAL') || die();
 
 $capabilities = [
-    // Run the screens of the site: their content, schedule and groups, adding and removing screens.
-    'local/oksigeniahechauka:manage' => [
-        'riskbitmask' => RISK_CONFIG | RISK_XSS,
+    // Open the panel and the preview: what each screen shows, and whether it is on.
+    'local/oksigeniahechauka:view' => [
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_SYSTEM,
+        'archetypes' => [
+            'manager' => CAP_ALLOW,
+        ],
+        'clonepermissionsfrom' => 'local/oksigeniahechauka:manage',
+    ],
+    // Add, change and remove one's own content, in the groups of screens where one publishes.
+    'local/oksigeniahechauka:publish' => [
+        'riskbitmask' => RISK_XSS,
         'captype' => 'write',
         'contextlevel' => CONTEXT_SYSTEM,
         'archetypes' => [
             'manager' => CAP_ALLOW,
         ],
+        'clonepermissionsfrom' => 'local/oksigeniahechauka:manage',
+    ],
+    // Publish on every screen and in any group, and touch the content of others.
+    'local/oksigeniahechauka:publishall' => [
+        'riskbitmask' => RISK_XSS,
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_SYSTEM,
+        'archetypes' => [
+            'manager' => CAP_ALLOW,
+        ],
+        'clonepermissionsfrom' => 'local/oksigeniahechauka:manage',
+    ],
+    // Add, set up, reload and remove screens; their groups, and who publishes in each; the warnings of a screen down.
+    'local/oksigeniahechauka:managescreens' => [
+        'riskbitmask' => RISK_CONFIG | RISK_PERSONAL,
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_SYSTEM,
+        'archetypes' => [
+            'manager' => CAP_ALLOW,
+        ],
+        'clonepermissionsfrom' => 'local/oksigeniahechauka:manage',
     ],
 ];

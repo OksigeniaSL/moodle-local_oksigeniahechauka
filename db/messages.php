@@ -27,7 +27,7 @@ defined('MOODLE_INTERNAL') || die();
 $messageproviders = [
     // A screen that should be on has stopped giving signs of life, or has come back.
     'screendown' => [
-        'capability' => 'local/oksigeniahechauka:manage',
+        'capability' => 'local/oksigeniahechauka:managescreens',
         'defaults' => [
             'popup' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_ENABLED,
             'email' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_ENABLED,

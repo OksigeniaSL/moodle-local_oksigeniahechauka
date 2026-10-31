@@ -81,7 +81,7 @@ class alerts {
      * @return \stdClass[]
      */
     public static function recipients(): array {
-        $users = get_users_by_capability(files::context(), 'local/oksigeniahechauka:manage');
+        $users = get_users_by_capability(files::context(), 'local/oksigeniahechauka:managescreens');
         return $users ?: get_admins();
     }
 

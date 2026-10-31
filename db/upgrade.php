@@ -94,5 +94,21 @@ function xmldb_local_oksigeniahechauka_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026103108, 'local', 'oksigeniahechauka');
     }
 
+    if ($oldversion < 2026110100) {
+        // Who made each item, so who publishes only in some groups changes only what they made. Until now, whoever
+        // changed it last.
+        $table = new xmldb_table('local_oksigeniahechauka_item');
+        $field = new xmldb_field('createdby', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'targetall');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+            $DB->execute('UPDATE {local_oksigeniahechauka_item} SET createdby = usermodified');
+        }
+        // The two roles to run the screens without being administrators. Moodle stores the new capabilities after the
+        // upgrade steps (and the old «manage» goes, its permissions copied to the four new ones): the roles need them now.
+        update_capabilities('local_oksigeniahechauka');
+        \local_oksigeniahechauka\local\access::create_roles();
+        upgrade_plugin_savepoint(true, 2026110100, 'local', 'oksigeniahechauka');
+    }
+
     return true;
 }

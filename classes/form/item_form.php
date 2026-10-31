@@ -41,7 +41,6 @@ class item_form extends \moodleform {
      * @return void
      */
     protected function definition(): void {
-        global $DB;
         $f = $this->_form;
         $c = 'local_oksigeniahechauka';
         $type = $this->_customdata['type'];
@@ -166,18 +165,30 @@ class item_form extends \moodleform {
         // Where.
         $f->addElement('header', 'wherehdr', get_string('where', $c));
         $f->setExpanded('wherehdr', false);
-        $f->addElement('advcheckbox', 'targetall', '', get_string('all', $c));
-        $f->setDefault('targetall', 1);
-        $groups = $DB->get_records_menu('local_oksigeniahechauka_group', null, 'sortorder, name', 'id, name');
+        // Only where the user may publish: who publishes in some groups gets those groups, and no single screen.
+        $where = $this->_customdata['destinations'] ?? ['all' => true, 'groups' => [], 'screens' => []];
+        if ($where['all']) {
+            $f->addElement('advcheckbox', 'targetall', '', get_string('all', $c));
+            $f->setDefault('targetall', 1);
+        } else {
+            $f->addElement('hidden', 'targetall', 0);
+            $f->setType('targetall', PARAM_BOOL);
+            $f->setExpanded('wherehdr', true);
+        }
+        $groups = $where['groups'];
         if ($groups) {
             $boxes = [];
             foreach ($groups as $id => $name) {
                 $boxes[] = $f->createElement('advcheckbox', $id, '', format_string($name));
             }
             $f->addGroup($boxes, 'groups', get_string('groups', $c), ' ', true);
-            $f->hideIf('groups', 'targetall', 'checked');
+            if ($where['all']) {
+                $f->hideIf('groups', 'targetall', 'checked');
+            } else if (count($groups) === 1) {
+                $f->setDefault('groups[' . array_key_first($groups) . ']', 1);
+            }
         }
-        $screens = $DB->get_records_menu('local_oksigeniahechauka_screen', null, 'sortorder, name', 'id, name');
+        $screens = $where['screens'];
         if ($screens) {
             $boxes = [];
             foreach ($screens as $id => $name) {
@@ -204,6 +215,10 @@ class item_form extends \moodleform {
     public function validation($data, $files): array {
         $errors = parent::validation($data, $files);
         $c = 'local_oksigeniahechauka';
+        $where = $this->_customdata['destinations'] ?? ['all' => true];
+        if (!$where['all'] && !array_filter((array) ($data['groups'] ?? []))) {
+            $errors['groups'] = get_string('publish_choosegroup', $c);
+        }
         if (($data['type'] ?? '') === 'agenda') {
             if (!preg_match('#^(https?|webcal)://#i', trim($data['url'] ?? ''))) {
                 $errors['url'] = get_string('agenda_bad_url', $c);

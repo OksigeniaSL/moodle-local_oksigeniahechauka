@@ -31,7 +31,7 @@ use local_oksigeniahechauka\local\screens;
 $code = keys::clean_code(optional_param('code', '', PARAM_RAW_TRIMMED));
 $context = context_system::instance();
 require_login(null, false);
-require_capability('local/oksigeniahechauka:manage', $context);
+require_capability('local/oksigeniahechauka:managescreens', $context);
 
 $c = 'local_oksigeniahechauka';
 $panel = new moodle_url('/local/oksigeniahechauka/index.php');
