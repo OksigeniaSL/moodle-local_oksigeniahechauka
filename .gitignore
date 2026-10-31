@@ -1,0 +1,10 @@
+.DS_Store
+.idea/
+.vscode/
+*.log
+*.swp
+*.bak
+node_modules/
+dist/
+# The demo videos are generated (player/demo/make-videos.sh): too heavy for git.
+player/demo/media/clip-*

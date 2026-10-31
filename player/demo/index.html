@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="es" data-tema="claro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hechauka · demo</title>
+<!-- The player with a static manifest and its media (mode «demo»): for development, captures and trying a device
+     without a server. ?at=2026-11-02T10:45 fixes the clock (by default, Monday 2 November 2026, the day of the
+     example data); ?at=now uses the real one; ?tema=oscuro forces the dark theme. -->
+<link rel="stylesheet" href="../hechauka.css">
+</head>
+<body>
+<div id="hechauka"></div>
+<script id="hechauka-boot" type="application/json">
+{
+  "contract": 1,
+  "mode": "demo",
+  "lang": "es",
+  "at": "2026-11-02T10:45",
+  "manifest_url": "manifest.json",
+  "strings": {
+    "sample": "Datos de ejemplo",
+    "menu": "Menú de hoy",
+    "notices": "Avisos",
+    "events": "Hoy",
+    "ticker": "Al día",
+    "closed": "Hoy no hay comedor",
+    "days": ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"],
+    "months": ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"],
+    "date_format": "{d} de {m}"
+  }
+}
+</script>
+<script>
+  // ?at=now: the real clock, for a device that runs the demo for hours.
+  (function () {
+    if (/[?&]at=now\b/.test(location.search)) {
+      var n = document.getElementById('hechauka-boot');
+      var b = JSON.parse(n.textContent);
+      delete b.at;
+      n.textContent = JSON.stringify(b);
+    }
+  }());
+</script>
+<script src="../build/hechauka.js"></script>
+</body>
+</html>

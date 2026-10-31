@@ -1,0 +1,14 @@
+{
+  "name": "hechauka-player",
+  "private": true,
+  "description": "The screen player of Oksigenia Hechauka: one web page for every screen, built for old browsers.",
+  "license": "GPL-3.0-or-later",
+  "type": "module",
+  "scripts": {
+    "build": "esbuild src/main.js --bundle --minify --format=iife --target=chrome56 --legal-comments=eof --outfile=build/hechauka.js && esbuild src/sw.js --bundle --minify --format=iife --target=chrome56 --outfile=sw.js",
+    "test": "node --test test/*.test.js"
+  },
+  "devDependencies": {
+    "esbuild": "0.25.11"
+  }
+}
