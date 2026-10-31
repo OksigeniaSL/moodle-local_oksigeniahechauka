@@ -89,9 +89,32 @@ class manifest {
                 $m['weather'] = $weather;
             }
         }
-        $m['items'] = array_merge(self::own_items($screen, $now), self::source_items($config, $now));
+        $m['items'] = self::unique(array_merge(self::own_items($screen, $now), self::source_items($config, $now)));
         $m['etag'] = self::etag($m);
         return $m;
+    }
+
+    /**
+     * The same event only once, whichever way it came (an agenda and the site calendar subscribed to the same
+     * calendar): the first one stays, the panel's and the agendas' before the site's.
+     *
+     * @param array $items
+     * @return array
+     */
+    protected static function unique(array $items): array {
+        $seen = [];
+        $out = [];
+        foreach ($items as $it) {
+            if (($it['type'] ?? '') === 'event') {
+                $key = \core_text::strtolower(trim((string) ($it['title'] ?? ''))) . '@' . ($it['start'] ?? '');
+                if (isset($seen[$key])) {
+                    continue;
+                }
+                $seen[$key] = true;
+            }
+            $out[] = $it;
+        }
+        return $out;
     }
 
     /**

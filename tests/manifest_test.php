@@ -203,4 +203,30 @@ final class manifest_test extends \advanced_testcase {
         items::delete($id);
         $this->assertSame(0, $DB->count_records(agendas::TABLE));
     }
+
+    /**
+     * The same event from an agenda and from the site calendar reaches the screen once.
+     */
+    public function test_same_event_once(): void {
+        global $DB;
+        $this->resetAfterTest();
+        $this->setTimezone('Atlantic/Canary');
+        set_config('sourcecalendar', 1, 'local_oksigeniahechauka');
+        $screen = $this->screen('Hall');
+        $start = (new \DateTime('2026-11-03 08:00', new \DateTimeZone('Atlantic/Canary')))->getTimestamp();
+        $now = $start - DAYSECS;
+        $DB->insert_record('event', (object) ['name' => '3º ESO - Acampada', 'description' => '', 'format' => FORMAT_HTML,
+            'eventtype' => 'site', 'courseid' => SITEID, 'groupid' => 0, 'userid' => 2, 'modulename' => '', 'instance' => 0,
+            'timestart' => $start, 'timeduration' => 3 * DAYSECS, 'visible' => 1, 'timemodified' => $now]);
+        $id = (int) $DB->insert_record('local_oksigeniahechauka_item', (object) ['type' => 'agenda', 'title' => 'Colegio',
+            'body' => '', 'data' => '{}', 'visible' => 1, 'targetall' => 1, 'everyweeks' => 0, 'timecreated' => $now,
+            'timemodified' => $now]);
+        agendas::store($id, [['uid' => 'a', 'title' => '3º ESO - Acampada', 'detail' => '', 'start' => $start,
+            'end' => $start + 3 * DAYSECS, 'allday' => false]]);
+        $events = array_values(array_filter(manifest::build($screen, $now)['items'], function ($it) {
+            return $it['type'] === 'event';
+        }));
+        $this->assertCount(1, $events);
+        $this->assertStringStartsWith('c', $events[0]['id']);
+    }
 }
