@@ -259,7 +259,7 @@ class video {
      */
     protected static function run(array $command, int $timeout): array {
         $pipes = [];
-        $process = proc_open($command, [0 => ['pipe', 'r'], 1 => ['pipe', 'w'], 2 => ['pipe', 'w']], $pipes);
+        $process = proc_open(self::gently($command), [0 => ['pipe', 'r'], 1 => ['pipe', 'w'], 2 => ['pipe', 'w']], $pipes);
         if (!is_resource($process)) {
             return [-1, ''];
         }
@@ -287,6 +287,23 @@ class video {
         fclose($pipes[2]);
         proc_close($process);
         return [$code, $log];
+    }
+
+    /**
+     * A command at the lowest priority, where the server has «nice»: converting takes every core it can (about four for
+     * a 4K video, whatever the threads asked), and the pages of the site must not wait for it. When the server is
+     * idle it takes the same time.
+     *
+     * @param string[] $command
+     * @return string[]
+     */
+    protected static function gently(array $command): array {
+        foreach (['/usr/bin/nice', '/bin/nice'] as $nice) {
+            if (is_executable($nice)) {
+                return array_merge([$nice, '-n', '19'], $command);
+            }
+        }
+        return $command;
     }
 
     /**

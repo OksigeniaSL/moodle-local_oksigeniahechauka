@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.0 (2026-10-31)
+
+- When an item shows, said as people say it: always, a single day, between two dates, from a date on or every day until
+  a date; every day or only some days; all day or at some hours; every N weeks. Together they make every combination.
+  The panel says it the same way («On 4/11», «From 2/11», «Until 18/12»).
+- Video conversion runs at the lowest priority (`nice -n 19`): it takes every core it can, about four for a 4K video, and
+  the pages of the site must not wait for it.
 ## 0.3.0 (2026-10-31)
 
 - Each screen has its own page: how it is doing (on, off by its hours, or how long without a signal), the version of

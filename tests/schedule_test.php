@@ -110,4 +110,21 @@ final class schedule_test extends \advanced_testcase {
         $this->assertSame([], schedule::power(null));
         $this->assertTrue(schedule::power_on([], $at('2026-11-08 04:00')));
     }
+
+    /**
+     * The dates as people choose them in the form, there and back: always, one day, two dates, from, until.
+     */
+    public function test_dates_modes(): void {
+        $cases = [
+            'always' => [null, null],
+            'day' => ['2026-11-04', '2026-11-04'],
+            'range' => ['2026-11-02', '2026-12-18'],
+            'from' => ['2026-11-02', null],
+            'until' => [null, '2026-12-18'],
+        ];
+        foreach ($cases as $mode => $dates) {
+            $this->assertSame($dates, schedule::dates_for($mode, '2026-11-04', '2026-11-02', '2026-12-18'), $mode);
+            $this->assertSame($mode, schedule::dates_mode((string) $dates[0], (string) $dates[1]), $mode);
+        }
+    }
 }

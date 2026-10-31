@@ -116,6 +116,43 @@ class schedule {
     }
 
     /**
+     * How the dates of an item read in the form: always, one day, between two dates, from a date or until a date.
+     *
+     * @param string $from «YYYY-MM-DD» or empty
+     * @param string $until «YYYY-MM-DD» or empty
+     * @return string always, day, range, from or until
+     */
+    public static function dates_mode(string $from, string $until): string {
+        if ($from !== '' && $until !== '') {
+            return $from === $until ? 'day' : 'range';
+        }
+        return $from !== '' ? 'from' : ($until !== '' ? 'until' : 'always');
+    }
+
+    /**
+     * The first and last day of an item from what was chosen in the form.
+     *
+     * @param string $mode always, day, range, from or until
+     * @param string $day the day, for «day»
+     * @param string $from the first day, for «range» and «from»
+     * @param string $until the last day, for «range» and «until»
+     * @return array [first day or null, last day or null]
+     */
+    public static function dates_for(string $mode, string $day, string $from, string $until): array {
+        switch ($mode) {
+            case 'day':
+                return [$day, $day];
+            case 'range':
+                return [$from, $until];
+            case 'from':
+                return [$from, null];
+            case 'until':
+                return [null, $until];
+        }
+        return [null, null];
+    }
+
+    /**
      * The power hours of a screen from their JSON, only the valid windows.
      *
      * @param string|null $json

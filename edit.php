@@ -74,14 +74,21 @@ if ($item) {
         'targetall' => $item->targetall,
         'visible' => $item->visible,
     ];
-    foreach (['datefrom', 'dateuntil'] as $field) {
-        if (schedule::is_date($item->$field)) {
-            [$y, $m, $d] = explode('-', $item->$field);
+    $from = schedule::is_date($item->datefrom) ? $item->datefrom : '';
+    $until = schedule::is_date($item->dateuntil) ? $item->dateuntil : '';
+    $values->dates = schedule::dates_mode($from, $until);
+    foreach (['datefrom' => $from, 'dateuntil' => $until, 'day' => $from ?: $until] as $field => $date) {
+        if ($date !== '') {
+            [$y, $m, $d] = explode('-', $date);
             $values->$field = make_timestamp((int) $y, (int) $m, (int) $d);
         }
     }
-    $values->days = array_fill_keys(schedule::days($item->days), 1);
-    foreach (schedule::times($item->times) as $r => $range) {
+    $days = schedule::days($item->days);
+    $values->daysmode = $days && count($days) < 7 ? 'some' : 'all';
+    $values->days = array_fill_keys($days, 1);
+    $times = schedule::times($item->times);
+    $values->hoursmode = $times ? 'some' : 'all';
+    foreach ($times as $r => $range) {
         $values->{'range' . $r} = ['from' => $range[0], 'to' => $range[1]];
     }
     $targets = items::targets($item);
@@ -109,15 +116,23 @@ if ($data = $form->get_data()) {
     $record->duration = max(0, (int) ($data->duration ?? 0));
     $record->visible = empty($data->visible) ? 0 : 1;
     $record->targetall = empty($data->targetall) ? 0 : 1;
-    $record->datefrom = !empty($data->datefrom) ? userdate($data->datefrom, '%Y-%m-%d', 99, false) : null;
-    $record->dateuntil = !empty($data->dateuntil) ? userdate($data->dateuntil, '%Y-%m-%d', 99, false) : null;
+    $ymd = function ($time): string {
+        return userdate((int) $time, '%Y-%m-%d', 99, false);
+    };
+    [$record->datefrom, $record->dateuntil] = schedule::dates_for(
+        $data->dates ?? 'always',
+        $ymd($data->day ?? 0),
+        $ymd($data->datefrom ?? 0),
+        $ymd($data->dateuntil ?? 0)
+    );
     $days = [];
     foreach ((array) ($data->days ?? []) as $d => $on) {
         if ($on) {
             $days[] = (int) $d;
         }
     }
-    $record->days = $days && count($days) < 7 ? implode(',', $days) : null;
+    $single = ($data->dates ?? '') === 'day';
+    $record->days = !$single && ($data->daysmode ?? 'all') === 'some' && $days && count($days) < 7 ? implode(',', $days) : null;
     $times = [];
     for ($r = 0; $r < 2; $r++) {
         $range = $data->{'range' . $r} ?? [];
@@ -125,8 +140,8 @@ if ($data = $form->get_data()) {
             $times[] = [item_form::hour($range['from']), item_form::hour($range['to'])];
         }
     }
-    $record->times = $times ? json_encode($times) : null;
-    $record->everyweeks = (int) ($data->everyweeks ?? 1) > 1 ? (int) $data->everyweeks : 0;
+    $record->times = ($data->hoursmode ?? 'all') === 'some' && $times ? json_encode($times) : null;
+    $record->everyweeks = !$single && (int) ($data->everyweeks ?? 1) > 1 ? (int) $data->everyweeks : 0;
     if ($type === 'media') {
         $extra['caption'] = !empty($data->caption);
         $extra['fit'] = $data->fit ?? 'cover';

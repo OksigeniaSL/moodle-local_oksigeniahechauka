@@ -124,10 +124,25 @@ function local_oksigeniahechauka_when_text(stdClass $item): string {
         $parts[] = userdate((int) $data['start'], get_string('strftimedaydatetime', 'langconfig'));
     }
     $when = schedule::when($item) ?? [];
-    if (!empty($when['from']) || !empty($when['until'])) {
-        $from = !empty($when['from']) ? userdate(strtotime($when['from'] . ' 12:00'), '%d/%m') : '…';
-        $until = !empty($when['until']) ? userdate(strtotime($when['until'] . ' 12:00'), '%d/%m') : '…';
-        $parts[] = $from . ' – ' . $until;
+    // The dates as they were chosen (not the first day «every N weeks» counts from).
+    $from = schedule::is_date($item->datefrom) ? $item->datefrom : '';
+    $until = schedule::is_date($item->dateuntil) ? $item->dateuntil : '';
+    $short = function (string $date): string {
+        return userdate(strtotime($date . ' 12:00'), '%d/%m');
+    };
+    switch (schedule::dates_mode($from, $until)) {
+        case 'day':
+            $parts[] = get_string('when_day', $c, $short($from));
+            break;
+        case 'range':
+            $parts[] = $short($from) . ' – ' . $short($until);
+            break;
+        case 'from':
+            $parts[] = get_string('when_from', $c, $short($from));
+            break;
+        case 'until':
+            $parts[] = get_string('when_until', $c, $short($until));
+            break;
     }
     if (!empty($when['days'])) {
         $short = explode(',', get_string('days_short', $c));

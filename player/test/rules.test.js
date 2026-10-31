@@ -35,6 +35,31 @@ test('first and last day are both included', () => {
     assert.equal(matchesWhen(when, wall('2026-11-07T00:00')), false);
 });
 
+test('a single day, only a first day, only a last day', () => {
+    const one = {from: '2026-11-04', until: '2026-11-04'};
+    assert.equal(matchesWhen(one, wall('2026-11-03T12:00')), false);
+    assert.equal(matchesWhen(one, wall('2026-11-04T12:00')), true);
+    assert.equal(matchesWhen(one, wall('2026-11-05T12:00')), false);
+    const from = {from: '2026-11-04'};
+    assert.equal(matchesWhen(from, wall('2026-11-03T23:59')), false);
+    assert.equal(matchesWhen(from, wall('2027-06-30T12:00')), true);
+    const until = {until: '2026-11-04'};
+    assert.equal(matchesWhen(until, wall('2025-01-01T12:00')), true);
+    assert.equal(matchesWhen(until, wall('2026-11-05T00:00')), false);
+});
+
+test('everything at once: some days, between two dates, at some hours, every other week', () => {
+    const when = {from: '2026-11-02', until: '2026-11-30', days: [1, 3], times: [['08:00', '10:30'], ['16:00', '17:00']],
+        every: 2};
+    assert.equal(matchesWhen(when, wall('2026-11-02T09:00')), true);
+    assert.equal(matchesWhen(when, wall('2026-11-02T11:00')), false);
+    assert.equal(matchesWhen(when, wall('2026-11-04T16:30')), true);
+    assert.equal(matchesWhen(when, wall('2026-11-03T09:00')), false);
+    assert.equal(matchesWhen(when, wall('2026-11-09T09:00')), false);
+    assert.equal(matchesWhen(when, wall('2026-11-16T09:00')), true);
+    assert.equal(matchesWhen(when, wall('2026-12-14T09:00')), false);
+});
+
 test('weekdays of the rule', () => {
     const when = {days: [1, 3, 5]};
     assert.equal(matchesWhen(when, wall('2026-11-02T10:00')), true);
