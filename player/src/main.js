@@ -311,7 +311,8 @@ class Player {
         const items = (this.manifest.items || []).filter(function (it) {
             return it.id !== d.replaces && it.id !== d.item.id;
         });
-        items.push(d.item);
+        // First of its kind: the line of the ticker or the notice being written is the one to look at.
+        items.unshift(Object.assign({order: -1}, d.item));
         return Object.assign({}, this.manifest, {items});
     }
 
