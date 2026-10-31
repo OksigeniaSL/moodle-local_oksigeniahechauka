@@ -190,6 +190,10 @@ final class manifest_test extends \advanced_testcase {
         $this->assertSame('Teatro', $events[0]['title']);
         $this->assertSame('2026-11-03T11:00', $events[0]['end']);
         $this->assertSame(3, $events[0]['color']);
+        $this->assertArrayNotHasKey('color', agendas::contract(
+            (object) ['id' => $id, 'data' => json_encode(['color' => 0])],
+            $now
+        )[0]);
         $this->assertTrue($events[1]['allday']);
         $this->assertSame(['from' => '2026-11-06', 'until' => '2026-11-06'], $events[1]['when']);
         $this->assertSame('Patio', $events[1]['detail']);

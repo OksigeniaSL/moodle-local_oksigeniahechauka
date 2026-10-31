@@ -27,10 +27,16 @@ function each(list, fn) {
 const DROP = '<svg viewBox="0 0 16 21" aria-hidden="true"><path d="M8 0C9.5 3.6 16 9.6 16 13a8 8 0 0 1-16 0C0 9.6 ' +
     '6.5 3.6 8 0z"/></svg>';
 
-function stage(node, color) {
-    const n = color >= 1 && color <= 4 ? color : 1;
-    node.style.setProperty('--hk-ev', 'var(--hk-marca-' + n + ')');
-    node.style.setProperty('--hk-sobre-ev', 'var(--hk-sobre-marca-' + n + ')');
+export function stage(node, color) {
+    if (color >= 1 && color <= 4) {
+        node.style.setProperty('--hk-ev', 'var(--hk-marca-' + color + ')');
+        node.style.setProperty('--hk-sobre-ev', 'var(--hk-sobre-marca-' + color + ')');
+        node.style.setProperty('--hk-ev-oscuro', 'var(--hk-marca-' + color + '-oscuro)');
+    } else {
+        // The whole school: a neutral grey (the primary colour of a centre may be one of its stages).
+        node.style.setProperty('--hk-ev', 'var(--hk-texto-suave)');
+        node.style.setProperty('--hk-sobre-ev', 'var(--hk-superficie)');
+    }
 }
 
 function block(cls, label, color, dark) {

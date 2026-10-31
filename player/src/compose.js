@@ -7,6 +7,7 @@
 // foto-sola       the picture in the whole body
 // solo-hoy        «Today» alone, the menu big, the weather for today and tomorrow
 // foto-completa   the picture over the whole screen, with its caption
+// semana          the next five school days, each with its events
 
 /** Width over height of an item's picture or video; landscape when it does not say. */
 export function ratio(item) {
@@ -52,6 +53,7 @@ export class Composer {
     constructor() {
         this.n = 0;
         this.sinceFull = 9;
+        this.sinceWeek = 0;
         this.last = null;
         this.lastId = null;
     }
@@ -72,13 +74,15 @@ export class Composer {
      * @param {object[]} queue the pictures and videos that can be shown now, in their order
      * @param {number} today how many things «Today» has (the menu counts as one; each notice and event, one)
      * @param {boolean} horizontal the shape of the screen
-     * @param {object} [opts] {menu: «Today» has a menu, noToday: the screen never shows «Today»}
+     * @param {object} [opts] {menu: «Today» has a menu, noToday: the screen never shows «Today»,
+     *     week: {things: what the week has beyond today, weekday: 1 Monday … 7 Sunday}}
      * @returns {{comp: string, items: object[], seconds: number}}
      */
     next(queue, today, horizontal, opts) {
         const o = opts || {};
         const h = o.noToday ? 0 : today;
         this.n++;
+        this.sinceWeek++;
         const pick = (comp, items, seconds) => {
             this.last = comp;
             if (items.length) {
@@ -86,21 +90,37 @@ export class Composer {
             }
             return {comp, items, seconds};
         };
+        // «La semana»: every 8 slides (5 on Mondays and Fridays, when the next week matters; 3 without pictures), only
+        // when the week has something beyond today, never right after the moment of «Today» or the full screen.
+        const week = o.week && !o.noToday ? o.week : null;
+        const weekDue = (every, alternate) => {
+            // Without pictures every slide is the moment of «Today»: then the two take turns.
+            if (week && week.things > 0 && this.sinceWeek >= every && (alternate || this.last !== 'solo-hoy') &&
+                    this.last !== 'foto-completa') {
+                this.sinceWeek = 0;
+                return pick('semana', [], week.things >= 8 ? 18 : 14);
+            }
+            return null;
+        };
         if (!queue.length) {
-            return pick('solo-hoy', [], o.menu ? 15 : 12);
+            return weekDue(3, true) || pick('solo-hoy', [], o.menu ? 15 : 12);
         }
         // The moment of «Today»: more often when it has much, less when it has little; never right after the full
-        // screen, and it uses no picture of the queue.
+        // screen or the week, and it uses no picture of the queue.
         const cadence = h >= 6 ? 4 : (h <= 2 ? 8 : 6);
-        if (h > 0 && this.n % cadence === 0 && this.last !== 'foto-completa') {
+        if (h > 0 && this.n % cadence === 0 && this.last !== 'foto-completa' && this.last !== 'semana') {
             return pick('solo-hoy', [], o.menu ? 15 : 12);
+        }
+        const theWeek = weekDue(week && (week.weekday === 1 || week.weekday === 5) ? 5 : 8);
+        if (theWeek) {
+            return theWeek;
         }
         const i = this.position(queue);
         const it = queue[i];
         const next = queue[(i + 1) % queue.length];
         const a = ratio(it);
         this.sinceFull++;
-        const fullDue = this.sinceFull > 3 && this.last !== 'solo-hoy';
+        const fullDue = this.sinceFull > 3 && this.last !== 'solo-hoy' && this.last !== 'semana';
         if (fullDue && (horizontal ? a >= 1.45 : a < 0.63)) {
             this.sinceFull = 0;
             return pick('foto-completa', [it], it.type === 'video' ? secondsOf(it) : 9);

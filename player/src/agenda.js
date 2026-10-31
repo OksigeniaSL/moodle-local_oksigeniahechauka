@@ -9,6 +9,27 @@ function keepEmoji(t) {
     return m ? m[1] + '\u00a0' + t.slice(m[0].length) : t;
 }
 
+/**
+ * The stage of an event from its group, as school calendars write it: «Inf» Infantil, «Pri» Primaria, «ESO»,
+ * «Bac(h)» Bachillerato, in the four colours of the centre in that order; 0 for something of the whole school.
+ */
+export function stageOf(group) {
+    const g = String(group || '');
+    if (/(^|[^a-z])inf/i.test(g)) {
+        return 1;
+    }
+    if (/(^|[^a-z])pri/i.test(g)) {
+        return 2;
+    }
+    if (/(^|[^a-z])eso($|[^a-z])/i.test(g)) {
+        return 3;
+    }
+    if (/(^|[^a-z])bac/i.test(g)) {
+        return 4;
+    }
+    return 0;
+}
+
 /** «3º ESO - Acampada» reads as «Acampada» with «3º ESO» under it; a title without « - » stays whole. */
 export function splitTitle(title) {
     const t = String(title || '');
@@ -75,7 +96,7 @@ export function upcoming(events, today, days, s) {
             day: dayLabel(date, today, s),
             title: parts.title,
             group: parts.group || ev.detail || '',
-            color: ev.color >= 1 && ev.color <= 4 ? ev.color : 1,
+            color: stageOf(parts.group || ev.detail) || (ev.color >= 1 && ev.color <= 4 ? ev.color : 0),
             sameDay: date === before,
         };
         before = date;
@@ -102,7 +123,7 @@ export function countdown(events, today, max) {
         if (long && days >= 2 && days <= (max || 14) && (!best || days < best.days)) {
             const parts = splitTitle(ev.title);
             best = {id: ev.id, days, title: parts.title, group: parts.group || ev.detail || '', date: dateOf(ev.start),
-                color: ev.color >= 1 && ev.color <= 4 ? ev.color : 1};
+                color: stageOf(parts.group) || (ev.color >= 1 && ev.color <= 4 ? ev.color : 0)};
         }
     });
     return best;

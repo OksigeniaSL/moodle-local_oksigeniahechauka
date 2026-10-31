@@ -161,7 +161,7 @@ length unless it has a duration.
 | `image` | `main` | `media`, `fit` (`cover`, `contain` or `blur`), `focus` (`[x, y]` from 0 to 1, for `cover`), `caption` |
 | `video` | `main` | `media`, `poster` and `backdrop` (still images), `fit`, `caption` |
 | `notice` | `side` | `title`, `body` (one short line), `tone` (`normal` or `important`) |
-| `event` | `side` | `title`, `detail` (who or where, one line), `start` and `end` (`"2026-11-02T10:00"`), `allday`, `color` (1 to 4). A title «3º ESO - Acampada» reads as «Acampada» with «3º ESO» under it |
+| `event` | `side` | `title`, `detail` (who or where, one line), `start` and `end` (`"2026-11-02T10:00"`), `allday`, `color` (1 to 4, optional), `holiday` (optional). A title «3º ESO - Acampada» reads as «Acampada» with «3º ESO» under it |
 | `menu` | `side` | `date`, `label`, `menus`, `closed`, `title`, `note` |
 | `ticker` | `ticker` | `text` |
 
@@ -169,6 +169,11 @@ length unless it has a duration.
 - «Today» has the menu, the notices, the events of the day and the coming days (the events of the next week, from
   the same items, with one countdown to the nearest event of more than a day). It fills its slot at the largest size
   at which nothing overflows; when nothing fits, notices and events turn pages.
+- «La semana» shows the events of the next five school days, holidays and events of more than a day. A holiday is an
+  event with `holiday: true`, or whose title starts with «Festivo», «No lectivo» or «Vacaciones» before « - ».
+- The colour of an event is its stage: the player takes it from the group of its title or its `detail` («Inf», «Pri»,
+  «ESO», «Bach»: `--hk-marca-1` to `-4`); without one, the event's `color`; without either, a neutral grey (the
+  whole school).
 - An `event` disappears by itself once its end has passed (an hour after its start if it has no end; the end of its
   last day if it is all day). `color` picks one of the four colours of the client (`--hk-marca-1` to `-4`), for example by stage.
 - A `menu` is the menu of one day: `menus` is `[{"name": "Menu A", "courses": [{"label": "First course", "dishes":

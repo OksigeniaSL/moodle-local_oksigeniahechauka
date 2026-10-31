@@ -167,7 +167,6 @@ class sources {
                 'zone' => 'side',
                 'title' => self::line($ev->name, 80),
                 'start' => schedule::stamp($start),
-                'color' => 1,
                 'when' => ['from' => schedule::day($start), 'until' => schedule::day($last)],
             ];
             if ($allday) {

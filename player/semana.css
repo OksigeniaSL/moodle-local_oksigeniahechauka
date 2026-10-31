@@ -1,0 +1,591 @@
+/* Oksigenia Hechauka: «La semana», a composition of its own (Gaudí, 31 October 2026, for Hechauka). Goes after
+ * composiciones.css and tiempo.css, before the client's sheet. Nothing of the client here: only its variables.
+ *
+ * «An agenda is there to see the days to come»: the next five school days side by side (stacked on a vertical
+ * screen), each with its name and number and, under it, its events in their stage colour. At a glance, which days
+ * have something; today stands out; a holiday looks like a holiday; a camp from Wednesday to Friday is one band
+ * across its days.
+ *
+ * Markup (in its layer, like any other composition):
+ *   <div class="hk-cuerpo hk-capa" data-composicion="semana">
+ *     <section class="hk-semana">
+ *       <article class="hk-dia hk-dia-hoy" data-carriles="1">              (.hk-dia-hoy: today)
+ *         <header class="hk-dia-cabeza"><b class="hk-dia-num">2</b>
+ *           <p class="hk-dia-nombre">Lunes<small class="hk-dia-marca">Hoy</small></p></header>
+ *         <div class="hk-dia-cuerpo hk-dia-lista" data-escala="3">         (data-escala 0–3, set by the fit)
+ *           <div class="hk-dia-ev" style="--hk-ev: var(--hk-marca-3); --hk-sobre-ev: var(--hk-sobre-marca-3);
+ *               --hk-ev-oscuro: var(--hk-marca-3-oscuro)">
+ *             <b>Acampada</b><small><time>10:30</time>3º ESO</small></div>
+ *           <p class="hk-dia-mas">+2 más</p>                             (only when some do not fit)
+ *         </div>
+ *       </article>
+ *       <article class="hk-dia hk-dia-festivo">                           a holiday: no list, its name on a plate
+ *         <header …></header>
+ *         <div class="hk-dia-cuerpo hk-festivo"><p><small>Festivo</small><b>Todos los Santos</b></p></div>
+ *       </article>
+ *       <article class="hk-dia hk-dia-vacio">                             nothing that day
+ *         <header …></header><p class="hk-dia-cuerpo hk-dia-nada">Sin actividades</p>
+ *       </article>
+ *       <article class="hk-dia hk-dia-tras-finde">…</article>              the first day after a weekend
+ *       <div class="hk-tramos">                                          the events of more than one day
+ *         <div class="hk-tramo hk-tramo-antes" data-desde="0" data-hasta="2" data-carril="0" style="--hk-ev: …">
+ *           <p class="hk-tramo-texto"><b>Acampada</b><small>3º ESO · desde el lun 2</small></p></div>
+ *       </div>
+ *     </section>
+ *   </div>
+ *
+ * - data-desde / data-hasta: the first and last day of the band (0–4). .hk-tramo-antes / .hk-tramo-despues: it
+ *   goes on before the first or after the last (a pointed end). data-carril: its lane (0–2 on a horizontal screen;
+ *   0–1 on a vertical one, where it is a flag on a pole, and data-fila="1" puts its flag under another one that
+ *   starts the same day). Each day says how much room its list leaves: data-carriles (lanes above it on a
+ *   horizontal screen, poles beside it on a vertical one) and, on a vertical screen, data-banderas (flags above it).
+ *   .hk-tramo-estrecho: a smaller title for a band of one day whose title does not fit.
+ * - An event without a stage (for the whole school) goes without --hk-ev: it takes a neutral, --hk-texto-suave (the
+ *   primary colour of a client may be one of its stages, as this school's blue is ESO's).
+ * - Every size of a day's list is in em of the list, so data-escala scales it at once; the header, the bands and
+ *   the plate of a holiday stay in rem, the same for the whole week.
+ * - The stage colour fills the bands (with --hk-sobre-ev on it, the client's pair) and only tints the events of a
+ *   day: their text stays in --hk-texto, readable on any client colour.
+ *
+ * Chromium 56: flexbox only, margins instead of gap, no grid; the bands are placed with calc() of % and rem; motion
+ * with transform and opacity.
+ */
+
+/* --- The week ------------------------------------------------------------------------------------------------------ */
+.hk-cuerpo[data-composicion="semana"] > .hk-semana {
+    position: relative;
+    display: flex;
+    flex: 1 1 auto;
+    min-width: 0;
+    min-height: 0;
+}
+.hk-vertical .hk-semana {
+    flex-direction: column;
+}
+.hk-dia {
+    position: relative;
+    display: flex;
+    flex: 1 1 0px;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+    border-radius: 2rem;
+    background: var(--hk-superficie);
+    box-shadow: 0 .2rem .8rem rgba(0, 0, 0, .06);
+}
+.hk-horizontal .hk-dia + .hk-dia {
+    margin-left: 2.4rem;                  /* the gutter: the bands below count on it (2.4rem) */
+}
+.hk-vertical .hk-dia {
+    flex-direction: row;
+}
+.hk-vertical .hk-dia + .hk-dia {
+    margin-top: 2rem;                     /* the gutter on a vertical screen (2rem) */
+}
+
+/* --- The head of a day: its number, its name, and «Today» or «Tomorrow» -------------------------------------------- */
+.hk-dia-cabeza {
+    display: flex;
+    flex: none;
+    align-items: center;
+    height: 12rem;
+    padding: 0 2.4rem;
+    border-bottom: .2rem solid var(--hk-linea);
+    border-radius: 2rem 2rem 0 0;
+}
+.hk-vertical .hk-dia-cabeza {
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    width: 24rem;
+    height: auto;
+    border-bottom: 0;
+    border-right: .2rem solid var(--hk-linea);
+    border-radius: 2rem 0 0 2rem;
+}
+.hk-dia-num {
+    flex: none;
+    margin-right: 1.6rem;
+    font-family: var(--hk-letra-titulos);
+    font-size: 8rem;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -.02em;
+    font-variant-numeric: tabular-nums;
+}
+.hk-vertical .hk-dia-num {
+    margin: 0 0 .6rem;
+}
+.hk-dia-nombre {
+    min-width: 0;
+    font-family: var(--hk-letra-titulos);
+    font-size: 3.6rem;
+    font-weight: 800;
+    line-height: 1.05;
+}
+.hk-dia-marca {
+    display: block;
+    margin-top: .5rem;
+    color: var(--hk-texto-suave);
+    font-family: var(--hk-letra-texto);
+    font-size: 2.8rem;
+    font-weight: 700;
+    line-height: 1.1;
+}
+
+/* Today: its head in the primary colour, and «Today» in a pill of the accent. */
+.hk-dia-hoy {
+    box-shadow: 0 0 0 .4rem var(--hk-primario), 0 .4rem 1.6rem rgba(0, 0, 0, .12);
+}
+.hk-dia-hoy .hk-dia-cabeza {
+    border-color: var(--hk-primario);
+    background: var(--hk-primario);
+    color: var(--hk-sobre-primario);
+}
+.hk-dia-hoy .hk-dia-marca {
+    display: inline-block;
+    padding: .2rem 1.2rem .3rem;
+    border-radius: 1rem;
+    background: var(--hk-acento);
+    color: var(--hk-sobre-acento);
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+.hk-horizontal .hk-dia-hoy .hk-dia-marca {
+    display: table;                       /* under the name, as wide as its word */
+}
+[data-tema="oscuro"] .hk-dia-hoy {
+    box-shadow: 0 0 0 .4rem var(--hk-acento), 0 .4rem 1.6rem rgba(0, 0, 0, .3);
+}
+
+/* Nothing that day: the card steps back (an outline, no surface), so the days that have something read first.
+   Today keeps its surface and its ring. */
+.hk-dia-vacio:not(.hk-dia-hoy) {
+    background: transparent;
+    box-shadow: inset 0 0 0 .3rem var(--hk-linea);
+}
+.hk-dia-vacio:not(.hk-dia-hoy) .hk-dia-cabeza {
+    border-color: transparent;
+}
+.hk-dia .hk-dia-nada {                   /* (.hk p of hechauka.css takes the padding of a p) */
+    display: flex;
+    flex: 1 1 auto;
+    align-items: flex-start;                /* at the top of the day, under its head: «nothing» at a glance */
+    justify-content: center;
+    padding: 1.6rem;
+    color: var(--hk-texto-suave);
+    font-size: 2.8rem;
+    font-weight: 700;
+    line-height: 1.2;
+    text-align: center;
+}
+
+/* A holiday: hatched, its head muted, and its name on a plate in the middle. No list. */
+.hk-dia-festivo .hk-dia-num,
+.hk-dia-festivo .hk-dia-nombre {
+    color: var(--hk-texto-suave);
+}
+.hk-dia-festivo.hk-dia-hoy .hk-dia-num,
+.hk-dia-festivo.hk-dia-hoy .hk-dia-nombre {
+    color: var(--hk-sobre-primario);
+}
+.hk-festivo {
+    display: flex;
+    flex: 1 1 auto;
+    align-items: center;
+    justify-content: center;
+    min-height: 0;
+    margin: 1.6rem;
+    padding: 1.6rem;
+    overflow: hidden;
+    border-radius: 1.4rem;
+    background: repeating-linear-gradient(135deg, transparent 0, transparent 1.6rem,
+        var(--hk-linea) 1.6rem, var(--hk-linea) 2.4rem);
+}
+.hk-dia .hk-festivo p {
+    min-width: 0;
+    padding: 2rem 2.4rem 2.2rem;
+    border-radius: 1.4rem;
+    background: var(--hk-superficie);
+    box-shadow: 0 .2rem .8rem rgba(0, 0, 0, .08);
+    text-align: center;
+}
+.hk-festivo small {
+    display: block;
+    margin-bottom: .6rem;
+    color: var(--hk-acento-texto);
+    font-size: 2.8rem;
+    font-weight: 800;
+    letter-spacing: .08em;
+    line-height: 1;
+    text-transform: uppercase;
+}
+[data-tema="oscuro"] .hk-festivo small {
+    color: var(--hk-acento);
+}
+.hk-festivo b {
+    display: block;
+    font-family: var(--hk-letra-titulos);
+    font-size: 4.4rem;
+    font-weight: 800;
+    line-height: 1.1;
+}
+
+/* After a weekend (a Monday that follows a Friday on screen): a quiet dotted rule in the gutter before it. */
+.hk-dia-tras-finde::before {
+    content: "";
+    position: absolute;
+    border: 0 dotted var(--hk-texto-suave);
+    opacity: .55;
+}
+.hk-horizontal .hk-dia-tras-finde::before {
+    top: 3rem;
+    bottom: 3rem;
+    left: -1.4rem;
+    border-left-width: .4rem;
+}
+.hk-vertical .hk-dia-tras-finde::before {
+    top: -1.2rem;
+    left: 3rem;
+    right: 3rem;
+    border-top-width: .4rem;
+}
+
+/* --- The list of a day ---------------------------------------------------------------------------------------------
+ * Its events, the whole day ones first and then by the hour. One scale per day (data-escala 0–3: 1 to 1.3 rem of
+ * base), the largest at which nothing overflows and no title takes three lines; at 0 the title is 3.4rem and the
+ * line under it 2.8rem, the floor of the templates. If even then they do not fit, the last ones give way to «+2 más».
+ * On a vertical screen a day may set its events in two columns (data-columnas="2"). */
+.hk-dia-lista {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    align-items: stretch;
+    min-width: 0;
+    min-height: 0;
+    padding: 1.6rem 1.6rem 2rem;
+    overflow: hidden;
+    font-size: 1rem;
+}
+.hk-dia-lista[data-escala="1"] { font-size: 1.1rem; }
+.hk-dia-lista[data-escala="2"] { font-size: 1.2rem; }
+.hk-dia-lista[data-escala="3"] { font-size: 1.3rem; }
+.hk-vertical .hk-dia-lista {
+    padding: 1.6rem 2.4rem;
+}
+.hk-dia-lista[data-columnas="2"] {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    align-items: flex-start;
+}
+.hk-dia-ev {
+    position: relative;
+    z-index: 0;                           /* its tint goes under its text */
+    flex: none;
+    margin-top: .8em;
+    padding: .45em .8em .55em 1.35em;
+    border-radius: .7em;
+}
+.hk-dia-ev:first-child {
+    margin-top: 0;
+}
+.hk-dia-lista[data-columnas="2"] > .hk-dia-ev {
+    width: 48.5%;
+}
+.hk-dia-lista[data-columnas="2"] > .hk-dia-ev:nth-child(2n) {
+    margin-left: 3%;
+}
+.hk-dia-lista[data-columnas="2"] > .hk-dia-ev:nth-child(2) {
+    margin-top: 0;
+}
+/* the tint of its stage, and the edge in its colour */
+.hk-dia-ev::before,
+.hk-dia-ev::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: -1;
+    background: var(--hk-ev, var(--hk-texto-suave));
+}
+.hk-dia-ev::before {
+    right: 0;
+    border-radius: .7em;
+    opacity: .13;
+}
+.hk-dia-ev::after {
+    width: .55em;
+    border-radius: .7em 0 0 .7em;
+}
+[data-tema="oscuro"] .hk-dia-ev::before,
+[data-tema="oscuro"] .hk-dia-ev::after {
+    background: var(--hk-ev-oscuro, var(--hk-ev, var(--hk-texto-suave)));
+}
+[data-tema="oscuro"] .hk-dia-ev::before {
+    opacity: .16;
+}
+.hk-dia-ev b {
+    display: block;
+    font-family: var(--hk-letra-titulos);
+    font-size: 3.4em;
+    font-weight: 800;
+    line-height: 1.1;
+}
+.hk-dia-lista[data-escala="0"] .hk-dia-ev b {
+    word-wrap: break-word;                /* only at the smallest scale: above it, a long word lowers the scale */
+}
+.hk-dia-ev small {
+    display: block;
+    margin-top: .1em;
+    color: var(--hk-texto-suave);
+    font-size: 2.8em;
+    font-weight: 700;
+    line-height: 1.15;
+}
+.hk-dia-ev time {
+    margin-right: .35em;
+    color: var(--hk-texto);
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+}
+.hk-dia .hk-dia-mas {
+    flex: none;
+    width: 100%;
+    margin-top: .25em;
+    padding-left: .5em;
+    color: var(--hk-texto-suave);
+    font-size: 2.8em;
+    font-weight: 800;
+    line-height: 1.2;
+}
+
+/* --- The bands: an event of more than one day, once, across its days -----------------------------------------------
+ * A layer over the week (.hk-tramos). Each band is placed by its first and last day (data-desde, data-hasta): on a
+ * horizontal screen a day starts at (100% + 2.4rem) × i / 5 of the week's width; on a vertical one, at
+ * (100% + 2rem) × i / 5 of its height. Its label goes in <p class="hk-tramo-texto"><b>title</b><small>group</small></p>.
+ * Where it goes on beyond the days shown it ends in a point. */
+.hk-tramos {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+.hk-tramo {
+    position: absolute;
+    border-radius: 1.4rem;
+    background: var(--hk-ev, var(--hk-texto-suave));
+    color: var(--hk-sobre-ev, var(--hk-superficie));
+    box-shadow: 0 .2rem .8rem rgba(0, 0, 0, .14);
+}
+.hk-tramo .hk-tramo-texto {
+    height: 9rem;
+    padding: .7rem 2rem 0;
+    white-space: nowrap;
+}
+.hk-tramo-texto b,
+.hk-tramo-texto small {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.2;
+}
+.hk-tramo-texto b {
+    font-family: var(--hk-letra-titulos);
+    font-size: 3.4rem;
+    font-weight: 800;
+}
+.hk-tramo-texto small {
+    font-size: 2.8rem;
+    font-weight: 700;
+}
+.hk-tramo-estrecho .hk-tramo-texto b {
+    font-size: 3rem;                      /* a band of one day whose title does not fit at 3.4rem */
+    line-height: 1.36;
+}
+/* the pointed ends */
+.hk-tramo-antes::before,
+.hk-tramo-despues::after {
+    content: "";
+    position: absolute;
+    width: 0;
+    height: 0;
+    border: 0 solid transparent;
+}
+
+/* Horizontal: lanes under the heads of the days (data-carril 0–2, 10.2rem apart); the band, 9rem high, one line for
+   the title and one for the group (and «hasta el mar 10» when it goes on). 1.6rem inside its first and last day. */
+.hk-horizontal .hk-tramo {
+    height: 9rem;
+}
+.hk-horizontal .hk-tramo[data-carril="0"] { top: 13.6rem; }
+.hk-horizontal .hk-tramo[data-carril="1"] { top: 23.8rem; }
+.hk-horizontal .hk-tramo[data-carril="2"] { top: 34rem; }
+.hk-horizontal .hk-tramo[data-desde="0"] { left: 1.6rem; }
+.hk-horizontal .hk-tramo[data-desde="1"] { left: calc((100% + 2.4rem) * .2 + 1.6rem); }
+.hk-horizontal .hk-tramo[data-desde="2"] { left: calc((100% + 2.4rem) * .4 + 1.6rem); }
+.hk-horizontal .hk-tramo[data-desde="3"] { left: calc((100% + 2.4rem) * .6 + 1.6rem); }
+.hk-horizontal .hk-tramo[data-desde="4"] { left: calc((100% + 2.4rem) * .8 + 1.6rem); }
+.hk-horizontal .hk-tramo[data-hasta="4"] { right: 1.6rem; }
+.hk-horizontal .hk-tramo[data-hasta="3"] { right: calc((100% + 2.4rem) * .2 + 1.6rem); }
+.hk-horizontal .hk-tramo[data-hasta="2"] { right: calc((100% + 2.4rem) * .4 + 1.6rem); }
+.hk-horizontal .hk-tramo[data-hasta="1"] { right: calc((100% + 2.4rem) * .6 + 1.6rem); }
+.hk-horizontal .hk-tramo[data-hasta="0"] { right: calc((100% + 2.4rem) * .8 + 1.6rem); }
+.hk-horizontal .hk-tramo-antes {
+    margin-left: 1.6rem;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+.hk-horizontal .hk-tramo-despues {
+    margin-right: 1.6rem;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+.hk-horizontal .hk-tramo-antes::before {
+    top: 0;
+    left: -2.6rem;
+    border-width: 4.5rem 2.6rem 4.5rem 0;
+    border-right-color: var(--hk-ev, var(--hk-texto-suave));
+}
+.hk-horizontal .hk-tramo-despues::after {
+    top: 0;
+    right: -2.6rem;
+    border-width: 4.5rem 0 4.5rem 2.6rem;
+    border-left-color: var(--hk-ev, var(--hk-texto-suave));
+}
+/* the lists leave the lanes their days use (data-carriles on the day) */
+.hk-horizontal .hk-dia[data-carriles="1"] > .hk-dia-cuerpo { margin-top: 10.2rem; }
+.hk-horizontal .hk-dia[data-carriles="2"] > .hk-dia-cuerpo { margin-top: 20.4rem; }
+.hk-horizontal .hk-dia[data-carriles="3"] > .hk-dia-cuerpo { margin-top: 30.6rem; }
+.hk-horizontal .hk-dia[data-carriles="1"] > .hk-festivo { margin-top: 11.8rem; }
+.hk-horizontal .hk-dia[data-carriles="2"] > .hk-festivo { margin-top: 22rem; }
+.hk-horizontal .hk-dia[data-carriles="3"] > .hk-festivo { margin-top: 32.2rem; }
+
+/* Vertical: a flag on a pole. The band is a bar of 4.8rem on the right of the days it lasts (data-carril 0–1: the
+   first at the edge, the second 6.4rem further in); its label, a flag of 9rem at the top of its first day, from the
+   start of the list to the bar. Two flags in the same day go one under the other (data-fila 0–1). The vertical
+   screen is always 100rem wide inside, so the flags are measured in rem. A band that starts while another goes on
+   takes the lane further in, so its flag does not cross the other's bar; when there is none left, it takes a free
+   one and the bar further in passes over its flag. */
+.hk-vertical .hk-tramo {
+    width: 4.8rem;
+}
+.hk-vertical .hk-tramo[data-carril="0"] { right: 1.6rem; }
+.hk-vertical .hk-tramo[data-carril="1"] { right: 8rem; }
+.hk-vertical .hk-tramo[data-desde="0"] { top: 1.6rem; }
+.hk-vertical .hk-tramo[data-desde="1"] { top: calc((100% + 2rem) * .2 + 1.6rem); }
+.hk-vertical .hk-tramo[data-desde="2"] { top: calc((100% + 2rem) * .4 + 1.6rem); }
+.hk-vertical .hk-tramo[data-desde="3"] { top: calc((100% + 2rem) * .6 + 1.6rem); }
+.hk-vertical .hk-tramo[data-desde="4"] { top: calc((100% + 2rem) * .8 + 1.6rem); }
+.hk-vertical .hk-tramo[data-fila="1"] { margin-top: 10.2rem; }
+.hk-vertical .hk-tramo[data-hasta="4"] { bottom: 1.6rem; }
+.hk-vertical .hk-tramo[data-hasta="3"] { bottom: calc((100% + 2rem) * .2 + 1.6rem); }
+.hk-vertical .hk-tramo[data-hasta="2"] { bottom: calc((100% + 2rem) * .4 + 1.6rem); }
+.hk-vertical .hk-tramo[data-hasta="1"] { bottom: calc((100% + 2rem) * .6 + 1.6rem); }
+.hk-vertical .hk-tramo[data-hasta="0"] { bottom: calc((100% + 2rem) * .8 + 1.6rem); }
+.hk-vertical .hk-tramo-texto {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 72rem;                         /* from the start of the list (26.4rem) to the bar of lane 0 (98.4rem) */
+    border-radius: 1.4rem;
+    background: var(--hk-ev, var(--hk-texto-suave));
+    box-shadow: 0 .2rem .8rem rgba(0, 0, 0, .14);
+}
+.hk-vertical .hk-tramo[data-carril="1"] .hk-tramo-texto {
+    width: 65.6rem;
+}
+/* when a flag has to pass a bar further in (a lane taken again), the bar goes over it */
+.hk-vertical .hk-tramo[data-carril="0"] { z-index: 1; }
+.hk-vertical .hk-tramo[data-carril="1"] { z-index: 2; }
+.hk-vertical .hk-tramo-antes {
+    margin-top: .8rem;                    /* room for its point above */
+}
+.hk-vertical .hk-tramo-antes[data-fila="1"] {
+    margin-top: 11rem;
+}
+.hk-vertical .hk-tramo-antes,
+.hk-vertical .hk-tramo-antes .hk-tramo-texto {
+    border-top-right-radius: 0;
+}
+.hk-vertical .hk-tramo-despues {
+    margin-bottom: 1.6rem;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+.hk-vertical .hk-tramo-antes::before {
+    top: -2.4rem;
+    left: 0;
+    border-width: 0 2.4rem 2.4rem;
+    border-bottom-color: var(--hk-ev, var(--hk-texto-suave));
+}
+.hk-vertical .hk-tramo-despues::after {
+    bottom: -2.4rem;
+    left: 0;
+    border-width: 2.4rem 2.4rem 0;
+    border-top-color: var(--hk-ev, var(--hk-texto-suave));
+}
+/* the lists leave the bars beside them (data-carriles) and the flags above them (data-banderas) */
+.hk-vertical .hk-dia[data-carriles="1"] > .hk-dia-cuerpo { margin-right: 5.2rem; }
+.hk-vertical .hk-dia[data-carriles="2"] > .hk-dia-cuerpo { margin-right: 11.6rem; }
+.hk-vertical .hk-dia[data-carriles="1"] > .hk-festivo { margin-right: 8rem; }
+.hk-vertical .hk-dia[data-carriles="2"] > .hk-festivo { margin-right: 14.4rem; }
+.hk-vertical .hk-dia[data-banderas="1"] > .hk-dia-cuerpo { margin-top: 10.6rem; }
+.hk-vertical .hk-dia[data-banderas="2"] > .hk-dia-cuerpo { margin-top: 20.8rem; }
+.hk-vertical .hk-dia[data-banderas="1"] > .hk-festivo { margin-top: 11.8rem; }
+.hk-vertical .hk-dia[data-banderas="2"] > .hk-festivo { margin-top: 22rem; }
+
+/* --- Coming in -----------------------------------------------------------------------------------------------------
+ * Over the passes of composiciones.css (the layer rises and fades in): the days follow one another from today, and
+ * the bands come last, from the side they run. With .hk-quieto, only the fade. */
+.hk-capa .hk-semana > .hk-dia,
+.hk-capa .hk-tramos {
+    opacity: 0;
+    -webkit-transition: opacity .6s ease, -webkit-transform .8s cubic-bezier(.2, .7, .2, 1);
+    transition: opacity .6s ease, transform .8s cubic-bezier(.2, .7, .2, 1);
+}
+.hk-capa .hk-semana > .hk-dia {
+    -webkit-transform: translate3d(0, 1.6rem, 0);
+    transform: translate3d(0, 1.6rem, 0);
+}
+.hk-capa .hk-semana > .hk-dia:nth-child(2) { -webkit-transition-delay: .07s; transition-delay: .07s; }
+.hk-capa .hk-semana > .hk-dia:nth-child(3) { -webkit-transition-delay: .14s; transition-delay: .14s; }
+.hk-capa .hk-semana > .hk-dia:nth-child(4) { -webkit-transition-delay: .21s; transition-delay: .21s; }
+.hk-capa .hk-semana > .hk-dia:nth-child(5) { -webkit-transition-delay: .28s; transition-delay: .28s; }
+.hk-capa .hk-tramos {
+    -webkit-transform: translate3d(-2.4rem, 0, 0);
+    transform: translate3d(-2.4rem, 0, 0);
+    -webkit-transition-delay: .45s;
+    transition-delay: .45s;
+}
+.hk-vertical .hk-capa .hk-tramos {
+    -webkit-transform: translate3d(0, -2.4rem, 0);
+    transform: translate3d(0, -2.4rem, 0);
+}
+.hk-capa.hk-dentro .hk-semana > .hk-dia,
+.hk-capa.hk-dentro .hk-tramos {
+    opacity: 1;
+    -webkit-transform: none;
+    transform: none;
+}
+.hk-capa.hk-fuera .hk-semana > .hk-dia,
+.hk-capa.hk-fuera .hk-tramos {
+    -webkit-transition-delay: 0s;
+    transition-delay: 0s;
+}
+.hk-quieto .hk-capa .hk-semana > .hk-dia,
+.hk-quieto .hk-capa .hk-tramos {
+    -webkit-transform: none;
+    transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+    .hk .hk-capa .hk-semana > .hk-dia,
+    .hk .hk-capa .hk-tramos {
+        -webkit-transform: none;
+        transform: none;
+    }
+}

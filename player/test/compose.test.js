@@ -144,6 +144,41 @@ test('one countdown, for the nearest event of more than a day, from two to fourt
         {id: 'd', title: 'Mañana mismo', start: '2026-11-01T08:00', end: '2026-11-03T16:00'},
     ];
     assert.deepEqual(countdown(events, '2026-10-31', 14), {id: 'b', days: 3, title: 'Acampada', group: '3º ESO',
-        date: '2026-11-03', color: 1});
+        date: '2026-11-03', color: 3});
     assert.equal(countdown(events, '2026-11-09', 14), null);
 });
+
+test('«La semana» every 8 slides, every 5 on Mondays and Fridays, only with something beyond today', () => {
+    const run = (weekday, things, slides) => {
+        const c = new Composer();
+        c.sinceFull = -100;
+        const out = [];
+        for (let i = 1; i <= slides; i++) {
+            out.push(c.next([wide('a'), wide('b')], 3, true, {week: {things, weekday}}).comp);
+        }
+        return out;
+    };
+    const wed = run(3, 4, 16);
+    assert.equal(wed.indexOf('semana') + 1, 8);
+    const mon = run(1, 4, 16);
+    assert.equal(mon.indexOf('semana') + 1, 5);
+    assert.equal(run(3, 0, 20).indexOf('semana'), -1);
+    // Never right after the moment of «Today».
+    for (const list of [wed, mon]) {
+        for (let i = 1; i < list.length; i++) {
+            if (list[i] === 'semana') {
+                assert.notEqual(list[i - 1], 'solo-hoy');
+            }
+        }
+    }
+});
+
+test('without pictures, «Today» and the week take turns', () => {
+    const c = new Composer();
+    const out = [];
+    for (let i = 0; i < 6; i++) {
+        out.push(c.next([], 3, true, {week: {things: 5, weekday: 3}}).comp);
+    }
+    assert.deepEqual(out, ['solo-hoy', 'solo-hoy', 'semana', 'solo-hoy', 'solo-hoy', 'semana']);
+});
+

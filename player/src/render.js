@@ -5,6 +5,7 @@
 
 import {shapeOf} from './compose.js';
 import {buildToday, fitToday, turnPages} from './today.js';
+import {buildWeek, fitWeek} from './weekview.js';
 
 const CAPTION_MS = 2800;
 const PASS_MS = 1000;
@@ -422,9 +423,16 @@ export class Screen {
 
     // --- The compositions -------------------------------------------------------------------------------------------
 
-    makeLayer(comp, items, today) {
+    makeLayer(comp, items, today, week) {
         const c = el('div', 'hk-cuerpo hk-capa');
         c.setAttribute('data-composicion', comp);
+        if (comp === 'semana') {
+            const l = this.labelsFull();
+            c.hkWeek = buildWeek(week, {today: l.today, tomorrow: l.tomorrow, none: this.s.week_none || '',
+                more: this.s.week_more || '+{n}'});
+            c.appendChild(c.hkWeek);
+            return c;
+        }
         if (comp === 'dos-verticales') {
             const pair = el('div', 'hk-pareja');
             pair.setAttribute('data-forma', shapeOf(items[0]) || '2x3');
@@ -493,8 +501,9 @@ export class Screen {
      *
      * @param {{comp: string, items: object[]}} choice
      * @param {object} today the data of «Today»
+     * @param {object|null} week the week, from weekOf()
      */
-    show(choice, today) {
+    show(choice, today, week) {
         const comp = choice.comp;
         const items = choice.items;
         const wasFull = this.frame.getAttribute('data-composicion') === 'foto-completa';
@@ -510,7 +519,8 @@ export class Screen {
         }
         const shapes = items.map(shapeOf).join(',');
         const todayKey = JSON.stringify(today);
-        if (this.layer && this.comp === comp && this.shapes === shapes && comp !== 'solo-hoy' && !wasFull) {
+        if (this.layer && this.comp === comp && this.shapes === shapes && comp !== 'solo-hoy' && comp !== 'semana' &&
+                !wasFull) {
             const slots = this.layer.querySelectorAll('.hk-medio');
             for (let i = 0; i < slots.length; i++) {
                 const slot = slots[i];
@@ -540,8 +550,11 @@ export class Screen {
             return;
         }
         const old = this.layer;
-        const layer = this.makeLayer(comp, items, today);
+        const layer = this.makeLayer(comp, items, today, week);
         this.stage.appendChild(layer);
+        if (layer.hkWeek) {
+            fitWeek(layer.hkWeek, this.horizontal);
+        }
         layer.hkPaging = turnPages(fitToday(layer.hkToday));
         void layer.offsetWidth;
         requestAnimationFrame(function () {

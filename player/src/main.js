@@ -8,14 +8,15 @@ import {makeApi} from './api.js';
 import {realClock, simulatedClock} from './clock.js';
 import {MediaStore, mediaOf} from './media.js';
 import {pair} from './pairing.js';
-import {countdown, dayLabel, splitTitle, upcoming} from './agenda.js';
+import {countdown, dayLabel, splitTitle, stageOf, upcoming} from './agenda.js';
 import {Composer} from './compose.js';
-import {isDark, isLive, isPowerOn, liveItems} from './rules.js';
+import {dayNumber, isDark, isLive, isPowerOn, liveItems, weekdayOf} from './rules.js';
 import {Screen} from './render.js';
 import {store} from './store.js';
 import {countToday} from './today.js';
+import {weekOf} from './week.js';
 
-const VERSION = '0.5.0';
+const VERSION = '0.5.1';
 const COMING_DAYS = 7;
 const HEARTBEAT_MS = 60000;
 const REFRESH_MS = 15 * 60000;
@@ -235,7 +236,7 @@ class Player {
         }).sort(byStart).map(function (ev) {
             const parts = splitTitle(ev.title);
             return {time: ev.allday || !ev.start ? '·' : ev.start.slice(11, 16), title: parts.title,
-                group: parts.group || ev.detail || '', color: ev.color};
+                group: parts.group || ev.detail || '', color: stageOf(parts.group || ev.detail) || ev.color || 0};
         });
         const menu = this.menuOf(side.filter(function (it) {
             return it.type === 'menu';
@@ -263,6 +264,23 @@ class Player {
         };
     }
 
+    /** The next five school days with their events, for «La semana». */
+    weekOf(wall) {
+        const s = this.strings;
+        const events = (this.manifest.items || []).filter(function (it) {
+            return it.type === 'event';
+        });
+        return weekOf(events, wall.date, !this.screen.horizontal, {
+            days: s.days || ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+            days_short: s.days_mid || s.days_short || ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+            months: s.months || [],
+            months_short: s.months_short || [],
+            holiday: s.week_holiday || '',
+            from: s.week_from || '',
+            until: s.week_until || '',
+        });
+    }
+
     /** The next slide: the composition the rules choose, shown, and the one after it in its seconds. */
     next() {
         clearTimeout(this.timer);
@@ -284,10 +302,12 @@ class Player {
         }
         const today = this.todayOf(wall);
         const coming = today.upcoming.length || today.countdown ? 1 : 0;
+        const week = m.template === 'full' ? null : this.weekOf(wall);
         const choice = this.composer.next(this.mainList(wall), countToday(today) + coming, this.screen.horizontal,
-            {menu: !!today.menu, noToday: m.template === 'full'});
+            {menu: !!today.menu, noToday: m.template === 'full',
+                week: week ? {things: week.things, weekday: weekdayOf(dayNumber(wall.date))} : null});
         this.menuTurn++;
-        this.screen.show(choice, today);
+        this.screen.show(choice, today, week);
         this.timer = setTimeout(function () {
             self.next();
         }, choice.seconds * 1000 + (choice.items.some(function (it) {

@@ -71,7 +71,7 @@ class item_form extends \moodleform {
             $f->setType('url', PARAM_RAW_TRIMMED);
             $f->addRule('url', null, 'required', null, 'client');
             $f->addHelpButton('url', 'agenda_url', $c);
-            $colours = [];
+            $colours = [0 => get_string('colour_bystage', $c)];
             for ($i = 1; $i <= 4; $i++) {
                 $colours[$i] = get_string('colour_n', $c, $i);
             }

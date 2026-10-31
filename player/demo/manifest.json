@@ -1,6 +1,6 @@
 {
   "contract": 1,
-  "etag": "demo-2",
+  "etag": "demo-3",
   "generated": 1793577600,
   "horizon": "2026-11-15",
   "sample": true,
@@ -369,6 +369,18 @@
       "when": {
         "from": "2026-11-06",
         "until": "2026-11-06"
+      }
+    },
+    {
+      "id": "e8",
+      "type": "event",
+      "zone": "side",
+      "title": "Festivo - Día del Enseñante",
+      "start": "2026-11-04T00:00",
+      "allday": true,
+      "when": {
+        "from": "2026-11-04",
+        "until": "2026-11-04"
       }
     }
   ],

@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.5.1 (2026-11-01)
+
+- **«La semana»**, the seventh composition (the art direction's design): the next five school days side by side (one
+  under the other on a vertical screen), today highlighted, a day without anything stepped back, a holiday striped with
+  its name, and events of more than a day as a band across their days (a flag on a pole on a vertical screen) that
+  says from or until when it goes on. Each day fits its list; what does not fit says «+2 more». It comes every 8
+  slides, every 5 on Mondays and Fridays, only when the week has something beyond today.
+- **Stages by colour**: an event takes its stage from the group in its title or its «who or where» (Inf, Pri, ESO,
+  Bach: the four colours of the centre, in that order); one of the whole school goes in a neutral grey. Calendar events
+  no longer come all in the first colour; an agenda can take each event's stage (the default) or a colour of its own.
 ## 0.5.0 (2026-10-31)
 
 - **Compositions that change with each slide** (the design of the art direction): a landscape picture with «Today»

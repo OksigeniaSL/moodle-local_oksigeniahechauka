@@ -70,7 +70,7 @@ if ($item) {
         'important' => !empty($data['important']),
         'start' => $data['start'] ?? time(),
         'end' => $data['end'] ?? 0,
-        'colour' => $data['color'] ?? 1,
+        'colour' => $data['color'] ?? ($type === 'agenda' ? 0 : 1),
         'url' => $data['url'] ?? '',
         'everyweeks' => max(1, (int) $item->everyweeks),
         'targetall' => $item->targetall,
@@ -151,7 +151,7 @@ if ($data = $form->get_data()) {
         $extra['important'] = !empty($data->important);
     } else if ($type === 'agenda') {
         $extra['url'] = trim($data->url ?? '');
-        $extra['color'] = (int) ($data->colour ?? 1);
+        $extra['color'] = (int) ($data->colour ?? 0);
     } else if ($type === 'event') {
         $extra['start'] = (int) $data->start;
         $extra['end'] = !empty($data->end) ? (int) $data->end : 0;

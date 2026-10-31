@@ -158,8 +158,12 @@ class agendas {
             // An all-day event ends at the midnight after its last day: its last day is the one before.
             $last = $end > 0 ? ($r->allday ? $end - 60 : $end) : $start;
             $event = ['id' => 'c' . $r->id, 'type' => 'event', 'zone' => 'side', 'title' => $r->title,
-                'start' => schedule::stamp($start), 'color' => $color >= 1 && $color <= 4 ? $color : 1,
+                'start' => schedule::stamp($start),
                 'when' => ['from' => schedule::day($start), 'until' => schedule::day($last)]];
+            if ($color >= 1 && $color <= 4) {
+                // Without a colour of its own, the screen takes each event's stage from its title.
+                $event['color'] = $color;
+            }
             if ($end > 0) {
                 $event['end'] = schedule::stamp($last);
             }
