@@ -62,7 +62,7 @@ if ($shape === 'vertical' && $width > $height || $shape === 'horizontal' && $hei
     [$width, $height] = [$height, $width];
 }
 if (!preg_match('/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/', $at)) {
-    $at = userdate(time(), '%Y-%m-%dT%H:%M', 99, false);
+    $at = userdate(time(), '%Y-%m-%dT%H:%M', core_date::get_server_timezone(), false);
 }
 
 echo $OUTPUT->header();

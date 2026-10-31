@@ -304,8 +304,21 @@ export class Screen {
     slide(item) {
         const d = el('div', 'hk-diapo');
         d.hkItem = item;
-        const contain = item.fit === 'contain';
+        const contain = item.fit === 'contain' || item.fit === 'blur';
         const src = this.media.url(item.media);
+        if (item.fit === 'blur') {
+            // Whole, over a blurred copy of itself: the still for a video (never a second video), the picture itself.
+            const back = el('div', 'hk-diapo-fondo');
+            let bg = item.type === 'video' ? this.media.url(item.backdrop) : null;
+            if (!bg) {
+                bg = item.type === 'video' ? this.media.url(item.poster) : src;
+                back.classList.add('hk-difuminar');
+            }
+            if (bg) {
+                back.style.backgroundImage = 'url("' + bg + '")';
+            }
+            d.appendChild(back);
+        }
         if (item.type === 'video') {
             const v = el('video');
             v.muted = !this.sound;
@@ -395,7 +408,7 @@ export class Screen {
     }
 
     slot(item, comp) {
-        const s = el('section', 'hk-medio' + (item.fit === 'contain' ? ' hk-medio-contener' : ''));
+        const s = el('section', 'hk-medio' + (item.fit === 'contain' || item.fit === 'blur' ? ' hk-medio-contener' : ''));
         const shape = shapeOf(item);
         if (shape && comp !== 'foto-hoy' && comp !== 'foto-sola') {
             s.setAttribute('data-forma', shape);
@@ -486,6 +499,10 @@ export class Screen {
         const items = choice.items;
         const wasFull = this.frame.getAttribute('data-composicion') === 'foto-completa';
         if (comp === 'foto-completa') {
+            // Under the full screen the layer stays, still: its videos stop.
+            if (this.layer) {
+                this.stopSlides(this.layer);
+            }
             this.fillFull(items[0]);
             this.frame.setAttribute('data-composicion', comp);
             this.comp = comp;
@@ -497,17 +514,22 @@ export class Screen {
             const slots = this.layer.querySelectorAll('.hk-medio');
             for (let i = 0; i < slots.length; i++) {
                 const slot = slots[i];
-                const old = slot.querySelector('.hk-diapo');
+                const olds = slot.querySelectorAll('.hk-diapo');
                 const fresh = this.slide(items[i]);
                 slot.appendChild(fresh);
                 void slot.offsetWidth;
                 fresh.classList.add('hk-visible');
                 this.startVideo(fresh);
                 const self = this;
+                // Every slide that was there goes, also one still fading in from a slide just before.
+                for (let k = 0; k < olds.length; k++) {
+                    this.stopSlide(olds[k]);
+                }
                 setTimeout(function () {
-                    if (old && old.parentNode) {
-                        self.stopSlide(old);
-                        old.parentNode.removeChild(old);
+                    for (let k = 0; k < olds.length; k++) {
+                        if (olds[k].parentNode) {
+                            olds[k].parentNode.removeChild(olds[k]);
+                        }
                     }
                 }, 900);
             }

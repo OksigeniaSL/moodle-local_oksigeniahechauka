@@ -77,7 +77,7 @@ final class video_test extends \advanced_testcase {
         $command = video::convert_command('/opt/ffmpeg/ffmpeg', '/tmp/in', '/tmp/out.mp4');
         $this->assertSame('/opt/ffmpeg/ffmpeg', $command[0]);
         $this->assertSame('/tmp/out.mp4', end($command));
-        foreach (['libx264', 'yuv420p', '+faststart', '-an'] as $part) {
+        foreach (['libx264', 'yuv420p', '+faststart', 'aac', '0:a:0?'] as $part) {
             $this->assertContains($part, $command);
         }
         $this->assertSame('2', $command[array_search('-threads', $command) + 1]);

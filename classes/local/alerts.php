@@ -103,7 +103,7 @@ class alerts {
             }
             $lang = $user->lang ?: null;
             $a = (object) [
-                'name' => format_string($screen->name, true, ['context' => files::context()]),
+                'name' => items::plain((string) $screen->name),
                 'since' => userdate($screen->lastseen, $strings->get_string(
                     'strftimedaydatetime',
                     'langconfig',

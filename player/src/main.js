@@ -301,6 +301,8 @@ class Player {
         }
         const m = this.manifest;
         const wall = this.clock.wall();
+        // In the small hours a screen with power hours is off: it reloads then, in black.
+        this.nightly(wall);
         const on = isPowerOn(m.power, wall);
         this.screen.setPower(on);
         if (!on) {
@@ -318,7 +320,6 @@ class Player {
         this.screen.showTicker(liveItems(m.items || [], 'ticker', wall).map(function (it) {
             return it.text;
         }).filter(Boolean));
-        this.nightly(wall);
     }
 
     // Once a day, in the small hours, a screen reloads itself: weeks of a page open wear any browser down.

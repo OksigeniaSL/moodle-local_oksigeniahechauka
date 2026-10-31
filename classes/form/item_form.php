@@ -66,7 +66,18 @@ class item_form extends \moodleform {
         if ($type !== 'media') {
             $f->addRule('title', null, 'required', null, 'client');
         }
-        if ($type !== 'ticker') {
+        if ($type === 'agenda') {
+            $f->addElement('text', 'url', get_string('agenda_url', $c), ['size' => 60, 'maxlength' => 1000]);
+            $f->setType('url', PARAM_RAW_TRIMMED);
+            $f->addRule('url', null, 'required', null, 'client');
+            $f->addHelpButton('url', 'agenda_url', $c);
+            $colours = [];
+            for ($i = 1; $i <= 4; $i++) {
+                $colours[$i] = get_string('colour_n', $c, $i);
+            }
+            $f->addElement('select', 'colour', get_string('colour', $c), $colours);
+        }
+        if ($type !== 'ticker' && $type !== 'agenda') {
             $f->addElement('text', 'body', get_string('body_' . $type, $c), ['size' => 60, 'maxlength' => 200]);
             $f->setType('body', PARAM_TEXT);
         }
@@ -95,59 +106,62 @@ class item_form extends \moodleform {
             $f->addElement('select', 'colour', get_string('colour', $c), $colours);
         }
 
-        // When: the dates, the days and the hours, each said as people say it; together they make every combination.
-        $f->addElement('header', 'when', get_string('schedule', $c));
-        $f->setExpanded('when', true);
-        $f->addElement('select', 'dates', get_string('dates', $c), [
-            'always' => get_string('schedule_always', $c),
-            'day' => get_string('dates_day', $c),
-            'range' => get_string('dates_range', $c),
-            'from' => get_string('dates_from', $c),
-            'until' => get_string('dates_until', $c),
-        ]);
-        $f->addElement('date_selector', 'day', get_string('day', $c));
-        $f->hideIf('day', 'dates', 'neq', 'day');
-        $f->addElement('date_selector', 'datefrom', get_string('datefrom', $c));
-        $f->hideIf('datefrom', 'dates', 'in', ['always', 'day', 'until']);
-        $f->addElement('date_selector', 'dateuntil', get_string('dateuntil', $c));
-        $f->hideIf('dateuntil', 'dates', 'in', ['always', 'day', 'from']);
+        // An agenda brings its own dates.
+        if ($type !== 'agenda') {
+            // When: the dates, the days and the hours, each said as people say it; together they make every combination.
+            $f->addElement('header', 'when', get_string('schedule', $c));
+            $f->setExpanded('when', true);
+            $f->addElement('select', 'dates', get_string('dates', $c), [
+                'always' => get_string('schedule_always', $c),
+                'day' => get_string('dates_day', $c),
+                'range' => get_string('dates_range', $c),
+                'from' => get_string('dates_from', $c),
+                'until' => get_string('dates_until', $c),
+            ]);
+            $f->addElement('date_selector', 'day', get_string('day', $c));
+            $f->hideIf('day', 'dates', 'neq', 'day');
+            $f->addElement('date_selector', 'datefrom', get_string('datefrom', $c));
+            $f->hideIf('datefrom', 'dates', 'in', ['always', 'day', 'until']);
+            $f->addElement('date_selector', 'dateuntil', get_string('dateuntil', $c));
+            $f->hideIf('dateuntil', 'dates', 'in', ['always', 'day', 'from']);
 
-        $f->addElement('select', 'daysmode', get_string('weekdays', $c), [
-            'all' => get_string('daysmode_all', $c),
-            'some' => get_string('daysmode_some', $c),
-        ]);
-        $short = explode(',', get_string('days_short', $c));
-        $days = [];
-        for ($d = 1; $d <= 7; $d++) {
-            $days[] = $f->createElement('advcheckbox', $d, '', $short[$d - 1]);
-        }
-        $f->addGroup($days, 'days', '', ' ', true);
-        $f->hideIf('days', 'daysmode', 'eq', 'all');
-        // On a single day, weekdays and «every N weeks» mean nothing.
-        $f->hideIf('daysmode', 'dates', 'eq', 'day');
-        $f->hideIf('days', 'dates', 'eq', 'day');
+            $f->addElement('select', 'daysmode', get_string('weekdays', $c), [
+                'all' => get_string('daysmode_all', $c),
+                'some' => get_string('daysmode_some', $c),
+            ]);
+            $short = explode(',', get_string('days_short', $c));
+            $days = [];
+            for ($d = 1; $d <= 7; $d++) {
+                $days[] = $f->createElement('advcheckbox', $d, '', $short[$d - 1]);
+            }
+            $f->addGroup($days, 'days', '', ' ', true);
+            $f->hideIf('days', 'daysmode', 'eq', 'all');
+            // On a single day, weekdays and «every N weeks» mean nothing.
+            $f->hideIf('daysmode', 'dates', 'eq', 'day');
+            $f->hideIf('days', 'dates', 'eq', 'day');
 
-        $f->addElement('select', 'hoursmode', get_string('times', $c), [
-            'all' => get_string('hoursmode_all', $c),
-            'some' => get_string('hoursmode_some', $c),
-        ]);
-        for ($r = 0; $r < 2; $r++) {
-            $range = [
-                $f->createElement('text', 'from', '', ['size' => 5, 'maxlength' => 5, 'placeholder' => '08:00']),
-                $f->createElement('text', 'to', '', ['size' => 5, 'maxlength' => 5, 'placeholder' => '10:30']),
-            ];
-            $f->addGroup($range, 'range' . $r, '', ' – ', true);
-            $f->setType('range' . $r . '[from]', PARAM_RAW_TRIMMED);
-            $f->setType('range' . $r . '[to]', PARAM_RAW_TRIMMED);
-            $f->hideIf('range' . $r, 'hoursmode', 'eq', 'all');
+            $f->addElement('select', 'hoursmode', get_string('times', $c), [
+                'all' => get_string('hoursmode_all', $c),
+                'some' => get_string('hoursmode_some', $c),
+            ]);
+            for ($r = 0; $r < 2; $r++) {
+                $range = [
+                    $f->createElement('text', 'from', '', ['size' => 5, 'maxlength' => 5, 'placeholder' => '08:00']),
+                    $f->createElement('text', 'to', '', ['size' => 5, 'maxlength' => 5, 'placeholder' => '10:30']),
+                ];
+                $f->addGroup($range, 'range' . $r, '', ' – ', true);
+                $f->setType('range' . $r . '[from]', PARAM_RAW_TRIMMED);
+                $f->setType('range' . $r . '[to]', PARAM_RAW_TRIMMED);
+                $f->hideIf('range' . $r, 'hoursmode', 'eq', 'all');
+            }
+            $f->addHelpButton('hoursmode', 'times', $c);
+            $every = [1 => get_string('everyweeks_1', $c)];
+            for ($n = 2; $n <= 4; $n++) {
+                $every[$n] = get_string('everyweeks_n', $c, $n);
+            }
+            $f->addElement('select', 'everyweeks', get_string('everyweeks', $c), $every);
+            $f->hideIf('everyweeks', 'dates', 'eq', 'day');
         }
-        $f->addHelpButton('hoursmode', 'times', $c);
-        $every = [1 => get_string('everyweeks_1', $c)];
-        for ($n = 2; $n <= 4; $n++) {
-            $every[$n] = get_string('everyweeks_n', $c, $n);
-        }
-        $f->addElement('select', 'everyweeks', get_string('everyweeks', $c), $every);
-        $f->hideIf('everyweeks', 'dates', 'eq', 'day');
 
         // Where.
         $f->addElement('header', 'wherehdr', get_string('where', $c));
@@ -190,6 +204,12 @@ class item_form extends \moodleform {
     public function validation($data, $files): array {
         $errors = parent::validation($data, $files);
         $c = 'local_oksigeniahechauka';
+        if (($data['type'] ?? '') === 'agenda') {
+            if (!preg_match('#^(https?|webcal)://#i', trim($data['url'] ?? ''))) {
+                $errors['url'] = get_string('agenda_bad_url', $c);
+            }
+            return $errors;
+        }
         if (($data['dates'] ?? '') === 'range' && (int) $data['dateuntil'] < (int) $data['datefrom']) {
             $errors['dateuntil'] = get_string('wrongdates', $c);
         }

@@ -56,5 +56,43 @@ function xmldb_local_oksigeniahechauka_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026103106, 'local', 'oksigeniahechauka');
     }
 
+    if ($oldversion < 2026103107) {
+        // The sound of a screen.
+        $table = new xmldb_table('local_oksigeniahechauka_screen');
+        $field = new xmldb_field('sound', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'command');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        // The events of the agendas.
+        $table = new xmldb_table('local_oksigeniahechauka_calevent');
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('itemid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('uid', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+        $table->add_field('title', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('detail', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+        $table->add_field('timestart', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timeend', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('allday', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_key('itemid', XMLDB_KEY_FOREIGN, ['itemid'], 'local_oksigeniahechauka_item', ['id']);
+        $table->add_index('timestart', XMLDB_INDEX_NOTUNIQUE, ['timestart']);
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+        upgrade_plugin_savepoint(true, 2026103107, 'local', 'oksigeniahechauka');
+    }
+
+    if ($oldversion < 2026103108) {
+        // Where each item goes is asked at every request of a screen: indexes for its groups and screens.
+        $table = new xmldb_table('local_oksigeniahechauka_target');
+        foreach (['groupid', 'screenid'] as $name) {
+            $index = new xmldb_index($name, XMLDB_INDEX_NOTUNIQUE, [$name]);
+            if (!$dbman->index_exists($table, $index)) {
+                $dbman->add_index($table, $index);
+            }
+        }
+        upgrade_plugin_savepoint(true, 2026103108, 'local', 'oksigeniahechauka');
+    }
+
     return true;
 }

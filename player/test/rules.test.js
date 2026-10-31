@@ -100,7 +100,10 @@ test('an event goes away once it is over', () => {
     const ev = {type: 'event', start: '2026-11-02T10:30', end: '2026-11-02T11:30'};
     assert.equal(eventOver(ev, wall('2026-11-02T11:00')), false);
     assert.equal(eventOver(ev, wall('2026-11-02T11:30')), true);
-    assert.equal(eventOver({type: 'event', start: '2026-11-02T10:30'}, wall('2026-11-02T10:31')), true);
+    // Without an end, an hour.
+    assert.equal(eventOver({type: 'event', start: '2026-11-02T10:30'}, wall('2026-11-02T10:31')), false);
+    assert.equal(eventOver({type: 'event', start: '2026-11-02T10:30'}, wall('2026-11-02T11:30')), true);
+    assert.equal(eventOver({type: 'event', start: '2026-11-02T23:30'}, wall('2026-11-03T00:15')), false);
     const allday = {type: 'event', start: '2026-11-02', allday: true};
     assert.equal(eventOver(allday, wall('2026-11-02T23:00')), false);
     assert.equal(eventOver(allday, wall('2026-11-03T00:00')), true);

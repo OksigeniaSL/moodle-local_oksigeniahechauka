@@ -16,6 +16,7 @@
 
 namespace local_oksigeniahechauka;
 
+use local_oksigeniahechauka\local\agendas;
 use local_oksigeniahechauka\local\items;
 use local_oksigeniahechauka\local\manifest;
 use local_oksigeniahechauka\local\screens;
@@ -154,5 +155,48 @@ final class manifest_test extends \advanced_testcase {
         $this->assertNull(items::to_contract((object) ['id' => 7, 'type' => 'media', 'title' => 'No file', 'body' => '',
             'sortorder' => 0, 'duration' => 0, 'datefrom' => null, 'dateuntil' => null, 'days' => null, 'times' => null,
             'everyweeks' => 0, 'timecreated' => 0, 'data' => '{}']));
+    }
+
+    /**
+     * An agenda brings its events to the screens it goes to, and only to those; with its colour, whole days kept whole.
+     */
+    public function test_agenda(): void {
+        global $DB;
+        $this->resetAfterTest();
+        $this->setTimezone('Atlantic/Canary');
+        $infant = $this->screen('Infantil');
+        $hall = $this->screen('Hall');
+        $now = (new \DateTime('2026-11-02 09:00', new \DateTimeZone('Atlantic/Canary')))->getTimestamp();
+        $id = (int) $DB->insert_record('local_oksigeniahechauka_item', (object) ['type' => 'agenda',
+            'title' => 'Infantil', 'body' => '', 'data' => json_encode(['url' => 'https://example.com/a.ics',
+            'color' => 3]), 'visible' => 1, 'targetall' => 0, 'everyweeks' => 0, 'timecreated' => $now,
+            'timemodified' => $now]);
+        items::set_targets($id, [], [(int) $infant->id]);
+        $day = function (string $when): int {
+            return (new \DateTime($when, new \DateTimeZone('Atlantic/Canary')))->getTimestamp();
+        };
+        agendas::store($id, [
+            ['uid' => 'x', 'title' => 'Fiesta del otoño', 'detail' => 'Patio', 'start' => $day('2026-11-06 00:00'),
+                'end' => $day('2026-11-07 00:00'), 'allday' => true],
+            ['uid' => 'y', 'title' => 'Teatro', 'detail' => '', 'start' => $day('2026-11-03 10:00'),
+                'end' => $day('2026-11-03 11:00'), 'allday' => false],
+            ['uid' => 'z', 'title' => 'Pasado', 'detail' => '', 'start' => $day('2026-10-20 10:00'),
+                'end' => $day('2026-10-20 11:00'), 'allday' => false],
+        ]);
+        $events = array_values(array_filter(manifest::build($infant, $now)['items'], function ($it) {
+            return $it['type'] === 'event';
+        }));
+        $this->assertCount(2, $events);
+        $this->assertSame('Teatro', $events[0]['title']);
+        $this->assertSame('2026-11-03T11:00', $events[0]['end']);
+        $this->assertSame(3, $events[0]['color']);
+        $this->assertTrue($events[1]['allday']);
+        $this->assertSame(['from' => '2026-11-06', 'until' => '2026-11-06'], $events[1]['when']);
+        $this->assertSame('Patio', $events[1]['detail']);
+        $this->assertSame([], array_values(array_filter(manifest::build($hall, $now)['items'], function ($it) {
+            return $it['type'] === 'event';
+        })));
+        items::delete($id);
+        $this->assertSame(0, $DB->count_records(agendas::TABLE));
     }
 }

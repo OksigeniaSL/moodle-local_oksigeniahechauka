@@ -64,6 +64,25 @@ final class pairing_test extends \advanced_testcase {
     }
 
     /**
+     * Claimed at the last minute and asked for just after the code expired: the screen still gets its key, even if
+     * another screen asks for a code meanwhile; and it learns how long its code lasts by seconds, not by its clock.
+     */
+    public function test_claimed_at_the_last_minute(): void {
+        $this->resetAfterTest();
+        $now = time();
+        $start = screens::start_pairing(['ua' => 'test'], $now);
+        $this->assertSame(screens::PAIR_MINUTES * MINSECS, $start['expires_in']);
+        $late = $now + screens::PAIR_MINUTES * MINSECS - 10;
+        $id = screens::claim(screens::pairing($start['code'], $late), (object) ['name' => 'Hall', 'template' => 'zones',
+            'groups' => []], $late);
+        $after = $late + 60;
+        screens::start_pairing(['ua' => 'another'], $after);
+        $answer = screens::poll($start['token'], $after);
+        $this->assertSame('paired', $answer['status']);
+        $this->assertSame($id, $answer['screen']['id']);
+    }
+
+    /**
      * An expired code is no good, and a new device can take the place of an existing screen.
      */
     public function test_expired_and_replaced(): void {

@@ -90,6 +90,8 @@ class screen_form extends \moodleform {
         $f->setType('powerrange[from]', PARAM_RAW_TRIMMED);
         $f->setType('powerrange[to]', PARAM_RAW_TRIMMED);
         $f->hideIf('powerrange', 'powermode', 'eq', 'always');
+        $f->addElement('advcheckbox', 'sound', '', get_string('sound', $c));
+        $f->addHelpButton('sound', 'sound', $c);
         $f->addElement('advcheckbox', 'alerts', '', get_string('alerts', $c));
         $f->addHelpButton('alerts', 'alerts', $c);
         $f->setDefault('alerts', 1);

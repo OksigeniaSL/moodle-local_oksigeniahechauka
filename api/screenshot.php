@@ -44,6 +44,10 @@ $raw = file_get_contents('php://input', false, null, 0, $max + 1);
 if ($raw === false || $raw === '' || strlen($raw) > $max) {
     endpoint::fail(413, 'toolarge');
 }
+$size = @getimagesizefromstring($raw);
+if (!$size || !in_array($size['mime'] ?? '', ['image/jpeg', 'image/png'])) {
+    endpoint::fail(415, 'type', 'not a JPEG or PNG image');
+}
 $fs = get_file_storage();
 $fs->delete_area_files(files::context()->id, files::COMPONENT, files::SHOT, $screen->id);
 $fs->create_file_from_string([

@@ -55,11 +55,12 @@ class manifest {
             'horizon' => schedule::day($now, self::HORIZON),
             'screen' => [
                 'id' => (int) $screen->id,
-                'name' => format_string($screen->name, true, ['context' => files::context()]),
+                'name' => items::plain((string) $screen->name),
                 'width' => (int) ($display['width'] ?? 1920),
                 'height' => (int) ($display['height'] ?? 1080),
                 'timezone' => \core_date::get_server_timezone(),
                 'lang' => current_language(),
+                'sound' => !empty($screen->sound),
             ],
             'template' => $screen->template === 'full' ? 'full' : 'zones',
             'theme' => self::theme($screen, $config),
@@ -81,6 +82,12 @@ class manifest {
         }
         if (!empty($config->sampledata)) {
             $m['sample'] = true;
+        }
+        if (!empty($config->sourceweather)) {
+            $weather = weather::summary(weather::hours(), $now);
+            if ($weather) {
+                $m['weather'] = $weather;
+            }
         }
         $m['items'] = array_merge(self::own_items($screen, $now), self::source_items($config, $now));
         $m['etag'] = self::etag($m);
@@ -167,6 +174,10 @@ class manifest {
             'screen1' => $screen->id, 'screen2' => $screen->id]);
         $items = [];
         foreach ($records as $record) {
+            if ($record->type === 'agenda') {
+                $items = array_merge($items, agendas::contract($record, $now));
+                continue;
+            }
             $item = items::to_contract($record);
             if ($item) {
                 $items[] = $item;

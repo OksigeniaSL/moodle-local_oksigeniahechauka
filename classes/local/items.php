@@ -29,7 +29,19 @@ namespace local_oksigeniahechauka\local;
  */
 class items {
     /** The types the panel makes. */
-    const TYPES = ['media', 'notice', 'event', 'ticker'];
+    const TYPES = ['media', 'notice', 'event', 'ticker', 'agenda'];
+
+    /**
+     * A text for the screens: through the filters (multilang), as plain text. The player writes it with textContent,
+     * so it must not come escaped («AMPA & Dirección», not «AMPA &amp; Dirección»).
+     *
+     * @param string $text
+     * @return string
+     */
+    public static function plain(string $text): string {
+        $t = format_string($text, true, ['context' => files::context(), 'escape' => false]);
+        return trim(html_entity_decode(strip_tags($t), ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+    }
 
     /**
      * The extra data of an item.
@@ -58,7 +70,7 @@ class items {
         if ($when) {
             $item['when'] = $when;
         }
-        $title = format_string($record->title, true, ['context' => files::context()]);
+        $title = self::plain((string) $record->title);
         // Plain text typed in the panel: the player writes it with textContent, never as markup.
         $body = trim(strip_tags((string) $record->body));
         switch ($record->type) {
@@ -86,6 +98,9 @@ class items {
                 return $event;
             case 'ticker':
                 return $item + ['type' => 'ticker', 'zone' => 'ticker', 'text' => $title];
+            case 'agenda':
+                // Its events, one by one: agendas::contract().
+                return null;
         }
         return null;
     }
@@ -218,6 +233,7 @@ class items {
         foreach ([files::MEDIA, files::VIDEO, files::POSTER, files::BACKDROP] as $area) {
             $fs->delete_area_files(files::context()->id, files::COMPONENT, $area, $itemid);
         }
+        agendas::delete($itemid);
         $DB->delete_records('local_oksigeniahechauka_target', ['itemid' => $itemid]);
         $DB->delete_records('local_oksigeniahechauka_item', ['id' => $itemid]);
     }

@@ -124,6 +124,23 @@ if ($hassiteconfig) {
         $settings->add(new admin_setting_configcheckbox("$p/sourcecalendar", get_string('sourcecalendar', $p), '', 1));
         $settings->add(new admin_setting_configcheckbox("$p/sourcenews", get_string('sourcenews', $p), '', 1));
         $settings->add(new admin_setting_configtext("$p/newsdays", get_string('newsdays', $p), '', 7, PARAM_INT, 4));
+        $settings->add(new admin_setting_configcheckbox(
+            "$p/sourceweather",
+            get_string('sourceweather', $p),
+            get_string('sourceweather_desc', $p),
+            1
+        ));
+        $place = get_config($p, 'place');
+        $settings->add(new \local_oksigeniahechauka\admin\setting_location(
+            "$p/location",
+            get_string('location', $p),
+            get_string('location_desc', $p) . ($place ? ' ' . get_string('location_found', $p, (object) [
+                'place' => s($place), 'lat' => round((float) get_config($p, 'lat'), 4),
+                'lon' => round((float) get_config($p, 'lon'), 4)]) : ''),
+            '',
+            PARAM_TEXT,
+            40
+        ));
 
         // Videos.
         $settings->add(new admin_setting_configexecutable(

@@ -66,7 +66,10 @@ export function pair(root, api, strings) {
         function start() {
             api.pair(device()).then(function (p) {
                 show(p.code, p.qr_svg, p.claim_url);
-                const until = Date.now() + Math.max(60, (p.expires || 0) - Math.floor(Date.now() / 1000)) * 1000;
+                // How long the code lasts, in seconds from now: a device with its clock wrong still waits the
+                // whole time (servers before expires_in only gave the moment).
+                const left = p.expires_in > 0 ? p.expires_in : (p.expires || 0) - Math.floor(Date.now() / 1000);
+                const until = Date.now() + Math.max(60, left) * 1000;
                 const every = Math.max(2, p.poll || 5) * 1000;
                 function poll() {
                     if (Date.now() > until) {

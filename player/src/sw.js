@@ -46,8 +46,46 @@ function retryPage() {
         {headers: {'Content-Type': 'text/html; charset=utf-8'}});
 }
 
+const MEDIA = 'hechauka-media-1';
+
+// A kept picture or video, from the cache; in pieces when a <video> asks for a range, so it is never read whole into
+// memory (a blob slice reads only its part).
+function media(req) {
+    const url = req.url.split('?')[0];
+    return caches.open(MEDIA).then(function (c) {
+        return c.match(url);
+    }).then(function (hit) {
+        if (!hit) {
+            return new Response('', {status: 404});
+        }
+        const range = /^bytes=(\d*)-(\d*)$/.exec(req.headers.get('range') || '');
+        if (!range) {
+            return hit;
+        }
+        return hit.blob().then(function (blob) {
+            const size = blob.size;
+            let start = range[1] === '' ? size - parseInt(range[2], 10) : parseInt(range[1], 10);
+            let end = range[1] === '' || range[2] === '' ? size - 1 : Math.min(parseInt(range[2], 10), size - 1);
+            start = Math.max(0, start);
+            if (start >= size || end < start) {
+                return new Response('', {status: 416, headers: {'Content-Range': 'bytes */' + size}});
+            }
+            return new Response(blob.slice(start, end + 1), {status: 206, headers: {
+                'Content-Type': hit.headers.get('Content-Type') || 'application/octet-stream',
+                'Content-Range': 'bytes ' + start + '-' + end + '/' + size,
+                'Content-Length': String(end - start + 1),
+                'Accept-Ranges': 'bytes',
+            }});
+        });
+    });
+}
+
 self.addEventListener('fetch', function (event) {
     const req = event.request;
+    if (req.method === 'GET' && req.url.indexOf(self.registration.scope + '__media__/') === 0) {
+        event.respondWith(media(req));
+        return;
+    }
     if (req.method !== 'GET' || !isShell(req.url)) {
         return;
     }
@@ -55,9 +93,19 @@ self.addEventListener('fetch', function (event) {
     event.respondWith(fetch(req).then(function (res) {
         if (res.ok) {
             const copy = res.clone();
-            caches.open(SHELL).then(function (c) {
-                return c.put(req, copy);
-            });
+            event.waitUntil(caches.open(SHELL).then(function (c) {
+                // One copy of each file: the copies of other versions (?v=…) go.
+                const path = req.url.split('?')[0];
+                return c.keys().then(function (keys) {
+                    return Promise.all(keys.filter(function (k) {
+                        return k.url.split('?')[0] === path && k.url !== req.url;
+                    }).map(function (k) {
+                        return c.delete(k);
+                    }));
+                }).then(function () {
+                    return c.put(req, copy);
+                });
+            }));
             return res;
         }
         // A site being updated, or failing, answers with its own page: the screen keeps going with its copy.

@@ -56,6 +56,7 @@ $values = (object) [
     'powerdays' => array_fill_keys($power ? $power[0]['days'] : [1, 2, 3, 4, 5], 1),
     'powerrange' => $power ? ['from' => $power[0]['on'], 'to' => $power[0]['off']] : [],
     'alerts' => $screen->alerts,
+    'sound' => $screen->sound,
 ];
 $form->set_data($values);
 
@@ -81,6 +82,7 @@ if ($data = $form->get_data()) {
         'theme' => in_array($data->theme, ['site', 'light', 'dark', 'auto']) ? $data->theme : 'site',
         'power' => $power,
         'alerts' => empty($data->alerts) ? 0 : 1,
+        'sound' => empty($data->sound) ? 0 : 1,
         'timemodified' => time(),
     ]);
     $groups = [];
@@ -146,6 +148,11 @@ echo $OUTPUT->heading(format_string($screen->name));
 echo html_writer::tag('p', implode(' · ', $facts), ['class' => 'text-muted']);
 foreach ($warnings as $warning) {
     echo $OUTPUT->notification($warning, 'warning', false);
+}
+// What the screen itself reports: files that fail, a manifest it cannot get.
+if (!empty($info['errors'])) {
+    echo html_writer::tag('h3', get_string('screen_errors', $c), ['class' => 'h6 mt-3']);
+    echo html_writer::alist(array_map('s', $info['errors']), ['class' => 'small text-muted']);
 }
 echo html_writer::tag('p', html_writer::link(
     new moodle_url('/local/oksigeniahechauka/preview.php', ['screen' => $screen->id]),

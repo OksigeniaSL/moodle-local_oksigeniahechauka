@@ -25,6 +25,7 @@
 require(__DIR__ . '/../../config.php');
 
 use local_oksigeniahechauka\form\item_form;
+use local_oksigeniahechauka\local\agendas;
 use local_oksigeniahechauka\local\files;
 use local_oksigeniahechauka\local\items;
 use local_oksigeniahechauka\local\schedule;
@@ -70,6 +71,7 @@ if ($item) {
         'start' => $data['start'] ?? time(),
         'end' => $data['end'] ?? 0,
         'colour' => $data['color'] ?? 1,
+        'url' => $data['url'] ?? '',
         'everyweeks' => max(1, (int) $item->everyweeks),
         'targetall' => $item->targetall,
         'visible' => $item->visible,
@@ -147,6 +149,9 @@ if ($data = $form->get_data()) {
         $extra['fit'] = $data->fit ?? 'cover';
     } else if ($type === 'notice') {
         $extra['important'] = !empty($data->important);
+    } else if ($type === 'agenda') {
+        $extra['url'] = trim($data->url ?? '');
+        $extra['color'] = (int) ($data->colour ?? 1);
     } else if ($type === 'event') {
         $extra['start'] = (int) $data->start;
         $extra['end'] = !empty($data->end) ? (int) $data->end : 0;
@@ -185,6 +190,19 @@ if ($data = $form->get_data()) {
         }
     }
     items::set_targets((int) $record->id, $record->targetall ? [] : $groups, $record->targetall ? [] : $screens);
+    if ($type === 'agenda') {
+        // Read at once, so the panel says whether the address works.
+        $result = agendas::fetch((int) $record->id, $now);
+        $saved = items::data($DB->get_record('local_oksigeniahechauka_item', ['id' => $record->id]));
+        $ok = $result === 'ok';
+        redirect(
+            $panel,
+            $ok ? get_string('agenda_read', $c, (int) ($saved['count'] ?? 0)) :
+            get_string('agenda_failed', $c, $result),
+            null,
+            $ok ? \core\output\notification::NOTIFY_SUCCESS : \core\output\notification::NOTIFY_WARNING
+        );
+    }
     redirect($panel);
 }
 

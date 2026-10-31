@@ -23,7 +23,8 @@ production sites.
 
 - **The plugin** keeps the screens, their groups and their content, with dates, weekdays, hours and "every N weeks".
   Each screen has its hours on; if it stops answering within them, the people who run the screens get a Moodle
-  notification. With `ffmpeg` on the server (a static build is enough), each uploaded video is made ready for every
+  notification. What reaches the screens by itself: the menu of Oksigenia Meals, the events of the site calendar, the
+  site news, the weather (MET Norway, with the location of the centre) and any iCal agenda added as content. With `ffmpeg` on the server (a static build is enough), each uploaded video is made ready for every
   screen: H.264, 1080p and 30 fps at most, one at a time.
 - **The player** is one web page that every screen opens: a small computer with a browser in kiosk mode, a smart TV
   with a kiosk browser or a professional display that loads a web page. It keeps what it needs on the device and goes

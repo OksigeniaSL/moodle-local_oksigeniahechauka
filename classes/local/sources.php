@@ -57,7 +57,8 @@ class sources {
         $tomorrow = get_string('label_menu_tomorrow', 'local_oksigeniahechauka');
         for ($i = 0; $i <= $days; $i++) {
             $day = schedule::day($now, $i);
-            $menu = self::menu($now + $i * DAYSECS, $centreid);
+            $noon = (new \DateTime($day . ' 12:00', \core_date::get_server_timezone_object()))->getTimestamp();
+            $menu = self::menu($noon, $centreid);
             if ($menu) {
                 $items[] = $menu + [
                     'id' => 'menu-' . $day,

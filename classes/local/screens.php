@@ -69,6 +69,7 @@ class screens {
             'claim_url' => $url->out(false),
             'qr_svg' => self::qr($url->out(false)),
             'expires' => $expires,
+            'expires_in' => $expires - $now,
             'poll' => 5,
         ];
     }
@@ -103,10 +104,14 @@ class screens {
     public static function poll(string $token, int $now): array {
         global $DB;
         $pair = $token !== '' ? $DB->get_record('local_oksigeniahechauka_pair', ['tokenhash' => keys::hash($token)]) : null;
-        if (!$pair || $pair->timeexpires < $now) {
+        if (!$pair) {
             return ['status' => 'expired'];
         }
-        if (!$pair->screenid || !$pair->screenkey) {
+        $claimed = $pair->screenid && $pair->screenkey;
+        if ($pair->timeexpires < $now && !$claimed) {
+            return ['status' => 'expired'];
+        }
+        if (!$claimed) {
             return ['status' => 'pending'];
         }
         $screen = $DB->get_record('local_oksigeniahechauka_screen', ['id' => $pair->screenid]);
@@ -173,6 +178,8 @@ class screens {
         }
         $pair->screenid = $id;
         $pair->screenkey = $key;
+        // The screen may ask a little after its code expired: the claimed key waits for it.
+        $pair->timeexpires = max((int) $pair->timeexpires, $now + self::PAIR_MINUTES * MINSECS);
         $DB->update_record('local_oksigeniahechauka_pair', $pair);
         $transaction->allow_commit();
         return $id;
@@ -221,16 +228,7 @@ class screens {
      */
     public static function heartbeat(\stdClass $screen, array $beat, int $now): void {
         global $DB;
-        $keep = [];
-        foreach (
-            ['time', 'tz_offset', 'version', 'uptime', 'manifest', 'stale', 'on', 'showing', 'display', 'cache',
-                'errors', 'agent'] as $field
-        ) {
-            if (array_key_exists($field, $beat)) {
-                $keep[$field] = $beat[$field];
-            }
-        }
-        $json = json_encode($keep);
+        $json = json_encode(self::clean_beat($beat));
         $DB->update_record('local_oksigeniahechauka_screen', (object) [
             'id' => $screen->id,
             'lastseen' => $now,
@@ -269,6 +267,54 @@ class screens {
         }
         $DB->set_field('local_oksigeniahechauka_screen', 'command', null, ['id' => $screenid]);
         return [$command];
+    }
+
+    /**
+     * What is kept of a heartbeat: only the fields of the contract, each of its kind, short. What a screen sends is
+     * not trusted: the panel shows it.
+     *
+     * @param array $beat
+     * @return array
+     */
+    public static function clean_beat(array $beat): array {
+        $text = function ($v, int $max): ?string {
+            return is_scalar($v) ? \core_text::substr((string) $v, 0, $max) : null;
+        };
+        $int = function ($v): ?int {
+            return is_numeric($v) ? (int) $v : null;
+        };
+        $keep = [
+            'time' => $int($beat['time'] ?? null),
+            'tz_offset' => $int($beat['tz_offset'] ?? null),
+            'version' => $text($beat['version'] ?? null, 32),
+            'uptime' => $int($beat['uptime'] ?? null),
+            'manifest' => $text($beat['manifest'] ?? null, 64),
+            'stale' => isset($beat['stale']) ? !empty($beat['stale']) : null,
+            'on' => isset($beat['on']) ? !empty($beat['on']) : null,
+        ];
+        $display = $beat['display'] ?? null;
+        if (is_array($display)) {
+            $keep['display'] = ['width' => $int($display['width'] ?? null), 'height' => $int($display['height'] ?? null)];
+        }
+        $cache = $beat['cache'] ?? null;
+        if (is_array($cache)) {
+            $keep['cache'] = ['files' => $int($cache['files'] ?? null), 'bytes' => $int($cache['bytes'] ?? null)];
+        }
+        $keep['showing'] = [];
+        foreach (array_slice(is_array($beat['showing'] ?? null) ? $beat['showing'] : [], 0, 10) as $s) {
+            if (is_array($s)) {
+                $keep['showing'][] = ['zone' => $text($s['zone'] ?? '', 20), 'item' => $text($s['item'] ?? '', 40)];
+            }
+        }
+        $keep['errors'] = [];
+        foreach (array_slice(is_array($beat['errors'] ?? null) ? $beat['errors'] : [], 0, 5) as $e) {
+            if (is_scalar($e)) {
+                $keep['errors'][] = $text($e, 200);
+            }
+        }
+        return array_filter($keep, function ($v) {
+            return $v !== null;
+        });
     }
 
     /**

@@ -18,6 +18,7 @@
         <FIELD NAME="alerts" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="Whether to warn when the screen goes down"/>
         <FIELD NAME="alerted" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="When the warning that it went down was sent; 0 while it is up"/>
         <FIELD NAME="command" TYPE="char" LENGTH="20" NOTNULL="false" SEQUENCE="false" COMMENT="What the screen does at its next heartbeat (reload), or null"/>
+        <FIELD NAME="sound" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Whether its videos play with their sound"/>
         <FIELD NAME="sortorder" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
@@ -92,6 +93,10 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
         <KEY NAME="itemid" TYPE="foreign" FIELDS="itemid" REFTABLE="local_oksigeniahechauka_item" REFFIELDS="id"/>
       </KEYS>
+      <INDEXES>
+        <INDEX NAME="groupid" UNIQUE="false" FIELDS="groupid"/>
+        <INDEX NAME="screenid" UNIQUE="false" FIELDS="screenid"/>
+      </INDEXES>
     </TABLE>
     <TABLE NAME="local_oksigeniahechauka_pair" COMMENT="A screen waiting to be given a name: its code, and its key once claimed">
       <FIELDS>
@@ -110,6 +115,25 @@
       <INDEXES>
         <INDEX NAME="code" UNIQUE="true" FIELDS="code"/>
         <INDEX NAME="tokenhash" UNIQUE="false" FIELDS="tokenhash"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="local_oksigeniahechauka_calevent" COMMENT="The events of an agenda (an iCal address), as the server last read them">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="itemid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The agenda item"/>
+        <FIELD NAME="uid" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="title" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="detail" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Where, one line"/>
+        <FIELD NAME="timestart" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timeend" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="0 when it has no end"/>
+        <FIELD NAME="allday" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="itemid" TYPE="foreign" FIELDS="itemid" REFTABLE="local_oksigeniahechauka_item" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="timestart" UNIQUE="false" FIELDS="timestart"/>
       </INDEXES>
     </TABLE>
   </TABLES>

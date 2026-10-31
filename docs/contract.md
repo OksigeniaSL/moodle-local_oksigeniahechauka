@@ -55,7 +55,7 @@ the server, names the screen and chooses its groups and template. The screen the
 
    ```json
    {"code": "KM7Q4X", "token": "…", "claim_url": "https://…/claim.php?code=KM7Q4X", "qr_svg": "<svg …>",
-    "expires": 1793520000, "poll": 5}
+    "expires": 1793520000, "expires_in": 900, "poll": 5}
    ```
 
    - `code`: six characters from an alphabet without look-alikes (no `0 O 1 I L`).
@@ -63,6 +63,8 @@ the server, names the screen and chooses its groups and template. The screen the
    - `claim_url`: what the QR opens.
    - `qr_svg`: the QR of `claim_url` as SVG markup, made by the server, so the player needs no QR library.
      Optional: without it the screen shows the code and the address.
+   - `expires_in`: seconds the code lasts from now. The player counts with it, not with `expires`, so a device with
+     its clock wrong waits the whole time.
    - `poll`: seconds between polls.
 
 2. `POST poll` with `{"token": "…"}` every `poll` seconds answers one of:
@@ -99,7 +101,7 @@ changed, or the manifest with its `ETag` header:
   "horizon": "2026-11-16",
   "screen": {
     "id": 7, "name": "Library", "width": 1920, "height": 1080,
-    "timezone": "Atlantic/Canary", "lang": "es"
+    "timezone": "Atlantic/Canary", "lang": "es", "sound": false
   },
   "template": "zones",
   "theme": {
@@ -109,8 +111,15 @@ changed, or the manifest with its `ETag` header:
     "logo_dark": {"id": 13, "url": "…", "sha1": "…"},
     "fonts": [{"family": "Nunito", "weight": 700, "media": {"id": 14, "url": "…", "sha1": "…"}}]
   },
-  "labels": {"menu": "Menú de hoy", "notices": "Avisos", "events": "Hoy en el colegio", "ticker": "Al día"},
+  "labels": {"menu": "Menú de hoy", "notices": "Avisos", "events": "Hoy en el colegio", "ticker": "Al día",
+             "upcoming": "Próximos días", "today": "Hoy", "tomorrow": "Mañana", "days": "días"},
   "power": [{"days": [1, 2, 3, 4, 5], "on": "07:30", "off": "18:30"}],
+  "weather": {
+    "now": {"symbol": "fair_day", "temp": 22},
+    "today": {"symbol": "partlycloudy_day", "max": 24, "min": 18, "rain": 40, "text": "Intervalos nubosos"},
+    "tomorrow": {"symbol": "lightrain", "max": 21, "min": 17, "text": "Lluvia débil"},
+    "credit": "Datos de MET Norway"
+  },
   "sample": false,
   "items": [ … ]
 }
@@ -119,18 +128,24 @@ changed, or the manifest with its `ETag` header:
 - `horizon`: the last day the manifest has data for. The server sends what is due from today to the horizon (two
   weeks is a good default), so a screen without a network keeps going. After the horizon the player keeps showing what
   it has and reports itself as stale.
+- `screen.sound`: whether its videos play with their sound (most screens are muted: behind glass, or in a room that
+  would hear the same thing forty times an hour).
 - `screen.timezone`: the time zone the screen should be in. The player reports its own offset in the heartbeat, so
   the panel can warn when a device clock or zone is wrong.
-- `template`: `zones` (header, media area, the «Today» column and ticker) or `full` (header, media area across the
-  whole width and ticker; the «Today» column is not shown). The orientation is the one of the page itself: a screen
-  turned on its side lays itself out in vertical.
+- `template`: `zones` (the compositions of each slide, with «Today») or `full` (the pictures alone, never «Today»).
+  The player chooses each slide's composition by the shape of its picture or video (`media.width` and
+  `media.height`) and how much «Today» has. The orientation is the one of the page itself: a screen turned on its side
+  lays itself out in vertical.
 - `theme.mode`: `light`, `dark` or `auto` (dark from `theme.dark_from` to `theme.dark_until`, for example
   `"19:00"`–`"07:30"`).
 - `theme.vars`: CSS custom properties of the templates, only names that start with `--hk-` (colours, the two fonts).
   The list is in the stylesheet of the player.
 - `theme.logo` and `theme.logo_dark`: the client's logo for each theme; without the dark one, the light one serves for
   both. `theme.fonts`: the client's fonts, as media, so they work without a network too.
-- `labels`: the titles of the blocks and the ticker, in the language of the screen.
+- `labels`: the titles of the blocks and the ticker, and the words of the coming days, in the language of the screen.
+- `weather`: optional. The sky as a `symbol_code` of MET Norway (the player has an icon for each), temperatures in
+  degrees Celsius, `rain` the chance of rain in percent only where the source gives it, `text` the sky in words, and
+  the `credit` the source asks to show. `now` is the current hour; `today` and `tomorrow`, days of the site's calendar.
 - `sample`: true when the manifest carries example data; the screen says so in a corner.
 - `power`: when the screen should be on. Outside these hours the player shows black and a device agent may turn the
   display off. Without `power`, always on.
@@ -146,15 +161,16 @@ length unless it has a duration.
 | `image` | `main` | `media`, `fit` (`cover`, `contain` or `blur`), `focus` (`[x, y]` from 0 to 1, for `cover`), `caption` |
 | `video` | `main` | `media`, `poster` and `backdrop` (still images), `fit`, `caption` |
 | `notice` | `side` | `title`, `body` (one short line), `tone` (`normal` or `important`) |
-| `event` | `side` | `title`, `detail` (who or where, one line), `start` and `end` (`"2026-11-02T10:00"`), `allday`, `color` (1 to 4) |
+| `event` | `side` | `title`, `detail` (who or where, one line), `start` and `end` (`"2026-11-02T10:00"`), `allday`, `color` (1 to 4). A title «3º ESO - Acampada» reads as «Acampada» with «3º ESO» under it |
 | `menu` | `side` | `date`, `label`, `menus`, `closed`, `title`, `note` |
 | `ticker` | `ticker` | `text` |
 
 - `caption`: `{"title": "…", "text": "…"}`, over the picture on a dark fade.
-- The «Today» column has three blocks: the menu, the notices and the events of the day. What does not fit turns
-  pages every few seconds; the type never shrinks to make room.
-- An `event` disappears by itself once its end has passed (its start if it has no end; the end of the day if it is
-  all day). `color` picks one of the four colours of the client (`--hk-marca-1` to `-4`), for example by stage.
+- «Today» has the menu, the notices, the events of the day and the coming days (the events of the next week, from
+  the same items, with one countdown to the nearest event of more than a day). It fills its slot at the largest size
+  at which nothing overflows; when nothing fits, notices and events turn pages.
+- An `event` disappears by itself once its end has passed (an hour after its start if it has no end; the end of its
+  last day if it is all day). `color` picks one of the four colours of the client (`--hk-marca-1` to `-4`), for example by stage.
 - A `menu` is the menu of one day: `menus` is `[{"name": "Menu A", "courses": [{"label": "First course", "dishes":
   ["…"]}]}]`, and every menu is a page of the block. `label` replaces the title of the block (the server can show
   tomorrow's menu in the afternoon, with its own `when` and «Tomorrow's menu»). With `closed`, `title` says why.

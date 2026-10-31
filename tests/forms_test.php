@@ -53,10 +53,11 @@ final class forms_test extends \advanced_testcase {
     }
 
     /**
-     * A file that uses the file constants of the repositories loads them itself: a page does not always have them, and
-     * the tests always do, so building the form here would not catch it (it broke «Picture or video» on a real site).
+     * A file that uses the file constants of the repositories, or Moodle's curl class, loads their library itself: a
+     * page or a task does not always have them, and the tests always do, so running the code here would not catch it
+     * (it broke «Picture or video» on a real site, and the weather task).
      */
-    public function test_repository_constants_loaded(): void {
+    public function test_libraries_loaded(): void {
         $root = dirname(__DIR__);
         $files = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($root, \FilesystemIterator::SKIP_DOTS));
         $missing = [];
@@ -71,6 +72,9 @@ final class forms_test extends \advanced_testcase {
                     && strpos($code, "/repository/lib.php'") === false
             ) {
                 $missing[] = substr($path, strlen($root) + 1);
+            }
+            if (strpos($code, 'new \curl(') !== false && strpos($code, "/filelib.php'") === false) {
+                $missing[] = substr($path, strlen($root) + 1) . ' (curl)';
             }
         }
         $this->assertSame([], $missing);

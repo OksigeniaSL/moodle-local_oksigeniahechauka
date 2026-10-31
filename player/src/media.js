@@ -1,13 +1,20 @@
 // The media of the screen, kept on the device so the screen goes on without a network. Every file is fetched with
-// the key of the screen and stored by its sha1 in the Cache API; the player shows it through a blob URL, which a
-// <video> can seek in. Where the Cache API is missing, the files stay in memory until the next restart.
+// the key of the screen and stored by its sha1 in the Cache API, under an address inside the player's folder; the
+// service worker (sw.js) serves it from there, in pieces when a <video> asks for them, so nothing big is held in
+// memory. While the worker does not control the page yet (the very first start), or where the Cache API is missing,
+// the files are shown from memory through blob URLs, as before.
 //
 // In the preview and the demo nothing is stored: the media URLs are used as they come.
 
 const CACHE = 'hechauka-media-1';
 
-function fakeRequest(sha1) {
-    return new Request(location.origin + '/__hechauka_media__/' + sha1);
+/** The address of a kept file: inside the folder of the player, where its worker answers. */
+export function mediaAddress(sha1) {
+    return new URL('__media__/' + sha1, location.href.split('?')[0]).href;
+}
+
+function controlled() {
+    return !!(navigator.serviceWorker && navigator.serviceWorker.controller);
 }
 
 export class MediaStore {
@@ -18,8 +25,10 @@ export class MediaStore {
         this.api = api;
         this.urls = {};
         this.blobs = {};
+        this.sizes = {};
         this.failed = {};
         this.busy = false;
+        this.pending = null;
         this.hasCache = !!(api && window.caches && window.caches.open);
     }
 
@@ -54,7 +63,12 @@ export class MediaStore {
      * @returns {Promise<void>}
      */
     sync(list) {
-        if (!this.api || this.busy) {
+        if (!this.api) {
+            return Promise.resolve();
+        }
+        if (this.busy) {
+            // A newer list waits for the one being brought, and goes after it: never dropped.
+            this.pending = list;
             return Promise.resolve();
         }
         this.busy = true;
@@ -78,20 +92,25 @@ export class MediaStore {
                 });
             });
         });
-        return chain.then(function () {
+        const done = function () {
             self.busy = false;
-        }, function () {
-            self.busy = false;
-        });
+            if (self.pending) {
+                const next = self.pending;
+                self.pending = null;
+                return self.sync(next);
+            }
+            return null;
+        };
+        return chain.then(done, done);
     }
 
     /** How many files and bytes are on the device. */
     usage() {
         let files = 0;
         let bytes = 0;
-        for (const sha1 in this.blobs) {
+        for (const sha1 in this.urls) {
             files++;
-            bytes += this.blobs[sha1].size || 0;
+            bytes += this.sizes[sha1] || 0;
         }
         return {files, bytes};
     }
@@ -110,26 +129,36 @@ export class MediaStore {
         if (this.urls[media.sha1]) {
             return Promise.resolve();
         }
-        const stored = cache ? cache.match(fakeRequest(media.sha1)) : Promise.resolve(null);
+        const address = mediaAddress(media.sha1);
+        const stored = cache ? cache.match(address) : Promise.resolve(null);
         return stored.then(function (hit) {
             if (hit) {
-                return hit.blob();
+                return {kept: true, res: hit};
             }
             return self.api.media(media.url).then(function (res) {
                 if (!cache) {
-                    return res.blob();
+                    return {kept: false, res};
                 }
-                return cache.put(fakeRequest(media.sha1), res.clone()).then(function () {
-                    return res.blob();
+                return cache.put(address, res.clone()).then(function () {
+                    return {kept: true, res};
                 }, function () {
                     // The disk is full or the cache refused it: show it anyway, from memory.
-                    return res.blob();
+                    return {kept: false, res};
                 });
             });
-        }).then(function (blob) {
-            self.blobs[media.sha1] = blob;
-            self.urls[media.sha1] = URL.createObjectURL(blob);
-            delete self.failed[media.sha1];
+        }).then(function (got) {
+            self.sizes[media.sha1] = media.size || 0;
+            if (got.kept && controlled()) {
+                // The worker serves it from the cache: nothing in memory.
+                self.urls[media.sha1] = address;
+                delete self.failed[media.sha1];
+                return null;
+            }
+            return got.res.blob().then(function (blob) {
+                self.blobs[media.sha1] = blob;
+                self.urls[media.sha1] = URL.createObjectURL(blob);
+                delete self.failed[media.sha1];
+            });
         });
     }
 
@@ -137,9 +166,12 @@ export class MediaStore {
         const self = this;
         Object.keys(this.urls).forEach(function (sha1) {
             if (!wanted[sha1]) {
-                URL.revokeObjectURL(self.urls[sha1]);
+                if (self.blobs[sha1]) {
+                    URL.revokeObjectURL(self.urls[sha1]);
+                }
                 delete self.urls[sha1];
                 delete self.blobs[sha1];
+                delete self.sizes[sha1];
             }
         });
         if (!cache) {

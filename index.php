@@ -125,6 +125,14 @@ function local_oksigeniahechauka_when_text(stdClass $item): string {
     $c = 'local_oksigeniahechauka';
     $parts = [];
     $data = items::data($item);
+    if ($item->type === 'agenda') {
+        if (empty($data['fetched'])) {
+            return get_string('agenda_unread', $c);
+        }
+        $ago = format_time(time() - (int) $data['fetched']);
+        return ($data['result'] ?? '') === 'ok' ? get_string('agenda_status', $c, (object) ['count' => (int) ($data['count'] ?? 0),
+            'ago' => $ago]) : get_string('agenda_failed', $c, $data['result'] ?? '?');
+    }
     if ($item->type === 'event' && !empty($data['start'])) {
         $parts[] = userdate((int) $data['start'], get_string('strftimedaydatetime', 'langconfig'));
     }

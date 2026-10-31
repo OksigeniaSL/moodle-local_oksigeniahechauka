@@ -99,6 +99,11 @@ export function eventOver(item, wall) {
     if (item.allday) {
         return wall.date > last.slice(0, 10);
     }
+    if (!item.end) {
+        // Without an end it stays an hour: «10:00 Museum visit» is news while it is happening.
+        const startMin = dayNumber(last.slice(0, 10)) * 1440 + toMinutes(last.slice(11, 16));
+        return dayNumber(wall.date) * 1440 + wall.min >= startMin + 60;
+    }
     return wall.stamp >= last.slice(0, 16);
 }
 

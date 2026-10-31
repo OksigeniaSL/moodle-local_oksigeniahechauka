@@ -1,5 +1,35 @@
 # Changelog
 
+## 0.5.0 (2026-10-31)
+
+- **Compositions that change with each slide** (the design of the art direction): a landscape picture with «Today»
+  beside it, a portrait one in a slot of its shape with a wider «Today», two portrait pictures together, the picture
+  alone, «Today» alone with the menu big, and a picture at full screen with its caption. They take turns by the shape
+  of each picture or video and how much «Today» has, with a soft pass from one to the next. A video shows its caption
+  over its first frame, then plays clean.
+- **«Today» fills its slot**: two columns at the largest size at which nothing overflows; when nothing fits, notices
+  and events turn pages. And **the coming days**: the events of the next week with their day in front («Tomorrow»,
+  «Thu 5»), titles split on « - » («Camp» with «3º ESO» under it), and a countdown to the nearest event of more than a
+  day.
+- **The weather**, from MET Norway (free for any use, with its credit on the screen): now in the header, today and
+  tomorrow in the moment of «Today». Each centre writes its location in the settings; the server looks it up once
+  (OpenStreetMap) and asks MET Norway every half hour at most.
+- **Agendas**: a new kind of content, an iCal address with its colour and where it goes (every screen, some groups,
+  some screens). The server reads it every quarter of an hour and keeps the events of the next two weeks: one-off,
+  all-day, many-day and repeating ones, with their exceptions and moved occurrences.
+- **Sound** as an option of each screen (off by default); the video conversion keeps the sound now.
+- **Media served by the service worker** from the cache, in pieces for videos, instead of held whole in memory (the
+  old Chromium of some screens could not take several videos). A newer list of media waits for the one being brought
+  instead of being dropped.
+- The screen page shows what the screen itself reports (files that fail).
+- Fixed: the nightly reload never happened on a screen with power hours (it is off at night); a slide could stay
+  hidden and playing when two slides came close together; «Whole, over a blurred copy» had been lost; texts with «&»
+  reached the screens as «&amp;»; the menu of the day after the change of time; a screen claimed at the last minute of
+  its code; a device with its clock wrong asked for a new code every minute; a screenshot is checked to be an image;
+  what a heartbeat brings is kept only as the contract says; the preview runs on the site's clock; the shell keeps one
+  copy of each file; an event without an end stays an hour; indexes on where each item goes.
+- Libraries a task does not have loaded (the file constants, curl) are loaded by the code that uses them, and a test
+  checks it.
 ## 0.4.3 (2026-10-31)
 
 - Fixed: a screen that reloaded while its site was being updated showed Moodle's maintenance page and stayed there.

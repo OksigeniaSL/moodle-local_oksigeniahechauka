@@ -26,7 +26,7 @@ namespace local_oksigeniahechauka\local;
 
 /**
  * A video as it comes from a phone (HEVC, 4K, 60 fps, turned on its side) does not play on every screen. With ffmpeg,
- * the server makes of it what every screen plays: H.264 in MP4, 1080p at most, 30 fps at most, without sound, and a
+ * the server makes of it what every screen plays: H.264 in MP4, 1080p at most, 30 fps at most, its sound in AAC, and a
  * still and a blurred still for the poster and the backdrop. Without ffmpeg, the video goes as it was uploaded.
  *
  * The state of each video is in the data of its item: videosource (the content hash of the upload it was made from),
@@ -191,7 +191,8 @@ class video {
 
     /**
      * What ffmpeg is told to do with an upload: every screen plays H.264 in MP4. 1080p at most in either
-     * orientation, never larger than the upload; 30 fps at most; no sound (screens play muted); the index at the start,
+     * orientation, never larger than the upload; 30 fps at most; the sound in AAC, for the screens that play it (most are
+     * muted); the index at the start,
      * so a screen can begin before the whole file has arrived. Two threads for reading and two for writing, so the
      * server keeps serving its pages (a 4K video from a phone takes about 400 MB like this, twice as much without).
      *
@@ -204,9 +205,10 @@ class video {
         $scale = "scale=w='if(gte(iw,ih),min(iw,1920),min(iw,1080))':h='if(gte(iw,ih),min(ih,1080),min(ih,1920))'"
             . ':force_original_aspect_ratio=decrease:force_divisible_by=2,setsar=1';
         return [$ffmpeg, '-hide_banner', '-nostdin', '-y', '-threads', '2', '-i', $in, '-t', (string) self::MAX_SECONDS,
-            '-map', '0:v:0', '-an', '-sn', '-dn', '-vf', $scale, '-fpsmax', '30',
+            '-map', '0:v:0', '-map', '0:a:0?', '-sn', '-dn', '-vf', $scale, '-fpsmax', '30',
             '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '23', '-maxrate', '6M', '-bufsize', '12M',
-            '-profile:v', 'high', '-level:v', '4.1', '-pix_fmt', 'yuv420p', '-movflags', '+faststart',
+            '-profile:v', 'high', '-level:v', '4.1', '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-b:a', '128k', '-ac', '2',
+            '-movflags', '+faststart',
             '-threads', '2', $out];
     }
 
