@@ -69,7 +69,7 @@ if ($hassiteconfig) {
         ));
         $settings->add(new admin_setting_configstoredfile(
             "$p/logo",
-            get_string('logo'),
+            get_string('logo', $p),
             '',
             'logo',
             0,
@@ -77,8 +77,7 @@ if ($hassiteconfig) {
         ));
         $settings->add(new admin_setting_configstoredfile(
             "$p/logodark",
-            get_string('logo') . ' · ' .
-            get_string('thememode_dark', $p),
+            get_string('logodark', $p),
             '',
             'logodark',
             0,

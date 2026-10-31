@@ -116,6 +116,57 @@ class schedule {
     }
 
     /**
+     * The power hours of a screen from their JSON, only the valid windows.
+     *
+     * @param string|null $json
+     * @return array [['days' => int[], 'on' => 'HH:MM', 'off' => 'HH:MM'], …]
+     */
+    public static function power(?string $json): array {
+        $list = json_decode((string) $json, true);
+        $out = [];
+        foreach (is_array($list) ? $list : [] as $window) {
+            if (!is_array($window) || !self::is_hour($window['on'] ?? '') || !self::is_hour($window['off'] ?? '')) {
+                continue;
+            }
+            $days = self::days(implode(',', (array) ($window['days'] ?? [])));
+            $out[] = ['days' => $days, 'on' => $window['on'], 'off' => $window['off']];
+        }
+        return $out;
+    }
+
+    /**
+     * Whether a screen should be on at a moment, by its power hours and the site clock. The same rule as the
+     * player (isPowerOn in player/src/rules.js): no hours means always on, and a window whose end comes before its
+     * start crosses midnight.
+     *
+     * @param array $power windows from power()
+     * @param int $time
+     * @return bool
+     */
+    public static function power_on(array $power, int $time): bool {
+        if (!$power) {
+            return true;
+        }
+        $date = new \DateTime('@' . $time);
+        $date->setTimezone(\core_date::get_server_timezone_object());
+        $dow = (int) $date->format('N');
+        $min = (int) $date->format('G') * 60 + (int) $date->format('i');
+        foreach ($power as $window) {
+            if ($window['days'] && !in_array($dow, $window['days'])) {
+                continue;
+            }
+            [$h, $m] = explode(':', $window['on']);
+            $on = (int) $h * 60 + (int) $m;
+            [$h, $m] = explode(':', $window['off']);
+            $off = (int) $h * 60 + (int) $m;
+            if ($on === $off || ($on < $off ? $min >= $on && $min < $off : $min >= $on || $min < $off)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * A day of the site calendar, «YYYY-MM-DD», for a moment.
      *
      * @param int $time

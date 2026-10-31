@@ -165,10 +165,13 @@ echo html_writer::start_div('d-flex flex-wrap');
 foreach ($screens as $s) {
     $info = json_decode((string) $s->lastinfo, true) ?: [];
     $on = screens::online($s, $now);
+    $resting = !$on && !schedule::power_on(schedule::power($s->power), $now);
     if (!$s->lastseen) {
         $state = get_string('never', $c);
     } else if ($on) {
         $state = get_string('online', $c);
+    } else if ($resting) {
+        $state = get_string('off_hours', $c);
     } else {
         $state = get_string('offline_since', $c, format_time($now - $s->lastseen));
     }
@@ -189,10 +192,11 @@ foreach ($screens as $s) {
         echo html_writer::img($src, '', ['class' => 'card-img-top']);
     }
     echo html_writer::start_div('card-body');
-    echo html_writer::tag('h4', format_string($s->name), ['class' => 'h5 card-title mb-1']);
+    $screenurl = new moodle_url('/local/oksigeniahechauka/screen.php', ['id' => $s->id]);
+    echo html_writer::tag('h4', html_writer::link($screenurl, format_string($s->name)), ['class' => 'h5 card-title mb-1']);
     echo html_writer::tag(
         'p',
-        html_writer::tag('span', '●', ['class' => $on ? 'text-success' : 'text-danger',
+        html_writer::tag('span', '●', ['class' => $on ? 'text-success' : ($resting ? 'text-muted' : 'text-danger'),
         'aria-hidden' => 'true']) . ' ' . s($state) . (!empty($info['version']) ? ' · ' . s($info['version']) : ''),
         ['class' => 'mb-1']
     );
@@ -204,6 +208,7 @@ foreach ($screens as $s) {
         get_string('preview', $c),
         ['class' => 'btn btn-primary btn-sm me-2']
     );
+    echo html_writer::link($screenurl, get_string('edit'), ['class' => 'btn btn-outline-secondary btn-sm me-2']);
     echo html_writer::link(
         new moodle_url($url, ['action' => 'removescreen', 'id' => $s->id, 'sesskey' => sesskey()]),
         get_string('remove', $c),
@@ -249,6 +254,12 @@ echo html_writer::link(
     ['class' => 'btn btn-outline-primary mb-2']
 );
 echo html_writer::end_div();
+$asis = array_filter($items, function ($item) {
+    return (items::data($item)['videostate'] ?? '') === 'asis';
+});
+if ($asis) {
+    echo $OUTPUT->notification(get_string('video_asis', $c), 'info', false);
+}
 if (!$items) {
     echo html_writer::tag('p', get_string('content_none', $c), ['class' => 'text-muted']);
 } else {
@@ -288,9 +299,11 @@ if (!$items) {
             },
             $targets['screens'])
         ));
+        $videostate = items::data($item)['videostate'] ?? '';
         $name = html_writer::tag('strong', format_string($item->title)) . html_writer::tag(
             'div',
-            get_string('type_' . $item->type, $c) . ($item->visible ? '' : ' · ' . get_string('hidden', $c)),
+            get_string('type_' . $item->type, $c) . ($item->visible ? '' : ' · ' . get_string('hidden', $c)) .
+                (in_array($videostate, ['pending', 'failed']) ? ' · ' . get_string('video_' . $videostate, $c) : ''),
             ['class' => 'text-muted small']
         );
         $act = function (string $action, string $label) use ($url, $item) {

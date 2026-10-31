@@ -21,12 +21,17 @@ las pantallas. No es para sitios en producción.
 ## Cómo funciona
 
 - **El plugin** guarda las pantallas, sus grupos y sus contenidos, con fechas, días de la semana, horas y «cada N
-  semanas».
+  semanas». Cada pantalla tiene su horario de encendido; si deja de responder dentro de él, quien lleva las pantallas
+  recibe un aviso de Moodle. Con `ffmpeg` en el servidor (basta una versión estática), cada vídeo que se sube se
+  prepara para todas las pantallas: H.264, 1080p y 30 fps como mucho, de uno en uno.
 - **El reproductor** es una sola página web que abre cada pantalla: un ordenador pequeño con un navegador en modo
   quiosco, una tele inteligente con un navegador de quiosco o una pantalla profesional que carga una página web.
   Guarda en el aparato lo que necesita y sigue sin red.
 - **El contrato** entre la pantalla y el servidor está en [docs/contract.md](docs/contract.md). El reproductor solo
   conoce el contrato, así que el mismo reproductor puede funcionar con otro servidor.
+- **En la app de Moodle** no hay nada que abrir: el panel es una página para el ordenador, y una pantalla se da de alta
+  desde el navegador del móvil con su código QR. Los avisos de las pantallas llegan a la app como cualquier aviso de
+  Moodle.
 
 ## Desarrollo
 

@@ -111,7 +111,11 @@ class items {
         if (!$original) {
             return null;
         }
-        $isvideo = strpos($original->get_mimetype(), 'video/') === 0;
+        $isvideo = video::is_video($original);
+        if ($isvideo && video::held($data, time())) {
+            // Being made ready for the screens: it arrives in a few minutes, and never half done.
+            return null;
+        }
         $item['type'] = $isvideo ? 'video' : 'image';
         $item['zone'] = 'main';
         $item['fit'] = in_array($data['fit'] ?? '', ['cover', 'contain', 'blur']) ? $data['fit'] : 'cover';

@@ -81,4 +81,33 @@ final class schedule_test extends \advanced_testcase {
         $this->assertFalse(schedule::is_date('2/11/2026'));
         $this->assertFalse(schedule::is_date(null));
     }
+
+    /**
+     * Power hours: by weekday and hour on the site clock, across midnight, and only valid windows.
+     */
+    public function test_power(): void {
+        $this->resetAfterTest();
+        $this->setTimezone('Europe/Madrid');
+        $at = function (string $when): int {
+            return (new \DateTime($when, new \DateTimeZone('Europe/Madrid')))->getTimestamp();
+        };
+        $power = schedule::power(json_encode([
+            ['days' => [1, 2, 3, 4, 5], 'on' => '07:30', 'off' => '18:30'],
+            ['days' => [6], 'on' => '22:00', 'off' => '02:00'],
+            ['days' => [7], 'on' => '25:00', 'off' => '26:00'],
+        ]));
+        $this->assertCount(2, $power);
+        // Monday 2 November 2026.
+        $this->assertFalse(schedule::power_on($power, $at('2026-11-02 07:29')));
+        $this->assertTrue(schedule::power_on($power, $at('2026-11-02 07:30')));
+        $this->assertTrue(schedule::power_on($power, $at('2026-11-02 18:29')));
+        $this->assertFalse(schedule::power_on($power, $at('2026-11-02 18:30')));
+        // Saturday night, and the small hours of that Saturday (the window belongs to its day).
+        $this->assertTrue(schedule::power_on($power, $at('2026-11-07 23:00')));
+        $this->assertTrue(schedule::power_on($power, $at('2026-11-07 01:00')));
+        $this->assertFalse(schedule::power_on($power, $at('2026-11-08 01:00')));
+        // No hours, always on.
+        $this->assertSame([], schedule::power(null));
+        $this->assertTrue(schedule::power_on([], $at('2026-11-08 04:00')));
+    }
 }

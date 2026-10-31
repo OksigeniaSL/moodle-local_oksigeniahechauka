@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.3.0 (2026-10-31)
+
+- Each screen has its own page: how it is doing (on, off by its hours, or how long without a signal), the version of
+  its player, its size, and a warning when its clock or time zone disagrees with the site's, since it runs its
+  schedule by its own clock. There, its name, layout, light or dark, groups and hours on.
+- A warning when a screen stops answering: after 15 minutes without a heartbeat within its hours, the people who run
+  the screens (or the site admins, if nobody has the permission) get a Moodle notification with a link to the screen,
+  and another one when it comes back. A screen that has just reached its hours has time to start first. It can be
+  turned off for each screen.
+- Videos made ready for the screens: with `ffmpeg` set in the settings, an ad hoc task converts each uploaded video,
+  one at a time and with two threads, to what every screen plays (H.264 in MP4, 1080p and 30 fps at most, upright,
+  without sound), with a still and a blurred still. Until it is ready the screens do not get it; if it fails, or after
+  an hour, they get it as it was uploaded. Without `ffmpeg`, the panel says so.
+- Fixed: the settings and the forms asked Moodle for strings it does not have («logo», «days»), which broke the
+  installation of the tests. A test now checks every string the plugin asks for.
 ## 0.2.0 (2026-10-31)
 
 - The server side of the contract in Moodle: a new screen asks for a code (`api/pair.php`), someone with

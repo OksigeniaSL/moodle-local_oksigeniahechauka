@@ -22,11 +22,16 @@ production sites.
 ## How it works
 
 - **The plugin** keeps the screens, their groups and their content, with dates, weekdays, hours and "every N weeks".
+  Each screen has its hours on; if it stops answering within them, the people who run the screens get a Moodle
+  notification. With `ffmpeg` on the server (a static build is enough), each uploaded video is made ready for every
+  screen: H.264, 1080p and 30 fps at most, one at a time.
 - **The player** is one web page that every screen opens: a small computer with a browser in kiosk mode, a smart TV
   with a kiosk browser or a professional display that loads a web page. It keeps what it needs on the device and goes
   on without a network.
 - **The contract** between the screen and the server is documented in [docs/contract.md](docs/contract.md). The
   player only knows the contract, so the same player can work with another server.
+- **In the Moodle app** there is nothing to open: the panel is a page for a computer, and a screen is claimed from
+  the phone's browser with its QR code. The warnings about screens reach the app like any Moodle notification.
 
 ## Development
 

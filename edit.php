@@ -28,6 +28,7 @@ use local_oksigeniahechauka\form\item_form;
 use local_oksigeniahechauka\local\files;
 use local_oksigeniahechauka\local\items;
 use local_oksigeniahechauka\local\schedule;
+use local_oksigeniahechauka\local\video;
 
 $id = optional_param('id', 0, PARAM_INT);
 $type = optional_param('type', 'media', PARAM_ALPHA);
@@ -153,6 +154,8 @@ if ($data = $form->get_data()) {
             $extra['caption'] = false;
             $DB->set_field('local_oksigeniahechauka_item', 'data', json_encode($extra), ['id' => $record->id]);
         }
+        // A new video is made ready for the screens; until then they do not get it.
+        video::queue((int) $record->id);
     }
     $groups = [];
     foreach ((array) ($data->groups ?? []) as $g => $on) {

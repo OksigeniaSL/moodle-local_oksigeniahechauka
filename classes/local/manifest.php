@@ -71,8 +71,8 @@ class manifest {
             ],
             'items' => [],
         ];
-        $power = json_decode((string) $screen->power, true);
-        if (is_array($power) && $power) {
+        $power = schedule::power($screen->power);
+        if ($power) {
             $m['power'] = $power;
         }
         if (!empty($config->sampledata)) {

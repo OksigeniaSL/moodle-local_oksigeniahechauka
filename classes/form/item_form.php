@@ -104,7 +104,7 @@ class item_form extends \moodleform {
         for ($d = 1; $d <= 7; $d++) {
             $days[] = $f->createElement('advcheckbox', $d, '', $short[$d - 1]);
         }
-        $f->addGroup($days, 'days', get_string('days', 'calendar'), ' ', true);
+        $f->addGroup($days, 'days', get_string('weekdays', $c), ' ', true);
         for ($r = 0; $r < 2; $r++) {
             $range = [
                 $f->createElement('text', 'from', '', ['size' => 5, 'maxlength' => 5, 'placeholder' => '08:00']),

@@ -13,7 +13,7 @@ import {isDark, isLive, isPowerOn, liveItems} from './rules.js';
 import {Screen} from './render.js';
 import {store} from './store.js';
 
-const VERSION = '0.1.0';
+const VERSION = '0.3.0';
 const DEFAULT_SECONDS = {main: 10, side: 12, ticker: 0};
 const HEARTBEAT_MS = 60000;
 const REFRESH_MS = 15 * 60000;
