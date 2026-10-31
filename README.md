@@ -14,9 +14,10 @@ already knows reaches the screens by itself, and every screen can be seen from a
 
 ## Status
 
-**Pre-alpha.** The screen player is here: it lays out the screen, takes turns among pictures and videos, keeps a
-vertical video whole on a horizontal screen, and pages through the menu, the notices and the events of the day. The
-management panel inside Moodle comes next. Not for production sites.
+**Pre-alpha.** A screen opens one address and shows a code; someone gives it a name in Moodle and it starts. The
+panel keeps the screens, the content and its schedule, and shows a preview of each screen at any day and time. The
+menu of Oksigenia Meals, the events of the calendar and the site news reach the screens by themselves. Not for
+production sites.
 
 ## How it works
 

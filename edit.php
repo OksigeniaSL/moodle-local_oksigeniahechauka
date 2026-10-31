@@ -1,0 +1,176 @@
+<?php
+// This file is part of Moodle - https://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+
+/**
+ * A piece of content: add or change it.
+ *
+ * @package    local_oksigeniahechauka
+ * @copyright  2026 Oksigenia SL <dev@oksigenia.cc>
+ * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+require(__DIR__ . '/../../config.php');
+
+use local_oksigeniahechauka\form\item_form;
+use local_oksigeniahechauka\local\files;
+use local_oksigeniahechauka\local\items;
+use local_oksigeniahechauka\local\schedule;
+
+$id = optional_param('id', 0, PARAM_INT);
+$type = optional_param('type', 'media', PARAM_ALPHA);
+$context = context_system::instance();
+require_login(null, false);
+require_capability('local/oksigeniahechauka:manage', $context);
+
+$c = 'local_oksigeniahechauka';
+$item = $id ? $DB->get_record('local_oksigeniahechauka_item', ['id' => $id], '*', MUST_EXIST) : null;
+if ($item) {
+    $type = $item->type;
+}
+if (!in_array($type, items::TYPES)) {
+    throw new moodle_exception('invalidparameter', 'debug');
+}
+$panel = new moodle_url('/local/oksigeniahechauka/index.php');
+$PAGE->set_context($context);
+$PAGE->set_url(new moodle_url('/local/oksigeniahechauka/edit.php', ['id' => $id, 'type' => $type]));
+$PAGE->set_pagelayout('admin');
+$PAGE->set_title(get_string('type_' . $type, $c));
+$PAGE->set_heading(get_string('manage', $c));
+navigation_node::override_active_url($panel);
+
+$form = new item_form(null, ['type' => $type]);
+$fileoptions = ['subdirs' => 0, 'maxfiles' => 1, 'accepted_types' => ['image', 'video']];
+
+// What the form shows when the item already exists.
+if ($item) {
+    $data = items::data($item);
+    $values = (object) [
+        'id' => $item->id,
+        'type' => $type,
+        'title' => $item->title,
+        'body' => $item->body,
+        'duration' => $item->duration ?: '',
+        'caption' => !empty($data['caption']),
+        'fit' => $data['fit'] ?? 'cover',
+        'important' => !empty($data['important']),
+        'start' => $data['start'] ?? time(),
+        'end' => $data['end'] ?? 0,
+        'colour' => $data['color'] ?? 1,
+        'everyweeks' => max(1, (int) $item->everyweeks),
+        'targetall' => $item->targetall,
+        'visible' => $item->visible,
+    ];
+    foreach (['datefrom', 'dateuntil'] as $field) {
+        if (schedule::is_date($item->$field)) {
+            [$y, $m, $d] = explode('-', $item->$field);
+            $values->$field = make_timestamp((int) $y, (int) $m, (int) $d);
+        }
+    }
+    $values->days = array_fill_keys(schedule::days($item->days), 1);
+    foreach (schedule::times($item->times) as $r => $range) {
+        $values->{'range' . $r} = ['from' => $range[0], 'to' => $range[1]];
+    }
+    $targets = items::targets($item);
+    $values->groups = array_fill_keys($targets['groups'], 1);
+    $values->screens = array_fill_keys($targets['screens'], 1);
+    if ($type === 'media') {
+        $draft = file_get_submitted_draft_itemid('media');
+        file_prepare_draft_area($draft, $context->id, $c, files::MEDIA, $item->id, $fileoptions);
+        $values->media = $draft;
+    }
+    $form->set_data($values);
+}
+
+if ($form->is_cancelled()) {
+    redirect($panel);
+}
+if ($data = $form->get_data()) {
+    $now = time();
+    $record = $item ?: (object) ['type' => $type, 'timecreated' => $now,
+        'sortorder' => (int) $DB->get_field_sql('SELECT COALESCE(MAX(sortorder), 0) + 1
+                                                   FROM {local_oksigeniahechauka_item}')];
+    $extra = $item ? items::data($item) : [];
+    $record->title = trim($data->title ?? '');
+    $record->body = trim($data->body ?? '');
+    $record->duration = max(0, (int) ($data->duration ?? 0));
+    $record->visible = empty($data->visible) ? 0 : 1;
+    $record->targetall = empty($data->targetall) ? 0 : 1;
+    $record->datefrom = !empty($data->datefrom) ? userdate($data->datefrom, '%Y-%m-%d', 99, false) : null;
+    $record->dateuntil = !empty($data->dateuntil) ? userdate($data->dateuntil, '%Y-%m-%d', 99, false) : null;
+    $days = [];
+    foreach ((array) ($data->days ?? []) as $d => $on) {
+        if ($on) {
+            $days[] = (int) $d;
+        }
+    }
+    $record->days = $days && count($days) < 7 ? implode(',', $days) : null;
+    $times = [];
+    for ($r = 0; $r < 2; $r++) {
+        $range = $data->{'range' . $r} ?? [];
+        if (!empty($range['from']) && !empty($range['to'])) {
+            $times[] = [item_form::hour($range['from']), item_form::hour($range['to'])];
+        }
+    }
+    $record->times = $times ? json_encode($times) : null;
+    $record->everyweeks = (int) ($data->everyweeks ?? 1) > 1 ? (int) $data->everyweeks : 0;
+    if ($type === 'media') {
+        $extra['caption'] = !empty($data->caption);
+        $extra['fit'] = $data->fit ?? 'cover';
+    } else if ($type === 'notice') {
+        $extra['important'] = !empty($data->important);
+    } else if ($type === 'event') {
+        $extra['start'] = (int) $data->start;
+        $extra['end'] = !empty($data->end) ? (int) $data->end : 0;
+        $extra['color'] = (int) ($data->colour ?? 1);
+    }
+    $record->data = json_encode($extra);
+    $record->usermodified = $USER->id;
+    $record->timemodified = $now;
+    if ($item) {
+        $DB->update_record('local_oksigeniahechauka_item', $record);
+    } else {
+        $record->id = $DB->insert_record('local_oksigeniahechauka_item', $record);
+    }
+    if ($type === 'media') {
+        file_save_draft_area_files($data->media, $context->id, $c, files::MEDIA, $record->id, $fileoptions);
+        $file = files::first(files::MEDIA, (int) $record->id);
+        if ($file && $record->title === '') {
+            // A picture without a title keeps the name of its file in the panel, never on the screen.
+            $DB->set_field('local_oksigeniahechauka_item', 'title', $file->get_filename(), ['id' => $record->id]);
+            $extra['caption'] = false;
+            $DB->set_field('local_oksigeniahechauka_item', 'data', json_encode($extra), ['id' => $record->id]);
+        }
+    }
+    $groups = [];
+    foreach ((array) ($data->groups ?? []) as $g => $on) {
+        if ($on) {
+            $groups[] = (int) $g;
+        }
+    }
+    $screens = [];
+    foreach ((array) ($data->screens ?? []) as $s => $on) {
+        if ($on) {
+            $screens[] = (int) $s;
+        }
+    }
+    items::set_targets((int) $record->id, $record->targetall ? [] : $groups, $record->targetall ? [] : $screens);
+    redirect($panel);
+}
+
+echo $OUTPUT->header();
+echo $OUTPUT->heading(get_string('type_' . $type, $c));
+$form->display();
+echo $OUTPUT->footer();

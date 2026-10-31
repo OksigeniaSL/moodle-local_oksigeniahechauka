@@ -488,6 +488,12 @@ body {
 .hk-sin-cinta.hk {
     padding-bottom: 3rem;
 }
+/* No logo: the name of the place opens the header, without the rule that would part it from the logo. */
+.hk-sin-logo .hk-lugar {
+    margin-left: 0;
+    padding-left: 0;
+    border-left: 0;
+}
 .hk-aviso-importante h3 {
     color: var(--hk-acento-texto);
 }

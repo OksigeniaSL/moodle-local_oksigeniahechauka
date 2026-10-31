@@ -132,6 +132,7 @@ export class Screen {
         const light = this.media.url(theme.logo);
         const dark = this.media.url(theme.logo_dark) || light;
         this.logo.style.display = light ? '' : 'none';
+        this.frame.classList.toggle('hk-sin-logo', !light);
         if (light && this.logo.src !== light) {
             this.logo.src = light;
         }

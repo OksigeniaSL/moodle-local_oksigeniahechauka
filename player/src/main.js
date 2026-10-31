@@ -104,8 +104,23 @@ class Player {
     }
 
     registerWorker() {
-        if (this.boot.sw && navigator.serviceWorker) {
-            navigator.serviceWorker.register(this.boot.sw).catch(function () {
+        if (!this.boot.sw || !navigator.serviceWorker) {
+            return;
+        }
+        navigator.serviceWorker.register(this.boot.sw).catch(function () {
+            return null;
+        });
+        // The first visit does not go through the worker: the page keeps its own shell, so that the next start
+        // without a network finds it. The same cache the worker reads (sw.js).
+        if (window.caches) {
+            const urls = [location.href];
+            const nodes = document.querySelectorAll('link[rel="stylesheet"], script[src]');
+            for (let i = 0; i < nodes.length; i++) {
+                urls.push(nodes[i].href || nodes[i].src);
+            }
+            window.caches.open('hechauka-shell-1').then(function (cache) {
+                return cache.addAll(urls);
+            }).catch(function () {
                 return null;
             });
         }

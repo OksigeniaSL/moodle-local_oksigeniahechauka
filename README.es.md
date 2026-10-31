@@ -13,9 +13,10 @@ llega solo a las pantallas, y cada una se ve a distancia tal como está. *Hechau
 
 ## Estado
 
-**Pre-alfa.** Ya está el reproductor de las pantallas: compone la pantalla, va pasando fotos y vídeos, encaja entero
-un vídeo vertical en una pantalla horizontal y pasa las páginas del menú, los avisos y los eventos del día. El panel
-de gestión dentro de Moodle es lo siguiente. No es para sitios en producción.
+**Pre-alfa.** Una pantalla abre una dirección y enseña un código; alguien le pone nombre en Moodle y empieza. El
+panel lleva las pantallas, los contenidos y su programación, y enseña la vista previa de cada pantalla cualquier día
+y a cualquier hora. El menú de Oksigenia Meals, los eventos del calendario y las noticias del sitio llegan solos a
+las pantallas. No es para sitios en producción.
 
 ## Cómo funciona
 
