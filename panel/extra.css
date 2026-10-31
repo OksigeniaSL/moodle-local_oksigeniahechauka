@@ -48,3 +48,12 @@ body.hkp-page #page.drawers .main-inner {
 [data-bs-theme] #region-main .hkp .hkp-screen.is-add a:not(.btn):not(:hover):not(:focus-visible) {
     text-decoration: none;
 }
+
+/* The form: the two fields of the hours of an event take their size, and the strip leaves a gap between its weeks. */
+.hkp-row .hkp-field-time {
+    flex: 0 1 8rem;
+}
+
+.hkp-strip .hkp-strip-gap {
+    background: none;
+}

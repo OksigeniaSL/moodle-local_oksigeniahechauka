@@ -9,7 +9,7 @@ import {realClock, simulatedClock} from './clock.js';
 import {MediaStore, mediaOf} from './media.js';
 import {pair} from './pairing.js';
 import {countdown, dayLabel, splitTitle, stageOf, upcoming} from './agenda.js';
-import {Composer} from './compose.js';
+import {Composer, draftChoice} from './compose.js';
 import {dayNumber, isDark, isLive, isPowerOn, liveItems, weekdayOf} from './rules.js';
 import {Screen} from './render.js';
 import {store} from './store.js';
@@ -56,6 +56,8 @@ class Player {
         this.composer = new Composer();
         this.timer = null;
         this.menuTurn = 0;
+        // In the panel's preview: what is being written, shown standing still where it would go (setDraft).
+        this.draft = null;
     }
 
     start() {
@@ -98,6 +100,13 @@ class Player {
             setInterval(function () {
                 self.heartbeat();
             }, HEARTBEAT_MS);
+        }
+        if (this.mode === 'preview') {
+            window.addEventListener('message', function (ev) {
+                if (ev.origin === location.origin && ev.data && ev.data.hkDraft !== undefined) {
+                    self.setDraft(ev.data.hkDraft);
+                }
+            });
         }
         this.refresh();
         if (this.mode !== 'preview') {
@@ -164,6 +173,10 @@ class Player {
 
     apply(m) {
         this.manifest = m;
+        if (this.mode === 'preview' && window.parent !== window) {
+            // The panel sends what is being written once the screen is ready for it.
+            window.parent.postMessage({hkPreviewReady: window.name || true}, location.origin);
+        }
         document.documentElement.lang = (m.screen && m.screen.lang) || this.boot.lang || 'en';
         this.screen.configure(m);
         const self = this;
@@ -281,10 +294,55 @@ class Player {
         });
     }
 
+    /**
+     * What is being written in the panel, or null to go back to the screen's own turns.
+     *
+     * @param {object|null} draft {item: the item as the contract gives it, replaces: the id of the item it changes,
+     *     focus: main, full, today or week}
+     */
+    setDraft(draft) {
+        this.draft = draft && draft.item ? draft : null;
+        this.next();
+    }
+
+    /** The manifest with the draft in it: the item it changes out, the draft in. */
+    withDraft() {
+        const d = this.draft;
+        const items = (this.manifest.items || []).filter(function (it) {
+            return it.id !== d.replaces && it.id !== d.item.id;
+        });
+        items.push(d.item);
+        return Object.assign({}, this.manifest, {items});
+    }
+
+    /** The draft's slide, standing still: no turns while something is being written. */
+    showDraft() {
+        const keep = this.manifest;
+        const merged = this.withDraft();
+        const wall = this.clock.wall();
+        this.manifest = merged;
+        try {
+            this.screen.configure(merged);
+            const today = this.todayOf(wall);
+            const week = merged.template === 'full' ? null : this.weekOf(wall);
+            const main = this.mainList(wall).filter(function (it) {
+                return it.id !== 'draft';
+            });
+            this.screen.show(draftChoice(this.draft.item, this.draft.focus || 'main', main, this.screen.horizontal), today,
+                week);
+        } finally {
+            this.manifest = keep;
+        }
+    }
+
     /** The next slide: the composition the rules choose, shown, and the one after it in its seconds. */
     next() {
         clearTimeout(this.timer);
         if (!this.manifest) {
+            return;
+        }
+        if (this.draft) {
+            this.showDraft();
             return;
         }
         if (this.reloadAt) {
@@ -319,7 +377,8 @@ class Player {
         if (!this.manifest) {
             return;
         }
-        const m = this.manifest;
+        // While something is being written in the panel, its ticker line too.
+        const m = this.draft ? this.withDraft() : this.manifest;
         const wall = this.clock.wall();
         // In the small hours a screen with power hours is off: it reloads then, in black.
         this.nightly(wall);

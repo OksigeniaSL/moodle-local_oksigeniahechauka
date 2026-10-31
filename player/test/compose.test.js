@@ -2,7 +2,7 @@
 
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {Composer, shapeOf, secondsOf} from '../src/compose.js';
+import {Composer, shapeOf, secondsOf, draftChoice} from '../src/compose.js';
 import {countdown, dayLabel, splitTitle, upcoming} from '../src/agenda.js';
 
 function pic(id, w, h, type) {
@@ -182,3 +182,18 @@ test('without pictures, «Today» and the week take turns', () => {
     assert.deepEqual(out, ['solo-hoy', 'solo-hoy', 'semana', 'solo-hoy', 'solo-hoy', 'semana']);
 });
 
+
+test('a draft in the preview stands where it would go', () => {
+    const photo = {id: 'draft', type: 'image', media: {width: 1600, height: 900}};
+    const tall = {id: 'draft', type: 'image', media: {width: 600, height: 900}};
+    const thin = {id: 'draft', type: 'image', media: {width: 500, height: 1000}};
+    const notice = {id: 'draft', type: 'notice'};
+    assert.deepEqual(draftChoice(photo, 'main', [], true), {comp: 'foto-hoy', items: [photo], seconds: 0});
+    assert.equal(draftChoice(photo, 'full', [], true).comp, 'foto-completa');
+    assert.equal(draftChoice(tall, 'main', [], true).comp, 'vertical-hoy');
+    assert.equal(draftChoice(thin, 'main', [], false).comp, 'foto-sola');
+    assert.deepEqual(draftChoice(notice, 'main', [photo], true).items, [photo]);
+    assert.equal(draftChoice(notice, 'main', [], true).comp, 'solo-hoy');
+    assert.equal(draftChoice(notice, 'today', [photo], true).comp, 'solo-hoy');
+    assert.equal(draftChoice({id: 'draft', type: 'event'}, 'week', [photo], true).comp, 'semana');
+});

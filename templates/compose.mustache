@@ -1,0 +1,163 @@
+{{!
+    This file is part of Moodle - https://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_oksigeniahechauka/compose
+
+    Adding or changing a piece of content: what it is, «Cuándo» with shortcuts said as a sentence and a strip of two
+    weeks, «Dónde» as chips, and the screen beside it, changing as one types (panel/compose.js). Without JavaScript
+    the form still works: the chips are checkboxes and radios.
+
+    Example context (json):
+    {
+        "style": "", "id": 0, "type": "notice", "isnotice": true, "editing": false, "title": "Añadir a las pantallas",
+        "back": "https://example.com/local/oksigeniahechauka/index.php", "backicon": "",
+        "action": "https://example.com/local/oksigeniahechauka/edit.php", "sesskey": "abc",
+        "hastypes": true, "types": [{"type": "notice", "label": "Aviso", "icon": "", "checked": true, "url": "#"}],
+        "values": {"title": "Salida temprana el viernes", "body": "", "important": false, "caption": true, "url": "",
+            "eventday": "2026-11-02", "eventfrom": "10:00", "eventto": ""},
+        "stages": [], "file": null, "maxbytes": "100 MB",
+        "shortcuts": [{"value": "friday", "label": "Hasta el viernes", "checked": true}],
+        "datesopen": false, "from": "", "to": "",
+        "days": [{"n": 1, "letter": "L", "name": "lunes", "on": true}],
+        "hours": false, "ranges": [{"n": 0, "from": "08:00", "to": "10:30", "hidden": false}],
+        "every": [{"n": 1, "label": "Todas las semanas", "selected": true}], "fineopen": false,
+        "whereall": true, "allchecked": true, "allcount": 6, "groups": [], "screens": [], "hasscreens": false,
+        "screensopen": false, "errors": {}, "haserrors": false,
+        "icons": {"clock": "", "event": "", "chev": "", "screens": "", "tv": ""},
+        "frame": "https://example.com/local/oksigeniahechauka/preview.php?frame=1", "vertical": false,
+        "moment": "Ahora · lunes 2, 10:45", "config": "{}"
+    }
+}}
+<div class="hkp" id="hkp-compose-page"{{#style}} style="{{style}}"{{/style}}>
+    <a class="hkp-back" href="{{back}}">{{{backicon}}}{{#str}}panel_title, local_oksigeniahechauka{{/str}}</a>
+    <header class="hkp-head"><div class="hkp-head-title"><h1>{{title}}</h1></div></header>
+    {{#haserrors}}<div class="alert alert-danger" role="alert">{{#str}}compose_errors, local_oksigeniahechauka{{/str}}</div>{{/haserrors}}
+    <form class="hkp-compose" method="post" action="{{action}}" enctype="multipart/form-data" data-config="{{config}}" novalidate>
+        <input type="hidden" name="sesskey" value="{{sesskey}}">
+        <input type="hidden" name="id" value="{{id}}">
+        <input type="hidden" name="type" value="{{type}}">
+        {{#hastypes}}
+        <div class="hkp-types" role="radiogroup" aria-label="{{#str}}compose_types, local_oksigeniahechauka{{/str}}">
+            {{#types}}<label><input type="radio" name="kind" value="{{type}}" data-url="{{url}}"{{#checked}} checked{{/checked}}><span>{{{icon}}}{{label}}</span></label>{{/types}}
+        </div>
+        {{/hastypes}}
+
+        <fieldset class="hkp-fs hkp-what">
+            {{#isnotice}}
+            <legend>{{#str}}compose_notice, local_oksigeniahechauka{{/str}}</legend>
+            <div class="hkp-field"><label class="form-label" for="hkp-title">{{#str}}compose_says, local_oksigeniahechauka{{/str}}</label><input class="form-control is-big{{#errors.title}} is-invalid{{/errors.title}}" id="hkp-title" name="title" value="{{values.title}}" maxlength="120" autocomplete="off" required><p class="hkp-hint" id="hkp-len">{{#errors.title}}{{errors.title}}{{/errors.title}}</p></div>
+            <div class="hkp-field"><label class="form-label" for="hkp-body">{{#str}}compose_oneline, local_oksigeniahechauka{{/str}}</label><input class="form-control" id="hkp-body" name="body" value="{{values.body}}" maxlength="120" autocomplete="off"></div>
+            <div class="hkp-switch form-switch form-check"><input class="form-check-input" type="checkbox" role="switch" id="hkp-imp" name="important" value="1"{{#values.important}} checked{{/values.important}}><div><label class="form-check-label" for="hkp-imp">{{#str}}flag_important, local_oksigeniahechauka{{/str}}</label><p>{{#str}}compose_important_help, local_oksigeniahechauka{{/str}}</p></div></div>
+            {{/isnotice}}
+            {{#ismedia}}
+            <legend>{{#str}}compose_media, local_oksigeniahechauka{{/str}}</legend>
+            <label class="hkp-drop" for="hkp-file">
+                <span class="hkp-thumb{{#file.vertical}} is-v{{/file.vertical}}" data-type="media" id="hkp-file-thumb">{{#file.thumb}}<img src="{{file.thumb}}" alt="">{{/file.thumb}}</span>
+                <div><b id="hkp-file-name">{{#file}}{{name}}{{/file}}{{^file}}{{#str}}compose_choosefile, local_oksigeniahechauka{{/str}}{{/file}}</b><span id="hkp-file-about">{{#file}}{{about}}{{/file}}{{^file}}{{#str}}compose_maxsize, local_oksigeniahechauka, {{maxbytes}}{{/str}}{{/file}}</span></div>
+                <span class="btn btn-outline-secondary">{{#file}}{{#str}}compose_change, local_oksigeniahechauka{{/str}}{{/file}}{{^file}}{{#str}}compose_pick, local_oksigeniahechauka{{/str}}{{/file}}</span>
+                <input class="visually-hidden sr-only" type="file" id="hkp-file" name="file" accept="image/*,video/*">
+            </label>
+            <p class="hkp-hint">{{#errors.file}}<b class="text-danger">{{errors.file}}</b> {{/errors.file}}{{#str}}compose_media_help, local_oksigeniahechauka{{/str}}</p>
+            <div class="hkp-field"><label class="form-label" for="hkp-title">{{#str}}compose_phototitle, local_oksigeniahechauka{{/str}}</label><input class="form-control" id="hkp-title" name="title" value="{{values.title}}" maxlength="120" autocomplete="off"><p class="hkp-hint" id="hkp-len"></p></div>
+            <div class="hkp-field"><label class="form-label" for="hkp-body">{{#str}}compose_secondline, local_oksigeniahechauka{{/str}}</label><input class="form-control" id="hkp-body" name="body" value="{{values.body}}" maxlength="120" autocomplete="off"></div>
+            <div class="hkp-switch form-switch form-check"><input class="form-check-input" type="checkbox" role="switch" id="hkp-cap" name="caption" value="1"{{#values.caption}} checked{{/values.caption}}><div><label class="form-check-label" for="hkp-cap">{{#str}}compose_caption, local_oksigeniahechauka{{/str}}</label><p>{{#str}}compose_caption_help, local_oksigeniahechauka{{/str}}</p></div></div>
+            {{/ismedia}}
+            {{#isevent}}
+            <legend>{{#str}}compose_event, local_oksigeniahechauka{{/str}}</legend>
+            <div class="hkp-field"><label class="form-label" for="hkp-title">{{#str}}compose_what, local_oksigeniahechauka{{/str}}</label><input class="form-control is-big{{#errors.title}} is-invalid{{/errors.title}}" id="hkp-title" name="title" value="{{values.title}}" maxlength="120" autocomplete="off" required><p class="hkp-hint" id="hkp-len">{{#errors.title}}{{errors.title}}{{/errors.title}}</p></div>
+            <div class="hkp-row">
+                <div class="hkp-field"><label class="form-label" for="hkp-eday">{{#str}}compose_day, local_oksigeniahechauka{{/str}}</label><input class="form-control{{#errors.eventday}} is-invalid{{/errors.eventday}}" type="date" id="hkp-eday" name="eventday" value="{{values.eventday}}"></div>
+                <div class="hkp-field hkp-field-time"><label class="form-label" for="hkp-ef">{{#str}}compose_starts, local_oksigeniahechauka{{/str}}</label><input class="form-control" type="time" id="hkp-ef" name="eventfrom" value="{{values.eventfrom}}"></div>
+                <div class="hkp-field hkp-field-time"><label class="form-label" for="hkp-et">{{#str}}compose_ends, local_oksigeniahechauka{{/str}}</label><input class="form-control" type="time" id="hkp-et" name="eventto" value="{{values.eventto}}"></div>
+            </div>
+            <div class="hkp-field"><label class="form-label" for="hkp-body">{{#str}}compose_forwho, local_oksigeniahechauka{{/str}}</label><input class="form-control" id="hkp-body" name="body" value="{{values.body}}" maxlength="120" autocomplete="off"></div>
+            <div class="hkp-field"><span class="hkp-label" id="hkp-st-l">{{#str}}compose_stage, local_oksigeniahechauka{{/str}}</span><div class="hkp-stages" role="radiogroup" aria-labelledby="hkp-st-l">{{#stages}}<label class="hkp-chip is-small" data-stage="{{n}}"><input type="radio" name="colour" value="{{n}}"{{#checked}} checked{{/checked}}><i aria-hidden="true"></i>{{label}}</label>{{/stages}}</div></div>
+            {{/isevent}}
+            {{#isticker}}
+            <legend>{{#str}}compose_ticker, local_oksigeniahechauka{{/str}}</legend>
+            <div class="hkp-field"><label class="form-label" for="hkp-title">{{#str}}compose_says, local_oksigeniahechauka{{/str}}</label><input class="form-control is-big{{#errors.title}} is-invalid{{/errors.title}}" id="hkp-title" name="title" value="{{values.title}}" maxlength="140" autocomplete="off" required><p class="hkp-hint" id="hkp-len">{{#errors.title}}{{errors.title}}{{/errors.title}}</p></div>
+            <p class="hkp-hint">{{#str}}compose_ticker_help, local_oksigeniahechauka{{/str}}</p>
+            {{/isticker}}
+            {{#isagenda}}
+            <legend>{{#str}}compose_agenda, local_oksigeniahechauka{{/str}}</legend>
+            <div class="hkp-field"><label class="form-label" for="hkp-title">{{#str}}compose_name, local_oksigeniahechauka{{/str}}</label><input class="form-control{{#errors.title}} is-invalid{{/errors.title}}" id="hkp-title" name="title" value="{{values.title}}" maxlength="80" autocomplete="off" required><p class="hkp-hint">{{#errors.title}}{{errors.title}}{{/errors.title}}</p></div>
+            <div class="hkp-field"><label class="form-label" for="hkp-url">{{#str}}agenda_url, local_oksigeniahechauka{{/str}}</label><input class="form-control{{#errors.url}} is-invalid{{/errors.url}}" type="url" id="hkp-url" name="url" value="{{values.url}}" spellcheck="false" autocomplete="off">
+                <p class="hkp-hint">{{#errors.url}}<b class="text-danger">{{errors.url}}</b> {{/errors.url}}{{#str}}compose_agenda_help, local_oksigeniahechauka{{/str}}</p></div>
+            <div class="hkp-field"><span class="hkp-label" id="hkp-col-l">{{#str}}compose_colour, local_oksigeniahechauka{{/str}}</span><div class="hkp-stages" role="radiogroup" aria-labelledby="hkp-col-l">{{#stages}}<label class="hkp-chip is-small" data-stage="{{n}}"><input type="radio" name="colour" value="{{n}}"{{#checked}} checked{{/checked}}><i aria-hidden="true"></i>{{label}}</label>{{/stages}}</div>
+                <p class="hkp-hint">{{#str}}compose_colour_help, local_oksigeniahechauka{{/str}}</p></div>
+            {{/isagenda}}
+        </fieldset>
+
+        <aside class="hkp-preview" aria-labelledby="hkp-pv-h">
+            <div class="hkp-preview-head"><h2 id="hkp-pv-h">{{#str}}compose_preview, local_oksigeniahechauka{{/str}}</h2><span class="hkp-clock">{{{icons.clock}}}{{moment}}</span></div>
+            <div class="hkp-chips" id="hkp-pv-screens" role="group" aria-label="{{#str}}compose_whichscreen, local_oksigeniahechauka{{/str}}"></div>
+            <div class="hkp-stage" id="hkp-compose-stage"><span class="hkp-bezel{{#vertical}} is-v{{/vertical}}" data-state="on"><iframe name="hkp-pv" id="hkp-pv" src="{{frame}}" title="{{#str}}compose_preview_title, local_oksigeniahechauka{{/str}}"></iframe><span class="hkp-led" aria-hidden="true"></span></span></div>
+            <div class="hkp-preview-tools" id="hkp-pv-tools"></div>
+            <p class="hkp-preview-note" id="hkp-pv-note" aria-live="polite"></p>
+        </aside>
+
+        {{#isagenda}}
+        <section class="hkp-fs hkp-when"><h2 class="hkp-label">{{#str}}when, local_oksigeniahechauka{{/str}}</h2><p class="hkp-hint">{{#str}}compose_agenda_when, local_oksigeniahechauka{{/str}}</p></section>
+        {{/isagenda}}
+        {{^isagenda}}
+        <fieldset class="hkp-fs hkp-when">
+            <legend>{{#isevent}}{{#str}}compose_when_event, local_oksigeniahechauka{{/str}}{{/isevent}}{{^isevent}}{{#str}}when, local_oksigeniahechauka{{/str}}{{/isevent}}</legend>
+            <div class="hkp-chips" role="radiogroup" aria-label="{{#str}}compose_when_label, local_oksigeniahechauka{{/str}}">
+                {{#shortcuts}}<label class="hkp-chip"><input type="radio" name="when" value="{{value}}"{{#checked}} checked{{/checked}}>{{label}}</label>{{/shortcuts}}
+            </div>
+            <div class="hkp-row" id="hkp-dates"{{^datesopen}} hidden{{/datesopen}}>
+                <div class="hkp-field"><label class="form-label" for="hkp-from">{{#str}}compose_from, local_oksigeniahechauka{{/str}}</label><input class="form-control" type="date" id="hkp-from" name="from" value="{{from}}"></div>
+                <div class="hkp-field"><label class="form-label" for="hkp-to">{{#str}}compose_to, local_oksigeniahechauka{{/str}}</label><input class="form-control{{#errors.to}} is-invalid{{/errors.to}}" type="date" id="hkp-to" name="to" value="{{to}}"><p class="hkp-hint">{{#errors.to}}{{errors.to}} {{/errors.to}}{{#str}}compose_noend, local_oksigeniahechauka{{/str}}</p></div>
+            </div>
+            <div class="hkp-sentence">{{{icons.event}}}<p id="hkp-sentence-text" aria-live="polite"></p><div class="hkp-strip" id="hkp-strip" aria-hidden="true"></div></div>
+            <details class="hkp-fine"{{#fineopen}} open{{/fineopen}}><summary>{{{icons.chev}}}{{#str}}compose_fine, local_oksigeniahechauka{{/str}}</summary>
+                <div class="hkp-fine-body">
+                    <div><span class="hkp-label" id="hkp-days-l">{{#str}}compose_days, local_oksigeniahechauka{{/str}}</span>
+                        <div class="hkp-days" role="group" aria-labelledby="hkp-days-l">{{#days}}<button type="button" aria-pressed="{{#on}}true{{/on}}{{^on}}false{{/on}}" data-day="{{n}}" aria-label="{{name}}">{{letter}}</button>{{/days}}</div>
+                        <div id="hkp-days-inputs">{{#days}}{{#on}}<input type="hidden" name="days[]" value="{{n}}">{{/on}}{{/days}}</div>
+                        {{#errors.days}}<p class="hkp-hint"><b class="text-danger">{{errors.days}}</b></p>{{/errors.days}}
+                    </div>
+                    <div><div class="form-switch form-check"><input class="form-check-input" type="checkbox" role="switch" id="hkp-hours" name="hours" value="1"{{#hours}} checked{{/hours}}><label class="form-check-label" for="hkp-hours"><b>{{#str}}compose_hours, local_oksigeniahechauka{{/str}}</b></label></div>
+                        <div id="hkp-hours-rows"{{^hours}} hidden{{/hours}}>
+                            {{#ranges}}<div class="hkp-time" data-range="{{n}}"{{#hidden}} hidden{{/hidden}}><label for="hkp-hf{{n}}">{{#str}}compose_hour_from, local_oksigeniahechauka{{/str}}</label><input class="form-control" type="time" id="hkp-hf{{n}}" name="hf{{n}}" value="{{from}}"><label for="hkp-ht{{n}}">{{#str}}compose_hour_to, local_oksigeniahechauka{{/str}}</label><input class="form-control" type="time" id="hkp-ht{{n}}" name="ht{{n}}" value="{{to}}"></div>{{/ranges}}
+                            <button type="button" class="btn btn-link" id="hkp-more-hours">{{#str}}compose_morehours, local_oksigeniahechauka{{/str}}</button>
+                            {{#errors.hours}}<p class="hkp-hint"><b class="text-danger">{{errors.hours}}</b></p>{{/errors.hours}}
+                        </div></div>
+                    <div class="hkp-field"><label class="form-label" for="hkp-every">{{#str}}everyweeks, local_oksigeniahechauka{{/str}}</label><select class="form-select" id="hkp-every" name="every">{{#every}}<option value="{{n}}"{{#selected}} selected{{/selected}}>{{label}}</option>{{/every}}</select></div>
+                </div>
+            </details>
+        </fieldset>
+        {{/isagenda}}
+
+        <fieldset class="hkp-fs hkp-where">
+            <legend>{{#str}}where, local_oksigeniahechauka{{/str}}</legend>
+            <div class="hkp-chips" role="group" aria-label="{{#str}}compose_where_label, local_oksigeniahechauka{{/str}}">
+                {{#whereall}}<label class="hkp-chip"><input type="checkbox" name="whereall" value="1" data-where="all"{{#allchecked}} checked{{/allchecked}}>{{{icons.screens}}}{{#str}}where_all, local_oksigeniahechauka{{/str}} <small>{{allcount}}</small></label>{{/whereall}}
+                {{#groups}}<label class="hkp-chip"><input type="checkbox" name="groups[]" value="{{id}}" data-where="group"{{#checked}} checked{{/checked}}>{{name}} <small>{{count}}</small></label>{{/groups}}
+                {{#hasscreens}}<button type="button" class="hkp-chip" id="hkp-pick-screens" aria-expanded="{{#screensopen}}true{{/screensopen}}{{^screensopen}}false{{/screensopen}}" aria-controls="hkp-screen-chips">{{{icons.tv}}}{{#str}}compose_pickscreens, local_oksigeniahechauka{{/str}}</button>{{/hasscreens}}
+            </div>
+            {{#hasscreens}}<div class="hkp-chips" id="hkp-screen-chips"{{^screensopen}} hidden{{/screensopen}}>{{#screens}}<label class="hkp-chip is-small"><input type="checkbox" name="screens[]" value="{{id}}" data-where="screen"{{#checked}} checked{{/checked}}>{{{icon}}}{{name}}</label>{{/screens}}</div>{{/hasscreens}}
+            <p class="hkp-hint" id="hkp-where-hint" aria-live="polite">{{#errors.where}}<b class="text-danger">{{errors.where}}</b>{{/errors.where}}</p>
+        </fieldset>
+
+        <div class="hkp-foot">
+            <button type="submit" class="btn btn-primary btn-lg" name="publish" value="1" id="hkp-publish">{{#str}}compose_publish, local_oksigeniahechauka{{/str}}</button>
+            <button type="submit" class="btn btn-outline-secondary btn-lg" name="publish" value="0">{{#str}}compose_draft, local_oksigeniahechauka{{/str}}</button>
+            <a class="btn btn-link" href="{{back}}">{{#str}}cancel{{/str}}</a>
+        </div>
+    </form>
+</div>

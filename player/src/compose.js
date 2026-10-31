@@ -138,3 +138,35 @@ export class Composer {
         return pick(h || !horizontal ? 'foto-hoy' : 'foto-sola', [it], secondsOf(it));
     }
 }
+
+/**
+ * The slide that shows a draft in the panel's preview, standing still: a picture or video where it would go (or over
+ * the whole screen), a notice or an event in «Today» beside the first picture of the screen (or «Today» alone, or the
+ * week), a ticker line under the first picture.
+ *
+ * @param {object} item the draft, as the contract gives an item
+ * @param {string} focus main, full, today or week
+ * @param {object[]} main the screen's pictures and videos
+ * @param {boolean} horizontal
+ * @returns {{comp: string, items: object[], seconds: number}}
+ */
+export function draftChoice(item, focus, main, horizontal) {
+    const at = (it) => {
+        const a = ratio(it);
+        if (!horizontal && a < 0.63) {
+            return {comp: 'foto-sola', items: [it], seconds: 0};
+        }
+        return {comp: a < 1.2 ? 'vertical-hoy' : 'foto-hoy', items: [it], seconds: 0};
+    };
+    const isMedia = item && (item.type === 'image' || item.type === 'video');
+    if (isMedia) {
+        return focus === 'full' ? {comp: 'foto-completa', items: [item], seconds: 0} : at(item);
+    }
+    if (focus === 'week') {
+        return {comp: 'semana', items: [], seconds: 0};
+    }
+    if (focus === 'today' || !main.length) {
+        return {comp: 'solo-hoy', items: [], seconds: 0};
+    }
+    return at(main[0]);
+}
