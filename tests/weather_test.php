@@ -106,4 +106,20 @@ final class weather_test extends \advanced_testcase {
         $this->assertSame('Partly cloudy', weather::sky('partlycloudy_polartwilight'));
         $this->assertSame('Cloudy', weather::sky('something_new'));
     }
+
+    /**
+     * Saving a new location asks for its weather at once, in an ad hoc task.
+     */
+    public function test_new_location_asks_at_once(): void {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        $setting = new \local_oksigeniahechauka\admin\setting_location('local_oksigeniahechauka/location', 'Location', '', '');
+        $this->assertSame('', $setting->write_setting('28.4858, -16.3159'));
+        $this->assertEquals('28.4858', get_config('local_oksigeniahechauka', 'lat'));
+        $tasks = \core\task\manager::get_adhoc_tasks('\\local_oksigeniahechauka\\task\\fetch_weather_now');
+        $this->assertCount(1, $tasks);
+        // The same text again asks nothing new.
+        $setting->write_setting('28.4858, -16.3159');
+        $this->assertCount(1, \core\task\manager::get_adhoc_tasks('\\local_oksigeniahechauka\\task\\fetch_weather_now'));
+    }
 }

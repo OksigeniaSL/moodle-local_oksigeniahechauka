@@ -30,7 +30,8 @@ require_once($CFG->libdir . '/adminlib.php');
 
 /**
  * The centre writes its town (or «latitude, longitude»); when it changes, the server looks it up once and keeps the
- * coordinates and the name of the place found, which the description shows to confirm it.
+ * coordinates and the name of the place found, which the description shows to confirm it, and asks for its weather at
+ * once.
  */
 class setting_location extends \admin_setting_configtext {
     /**
@@ -57,6 +58,8 @@ class setting_location extends \admin_setting_configtext {
             set_config('lat', $found['lat'], $c);
             set_config('lon', $found['lon'], $c);
             set_config('place', $found['name'], $c);
+            // Its weather now, not at the next quarter of an hour.
+            \core\task\manager::queue_adhoc_task(new \local_oksigeniahechauka\task\fetch_weather_now(), true);
         }
         return parent::write_setting($data);
     }
