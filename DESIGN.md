@@ -276,13 +276,15 @@ Biblioteca, Secretaría y Comedor.» A teacher sees only their groups, already c
 - A card per group: «Sus pantallas» (chips, «+ Añadir»), «Quién publica aquí» (people with initials, role, «×» to
   take them off, with the name in its label), and a search field «Añadir a alguien del centro» (combobox: results
   with initials, the typed part underlined, «Ya publica aquí» disabled).
-- Under the groups, a block with a small label «Permisos» and two cards with a solid border and a background lightly
-  tinted with the main colour (a dashed border means «a place to add something», and these are not):
-  - «Todas las pantallas»: who publishes everywhere, with the same search; whoever runs the screens chooses them. Those
+- On the right, a column of its own, «Permisos» (as the preview on the other pages; below the groups on narrow
+  screens), with two cards with a solid border and a background lightly tinted with the main colour (a dashed border
+  means «a place to add something», and these are not); each card says what it means under its title:
+  - «Publican en todas»: who publishes everywhere, with the same search; whoever runs the screens chooses them. Those
     who have it by another role show why («Lleva las pantallas», «Por su rol en el sitio») instead of «×».
-  - «Quién lleva las pantallas»: with the search for the administrator of the site; for the rest, the list and «Lo
-    decide el administrador del sitio.»
-- «Grupo nuevo»: a name and «Crear».
+  - «Llevan las pantallas»: with the search for the administrator of the site; for the rest, the list and «Lo decide
+    el administrador del sitio.»
+- «Grupo nuevo»: a button in the head of «Grupos» (next to the count) that opens a small dialog: a name and «Crear».
+  Without groups, a dashed empty state with an example and the same button, which then leaves the head.
 
 ### «Tu centro»
 

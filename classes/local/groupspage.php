@@ -122,6 +122,8 @@ class groupspage {
             'rows' => $rows,
             'count' => count($rows),
             'groups' => $cards,
+            'groupcount' => count($cards),
+            'hasgroups' => (bool) $cards,
             'everywhere' => $everywhere,
             'haseverywhere' => (bool) $everywhere,
             'managers' => $managers,
@@ -214,7 +216,8 @@ class groupspage {
             case 'removemanager':
                 $manager = strpos($action, 'manager') !== false;
                 if ($manager && !access::may_choose_managers()) {
-                    throw new \required_capability_exception(\context_system::instance(), 'moodle/role:assign', 'nopermissions', '');
+                    $system = \context_system::instance();
+                    throw new \required_capability_exception($system, 'moodle/role:assign', 'nopermissions', '');
                 }
                 $user = optional_param('user', 0, PARAM_INT);
                 if ($DB->record_exists('user', ['id' => $user, 'deleted' => 0]) && !isguestuser($user)) {

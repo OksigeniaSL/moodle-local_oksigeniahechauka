@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.6.3 (2026-11-01)
+
+- «Pantallas y grupos» balanced on wide screens: the screens and the groups on the left, the permissions in a column of
+  their own on the right (as the preview on the other pages), stacked below on narrow ones. «Grupo nuevo» is a button
+  in the head of «Grupos» that opens a small dialog, and without groups an empty state says what one is for.
+- Buttons keep the gap between their icon and their text on any theme (Boost Union did not give one).
+- The example name of a new group is no longer a school's.
+
 ## 0.6.2 (2026-11-01)
 
 - «Tu centro»: a keyword added with Enter no longer shows twice, and one already there is not added again; «palabra»

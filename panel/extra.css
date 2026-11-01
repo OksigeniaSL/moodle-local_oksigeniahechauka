@@ -373,17 +373,71 @@ dialog.hkp-dialog > footer {
     font-size: .8125rem;
 }
 
-/* «Pantallas y grupos»: the permissions (who publishes everywhere, who runs the screens) are a block apart from the
-   groups, under a small label. Solid border: in the panel a dashed one means «a place to add something». */
-.hkp-perms {
-    margin: 1.5rem 0 0;
+/* Buttons with an icon keep their gap on any theme (Boost Union, among others, does not give one). */
+.hkp .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .45rem;
 }
 
-.hkp-perms > .hkp-k {
-    margin: 0 0 .5rem;
+.hkp .btn[hidden] {
+    display: none;
+}
+
+/* «Pantallas y grupos»: the screens and the groups on the left; on the right, a column of its own for the permissions
+   (who publishes everywhere, who runs the screens), as the preview on the other pages. Solid border on their cards: in
+   the panel a dashed one means «a place to add something». */
+.hkp-gp {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(19rem, 25rem);
+    gap: 0 2.5rem;
+    align-items: start;
+}
+
+.hkp-gp-side {
+    display: grid;
+    gap: 1rem;
+}
+
+.hkp-gp-side > .hkp-sec-head {
+    margin: 0;
 }
 
 .hkp .hkp-group.is-perm {
     background: color-mix(in srgb, var(--hkp-accent) 4%, var(--hkp-card));
     box-shadow: none;
+}
+
+.hkp-group > header.is-stacked {
+    display: grid;
+    gap: .3rem;
+}
+
+.hkp-none {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: .75rem 1.5rem;
+    padding: 1.25rem 1.5rem;
+    border: 1px dashed var(--hkp-edge);
+    border-radius: var(--hkp-radius);
+    background: var(--hkp-sunk);
+}
+
+.hkp-none p {
+    flex: 1 1 18rem;
+    margin: 0;
+    color: var(--hkp-muted);
+}
+
+@container hkp (max-width: 62rem) {
+    .hkp-gp {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .hkp-gp-side {
+        margin-top: 1rem;
+    }
 }

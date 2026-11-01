@@ -23,7 +23,7 @@
     Example context (json):
     {
         "style": "", "title": "Pantallas", "hastabs": false, "tabs": [], "action": "#", "sesskey": "abc",
-        "rows": [], "count": 0, "groups": [], "everywhere": [], "haseverywhere": false, "managers": [],
+        "rows": [], "count": 0, "groups": [], "groupcount": 0, "hasgroups": false, "everywhere": [], "haseverywhere": false, "managers": [],
         "hasmanagers": false, "choosemanagers": false,
         "player": "https://example.com/local/oksigeniahechauka/player/", "claim": "#", "people": "#", "admin": "",
         "icons": {"qr": "", "x": "", "plus": "", "search": "", "sliders": "", "copy": ""}, "strings": "{}"
@@ -32,6 +32,8 @@
 <div class="hkp" id="hkp-groups-page"{{#style}} style="{{style}}"{{/style}} data-strings="{{strings}}" data-people="{{people}}" data-sesskey="{{sesskey}}">
     <header class="hkp-head"><div class="hkp-head-title"><h1>{{title}}</h1></div></header>
     {{#hastabs}}<nav class="hkp-tabs" aria-label="{{#str}}tabs_label, local_oksigeniahechauka{{/str}}">{{#tabs}}<a href="{{url}}"{{#current}} aria-current="page"{{/current}}>{{{icon}}}{{label}}</a>{{/tabs}}</nav>{{/hastabs}}
+    <div class="hkp-gp">
+    <div class="hkp-gp-main">
     <section aria-labelledby="hkp-h-scr">
         <div class="hkp-sec-head"><h2 id="hkp-h-scr">{{#str}}screens, local_oksigeniahechauka{{/str}}</h2><span class="hkp-count">{{count}}</span><div class="hkp-sec-tools"><button type="button" class="btn btn-primary" data-hkp-open="hkp-new-dialog">{{{icons.qr}}}{{#str}}addscreen_card, local_oksigeniahechauka{{/str}}</button></div></div>
         <ul class="hkp-glist">
@@ -39,7 +41,8 @@
         </ul>
     </section>
     <section aria-labelledby="hkp-h-grp">
-        <div class="hkp-sec-head"><h2 id="hkp-h-grp">{{#str}}groups, local_oksigeniahechauka{{/str}}</h2><p class="hkp-hint hkp-sec-hint">{{#str}}groups_help, local_oksigeniahechauka{{/str}}</p></div>
+        <div class="hkp-sec-head"><h2 id="hkp-h-grp">{{#str}}groups, local_oksigeniahechauka{{/str}}</h2><span class="hkp-count">{{groupcount}}</span>{{#hasgroups}}<div class="hkp-sec-tools"><button type="button" class="btn btn-outline-secondary" data-hkp-open="hkp-group-dialog">{{{icons.plus}}}{{#str}}groups_new, local_oksigeniahechauka{{/str}}</button></div>{{/hasgroups}}<p class="hkp-hint hkp-sec-hint">{{#str}}groups_help, local_oksigeniahechauka{{/str}}</p></div>
+        {{^hasgroups}}<div class="hkp-none"><p>{{#str}}groups_none, local_oksigeniahechauka{{/str}}</p><button type="button" class="btn btn-outline-secondary" data-hkp-open="hkp-group-dialog">{{{icons.plus}}}{{#str}}groups_new, local_oksigeniahechauka{{/str}}</button></div>{{/hasgroups}}
         <div class="hkp-groups">
             {{#groups}}
             <article class="hkp-group" id="hkp-group-{{id}}" data-list="group" data-group="{{id}}">
@@ -61,38 +64,39 @@
                 <div class="hkp-search" data-list="group" data-group="{{id}}">{{{icons.search}}}<input class="form-control" role="combobox" aria-expanded="false" aria-controls="hkp-lb-{{id}}" aria-autocomplete="list" placeholder="{{#str}}groups_search, local_oksigeniahechauka{{/str}}" aria-label="{{#str}}groups_search_label, local_oksigeniahechauka, {{name}}{{/str}}" autocomplete="off" spellcheck="false"><ul class="hkp-listbox" id="hkp-lb-{{id}}" role="listbox" aria-label="{{#str}}groups_found, local_oksigeniahechauka{{/str}}" hidden></ul></div>
             </article>
             {{/groups}}
-            <form class="hkp-group" method="post" action="{{action}}"><input type="hidden" name="sesskey" value="{{sesskey}}"><input type="hidden" name="action" value="addgroup">
-                <header><h3>{{#str}}groups_new, local_oksigeniahechauka{{/str}}</h3></header>
-                <div class="hkp-field"><label class="form-label" for="hkp-ng">{{#str}}name, local_oksigeniahechauka{{/str}}</label><div class="hkp-find"><input class="form-control" id="hkp-ng" name="name" placeholder="{{#str}}groups_new_example, local_oksigeniahechauka{{/str}}" autocomplete="off" required><button type="submit" class="btn btn-outline-secondary">{{#str}}groups_create, local_oksigeniahechauka{{/str}}</button></div></div>
-            </form>
-        </div>
-        <div class="hkp-perms" role="group" aria-labelledby="hkp-h-perms">
-            <p class="hkp-k" id="hkp-h-perms">{{#str}}groups_permissions, local_oksigeniahechauka{{/str}}</p>
-            <div class="hkp-groups">
-                <article class="hkp-group is-perm" id="hkp-all" data-list="everywhere" data-group="0"><header><h3>{{#str}}where_all, local_oksigeniahechauka{{/str}}</h3></header>
-                    <div><span class="hkp-k">{{#str}}groups_everywhere, local_oksigeniahechauka{{/str}}</span>
-                        <ul class="hkp-people">
-                            {{#everywhere}}<li class="hkp-person"><span class="hkp-av" aria-hidden="true">{{initials}}</span><span>{{name}}{{#detail}}<small>{{detail}}</small>{{/detail}}</span>{{#own}}<a class="btn btn-sm btn-outline-secondary btn-icon" href="#" data-remove-user="{{userid}}" aria-label="{{label}}">{{{icons.x}}}</a>{{/own}}{{^own}}<span></span>{{/own}}</li>{{/everywhere}}
-                            {{^haseverywhere}}<li class="hkp-hint">{{#str}}groups_nobody_else, local_oksigeniahechauka{{/str}}</li>{{/haseverywhere}}
-                        </ul>
-                    </div>
-                    <div class="hkp-search" data-list="everywhere" data-group="0">{{{icons.search}}}<input class="form-control" role="combobox" aria-expanded="false" aria-controls="hkp-lb-everywhere" aria-autocomplete="list" placeholder="{{#str}}groups_search, local_oksigeniahechauka{{/str}}" aria-label="{{#str}}groups_everywhere_search_label, local_oksigeniahechauka{{/str}}" autocomplete="off" spellcheck="false"><ul class="hkp-listbox" id="hkp-lb-everywhere" role="listbox" aria-label="{{#str}}groups_found, local_oksigeniahechauka{{/str}}" hidden></ul></div>
-                    <p class="hkp-hint">{{#str}}groups_everywhere_help, local_oksigeniahechauka{{/str}}</p>
-                </article>
-                <article class="hkp-group is-perm" id="hkp-managers" data-list="managers" data-group="0"><header><h3>{{#str}}groups_managers, local_oksigeniahechauka{{/str}}</h3></header>
-                    <div>
-                        <ul class="hkp-people">
-                            {{#managers}}<li class="hkp-person"><span class="hkp-av" aria-hidden="true">{{initials}}</span><span>{{name}}{{#detail}}<small>{{detail}}</small>{{/detail}}</span>{{#own}}<a class="btn btn-sm btn-outline-secondary btn-icon" href="#" data-remove-user="{{userid}}" aria-label="{{label}}">{{{icons.x}}}</a>{{/own}}{{^own}}<span></span>{{/own}}</li>{{/managers}}
-                            {{^hasmanagers}}<li class="hkp-hint">{{#str}}groups_nobody_else, local_oksigeniahechauka{{/str}}</li>{{/hasmanagers}}
-                        </ul>
-                    </div>
-                    {{#choosemanagers}}<div class="hkp-search" data-list="managers" data-group="0">{{{icons.search}}}<input class="form-control" role="combobox" aria-expanded="false" aria-controls="hkp-lb-managers" aria-autocomplete="list" placeholder="{{#str}}groups_search, local_oksigeniahechauka{{/str}}" aria-label="{{#str}}groups_managers_search_label, local_oksigeniahechauka{{/str}}" autocomplete="off" spellcheck="false"><ul class="hkp-listbox" id="hkp-lb-managers" role="listbox" aria-label="{{#str}}groups_found, local_oksigeniahechauka{{/str}}" hidden></ul></div>{{/choosemanagers}}
-                    <p class="hkp-hint">{{#choosemanagers}}{{#str}}groups_managers_help, local_oksigeniahechauka{{/str}}{{/choosemanagers}}{{^choosemanagers}}{{#str}}groups_managers_admin, local_oksigeniahechauka{{/str}}{{/choosemanagers}}</p>
-                </article>
-            </div>
         </div>
     </section>
+    </div>
+    <aside class="hkp-gp-side" aria-labelledby="hkp-h-perms">
+        <div class="hkp-sec-head"><h2 id="hkp-h-perms">{{#str}}groups_permissions, local_oksigeniahechauka{{/str}}</h2><p class="hkp-hint hkp-sec-hint">{{#str}}groups_permissions_help, local_oksigeniahechauka{{/str}}</p></div>
+        <article class="hkp-group is-perm" id="hkp-all" data-list="everywhere" data-group="0">
+            <header class="is-stacked"><h3>{{#str}}groups_everywhere, local_oksigeniahechauka{{/str}}</h3><p class="hkp-hint">{{#str}}groups_everywhere_help, local_oksigeniahechauka{{/str}}</p></header>
+            <ul class="hkp-people">
+                {{#everywhere}}<li class="hkp-person"><span class="hkp-av" aria-hidden="true">{{initials}}</span><span>{{name}}{{#detail}}<small>{{detail}}</small>{{/detail}}</span>{{#own}}<a class="btn btn-sm btn-outline-secondary btn-icon" href="#" data-remove-user="{{userid}}" aria-label="{{label}}">{{{icons.x}}}</a>{{/own}}{{^own}}<span></span>{{/own}}</li>{{/everywhere}}
+                            {{^haseverywhere}}<li class="hkp-hint">{{#str}}groups_nobody_else, local_oksigeniahechauka{{/str}}</li>{{/haseverywhere}}
+            </ul>
+            <div class="hkp-search" data-list="everywhere" data-group="0">{{{icons.search}}}<input class="form-control" role="combobox" aria-expanded="false" aria-controls="hkp-lb-everywhere" aria-autocomplete="list" placeholder="{{#str}}groups_search, local_oksigeniahechauka{{/str}}" aria-label="{{#str}}groups_everywhere_search_label, local_oksigeniahechauka{{/str}}" autocomplete="off" spellcheck="false"><ul class="hkp-listbox" id="hkp-lb-everywhere" role="listbox" aria-label="{{#str}}groups_found, local_oksigeniahechauka{{/str}}" hidden></ul></div>
+        </article>
+        <article class="hkp-group is-perm" id="hkp-managers" data-list="managers" data-group="0">
+            <header class="is-stacked"><h3>{{#str}}groups_managers, local_oksigeniahechauka{{/str}}</h3><p class="hkp-hint">{{#str}}groups_managers_help, local_oksigeniahechauka{{/str}}</p></header>
+            <ul class="hkp-people">
+                {{#managers}}<li class="hkp-person"><span class="hkp-av" aria-hidden="true">{{initials}}</span><span>{{name}}{{#detail}}<small>{{detail}}</small>{{/detail}}</span>{{#own}}<a class="btn btn-sm btn-outline-secondary btn-icon" href="#" data-remove-user="{{userid}}" aria-label="{{label}}">{{{icons.x}}}</a>{{/own}}{{^own}}<span></span>{{/own}}</li>{{/managers}}
+                            {{^hasmanagers}}<li class="hkp-hint">{{#str}}groups_nobody_else, local_oksigeniahechauka{{/str}}</li>{{/hasmanagers}}
+            </ul>
+            {{#choosemanagers}}<div class="hkp-search" data-list="managers" data-group="0">{{{icons.search}}}<input class="form-control" role="combobox" aria-expanded="false" aria-controls="hkp-lb-managers" aria-autocomplete="list" placeholder="{{#str}}groups_search, local_oksigeniahechauka{{/str}}" aria-label="{{#str}}groups_managers_search_label, local_oksigeniahechauka{{/str}}" autocomplete="off" spellcheck="false"><ul class="hkp-listbox" id="hkp-lb-managers" role="listbox" aria-label="{{#str}}groups_found, local_oksigeniahechauka{{/str}}" hidden></ul></div>{{/choosemanagers}}
+            {{^choosemanagers}}<p class="hkp-hint">{{#str}}groups_managers_admin, local_oksigeniahechauka{{/str}}</p>{{/choosemanagers}}
+        </article>
+    </aside>
+    </div>
     <form method="post" action="{{action}}" id="hkp-people-form" hidden><input type="hidden" name="sesskey" value="{{sesskey}}"><input type="hidden" name="action" value="addeditor"><input type="hidden" name="group" value=""><input type="hidden" name="user" value=""></form>
+    <dialog class="hkp-dialog is-narrow" id="hkp-group-dialog" aria-labelledby="hkp-ng-h">
+        <header>{{{icons.plus}}}<h2 id="hkp-ng-h">{{#str}}groups_new, local_oksigeniahechauka{{/str}}</h2><button type="button" class="btn btn-icon" data-hkp-close aria-label="{{#str}}closebuttontitle{{/str}}">{{{icons.x}}}</button></header>
+        <form class="hkp-dialog-body" id="hkp-ng-form" method="post" action="{{action}}"><input type="hidden" name="sesskey" value="{{sesskey}}"><input type="hidden" name="action" value="addgroup">
+            <div class="hkp-field"><label class="form-label" for="hkp-ng">{{#str}}name, local_oksigeniahechauka{{/str}}</label><input class="form-control" id="hkp-ng" name="name" placeholder="{{#str}}groups_new_example, local_oksigeniahechauka{{/str}}" autocomplete="off" required></div>
+            <p class="hkp-hint">{{#str}}groups_new_help, local_oksigeniahechauka{{/str}}</p>
+        </form>
+        <footer><button type="button" class="btn btn-outline-secondary" data-hkp-close>{{#str}}cancel{{/str}}</button><button type="submit" class="btn btn-primary" form="hkp-ng-form">{{#str}}groups_create, local_oksigeniahechauka{{/str}}</button></footer>
+    </dialog>
     <dialog class="hkp-dialog is-narrow" id="hkp-new-dialog" aria-labelledby="hkp-ns-h">
         <header>{{{icons.qr}}}<h2 id="hkp-ns-h">{{#str}}addscreen_card, local_oksigeniahechauka{{/str}}</h2><button type="button" class="btn btn-icon" data-hkp-close aria-label="{{#str}}closebuttontitle{{/str}}">{{{icons.x}}}</button></header>
         <div class="hkp-dialog-body">
@@ -126,21 +130,26 @@
         form.querySelector('[name="user"]').value = user;
         form.submit();
     };
-    // Adding a screen: the dialog, and copying the address.
-    var dialog = page.querySelector('#hkp-new-dialog');
-    page.querySelectorAll('[data-hkp-open="hkp-new-dialog"]').forEach(function(b) {
+    // The dialogs (adding a screen, a new group): each opens from its buttons and closes from its own.
+    page.querySelectorAll('[data-hkp-open]').forEach(function(b) {
         b.addEventListener('click', function() {
-            dialog.showModal();
+            var d = document.getElementById(b.getAttribute('data-hkp-open'));
+            d.showModal();
+            var first = d.querySelector('input:not([type="hidden"]):not([readonly])');
+            if (first) {
+                first.focus();
+            }
         });
     });
+    page.querySelectorAll('dialog [data-hkp-close]').forEach(function(b) {
+        b.addEventListener('click', function() {
+            b.closest('dialog').close();
+        });
+    });
+    var dialog = page.querySelector('#hkp-new-dialog');
     if (location.hash === '#add') {
         dialog.showModal();
     }
-    dialog.querySelectorAll('[data-hkp-close]').forEach(function(b) {
-        b.addEventListener('click', function() {
-            dialog.close();
-        });
-    });
     dialog.querySelectorAll('[data-copy]').forEach(function(b) {
         b.addEventListener('click', function() {
             var field = document.getElementById(b.getAttribute('data-copy'));
