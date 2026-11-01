@@ -258,3 +258,11 @@ Because it is the same player with the same manifest, what the preview shows is 
 - How a device agent (CEC, screenshots, restarts) gets the key of the screen it lives with.
 - The record of what was played («proof of play»).
 - Approval before publishing.
+
+## The panel's preview
+
+In `preview` mode the player also listens to messages from the page that holds it, of the same origin only: `hkDraft`
+(`{item, items, replaces, focus}`: an item being written, as this contract gives it, shown standing still where it
+would go, `focus` being `main`, `full`, `today` or `week`; `null` to go back to the turns) and `hkTheme` (`{vars, mode}`:
+colours and light or dark being chosen). It answers `hkPreviewReady` once it has its manifest. A screen ignores them.
+

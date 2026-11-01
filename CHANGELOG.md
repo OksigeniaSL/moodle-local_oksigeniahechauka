@@ -1,5 +1,35 @@
 # Changelog
 
+## 0.6.0 (2026-11-01)
+
+The panel, as the art direction drew it (DESIGN.md), and run without being an administrator.
+
+- **Who runs it.** Four capabilities (view, publish, publishall, managescreens) instead of one, each cloned from the
+  old one on upgrade; two roles made at install, without archetype; who publishes in each group of screens is chosen
+  in the panel. Who only publishes sends content to their groups and changes only what they made.
+- **Its own page**, «Pantallas», linked from the main bar and the user menu, at full width.
+- **Home («Lo que sale»):** the wall of screens, each as a television with its light, its picture (the player itself
+  when there is no screenshot), its state (running, off by its hours and when it comes on, no signal since when, clock
+  off, never seen) and what it shows now; a line that says whether one needs someone; what is on them in three groups,
+  with filters and «De todos / Lo mío».
+- **Adding content** with the screen beside it: the draft goes to the player as one types (a new photo too, before it
+  is sent); «Cuándo» with shortcuts said as a sentence and drawn on a two-week strip; «Dónde» as chips; defaults that
+  end by themselves.
+- **The urgent notice:** two steps to put it on (sentences already made, where, until when, the red screen beside it),
+  one to take it off; on the screens it covers everything until it goes.
+- **A screen's sheet:** its preview and facts, and a card per topic (name and groups, power hours in bars and in a
+  sentence, the warning if it stops answering, sound, light or dark).
+- **«Pantallas y grupos»:** the screens in rows, adding one in a dialog, and a card per group with its screens and who
+  publishes in it, with a search of the people of the school.
+- **«Tu centro»:** the place for the weather found by name and confirmed on a small map drawn by the plugin (Natural
+  Earth, no map service) with the weather there now; the colours, each with the text that reads on it, chosen by
+  itself (the screens get it too); the two logos; the screen beside them, live.
+- **A new screen from the phone** in three steps, new or replacing another.
+- **The player:** the urgent notice, drafts and colours from the panel's preview, titles of events kept to two lines,
+  slides measured again once the letters arrive; the preview never sounds.
+- The same event from an agenda and from the site calendar reaches a screen once; saving the location asks for its
+  weather at once.
+
 ## 0.5.1 (2026-11-01)
 
 - **«La semana»**, the seventh composition (the art direction's design): the next five school days side by side (one

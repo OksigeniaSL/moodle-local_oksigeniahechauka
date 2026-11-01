@@ -14,10 +14,11 @@ already knows reaches the screens by itself, and every screen can be seen from a
 
 ## Status
 
-**Pre-alpha.** A screen opens one address and shows a code; someone gives it a name in Moodle and it starts. The
-panel keeps the screens, the content and its schedule, and shows a preview of each screen at any day and time. The
-menu of Oksigenia Meals, the events of the calendar and the site news reach the screens by themselves. Not for
-production sites.
+**Pre-alpha.** A screen opens one address and shows a code; someone gives it a name from the phone and it starts. The
+panel («Screens», in the main bar) shows each screen as it is now and what is on them; adding content puts the screen
+beside the form, changing as one types; an urgent notice covers every screen in two clicks. The menu of Oksigenia
+Meals, the events of the calendar, the site news and the weather reach the screens by themselves. Not for production
+sites.
 
 ## How it works
 
@@ -26,6 +27,9 @@ production sites.
   notification. What reaches the screens by itself: the menu of Oksigenia Meals, the events of the site calendar, the
   site news, the weather (MET Norway, with the location of the centre) and any iCal agenda added as content. With `ffmpeg` on the server (a static build is enough), each uploaded video is made ready for every
   screen: H.264, 1080p and 30 fps at most, one at a time.
+- **Who runs the panel** need not be an administrator: four capabilities (view, publish in one's groups, publish
+  everywhere, run the screens) and two roles made at install, «Publishes on the screens» and «Runs the screens». Whoever
+  runs the screens chooses, group by group, who publishes in each.
 - **The player** is one web page that every screen opens: a small computer with a browser in kiosk mode, a smart TV
   with a kiosk browser or a professional display that loads a web page. It keeps what it needs on the device and goes
   on without a network.
@@ -39,7 +43,9 @@ production sites.
 Code, comments and commit messages in English; texts in the language packs (`lang/en`, `lang/es`). The player lives
 in `player/`: its sources in `player/src`, built with esbuild for the old browsers of professional displays
 (`npm run build`), and its tests run on Node (`npm test`). The built bundle is committed, so whoever installs the
-plugin builds nothing. `player/demo/` shows the player with example data. See [CONTRIBUTING.md](CONTRIBUTING.md).
+plugin builds nothing. `player/demo/` shows the player with example data. The panel follows [DESIGN.md](DESIGN.md): Mustache templates in
+`templates/`, `styles.css` built from the design's own sheet plus `panel/extra.css`, and two plain scripts in `panel/`
+(adding content and «Your school»). See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
 

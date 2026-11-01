@@ -13,10 +13,11 @@ llega solo a las pantallas, y cada una se ve a distancia tal como está. *Hechau
 
 ## Estado
 
-**Pre-alfa.** Una pantalla abre una dirección y enseña un código; alguien le pone nombre en Moodle y empieza. El
-panel lleva las pantallas, los contenidos y su programación, y enseña la vista previa de cada pantalla cualquier día
-y a cualquier hora. El menú de Oksigenia Meals, los eventos del calendario y las noticias del sitio llegan solos a
-las pantallas. No es para sitios en producción.
+**Pre-alfa.** Una pantalla abre una dirección y enseña un código; alguien le pone nombre desde el móvil y empieza. El
+panel («Pantallas», en la barra principal) enseña cada pantalla tal como está y lo que sale en ellas; al añadir algo,
+la pantalla va al lado del formulario y cambia mientras se escribe; un aviso urgente cubre todas las pantallas en dos
+clics. El menú de Oksigenia Meals, los eventos del calendario, las noticias del sitio y el tiempo llegan solos a las
+pantallas. No es para sitios en producción.
 
 ## Cómo funciona
 
@@ -26,6 +27,9 @@ las pantallas. No es para sitios en producción.
   del sitio, las noticias del sitio, el tiempo (MET Norway, con la ubicación del centro) y cualquier agenda iCal que se
   añada como contenido. Con `ffmpeg` en el servidor (basta una versión estática), cada vídeo que se sube se
   prepara para todas las pantallas: H.264, 1080p y 30 fps como mucho, de uno en uno.
+- **Quien lleva el panel** no tiene que ser administrador: cuatro capacidades (ver, publicar en sus grupos, publicar
+  en todas, llevar las pantallas) y dos roles creados al instalar, «Publica en las pantallas» y «Lleva las pantallas».
+  Quien lleva las pantallas elige, grupo a grupo, quién publica en cada uno.
 - **El reproductor** es una sola página web que abre cada pantalla: un ordenador pequeño con un navegador en modo
   quiosco, una tele inteligente con un navegador de quiosco o una pantalla profesional que carga una página web.
   Guarda en el aparato lo que necesita y sigue sin red.
@@ -41,7 +45,9 @@ Código, comentarios y mensajes de commit en inglés; los textos, en los paquete
 reproductor vive en `player/`: sus fuentes en `player/src`, compiladas con esbuild para los navegadores antiguos de
 las pantallas profesionales (`npm run build`), y sus pruebas corren en Node (`npm test`). El paquete compilado va en
 el repositorio, así que quien instala el plugin no compila nada. `player/demo/` enseña el reproductor con datos de
-ejemplo. Más en [CONTRIBUTING.md](CONTRIBUTING.md).
+ejemplo. El panel sigue [DESIGN.md](DESIGN.md): plantillas Mustache en `templates/`, `styles.css` hecho con la hoja del
+propio diseño más `panel/extra.css`, y dos guiones sencillos en `panel/` (añadir contenido y «Tu centro»). Más en
+[CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Licencia
 
