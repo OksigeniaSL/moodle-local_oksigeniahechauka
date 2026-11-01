@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * One screen: how it is doing, and its settings.
+ * A screen's sheet («Ficha»), for who runs the screens (DESIGN.md).
  *
  * @package    local_oksigeniahechauka
  * @copyright  2026 Oksigenia SL <dev@oksigenia.cc>
@@ -24,140 +24,32 @@
 
 require(__DIR__ . '/../../config.php');
 
-use local_oksigeniahechauka\form\item_form;
-use local_oksigeniahechauka\form\screen_form;
-use local_oksigeniahechauka\local\schedule;
-use local_oksigeniahechauka\local\screens;
+use local_oksigeniahechauka\local\access;
+use local_oksigeniahechauka\local\sheet;
 
 $id = required_param('id', PARAM_INT);
 $context = context_system::instance();
 require_login(null, false);
-require_capability('local/oksigeniahechauka:managescreens', $context);
-
+access::require_cap('managescreens');
 $c = 'local_oksigeniahechauka';
 $screen = $DB->get_record('local_oksigeniahechauka_screen', ['id' => $id], '*', MUST_EXIST);
-$panel = new moodle_url('/local/oksigeniahechauka/index.php');
+$url = new moodle_url('/local/oksigeniahechauka/screen.php', ['id' => $id]);
 $PAGE->set_context($context);
-$PAGE->set_url(new moodle_url('/local/oksigeniahechauka/screen.php', ['id' => $id]));
-$PAGE->set_pagelayout('admin');
+$PAGE->set_url($url);
+$PAGE->set_pagelayout('standard');
+$PAGE->add_body_class('hkp-page');
 $PAGE->set_title(format_string($screen->name));
-$PAGE->set_heading(get_string('manage', $c));
-navigation_node::override_active_url($panel);
+$PAGE->set_heading('');
+$PAGE->set_primary_active_tab('local_oksigeniahechauka');
 
-$form = new screen_form();
-$power = schedule::power($screen->power);
-$values = (object) [
-    'id' => $screen->id,
-    'name' => $screen->name,
-    'template' => $screen->template,
-    'theme' => $screen->theme,
-    'groups' => array_fill_keys(screens::groups_of((int) $screen->id), 1),
-    'powermode' => $power ? 'hours' : 'always',
-    'powerdays' => array_fill_keys($power ? $power[0]['days'] : [1, 2, 3, 4, 5], 1),
-    'powerrange' => $power ? ['from' => $power[0]['on'], 'to' => $power[0]['off']] : [],
-    'alerts' => $screen->alerts,
-    'sound' => $screen->sound,
-];
-$form->set_data($values);
-
-if ($form->is_cancelled()) {
-    redirect($panel);
-}
-if ($data = $form->get_data()) {
-    $power = null;
-    if ($data->powermode === 'hours') {
-        $days = [];
-        foreach ((array) ($data->powerdays ?? []) as $d => $on) {
-            if ($on) {
-                $days[] = (int) $d;
-            }
-        }
-        $power = json_encode([['days' => count($days) < 7 ? $days : [],
-            'on' => item_form::hour($data->powerrange['from']), 'off' => item_form::hour($data->powerrange['to'])]]);
-    }
-    $DB->update_record('local_oksigeniahechauka_screen', (object) [
-        'id' => $screen->id,
-        'name' => trim($data->name),
-        'template' => $data->template === 'full' ? 'full' : 'zones',
-        'theme' => in_array($data->theme, ['site', 'light', 'dark', 'auto']) ? $data->theme : 'site',
-        'power' => $power,
-        'alerts' => empty($data->alerts) ? 0 : 1,
-        'sound' => empty($data->sound) ? 0 : 1,
-        'timemodified' => time(),
-    ]);
-    $groups = [];
-    foreach ((array) ($data->groups ?? []) as $g => $on) {
-        if ($on) {
-            $groups[] = (int) $g;
-        }
-    }
-    screens::set_groups((int) $screen->id, $groups);
-    redirect($panel, get_string('changessaved'), null, \core\output\notification::NOTIFY_SUCCESS);
-}
-
-/**
- * A time zone offset in minutes as people read it: «UTC+1», «UTC−3:30».
- *
- * @param int $minutes
- * @return string
- */
-function local_oksigeniahechauka_offset(int $minutes): string {
-    $sign = $minutes < 0 ? '−' : '+';
-    $minutes = abs($minutes);
-    return 'UTC' . $sign . intdiv($minutes, 60) . ($minutes % 60 ? sprintf(':%02d', $minutes % 60) : '');
-}
-
-// How it is doing: whether it answers, and whether its clock agrees with the site's (it runs its schedule by it).
-$now = time();
-$info = json_decode((string) $screen->lastinfo, true) ?: [];
-if (!$screen->lastseen) {
-    $state = get_string('never', $c);
-} else if (screens::online($screen, $now)) {
-    $state = get_string('online', $c);
-} else if (!schedule::power_on(schedule::power($screen->power), $now)) {
-    $state = get_string('off_hours', $c);
-} else {
-    $state = get_string('offline_since', $c, format_time($now - $screen->lastseen));
-}
-$facts = [$state];
-if (!empty($info['version'])) {
-    $facts[] = get_string('player_version', $c, s($info['version']));
-}
-if (!empty($info['display']['width'])) {
-    $facts[] = (int) $info['display']['width'] . ' × ' . (int) $info['display']['height'];
-}
-$warnings = [];
-if (isset($info['time']) && $screen->lastseen) {
-    $skew = abs((int) $info['time'] - (int) $screen->lastseen);
-    if ($skew > 120) {
-        $warnings[] = get_string('clock_wrong', $c, format_time($skew));
-    }
-}
-if (isset($info['tz_offset'])) {
-    $site = (new DateTime('@' . $now))->setTimezone(core_date::get_server_timezone_object())->getOffset() / 60;
-    if ((int) $info['tz_offset'] !== (int) $site) {
-        $warnings[] = get_string('timezone_wrong', $c, (object) [
-            'device' => local_oksigeniahechauka_offset((int) $info['tz_offset']),
-            'site' => local_oksigeniahechauka_offset((int) $site),
-        ]);
+$errors = [];
+if (data_submitted() && confirm_sesskey()) {
+    $errors = sheet::save($screen);
+    if (!$errors) {
+        redirect($url, get_string('sheet_saved', $c), null, \core\output\notification::NOTIFY_SUCCESS);
     }
 }
 
 echo $OUTPUT->header();
-echo $OUTPUT->heading(format_string($screen->name));
-echo html_writer::tag('p', implode(' · ', $facts), ['class' => 'text-muted']);
-foreach ($warnings as $warning) {
-    echo $OUTPUT->notification($warning, 'warning', false);
-}
-// What the screen itself reports: files that fail, a manifest it cannot get.
-if (!empty($info['errors'])) {
-    echo html_writer::tag('h3', get_string('screen_errors', $c), ['class' => 'h6 mt-3']);
-    echo html_writer::alist(array_map('s', $info['errors']), ['class' => 'small text-muted']);
-}
-echo html_writer::tag('p', html_writer::link(
-    new moodle_url('/local/oksigeniahechauka/preview.php', ['screen' => $screen->id]),
-    get_string('preview', $c),
-    ['class' => 'btn btn-outline-primary']
-));
-$form->display();
+echo $OUTPUT->render_from_template('local_oksigeniahechauka/sheet', sheet::context($screen, time(), $errors));
 echo $OUTPUT->footer();

@@ -58,10 +58,37 @@
         });
         return out;
     };
-    const send = () => {
-        if (frame && frame.contentWindow) {
-            frame.contentWindow.postMessage({hkTheme: {vars: vars(), mode}}, location.origin);
+    // The preview stands on «a picture with Today»: the ticker (main colour), the label (second colour) and events of
+    // three stages, samples that only this preview shows.
+    const samples = () => {
+        const s = words.samples || {};
+        const items = (s.events || []).map((e, i) => ({id: 'sample-e' + i, type: 'event', zone: 'side', title: e.title,
+            detail: e.detail, start: words.today + 'T' + e.hour, color: e.color}));
+        if (s.ticker) {
+            items.push({id: 'sample-t', type: 'ticker', zone: 'ticker', text: s.ticker});
         }
+        return {item: {id: 'sample-n', type: 'notice', zone: 'side', title: (s.notice || {}).title || '',
+            body: (s.notice || {}).body || '', tone: 'normal'}, items, focus: 'main'};
+    };
+    const send = (override) => {
+        if (frame && frame.contentWindow) {
+            frame.contentWindow.postMessage({hkTheme: {vars: Object.assign(vars(), override || {}), mode}}, location.origin);
+        }
+    };
+    // Passing over a sample, its colour blinks on the screen: where it goes, at a glance.
+    let blinking = null;
+    const blink = (setting) => {
+        clearTimeout(blinking);
+        const name = names[setting];
+        let n = 0;
+        const step = () => {
+            send(n % 2 === 0 ? {[name]: '#ff2d95'} : null);
+            n++;
+            if (n < 5) {
+                blinking = setTimeout(step, 260);
+            }
+        };
+        step();
     };
 
     page.querySelectorAll('[data-colour]').forEach((input) => {
@@ -82,8 +109,14 @@
     });
     window.addEventListener('message', (ev) => {
         if (ev.origin === location.origin && ev.data && ev.data.hkPreviewReady && frame && ev.source === frame.contentWindow) {
+            frame.contentWindow.postMessage({hkDraft: samples()}, location.origin);
             send();
         }
+    });
+    page.querySelectorAll('.hkp-colour').forEach((tile) => {
+        const input = tile.querySelector('[data-colour]');
+        tile.addEventListener('mouseenter', () => blink(input.getAttribute('data-colour')));
+        input.addEventListener('focus', () => blink(input.getAttribute('data-colour')));
     });
     // A new logo, seen before it is saved.
     page.querySelectorAll('[data-logo]').forEach((input) => {

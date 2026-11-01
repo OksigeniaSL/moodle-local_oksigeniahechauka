@@ -1,0 +1,165 @@
+{{!
+    This file is part of Moodle - https://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_oksigeniahechauka/sheet
+
+    A screen's sheet: the screen on the left, as the preview draws it or as it really is, with its facts; on the right,
+    a card per topic. The save bar appears with the first change.
+
+    Example context (json):
+    {
+        "style": "", "id": 3, "name": "Biblioteca", "rawname": "Biblioteca", "back": "#", "backlabel": "Pantallas y grupos",
+        "backicon": "", "action": "#", "sesskey": "abc",
+        "card": {"state": "on", "label": "En marcha", "meta": "señal hace 1 min"},
+        "reload": "", "reloadicon": "", "clockicon": "", "moment": "Ahora · lunes 2, 10:45", "frame": "#",
+        "vertical": false, "shot": "", "shotwhen": "",
+        "facts": [{"term": "Señal", "value": "Hace 1 min"}],
+        "groups": [{"id": 1, "name": "Zonas comunes", "checked": true}], "hasgroups": true,
+        "always": false, "days": [{"n": 1, "letter": "L", "name": "lunes", "on": true}], "on": "07:30", "off": "18:30",
+        "bars": [{"letter": "L", "segments": [{"left": 31.25, "right": 22.92}]}],
+        "sentence": "Encendida de lunes a viernes, de 07:30 a 18:30.", "alerts": true, "sound": false,
+        "themes": [{"value": "site", "label": "Como el sitio", "checked": true}], "remove": "#",
+        "errors": {}, "haserrors": false, "strings": "{}"
+    }
+}}
+<div class="hkp" id="hkp-sheet-page"{{#style}} style="{{style}}"{{/style}} data-strings="{{strings}}">
+    <a class="hkp-back" href="{{back}}">{{{backicon}}}{{backlabel}}</a>
+    <header class="hkp-head">
+        <div class="hkp-head-title"><h1>{{name}}</h1>{{#card}}<p class="hkp-head-sub"><span class="hkp-state" data-state="{{state}}"><span class="hkp-state-word"><span class="hkp-dot" aria-hidden="true"></span>{{label}}</span>{{#meta}} <span class="hkp-meta">· {{meta}}</span>{{/meta}}</span></p>{{/card}}</div>
+        {{#reload}}<div class="hkp-head-actions"><a class="btn btn-outline-secondary" href="{{reload}}">{{{reloadicon}}}{{#str}}reload, local_oksigeniahechauka{{/str}}</a></div>{{/reload}}
+    </header>
+    {{#haserrors}}<div class="alert alert-danger" role="alert">{{#str}}compose_errors, local_oksigeniahechauka{{/str}}</div>{{/haserrors}}
+    <form method="post" action="{{action}}" id="hkp-sheet-form">
+        <input type="hidden" name="sesskey" value="{{sesskey}}">
+        <div class="hkp-sheet">
+            <section class="hkp-sheet-screen hkp-card" aria-label="{{#str}}sheet_screen, local_oksigeniahechauka{{/str}}">
+                <div class="hkp-preview-tools"><div class="hkp-seg" role="group" aria-label="{{#str}}sheet_see, local_oksigeniahechauka{{/str}}"><button type="button" aria-pressed="true" data-see="pv">{{#str}}preview, local_oksigeniahechauka{{/str}}</button><button type="button" aria-pressed="false" data-see="real">{{#str}}sheet_real, local_oksigeniahechauka{{/str}}</button></div><span class="hkp-clock">{{{clockicon}}}{{moment}}</span></div>
+                <div id="hkp-see-pv"><div class="hkp-stage"><span class="hkp-bezel{{#vertical}} is-v{{/vertical}}" data-state="on"><iframe id="hkp-spv" src="{{frame}}" title="{{#str}}preview_of, local_oksigeniahechauka, {{name}}{{/str}}"></iframe><span class="hkp-led" aria-hidden="true"></span></span></div></div>
+                <div id="hkp-see-real" hidden>
+                    {{#shot}}<div class="hkp-stage"><span class="hkp-bezel{{#vertical}} is-v{{/vertical}}" data-state="on" role="img" aria-label="{{#str}}picture_alt, local_oksigeniahechauka, {{name}}{{/str}}"><img src="{{shot}}" alt=""><span class="hkp-led" aria-hidden="true"></span></span></div><p class="hkp-hint">{{shotwhen}}</p>{{/shot}}
+                    {{^shot}}<p class="hkp-hint">{{#str}}sheet_noshot, local_oksigeniahechauka{{/str}}</p>{{/shot}}
+                </div>
+                <dl class="hkp-facts">{{#facts}}<div><dt>{{term}}</dt><dd>{{value}}</dd></div>{{/facts}}</dl>
+            </section>
+            <div class="hkp-sheet-settings">
+                <section class="hkp-card"><h2>{{#str}}sheet_namegroups, local_oksigeniahechauka{{/str}}</h2>
+                    <div class="hkp-field"><label class="form-label" for="hkp-sn">{{#str}}name, local_oksigeniahechauka{{/str}}</label><input class="form-control{{#errors.name}} is-invalid{{/errors.name}}" id="hkp-sn" name="name" value="{{rawname}}" maxlength="100" autocomplete="off" required>{{#errors.name}}<p class="hkp-hint"><b class="text-danger">{{errors.name}}</b></p>{{/errors.name}}</div>
+                    {{#hasgroups}}<div class="hkp-field"><span class="hkp-label">{{#str}}groups, local_oksigeniahechauka{{/str}}</span><div class="hkp-chips">{{#groups}}<label class="hkp-chip is-small"><input type="checkbox" name="groups[]" value="{{id}}"{{#checked}} checked{{/checked}}>{{name}}</label>{{/groups}}</div><p class="hkp-hint">{{#str}}sheet_groups_help, local_oksigeniahechauka{{/str}}</p></div>{{/hasgroups}}
+                </section>
+                <section class="hkp-card"><h2>{{#str}}power, local_oksigeniahechauka{{/str}}</h2>
+                    <div class="form-switch form-check"><input class="form-check-input" type="checkbox" role="switch" id="hkp-always" name="always" value="1"{{#always}} checked{{/always}}><label class="form-check-label" for="hkp-always"><b>{{#str}}sheet_always, local_oksigeniahechauka{{/str}}</b></label></div>
+                    <div id="hkp-power-hours"{{#always}} hidden{{/always}}>
+                        <div class="hkp-field"><span class="hkp-label" id="hkp-pd-l">{{#str}}compose_days, local_oksigeniahechauka{{/str}}</span><div class="hkp-days" role="group" aria-labelledby="hkp-pd-l">{{#days}}<button type="button" aria-pressed="{{#on}}true{{/on}}{{^on}}false{{/on}}" data-day="{{n}}" aria-label="{{name}}">{{letter}}</button>{{/days}}</div><div id="hkp-days-inputs">{{#days}}{{#on}}<input type="hidden" name="days[]" value="{{n}}">{{/on}}{{/days}}</div></div>
+                        <div class="hkp-time"><label for="hkp-on">{{#str}}compose_hour_from, local_oksigeniahechauka{{/str}}</label><input class="form-control" type="time" id="hkp-on" name="on" value="{{on}}"><label for="hkp-off">{{#str}}compose_hour_to, local_oksigeniahechauka{{/str}}</label><input class="form-control" type="time" id="hkp-off" name="off" value="{{off}}"></div>
+                        {{#errors.power}}<p class="hkp-hint"><b class="text-danger">{{errors.power}}</b></p>{{/errors.power}}
+                    </div>
+                    <div class="hkp-power" aria-hidden="true">{{#bars}}<b>{{letter}}</b><span>{{#segments}}<i style="left:{{left}}%;right:{{right}}%"></i>{{/segments}}</span>{{/bars}}<div class="hkp-power-scale"><span>0</span><span>6</span><span>12</span><span>18</span><span>24</span></div></div>
+                    <p class="hkp-hint" id="hkp-power-sentence" aria-live="polite">{{sentence}}</p>
+                </section>
+                <section class="hkp-card"><h2>{{#str}}sheet_ifdown, local_oksigeniahechauka{{/str}}</h2>
+                    <div class="form-switch form-check"><input class="form-check-input" type="checkbox" role="switch" id="hkp-al" name="alerts" value="1"{{#alerts}} checked{{/alerts}}><div><label class="form-check-label" for="hkp-al"><b>{{#str}}sheet_alerts, local_oksigeniahechauka{{/str}}</b></label><p class="hkp-hint">{{#str}}sheet_alerts_help, local_oksigeniahechauka{{/str}}</p></div></div>
+                </section>
+                <section class="hkp-card"><h2>{{#str}}sheet_sound_title, local_oksigeniahechauka{{/str}}</h2>
+                    <div class="form-switch form-check"><input class="form-check-input" type="checkbox" role="switch" id="hkp-snd" name="sound" value="1"{{#sound}} checked{{/sound}}><div><label class="form-check-label" for="hkp-snd"><b>{{#str}}sheet_sound, local_oksigeniahechauka{{/str}}</b></label><p class="hkp-hint">{{#str}}sheet_sound_help, local_oksigeniahechauka{{/str}}</p></div></div>
+                </section>
+                <section class="hkp-card"><h2>{{#str}}sheet_theme, local_oksigeniahechauka{{/str}}</h2><div class="hkp-chips" role="radiogroup" aria-label="{{#str}}sheet_theme, local_oksigeniahechauka{{/str}}">{{#themes}}<label class="hkp-chip is-small"><input type="radio" name="theme" value="{{value}}"{{#checked}} checked{{/checked}}>{{label}}</label>{{/themes}}</div></section>
+                <section class="hkp-card"><h2>{{#str}}sheet_device, local_oksigeniahechauka{{/str}}</h2><p>{{#str}}sheet_device_help, local_oksigeniahechauka, {{name}}{{/str}}</p></section>
+                <section class="hkp-card is-danger"><h2>{{#str}}sheet_remove, local_oksigeniahechauka{{/str}}</h2><p>{{#str}}sheet_remove_help, local_oksigeniahechauka{{/str}}</p><p><a class="btn btn-outline-danger" href="{{remove}}">{{#str}}sheet_remove_button, local_oksigeniahechauka, {{name}}{{/str}}</a></p></section>
+            </div>
+        </div>
+        <div class="hkp-savebar" id="hkp-savebar"{{^haserrors}} hidden{{/haserrors}} role="status"><p>{{#str}}sheet_unsaved, local_oksigeniahechauka{{/str}}</p><button type="submit" class="btn btn-primary">{{#str}}sheet_save, local_oksigeniahechauka{{/str}}</button><a class="btn btn-outline-secondary" href="{{action}}">{{#str}}sheet_undo, local_oksigeniahechauka{{/str}}</a></div>
+    </form>
+</div>
+{{#js}}
+(function() {
+    var page = document.getElementById('hkp-sheet-page');
+    if (!page) {
+        return;
+    }
+    var form = page.querySelector('#hkp-sheet-form');
+    var bar = page.querySelector('#hkp-savebar');
+    var words = JSON.parse(page.getAttribute('data-strings') || '{}');
+    var dirty = false;
+    var changed = function() {
+        dirty = true;
+        bar.hidden = false;
+        say();
+    };
+    var join = function(list) {
+        return list.length < 2 ? (list[0] || '') : list.slice(0, -1).join(', ') + ' ' + words.and + ' ' + list[list.length - 1];
+    };
+    var say = function() {
+        var node = page.querySelector('#hkp-power-sentence');
+        if (page.querySelector('#hkp-always').checked) {
+            node.textContent = words.always;
+            return;
+        }
+        var days = [];
+        page.querySelectorAll('[data-day][aria-pressed="true"]').forEach(function(b) {
+            days.push(Number(b.getAttribute('data-day')));
+        });
+        var said = days.length === 7 ? words.every : (days.join() === '1,2,3,4,5' ? words.weekdays :
+            words.some.replace('{$a}', join(days.map(function(d) {
+                return d > 5 ? words.plural[d - 6] : words.names[d - 1];
+            }))));
+        node.textContent = words.on.replace('{$a->days}', said).replace('{$a->from}', page.querySelector('#hkp-on').value)
+            .replace('{$a->to}', page.querySelector('#hkp-off').value) + ' ' + words.rest;
+    };
+    page.querySelectorAll('[data-see]').forEach(function(b) {
+        b.addEventListener('click', function() {
+            page.querySelectorAll('[data-see]').forEach(function(x) {
+                x.setAttribute('aria-pressed', x === b ? 'true' : 'false');
+            });
+            page.querySelector('#hkp-see-pv').hidden = b.getAttribute('data-see') !== 'pv';
+            page.querySelector('#hkp-see-real').hidden = b.getAttribute('data-see') === 'pv';
+        });
+    });
+    page.querySelectorAll('[data-day]').forEach(function(b) {
+        b.addEventListener('click', function() {
+            var on = b.getAttribute('aria-pressed') !== 'true';
+            if (!on && page.querySelectorAll('[data-day][aria-pressed="true"]').length === 1) {
+                return;
+            }
+            b.setAttribute('aria-pressed', on ? 'true' : 'false');
+            var box = page.querySelector('#hkp-days-inputs');
+            box.textContent = '';
+            page.querySelectorAll('[data-day][aria-pressed="true"]').forEach(function(x) {
+                var input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'days[]';
+                input.value = x.getAttribute('data-day');
+                box.appendChild(input);
+            });
+            changed();
+        });
+    });
+    page.querySelector('#hkp-always').addEventListener('change', function() {
+        page.querySelector('#hkp-power-hours').hidden = this.checked;
+    });
+    form.addEventListener('input', changed);
+    form.addEventListener('change', changed);
+    form.addEventListener('submit', function() {
+        dirty = false;
+    });
+    window.addEventListener('beforeunload', function(e) {
+        if (dirty) {
+            e.preventDefault();
+            e.returnValue = '';
+        }
+    });
+})();
+{{/js}}

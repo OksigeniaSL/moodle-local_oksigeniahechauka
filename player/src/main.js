@@ -319,11 +319,18 @@ class Player {
     /** The manifest with the draft in it: the item it changes out, the draft in. */
     withDraft() {
         const d = this.draft;
+        // Samples that go with it («Tu centro» shows each colour in its place), and the draft itself.
+        const extra = (d.items || []).concat([d.item]);
+        const ids = extra.map(function (it) {
+            return it.id;
+        });
         const items = (this.manifest.items || []).filter(function (it) {
-            return it.id !== d.replaces && it.id !== d.item.id;
+            return it.id !== d.replaces && ids.indexOf(it.id) < 0;
         });
         // First of its kind: the line of the ticker or the notice being written is the one to look at.
-        items.unshift(Object.assign({order: -1}, d.item));
+        extra.reverse().forEach(function (it) {
+            items.unshift(Object.assign({order: -1}, it));
+        });
         return Object.assign({}, this.manifest, {items});
     }
 
@@ -338,7 +345,7 @@ class Player {
             const today = this.todayOf(wall);
             const week = merged.template === 'full' ? null : this.weekOf(wall);
             const main = this.mainList(wall).filter(function (it) {
-                return it.id !== 'draft';
+                return it.id !== 'draft' && String(it.id).indexOf('sample') !== 0;
             });
             this.screen.show(draftChoice(this.draft.item, this.draft.focus || 'main', main, this.screen.horizontal), today,
                 week);

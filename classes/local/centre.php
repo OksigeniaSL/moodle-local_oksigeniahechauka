@@ -148,8 +148,27 @@ class centre {
             'icons' => ['search' => icons::svg('search'), 'pin' => icons::svg('pin'), 'out' => icons::svg('out'),
                 'check' => icons::svg('check')],
             'strings' => json_encode(['white' => get_string('centre_text_white', $c),
-                'dark' => get_string('centre_text_dark', $c)], JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP),
+                'dark' => get_string('centre_text_dark', $c), 'today' => schedule::day($now),
+                'samples' => self::samples()], JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP),
         ];
+    }
+
+    /**
+     * What the preview shows while the colours are chosen, so each one is seen in its place: a notice (the label in
+     * the second colour), three events of three stages, and a line of the ticker (the main colour). Only in this
+     * preview, never on a screen.
+     *
+     * @return array
+     */
+    protected static function samples(): array {
+        $c = self::C;
+        $out = ['notice' => ['title' => get_string('centre_sample_notice', $c), 'body' => get_string('centre_sample_body', $c)],
+            'ticker' => get_string('centre_sample_ticker', $c), 'events' => []];
+        foreach ([1 => '09:30', 2 => '10:30', 3 => '12:00'] as $stage => $hour) {
+            $out['events'][] = ['title' => get_string('centre_sample_event' . $stage, $c), 'detail' => get_string('stage_' . $stage,
+                $c), 'hour' => $hour, 'color' => $stage];
+        }
+        return $out;
     }
 
     /**
