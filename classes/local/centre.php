@@ -204,7 +204,9 @@ class centre {
         $cats = categories::all();
         $hours = ['09:00', '10:00', '11:00', '12:00', '13:00', '16:00'];
         foreach ($cats ?: [null] as $i => $cat) {
-            $out['events'][] = ['title' => get_string('centre_sample_title' . ($i + 1), $c), 'detail' => $cat ? $cat['name'] : '',
+            $titles = ['centre_sample_title1', 'centre_sample_title2', 'centre_sample_title3', 'centre_sample_title4',
+                'centre_sample_title5', 'centre_sample_title6'];
+            $out['events'][] = ['title' => get_string($titles[$i], $c), 'detail' => $cat ? $cat['name'] : '',
                 'hour' => $hours[$i], 'color' => $cat ? $i + 1 : 0];
         }
         return $out;
