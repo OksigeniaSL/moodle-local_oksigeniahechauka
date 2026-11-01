@@ -441,3 +441,19 @@ dialog.hkp-dialog > footer {
         margin-top: 1rem;
     }
 }
+
+/* «Tu centro»: when the day ends, a time beside its words. */
+.hkp-day {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .5rem .75rem;
+}
+
+.hkp-day .form-label {
+    margin: 0;
+}
+
+.hkp .hkp-day .form-control {
+    inline-size: auto;
+}

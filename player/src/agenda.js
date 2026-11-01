@@ -118,9 +118,11 @@ export function dayLabel(date, today, s) {
  * @param {string} today «YYYY-MM-DD»
  * @param {number} days how many days ahead
  * @param {object} s labels and day names
+ * @param {number} [skip] days left out after today (1 at the end of the day, when «Today» shows tomorrow)
  */
-export function upcoming(events, today, days, s) {
-    const first = dayNumber(today) + 1;
+export function upcoming(events, today, days, s, skip) {
+    // At the end of the day tomorrow is «Today»'s own: the coming days start after it.
+    const first = dayNumber(today) + 1 + (skip || 0);
     const last = dayNumber(today) + days;
     const list = events.filter(function (ev) {
         const n = dayNumber(dateOf(ev.start));
@@ -169,4 +171,61 @@ export function countdown(events, today, max, categories) {
         }
     });
     return best;
+}
+
+/**
+ * Whether the day is over for the screens: from the hour the centre sets («dayend», «HH:MM»), «Today» shows tomorrow.
+ *
+ * @param {{min: number}} wall
+ * @param {string} dayend
+ * @returns {boolean}
+ */
+export function afterDayEnd(wall, dayend) {
+    if (!/^\d{1,2}:\d{2}$/.test(String(dayend || ''))) {
+        return false;
+    }
+    const parts = dayend.split(':');
+    return wall.min >= parseInt(parts[0], 10) * 60 + parseInt(parts[1], 10);
+}
+
+/**
+ * Whether an event takes place on a day: from the day it starts to the day it ends (an end at midnight is the day
+ * before's).
+ *
+ * @param {object} ev
+ * @param {number} day a day number
+ * @returns {boolean}
+ */
+function onDay(ev, day) {
+    const first = dayNumber(dateOf(ev.start));
+    let last = ev.end ? dayNumber(dateOf(ev.end)) : first;
+    if (last > first && String(ev.end).slice(11, 16) === '00:00') {
+        last--;
+    }
+    return first <= day && day <= Math.max(first, last);
+}
+
+/**
+ * The events of one day as «Today» lists them (today's, or tomorrow's at the end of the day): those that take place
+ * that day, by their own dates, not by the days they are shown; each with its hour (a dot when it lasts all day or
+ * began before), its title split and its colour.
+ *
+ * @param {object[]} events items of type event
+ * @param {string} today «YYYY-MM-DD»
+ * @param {number} ahead days after today (0 for today)
+ * @param {Array} categories
+ * @returns {object[]}
+ */
+export function eventsOn(events, today, ahead, categories) {
+    const day = dayNumber(today) + ahead;
+    return events.filter(function (ev) {
+        return ev.start && onDay(ev, day);
+    }).sort(function (a, b) {
+        return a.start < b.start ? -1 : (a.start > b.start ? 1 : 0);
+    }).map(function (ev) {
+        const parts = splitTitle(ev.title);
+        const timed = !ev.allday && ev.start.length >= 16 && dayNumber(dateOf(ev.start)) === day;
+        return {time: timed ? ev.start.slice(11, 16) : '·', title: parts.title, group: parts.group || ev.detail || '',
+            color: colourOf(ev, parts.group || ev.detail, categories)};
+    });
 }

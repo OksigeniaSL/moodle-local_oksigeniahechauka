@@ -2,7 +2,7 @@
 
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {categoryOf, colourOf} from '../src/agenda.js';
+import {afterDayEnd, categoryOf, colourOf, eventsOn, upcoming} from '../src/agenda.js';
 import {weekOf} from '../src/week.js';
 
 const L = {
@@ -105,3 +105,35 @@ test('an event made in the panel takes its group, and its stage, from its «who 
     assert.deepEqual([w.days[0].events[0].group, w.days[0].events[0].color], ['3.º y 4.º de Primaria', 2]);
 });
 
+test('at the end of the day «Today» shows tomorrow, and the coming days start after it', () => {
+    const wall = (hm) => ({date: '2026-11-03', min: parseInt(hm.slice(0, 2), 10) * 60 + parseInt(hm.slice(3), 10)});
+    assert.equal(afterDayEnd(wall('15:59'), '16:00'), false);
+    assert.equal(afterDayEnd(wall('16:00'), '16:00'), true);
+    assert.equal(afterDayEnd(wall('21:30'), '21:00'), true);
+    assert.equal(afterDayEnd(wall('23:00'), ''), false);
+    assert.equal(afterDayEnd(wall('23:00'), undefined), false);
+    const events = [
+        {id: 'a', title: 'Claustro', start: '2026-11-03T17:00'},
+        {id: 'b', title: '4º Pri - Teatro', start: '2026-11-04T10:30'},
+        {id: 'c', title: 'Inglés - Club de conversación', start: '2026-11-04T09:00'},
+        {id: 'd', title: 'Puertas abiertas', start: '2026-11-04', allday: true},
+        {id: 'e', title: 'Feria', start: '2026-11-05T12:00'},
+    ];
+    const tomorrow = eventsOn(events, '2026-11-03', 1, L.categories);
+    assert.deepEqual(tomorrow.map((e) => e.time + ' ' + e.title), ['· Puertas abiertas', '09:00 Club de conversación',
+        '10:30 Teatro']);
+    assert.equal(tomorrow[2].color, 2);
+    const s = {tomorrow: 'Mañana', days_short: L.days_short, months_short: L.months_short, categories: L.categories};
+    assert.deepEqual(upcoming(events, '2026-11-03', 7, s).map((e) => e.id), ['d', 'c', 'b', 'e']);
+    assert.deepEqual(upcoming(events, '2026-11-03', 7, s, 1).map((e) => e.id), ['e']);
+    assert.equal(upcoming(events, '2026-11-03', 7, s, 1)[0].day, 'jue 5');
+    // Today's list goes by the event's own day, not by the days it is shown: the feria is not «today» on the 3rd.
+    assert.deepEqual(eventsOn(events, '2026-11-03', 0, L.categories).map((e) => e.title), ['Claustro']);
+    // A camp of three days is on each of them, with its hour only on the first; ending at midnight, not the next day.
+    const camp = [{title: '3º ESO - Acampada', start: '2026-11-04T09:00', end: '2026-11-06T17:00'},
+        {title: 'Fiesta', start: '2026-11-04T20:00', end: '2026-11-05T00:00'}];
+    assert.deepEqual(eventsOn(camp, '2026-11-03', 1, L.categories).map((e) => e.time + ' ' + e.title),
+        ['09:00 Acampada', '20:00 Fiesta']);
+    assert.deepEqual(eventsOn(camp, '2026-11-03', 2, L.categories).map((e) => e.time + ' ' + e.title), ['· Acampada']);
+    assert.deepEqual(eventsOn(camp, '2026-11-03', 4, L.categories), []);
+});

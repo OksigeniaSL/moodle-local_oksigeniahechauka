@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.7.0 (in progress)
+
+- **«Tomorrow» at the end of the day:** each centre sets in «Tu centro» when its day ends (16:00 by default; a
+  university with evening classes, at night). From then until midnight «Today» shows tomorrow's events under
+  «Tomorrow», the coming days start after it, and the menu switches at the same hour. New field `dayend` in the
+  manifest.
+- «Today» lists the events that take place today by their own dates: an event shown days before its day stays in the
+  coming days, and one of several days is on each of them.
+
 ## 0.6.3 (2026-11-01)
 
 - «Pantallas y grupos» balanced on wide screens: the screens and the groups on the left, the permissions in a column of

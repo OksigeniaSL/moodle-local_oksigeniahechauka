@@ -176,6 +176,7 @@ class centre {
             'palette' => json_encode(categories::PALETTE),
             'max' => categories::MAX,
             'logos' => $logos,
+            'dayend' => sources::day_end(),
             'frame' => (new \moodle_url('/local/oksigeniahechauka/preview.php', ['frame' => 1, 'screen' => $first]))->out(false),
             'placename' => $place['name'] ?? '',
             'admin' => has_capability('moodle/site:config', \context_system::instance()) ?
@@ -225,6 +226,11 @@ class centre {
             if (colours::valid($value)) {
                 set_config($setting, strtolower($value), $c);
             }
+        }
+        // When the day ends: from then «Today» shows tomorrow.
+        $dayend = optional_param('dayend', '', PARAM_RAW_TRIMMED);
+        if (preg_match('/^([01]\d|2[0-3]):[0-5]\d$/', $dayend)) {
+            set_config('dayend', $dayend, $c);
         }
         // The categories as they came, in their order (one without a name is taken out); then, if asked, the top
         // course categories of the site not linked yet.

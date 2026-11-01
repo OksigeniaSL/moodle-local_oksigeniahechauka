@@ -53,6 +53,7 @@ class manifest {
             'etag' => '',
             'generated' => $now,
             'horizon' => schedule::day($now, self::HORIZON),
+            'dayend' => sources::day_end(),
             'screen' => [
                 'id' => (int) $screen->id,
                 'name' => items::plain((string) $screen->name),

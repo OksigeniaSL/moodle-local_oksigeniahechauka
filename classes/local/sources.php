@@ -29,7 +29,19 @@ namespace local_oksigeniahechauka\local;
  */
 class sources {
     /** After this hour the screens show tomorrow's menu, as the canteen's own board does. */
-    const MENU_SWITCH = '16:00';
+    /** @var string When the day ends for the screens if the centre has not said (then «Today» shows tomorrow). */
+    const DAY_END = '16:00';
+
+    /**
+     * When the day ends for the screens: from then «Today» shows tomorrow (its menu and its events). Each centre sets it
+     * in «Tu centro»: a school at four, a university with evening classes at nine.
+     *
+     * @return string «HH:MM»
+     */
+    public static function day_end(): string {
+        $value = (string) get_config('local_oksigeniahechauka', 'dayend');
+        return preg_match('/^([01]\d|2[0-3]):[0-5]\d$/', $value) ? $value : self::DAY_END;
+    }
 
     /**
      * Whether Oksigenia Meals is on the site.
@@ -41,7 +53,7 @@ class sources {
     }
 
     /**
-     * The menus of the coming days, from Oksigenia Meals: each day's menu until the afternoon, then tomorrow's.
+     * The menus of the coming days, from Oksigenia Meals: each day's menu until the day ends, then tomorrow's.
      *
      * @param int $now
      * @param int $days how many days ahead
@@ -53,6 +65,7 @@ class sources {
             return [];
         }
         $items = [];
+        $switch = self::day_end();
         $label = get_string('label_menu', 'local_oksigeniahechauka');
         $tomorrow = get_string('label_menu_tomorrow', 'local_oksigeniahechauka');
         for ($i = 0; $i <= $days; $i++) {
@@ -63,14 +76,14 @@ class sources {
                 $items[] = $menu + [
                     'id' => 'menu-' . $day,
                     'label' => $label,
-                    'when' => ['from' => $day, 'until' => $day, 'times' => [['00:00', self::MENU_SWITCH]]],
+                    'when' => ['from' => $day, 'until' => $day, 'times' => [['00:00', $switch]]],
                 ];
                 if ($i > 0) {
                     $before = schedule::day($now, $i - 1);
                     $items[] = $menu + [
                         'id' => 'menu-' . $day . '-eve',
                         'label' => $tomorrow,
-                        'when' => ['from' => $before, 'until' => $before, 'times' => [[self::MENU_SWITCH, '00:00']]],
+                        'when' => ['from' => $before, 'until' => $before, 'times' => [[$switch, '00:00']]],
                     ];
                 }
             }

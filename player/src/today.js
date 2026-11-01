@@ -153,7 +153,7 @@ export function buildToday(data, labels, moment, horizontal, sky) {
             data.notices, notice));
     }
     if (data.events.length) {
-        col2.push(listBlock('hk-bloque-eventos', labels.events, 'marca-3', 'marca-3-oscuro', data.events, todayEvent));
+        col2.push(listBlock('hk-bloque-eventos', data.eventsLabel || labels.events, 'marca-3', 'marca-3-oscuro', data.events, todayEvent));
     }
     if (moment && data.weather && sky) {
         if (horizontal) {

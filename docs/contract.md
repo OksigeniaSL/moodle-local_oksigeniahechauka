@@ -99,6 +99,7 @@ changed, or the manifest with its `ETag` header:
   "etag": "9f2c…",
   "generated": 1793520000,
   "horizon": "2026-11-16",
+  "dayend": "16:00",
   "screen": {
     "id": 7, "name": "Library", "width": 1920, "height": 1080,
     "timezone": "Atlantic/Canary", "lang": "es", "sound": false
@@ -128,6 +129,8 @@ changed, or the manifest with its `ETag` header:
 - `horizon`: the last day the manifest has data for. The server sends what is due from today to the horizon (two
   weeks is a good default), so a screen without a network keeps going. After the horizon the player keeps showing what
   it has and reports itself as stale.
+- `dayend`: when the day ends for the centre («HH:MM»). From then until midnight, «Today» shows tomorrow's events under
+  «Tomorrow» and the coming days start after it; the server sends tomorrow's menu from the same hour.
 - `screen.sound`: whether its videos play with their sound (most screens are muted: behind glass, or in a room that
   would hear the same thing forty times an hour).
 - `screen.timezone`: the time zone the screen should be in. The player reports its own offset in the heartbeat, so

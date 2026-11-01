@@ -8,7 +8,7 @@ import {makeApi} from './api.js';
 import {realClock, simulatedClock} from './clock.js';
 import {MediaStore, mediaOf} from './media.js';
 import {pair} from './pairing.js';
-import {colourOf, countdown, dayLabel, splitTitle, upcoming} from './agenda.js';
+import {afterDayEnd, countdown, dayLabel, eventsOn, upcoming} from './agenda.js';
 import {Composer, draftChoice} from './compose.js';
 import {dayNumber, isDark, isLive, isPowerOn, liveItems, urgentOf, weekdayOf} from './rules.js';
 import {Screen} from './render.js';
@@ -235,7 +235,10 @@ class Player {
         return pages.length ? pages[this.menuTurn % pages.length] : null;
     }
 
-    /** What «Today» has now: the menu, the notices, today's events, the coming days and the weather. */
+    /**
+     * What «Today» has now: the menu, the notices, today's events, the coming days and the weather. From the hour the
+     * day ends for the centre, tomorrow's events instead, under «Tomorrow» (the menu switches on the server).
+     */
     todayOf(wall) {
         const items = this.manifest.items || [];
         const side = items.filter(function (it) {
@@ -243,9 +246,6 @@ class Player {
         });
         const byOrder = function (a, b) {
             return (a.order || 0) - (b.order || 0);
-        };
-        const byStart = function (a, b) {
-            return (a.start || '') < (b.start || '') ? -1 : (a.start || '') > (b.start || '') ? 1 : 0;
         };
         const notices = side.filter(function (it) {
             return it.type === 'notice';
@@ -256,19 +256,17 @@ class Player {
             return {title: n.title || '', body: n.body || '', tone: n.tone || 'normal'};
         });
         const cats = this.manifest.categories || [];
-        const events = side.filter(function (it) {
-            return it.type === 'event';
-        }).sort(byStart).map(function (ev) {
-            const parts = splitTitle(ev.title);
-            return {time: ev.allday || !ev.start ? '·' : ev.start.slice(11, 16), title: parts.title,
-                group: parts.group || ev.detail || '', color: colourOf(ev, parts.group || ev.detail, cats)};
-        });
-        const menu = this.menuOf(side.filter(function (it) {
-            return it.type === 'menu';
-        }).sort(byOrder));
         const all = items.filter(function (it) {
             return it.type === 'event';
         });
+        const over = afterDayEnd(wall, this.manifest.dayend);
+        // Today's: those shown now that take place today (one shown days before is in the coming days, not here).
+        const events = over ? eventsOn(all, wall.date, 1, cats) : eventsOn(side.filter(function (it) {
+            return it.type === 'event';
+        }), wall.date, 0, cats);
+        const menu = this.menuOf(side.filter(function (it) {
+            return it.type === 'menu';
+        }).sort(byOrder));
         const labels = this.manifest.labels || {};
         const names = {tomorrow: labels.tomorrow || this.strings.tomorrow, days_short: this.strings.days_short,
             months_short: this.strings.months_short, categories: cats};
@@ -283,8 +281,9 @@ class Player {
             // The event of the countdown is not repeated among the coming days.
             upcoming: upcoming(all.filter(function (ev) {
                 return !big || ev.id !== big.id;
-            }), wall.date, COMING_DAYS, names),
+            }), wall.date, COMING_DAYS, names, over ? 1 : 0),
             countdown: big,
+            eventsLabel: over ? names.tomorrow : '',
             weather: this.manifest.weather || null,
         };
     }

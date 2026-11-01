@@ -28,7 +28,7 @@
         "query": "", "searched": false, "results": [], "hasresults": false, "resultsjson": "[]", "place": null,
         "tiles": [{"setting": "colourprimary", "value": "#1f5f8b", "name": "Principal", "use": "la cinta", "hex": "#1F5F8B", "on": "letra blanca"}],
         "defaults": true, "categories": [], "hascategories": false, "canadd": true, "canimport": false, "palette": "[]", "max": 6,
-        "logos": [{"area": "logo", "dark": false, "label": "Para fondo claro", "url": "", "alt": "Logotipo"}],
+        "logos": [{"area": "logo", "dark": false, "label": "Para fondo claro", "url": "", "alt": "Logotipo"}], "dayend": "16:00",
         "frame": "https://example.com/local/oksigeniahechauka/preview.php?frame=1", "placename": "", "admin": "",
         "icons": {"search": "", "pin": "", "out": "", "check": "", "link": "", "x": "", "plus": ""}, "strings": "{}"
     }
@@ -72,6 +72,11 @@
             </section>
             <form method="post" action="{{action}}" enctype="multipart/form-data" id="hkp-centre-form" class="hkp-centre-form">
                 <input type="hidden" name="sesskey" value="{{sesskey}}">
+                <section class="hkp-fs" aria-labelledby="hkp-day-h">
+                    <h2 id="hkp-day-h" class="hkp-label hkp-section-label">{{#str}}centre_day, local_oksigeniahechauka{{/str}}</h2>
+                    <div class="hkp-day"><label class="form-label" for="hkp-dayend">{{#str}}centre_dayend, local_oksigeniahechauka{{/str}}</label><input type="time" class="form-control" id="hkp-dayend" name="dayend" value="{{dayend}}" required></div>
+                    <p class="hkp-hint">{{#str}}centre_dayend_help, local_oksigeniahechauka{{/str}}</p>
+                </section>
                 <section class="hkp-fs" aria-labelledby="hkp-col-h">
                     <h2 id="hkp-col-h" class="hkp-label hkp-section-label">{{#str}}centre_colours, local_oksigeniahechauka{{/str}}</h2>
                     <p class="hkp-hint hkp-section-hint">{{#str}}centre_colours_help, local_oksigeniahechauka{{/str}}{{#defaults}} <b>{{#str}}centre_colours_defaults, local_oksigeniahechauka{{/str}}</b>{{/defaults}}</p>
