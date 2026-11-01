@@ -12,6 +12,8 @@
 - The events come a month ahead (for the agenda that scrolls, into the next month), and the weather the next three
   days.
 - A first look for the showcase and the weather in a third (`player/usos.css`), until the art direction's design.
+- **Headlines in two even lines**: a caption, a showcase's headline or a notice that takes two lines is cut where both
+  come out most alike (measured in the player: Chromium 56 has no `text-wrap: balance`); its box keeps its width.
 
 - **«Tomorrow» at the end of the day:** each centre sets in «Tu centro» when its day ends (16:00 by default; a
   university with evening classes, at night). From then until midnight «Today» shows tomorrow's events under

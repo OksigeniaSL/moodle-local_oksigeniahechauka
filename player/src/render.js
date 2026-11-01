@@ -6,6 +6,7 @@
 import {shapeOf} from './compose.js';
 import {buildToday, buildWeatherThird, fitToday, turnPages} from './today.js';
 import {qrPath, shortWeb} from './qr.js';
+import {balanceIn} from './balance.js';
 import {buildWeek, fitWeek} from './weekview.js';
 
 const CAPTION_MS = 2800;
@@ -498,6 +499,7 @@ export class Screen {
         if (this.weather) {
             this.full.appendChild(el('p', 'hk-credito-tiempo', this.credit.textContent));
         }
+        balanceIn(this.full);
         if (d.hkVideo) {
             d.hkTimer = setTimeout(function () {
                 if (pie) {
@@ -541,7 +543,8 @@ export class Screen {
             path.setAttribute('d', q.d);
             svg.appendChild(path);
             box.appendChild(svg);
-            box.appendChild(el('p', 'hk-qr-web', shortWeb(item.web)));
+            // A long address goes on after a slash, never in the middle of a word.
+            box.appendChild(el('p', 'hk-qr-web', shortWeb(item.web).replace(/\//g, '/\u200B')));
             this.full.appendChild(box);
         }
     }
@@ -582,6 +585,7 @@ export class Screen {
                 const olds = slot.querySelectorAll('.hk-diapo');
                 const fresh = this.slide(items[i]);
                 slot.appendChild(fresh);
+                balanceIn(fresh);
                 void slot.offsetWidth;
                 fresh.classList.add('hk-visible');
                 this.startVideo(fresh);
@@ -611,6 +615,7 @@ export class Screen {
             fitWeek(layer.hkWeek, this.horizontal);
         }
         layer.hkPaging = turnPages(fitToday(layer.hkToday));
+        balanceIn(layer);
         // Measured while the screens' letters were still arriving: once they are here (wider, as a rule), «Today» and
         // the week are measured again, so no title ends up in three lines.
         if (document.fonts && document.fonts.status === 'loading') {
@@ -623,6 +628,7 @@ export class Screen {
                     if (layer.hkWeek) {
                         fitWeek(layer.hkWeek, self.horizontal);
                     }
+                    balanceIn(layer);
                 }
             });
         }
@@ -677,6 +683,7 @@ export class Screen {
         }
         layer.hkToday = aside;
         layer.hkPaging = turnPages(fitToday(aside));
+        balanceIn(aside);
     }
 
     // --- The ticker -------------------------------------------------------------------------------------------------

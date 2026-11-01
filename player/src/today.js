@@ -4,6 +4,8 @@
 // turn pages. The coming days only take what is left. From the compositions of the art direction (Gaudí, 31 October
 // 2026, «ajustarHoy»).
 
+import {balanceIn} from './balance.js';
+
 const MAX_SCALE = 7;
 const PAGE_SECONDS = 12;
 
@@ -455,6 +457,7 @@ export function turnPages(blocks) {
     return setInterval(function () {
         each(blocks, function (b) {
             showPage(b, (b.hkPage + 1) % b.hkPages);
+            balanceIn(b);
         });
     }, PAGE_SECONDS * 1000);
 }
