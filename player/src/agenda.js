@@ -59,16 +59,17 @@ export function categoryOf(text, categories) {
 }
 
 /**
- * The colour of an event: the category chosen for it, or the one its words mark, or 0 (a neutral grey).
+ * The colour of an event: the category chosen for it; else the one the words of its group or «for whom» mark; else the
+ * one the words of its whole title mark; else 0 (a neutral grey).
  *
  * @param {object} ev
- * @param {string} text
+ * @param {string} text the group of its title, or its «for whom»
  * @param {Array} categories
  * @returns {number}
  */
 export function colourOf(ev, text, categories) {
     const n = Number(ev && ev.color) || 0;
-    return n >= 1 && n <= 6 ? n : categoryOf(text, categories);
+    return n >= 1 && n <= 6 ? n : (categoryOf(text, categories) || categoryOf(ev && ev.title, categories));
 }
 
 /** «3º ESO - Acampada» reads as «Acampada» with «3º ESO» under it; a title without « - » stays whole. */

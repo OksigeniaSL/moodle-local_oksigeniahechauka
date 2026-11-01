@@ -43,6 +43,9 @@ test('the category of an event, by the words each centre gives its categories', 
     // A category chosen for the event wins over its words.
     assert.equal(colourOf({color: 2}, '3º ESO', school), 2);
     assert.equal(colourOf({}, '3º ESO', school), 3);
+    // Nothing in its group: its whole title.
+    assert.equal(colourOf({title: 'Teatro en inglés'}, '', [{n: 4, words: ['inglés']}]), 4);
+    assert.equal(colourOf({title: 'Teatro'}, '', [{n: 4, words: ['inglés']}]), 0);
 });
 
 test('five school days from today; from a Thursday it goes on after the weekend', () => {

@@ -284,7 +284,8 @@ class categories {
             if (!array_key_exists($ev->itemid, $agendas)) {
                 continue;
             }
-            $add($agendas[$ev->itemid] ?: self::of_text($group($ev->title, (string) $ev->detail), $all));
+            $add($agendas[$ev->itemid] ?: (self::of_text($group($ev->title, (string) $ev->detail), $all) ?:
+                self::of_text($ev->title, $all)));
         }
         foreach (
             $DB->get_records_select(
@@ -297,7 +298,7 @@ class categories {
             ) as $ev
         ) {
             $add($ev->eventtype === 'category' ? self::of_coursecat((int) $ev->categoryid) :
-                self::of_text($group((string) $ev->name, (string) $ev->location), $all));
+                (self::of_text($group((string) $ev->name, (string) $ev->location), $all) ?: self::of_text($ev->name, $all)));
         }
         foreach ($DB->get_records('local_oksigeniahechauka_item', ['type' => 'event', 'visible' => 1]) as $item) {
             $data = items::data($item);
@@ -305,10 +306,8 @@ class categories {
             if ($start < $from || $start >= $until) {
                 continue;
             }
-            $add(self::resolve($data['category'] ?? ($data['color'] ?? 0)) ?: self::of_text($group(
-                $item->title,
-                (string) $item->body
-            ), $all));
+            $words = self::of_text($group($item->title, (string) $item->body), $all) ?: self::of_text($item->title, $all);
+            $add(self::resolve($data['category'] ?? ($data['color'] ?? 0)) ?: $words);
         }
         return $counts;
     }
