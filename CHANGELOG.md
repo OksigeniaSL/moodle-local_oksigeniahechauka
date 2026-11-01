@@ -1,7 +1,10 @@
 # Changelog
 
-## Unreleased
+## 0.7.5 (2026-11-01)
 
+- **The bee**, the second character of the surprises: it comes from afar, hits the glass of the screen, is left dazed and,
+  before leaving, puffs out its cheeks or starts to dance. What flies goes by the steps its atlas gives for each frame, at a
+  height of its own, with no shadow.
 - The full preview is a page of the panel, with its tabs to go back: it was left in the site's administration, with no way
   back to the panel.
 - In «Tu centro», «Verlo en la vista previa» instead of «Verlo en la pantalla»: it plays in the preview, not on the real

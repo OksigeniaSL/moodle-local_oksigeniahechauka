@@ -32,7 +32,7 @@ class surprises {
     const EVERY = [20, 60, 180];
 
     /** @var string[] Who there is: each has its folder in player/sorpresas. */
-    const CHARACTERS = ['gusanito'];
+    const CHARACTERS = ['gusanito', 'abeja'];
 
     /**
      * How often, as the centre has it.

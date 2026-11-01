@@ -4,9 +4,9 @@
 //
 // A sheet is the art direction's (kit/hechauka-sorpresas): pages of frames and an atlas that says everything. Nothing
 // here repaints: a frame with `overflow: hidden` holds each page as an <img> on its layer, and each step changes only
-// `transform` (and the shadow's `opacity`), never `background-position`. The position goes forward with the frame
-// (speed / fps px at each change), never on a clock of its own: the sheet is drawn in the frame that moves at `speed`, so
-// what is planted stays planted only if both change together.
+// `transform` (and the shadow's `opacity`), never `background-position`. The position goes forward with the frame (speed /
+// fps px at each change or, in what flies, the state's `avance`: a [dx, dy] per frame), never on a clock of its own: the sheet
+// is drawn in the frame that moves that way, so what is planted stays planted only if both change together.
 
 const LEAST_MINUTES = 15;
 // An order waits this long for the manifest that says who comes out: it may have been given right after turning them on.
@@ -72,6 +72,24 @@ export function walkOf(meta, width, scale, random) {
 }
 
 /**
+ * The height its anchor goes at. What walks, on the ticker if it is in sight and if not on the bottom edge; what flies has no
+ * floor: anywhere within the heights its atlas says (`altura`, at base 1080), on any shape of screen.
+ *
+ * @param {object} meta the atlas's
+ * @param {number} height of the screen
+ * @param {number} scale
+ * @param {number|null} ticker where the ticker starts, if it is in sight
+ * @param {function(): number} random from 0 to 1
+ * @returns {number}
+ */
+export function heightOf(meta, height, scale, ticker, random) {
+    if (meta.altura) {
+        return (meta.altura[0] + random() * (meta.altura[1] - meta.altura[0])) * height / STEP_BASE;
+    }
+    return ticker === null ? height - EDGE * scale : ticker;
+}
+
+/**
  * Which pages a walk needs: fewer than all of them, with one gesture.
  *
  * @param {object} atlas
@@ -121,7 +139,12 @@ class Walk {
             this.images[p] = img;
             box.appendChild(img);
         });
-        this.root.appendChild(this.shadow);
+        // What goes on a glass has none.
+        if (Object.keys(m.estados).some(function (k) {
+            return !!m.estados[k].sombra;
+        })) {
+            this.root.appendChild(this.shadow);
+        }
         this.root.appendChild(box);
         layer.appendChild(this.root);
     }
@@ -169,25 +192,29 @@ class Walk {
             this.page = page;
         }
         this.images[page].style.transform = 'translate3d(' + (-f.frame.x) + 'px,' + (-f.frame.y) + 'px,0)';
-        const s = m.estados[state].sombra[i];
-        this.shadow.style.transform = 'translate3d(' + (s[0] - s[1] * 0.56) + 'px,0,0) scaleX(' + (s[1] * 1.12 / 100) + ')';
-        this.shadow.style.opacity = s[2];
+        const shadow = m.estados[state].sombra;
+        if (shadow) {
+            const s = shadow[i];
+            this.shadow.style.transform = 'translate3d(' + (s[0] - s[1] * 0.56) + 'px,0,0) scaleX(' + (s[1] * 1.12 / 100) + ')';
+            this.shadow.style.opacity = s[2];
+        }
         this.root.style.transform = 'translate3d(' + (x - m.anchor.x) + 'px,' + (y - m.anchor.y) + 'px,0) scale(' +
             (mirrored ? -scale : scale) + ',' + scale + ')';
     }
 
     /**
      * @param {{dir: number, from: number, turns: number, exit: number}} plan
-     * @param {number} floor the height it walks on
+     * @param {number} height the height its anchor starts at
      * @param {number} scale
      * @param {string} gesture
      * @param {function(): void} done
      */
-    run(plan, floor, scale, gesture, done) {
+    run(plan, height, scale, gesture, done) {
         const m = this.atlas.meta;
         const steps = [{state: 'cruza', times: plan.turns}, {state: 'para', times: 1}, {state: gesture, times: 1},
             {state: 'huye', times: 0}];
         let x = plan.from;
+        let y = height;
         let step = 0;
         let time = 0;
         let i = 0;
@@ -196,9 +223,14 @@ class Walk {
         const frame = () => {
             const now = steps[step];
             const st = m.estados[now.state];
-            this.draw(now.state, i, x, floor, scale, plan.dir < 0);
+            this.draw(now.state, i, x, y, scale, plan.dir < 0);
             due += 1000 / st.fps;
-            x += plan.dir * (st.speed || 0) * scale / st.fps;
+            if (st.avance) {
+                x += plan.dir * st.avance[i][0] * scale;
+                y += st.avance[i][1] * scale;
+            } else {
+                x += plan.dir * (st.speed || 0) * scale / st.fps;
+            }
             i++;
             if (i >= st.frames) {
                 i = 0;
@@ -348,9 +380,8 @@ export class Surprises {
                 }
                 this.walk = walk;
                 const scale = scaleOf(window.innerWidth, window.innerHeight, this.distance);
-                const floor = this.hooks.floor();
                 walk.run(walkOf(atlas.meta, window.innerWidth, scale, Math.random),
-                    floor === null ? window.innerHeight - EDGE * scale : floor, scale, gesture, () => {
+                    heightOf(atlas.meta, window.innerHeight, scale, this.hooks.floor(), Math.random), scale, gesture, () => {
                         this.stop();
                     });
             }, function (e) {

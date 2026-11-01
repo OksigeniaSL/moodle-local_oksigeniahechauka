@@ -143,7 +143,8 @@ changed, or the manifest with its `ETag` header:
 - `surprises`: now and then a character crosses the screen on a layer of its own, over whatever is there. Absent: none.
   `every`: about how many minutes between one and the next (the player varies it, and never less than 15).
   `characters`: `[{"id": "gusanito", "atlas": "https://…/spr.gusanito.atlas.json"}]`, one of them each time. The atlas
-  says its pages (beside it), states, frames per second, speed and shadow. Only an urgent notice takes it off; a screen
+  says its pages (beside it), states, frames per second, speed and shadow; what flies, a step per frame (`avance`), the
+  heights it goes at (`altura`) and no shadow. Only an urgent notice takes it off; a screen
   that is off or keeps still has none. The player keeps its files like the rest of the page, so they also come out
   without a network.
 - `screen.glass`: true behind glass: everything a bit bigger, and no secondary grey in what has to be read.

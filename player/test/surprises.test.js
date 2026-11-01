@@ -1,10 +1,12 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {dueAfter, pagesOf, scaleOf, Surprises, walkOf} from '../src/surprises.js';
+import {dueAfter, heightOf, pagesOf, scaleOf, Surprises, walkOf} from '../src/surprises.js';
 
-const atlas = JSON.parse(readFileSync(new URL('../sorpresas/gusanito/spr.gusanito.atlas.json', import.meta.url), 'utf8'));
+const atlasOf = (id) => JSON.parse(readFileSync(new URL('../sorpresas/' + id + '/spr.' + id + '.atlas.json', import.meta.url), 'utf8'));
+const atlas = atlasOf('gusanito');
 const m = atlas.meta;
+const ALL = ['gusanito', 'abeja'];
 const at = (v) => () => v;
 
 test('it comes now and then, never closer than a quarter of an hour', () => {
@@ -55,18 +57,59 @@ test('only the pages of its walk', () => {
     assert.equal(all.length, m.pages.length);
 });
 
-test('every frame of every state is in the atlas, and the states it needs are there', () => {
-    for (const state of ['cruza', 'para', 'huye'].concat(m.gestos)) {
-        const e = m.estados[state];
-        assert.ok(e, state);
-        assert.equal(e.sombra.length, e.frames);
-        for (let i = 0; i < e.frames; i++) {
-            const name = state + '_' + (i < 10 ? '0' : '') + i;
-            assert.ok(atlas.frames[name], name);
+test('every frame of every state of everyone is in its atlas, and the states it needs are there', () => {
+    for (const id of ALL) {
+        const one = atlasOf(id);
+        for (const state of ['cruza', 'para', 'huye'].concat(one.meta.gestos)) {
+            const e = one.meta.estados[state];
+            assert.ok(e, id + ' ' + state);
+            if (e.sombra) {
+                assert.equal(e.sombra.length, e.frames, id + ' ' + state);
+            }
+            if (e.avance) {
+                assert.equal(e.avance.length, e.frames, id + ' ' + state);
+            }
+            for (let i = 0; i < e.frames; i++) {
+                const name = state + '_' + (i < 10 ? '0' : '') + i;
+                assert.ok(one.frames[name], id + ' ' + name);
+            }
+        }
+        assert.ok(one.meta.estados.cruza.speed > 0, id);
+        assert.ok(one.meta.estados.huye.speed > 0, id);
+    }
+});
+
+test('what flies comes back to its height at the end of each turn of its loops, and its speed is its way forward', () => {
+    for (const state of ['cruza', 'huye']) {
+        const e = atlasOf('abeja').meta.estados[state];
+        const sum = (k) => e.avance.reduce((total, step) => total + step[k], 0);
+        assert.ok(Math.abs(sum(1)) < 0.01, state + ' dy ' + sum(1));
+        assert.ok(Math.abs(sum(0) - e.speed * e.frames / e.fps) < 0.5, state + ' dx ' + sum(0));
+    }
+});
+
+test('a walker goes on the ticker or the bottom edge; a flyer, within its heights, on any shape of screen', () => {
+    assert.equal(heightOf(m, 1080, 1, 984, at(0.5)), 984);
+    assert.equal(heightOf(m, 1080, 1, null, at(0.5)), 1074);
+    const bee = atlasOf('abeja').meta;
+    assert.equal(heightOf(bee, 1080, 1, 984, at(0)), 270);
+    assert.equal(heightOf(bee, 1080, 1, null, at(1)), 720);
+    assert.equal(heightOf(bee, 1920, 1, 984, at(0)), 480);
+    assert.equal(heightOf(bee, 1920, 1, 984, at(1)), 1280);
+});
+
+test('a flyer also starts out of sight and stops on the screen', () => {
+    const bee = atlasOf('abeja').meta;
+    const cross = bee.estados.cruza;
+    const turn = cross.speed * cross.frames / cross.fps;
+    for (const width of [1920, 1080]) {
+        for (const r of [0, 0.49, 0.5, 0.999]) {
+            const w = walkOf(bee, width, 1, at(r));
+            const stop = w.from + w.dir * w.turns * turn;
+            assert.ok(stop > 0 && stop < width);
+            assert.ok(w.dir > 0 ? w.from + bee.cell.w - bee.anchor.x <= 0 : w.from - (bee.cell.w - bee.anchor.x) >= width);
         }
     }
-    assert.ok(m.estados.cruza.speed > 0);
-    assert.ok(m.estados.huye.speed > 0);
 });
 
 /** Surprises with nothing of a page: it says who would come out, and nothing moves. */
