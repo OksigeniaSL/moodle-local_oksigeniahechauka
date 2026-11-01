@@ -93,7 +93,7 @@
         if (swap) {
             swap.hidden = !replace;
         }
-        form.querySelector('#hkp-claim-go').textContent = replace ? words.replace : words['new'];
+        form.querySelector('#hkp-claim-go').textContent = replace ? words.change : words.start;
     };
     form.querySelectorAll('input[name="kind"]').forEach(function(r) {
         r.addEventListener('change', parts);

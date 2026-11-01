@@ -94,7 +94,7 @@ class claimpage {
             'errors' => $errors,
             'icons' => ['plus' => icons::svg('plus')],
             'strings' => json_encode(
-                ['new' => get_string('claim_start', $c), 'replace' => get_string('claim_change', $c)],
+                ['start' => get_string('claim_start', $c), 'change' => get_string('claim_change', $c)],
                 JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP
             ),
         ];

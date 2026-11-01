@@ -112,10 +112,14 @@
         page.querySelectorAll('[data-day][aria-pressed="true"]').forEach(function(b) {
             days.push(Number(b.getAttribute('data-day')));
         });
-        var said = days.length === 7 ? words.every : (days.join() === '1,2,3,4,5' ? words.weekdays :
-            words.some.replace('{$a}', join(days.map(function(d) {
-                return d > 5 ? words.plural[d - 6] : words.names[d - 1];
-            }))));
+        var said = words.some.replace('{$a}', join(days.map(function(d) {
+            return d > 5 ? words.plural[d - 6] : words.names[d - 1];
+        })));
+        if (days.length === 7) {
+            said = words.every;
+        } else if (days.join() === '1,2,3,4,5') {
+            said = words.weekdays;
+        }
         node.textContent = words.on.replace('{$a->days}', said).replace('{$a->from}', page.querySelector('#hkp-on').value)
             .replace('{$a->to}', page.querySelector('#hkp-off').value) + ' ' + words.rest;
     };
