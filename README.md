@@ -28,8 +28,9 @@ sites.
   site news, the weather (MET Norway, with the location of the centre) and any iCal agenda added as content. With `ffmpeg` on the server (a static build is enough), each uploaded video is made ready for every
   screen: H.264, 1080p and 30 fps at most, one at a time.
 - **Who runs the panel** need not be an administrator: four capabilities (view, publish in one's groups, publish
-  everywhere, run the screens) and two roles made at install, «Publishes on the screens» and «Runs the screens». Whoever
-  runs the screens chooses, group by group, who publishes in each.
+  everywhere, run the screens) and three roles made at install: «Publishes on the screens», «Publishes on every
+  screen» and «Runs the screens». Whoever runs the screens chooses in the panel who publishes in each group and who
+  publishes everywhere; the administrator chooses there who runs the screens, without going through Moodle's roles.
 - **The player** is one web page that every screen opens: a small computer with a browser in kiosk mode, a smart TV
   with a kiosk browser or a professional display that loads a web page. It keeps what it needs on the device and goes
   on without a network.

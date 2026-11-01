@@ -23,7 +23,8 @@
     Example context (json):
     {
         "style": "", "title": "Pantallas", "hastabs": false, "tabs": [], "action": "#", "sesskey": "abc",
-        "rows": [], "count": 0, "groups": [], "everywhere": [], "haseverywhere": false,
+        "rows": [], "count": 0, "groups": [], "everywhere": [], "haseverywhere": false, "managers": [],
+        "hasmanagers": false, "choosemanagers": false,
         "player": "https://example.com/local/oksigeniahechauka/player/", "claim": "#", "people": "#", "admin": "",
         "icons": {"qr": "", "x": "", "plus": "", "search": "", "sliders": "", "copy": ""}, "strings": "{}"
     }
@@ -41,7 +42,7 @@
         <div class="hkp-sec-head"><h2 id="hkp-h-grp">{{#str}}groups, local_oksigeniahechauka{{/str}}</h2><p class="hkp-hint hkp-sec-hint">{{#str}}groups_help, local_oksigeniahechauka{{/str}}</p></div>
         <div class="hkp-groups">
             {{#groups}}
-            <article class="hkp-group" id="hkp-group-{{id}}">
+            <article class="hkp-group" id="hkp-group-{{id}}" data-list="group" data-group="{{id}}">
                 <header><h3>{{name}}</h3>{{{menu}}}</header>
                 <div><span class="hkp-k">{{#str}}groups_screens, local_oksigeniahechauka{{/str}}</span>
                     <div class="hkp-chips">
@@ -57,12 +58,28 @@
                         {{^haspeople}}<li class="hkp-hint">{{#str}}groups_nobody_yet, local_oksigeniahechauka{{/str}}</li>{{/haspeople}}
                     </ul>
                 </div>
-                <div class="hkp-search" data-group="{{id}}">{{{icons.search}}}<input class="form-control" role="combobox" aria-expanded="false" aria-controls="hkp-lb-{{id}}" aria-autocomplete="list" placeholder="{{#str}}groups_search, local_oksigeniahechauka{{/str}}" aria-label="{{#str}}groups_search_label, local_oksigeniahechauka, {{name}}{{/str}}" autocomplete="off" spellcheck="false"><ul class="hkp-listbox" id="hkp-lb-{{id}}" role="listbox" aria-label="{{#str}}groups_found, local_oksigeniahechauka{{/str}}" hidden></ul></div>
+                <div class="hkp-search" data-list="group" data-group="{{id}}">{{{icons.search}}}<input class="form-control" role="combobox" aria-expanded="false" aria-controls="hkp-lb-{{id}}" aria-autocomplete="list" placeholder="{{#str}}groups_search, local_oksigeniahechauka{{/str}}" aria-label="{{#str}}groups_search_label, local_oksigeniahechauka, {{name}}{{/str}}" autocomplete="off" spellcheck="false"><ul class="hkp-listbox" id="hkp-lb-{{id}}" role="listbox" aria-label="{{#str}}groups_found, local_oksigeniahechauka{{/str}}" hidden></ul></div>
             </article>
             {{/groups}}
-            <article class="hkp-group is-all"><header><h3>{{#str}}where_all, local_oksigeniahechauka{{/str}}</h3></header>
-                <div><span class="hkp-k">{{#str}}groups_everywhere, local_oksigeniahechauka{{/str}}</span><ul class="hkp-people">{{#everywhere}}<li class="hkp-person"><span class="hkp-av" aria-hidden="true">{{initials}}</span><span>{{name}}{{#detail}}<small>{{detail}}</small>{{/detail}}</span><span></span></li>{{/everywhere}}</ul></div>
+            <article class="hkp-group is-all" id="hkp-all" data-list="everywhere" data-group="0"><header><h3>{{#str}}where_all, local_oksigeniahechauka{{/str}}</h3></header>
+                <div><span class="hkp-k">{{#str}}groups_everywhere, local_oksigeniahechauka{{/str}}</span>
+                    <ul class="hkp-people">
+                        {{#everywhere}}<li class="hkp-person"><span class="hkp-av" aria-hidden="true">{{initials}}</span><span>{{name}}{{#detail}}<small>{{detail}}</small>{{/detail}}</span>{{#own}}<a class="btn btn-sm btn-outline-secondary btn-icon" href="#" data-remove-user="{{userid}}" aria-label="{{label}}">{{{icons.x}}}</a>{{/own}}{{^own}}<span></span>{{/own}}</li>{{/everywhere}}
+                        {{^haseverywhere}}<li class="hkp-hint">{{#str}}groups_nobody_else, local_oksigeniahechauka{{/str}}</li>{{/haseverywhere}}
+                    </ul>
+                </div>
+                <div class="hkp-search" data-list="everywhere" data-group="0">{{{icons.search}}}<input class="form-control" role="combobox" aria-expanded="false" aria-controls="hkp-lb-everywhere" aria-autocomplete="list" placeholder="{{#str}}groups_search, local_oksigeniahechauka{{/str}}" aria-label="{{#str}}groups_everywhere_search_label, local_oksigeniahechauka{{/str}}" autocomplete="off" spellcheck="false"><ul class="hkp-listbox" id="hkp-lb-everywhere" role="listbox" aria-label="{{#str}}groups_found, local_oksigeniahechauka{{/str}}" hidden></ul></div>
                 <p class="hkp-hint">{{#str}}groups_everywhere_help, local_oksigeniahechauka{{/str}}</p>
+            </article>
+            <article class="hkp-group is-all" id="hkp-managers" data-list="managers" data-group="0"><header><h3>{{#str}}groups_managers, local_oksigeniahechauka{{/str}}</h3></header>
+                <div>
+                    <ul class="hkp-people">
+                        {{#managers}}<li class="hkp-person"><span class="hkp-av" aria-hidden="true">{{initials}}</span><span>{{name}}{{#detail}}<small>{{detail}}</small>{{/detail}}</span>{{#own}}<a class="btn btn-sm btn-outline-secondary btn-icon" href="#" data-remove-user="{{userid}}" aria-label="{{label}}">{{{icons.x}}}</a>{{/own}}{{^own}}<span></span>{{/own}}</li>{{/managers}}
+                        {{^hasmanagers}}<li class="hkp-hint">{{#str}}groups_nobody_else, local_oksigeniahechauka{{/str}}</li>{{/hasmanagers}}
+                    </ul>
+                </div>
+                {{#choosemanagers}}<div class="hkp-search" data-list="managers" data-group="0">{{{icons.search}}}<input class="form-control" role="combobox" aria-expanded="false" aria-controls="hkp-lb-managers" aria-autocomplete="list" placeholder="{{#str}}groups_search, local_oksigeniahechauka{{/str}}" aria-label="{{#str}}groups_managers_search_label, local_oksigeniahechauka{{/str}}" autocomplete="off" spellcheck="false"><ul class="hkp-listbox" id="hkp-lb-managers" role="listbox" aria-label="{{#str}}groups_found, local_oksigeniahechauka{{/str}}" hidden></ul></div>{{/choosemanagers}}
+                <p class="hkp-hint">{{#choosemanagers}}{{#str}}groups_managers_help, local_oksigeniahechauka{{/str}}{{/choosemanagers}}{{^choosemanagers}}{{#str}}groups_managers_admin, local_oksigeniahechauka{{/str}}{{/choosemanagers}}</p>
             </article>
             <form class="hkp-group" method="post" action="{{action}}"><input type="hidden" name="sesskey" value="{{sesskey}}"><input type="hidden" name="action" value="addgroup">
                 <header><h3>{{#str}}groups_new, local_oksigeniahechauka{{/str}}</h3></header>
@@ -92,6 +109,12 @@
     var people = page.getAttribute('data-people');
     var sesskey = page.getAttribute('data-sesskey');
     var form = page.querySelector('#hkp-people-form');
+    // Each list of people, with its actions: a group, those who publish everywhere, those who run the screens.
+    var actions = {
+        group: ['addeditor', 'removeeditor'],
+        everywhere: ['addeverywhere', 'removeeverywhere'],
+        managers: ['addmanager', 'removemanager']
+    };
     var send = function(action, group, user) {
         form.querySelector('[name="action"]').value = action;
         form.querySelector('[name="group"]').value = group;
@@ -126,11 +149,13 @@
     page.querySelectorAll('[data-remove-user]').forEach(function(b) {
         b.addEventListener('click', function(e) {
             e.preventDefault();
-            send('removeeditor', b.closest('.hkp-group').id.replace('hkp-group-', ''), b.getAttribute('data-remove-user'));
+            var card = b.closest('[data-list]');
+            send(actions[card.getAttribute('data-list')][1], card.getAttribute('data-group'), b.getAttribute('data-remove-user'));
         });
     });
-    page.querySelectorAll('.hkp-search[data-group]').forEach(function(box) {
+    page.querySelectorAll('.hkp-search[data-list]').forEach(function(box) {
         var group = box.getAttribute('data-group');
+        var kind = box.getAttribute('data-list');
         var input = box.querySelector('input');
         var list = box.querySelector('.hkp-listbox');
         var timer = null;
@@ -153,7 +178,7 @@
         };
         var choose = function(o) {
             if (o && o.getAttribute('aria-disabled') !== 'true') {
-                send('addeditor', group, o.getAttribute('data-user'));
+                send(actions[kind][0], group, o.getAttribute('data-user'));
             }
         };
         var show = function(found) {
@@ -162,7 +187,7 @@
             var typed = input.value.trim().toLowerCase();
             found.forEach(function(p, i) {
                 var li = document.createElement('li');
-                li.id = 'hkp-opt-' + group + '-' + i;
+                li.id = 'hkp-opt-' + kind + group + '-' + i;
                 li.setAttribute('role', 'option');
                 li.setAttribute('data-user', p.id);
                 li.setAttribute('aria-selected', 'false');
@@ -185,7 +210,7 @@
                     text.textContent = p.name;
                 }
                 var small = document.createElement('small');
-                small.textContent = p.already ? words.already : p.detail;
+                small.textContent = p.already ? (words[kind] || words.already) : p.detail;
                 text.appendChild(small);
                 li.appendChild(av);
                 li.appendChild(text);
@@ -212,7 +237,8 @@
                 return;
             }
             timer = setTimeout(function() {
-                fetch(people + '?q=' + encodeURIComponent(input.value.trim()) + '&group=' + group + '&sesskey=' + sesskey,
+                fetch(people + '?q=' + encodeURIComponent(input.value.trim()) + '&group=' + group + '&list=' + kind +
+                    '&sesskey=' + sesskey,
                     {credentials: 'same-origin'}).then(function(r) {
                     return r.json();
                 }).then(show).catch(close);

@@ -21,10 +21,11 @@ namespace local_oksigeniahechauka\local;
  *
  * Four capabilities in the system context: view (the panel and the preview), publish (one's own content, in the groups
  * of screens where one publishes), publishall (any content, on any screen) and managescreens (the screens, their groups
- * and who publishes in each). Two roles are made at install, without archetype so they never take capabilities of
- * other plugins: «Publishes on the screens» and «Runs the screens». Whoever runs the screens chooses who publishes in
- * each group; the plugin gives them the first role as a component assignment, with the group as its item, so it is
- * never undone by hand in the administration.
+ * and who publishes in each). Three roles are made at install, without archetype so they never take capabilities of
+ * other plugins: «Publishes on the screens», «Publishes on every screen» and «Runs the screens». Whoever runs the screens
+ * chooses who publishes in each group (the first role, as a component assignment with the group as its item, so it is
+ * never undone by hand in the administration) and who publishes on every screen (the second, a plain assignment in the
+ * whole site). Who runs the screens is chosen in the panel too, by whoever may give that role in Moodle.
  *
  * @package    local_oksigeniahechauka
  * @copyright  2026 Oksigenia SL <dev@oksigenia.cc>
@@ -37,12 +38,16 @@ class access {
     /** @var string The role of who publishes in some groups. */
     const PUBLISHER = 'oksigeniahechauka_publisher';
 
+    /** @var string The role of who publishes on every screen. */
+    const EVERYWHERE = 'oksigeniahechauka_publishall';
+
     /** @var string The role of who runs the screens. */
     const MANAGER = 'oksigeniahechauka_manager';
 
     /** @var array The roles made at install: short name => capabilities of the plugin. */
     const ROLES = [
         self::PUBLISHER => ['view', 'publish'],
+        self::EVERYWHERE => ['view', 'publish', 'publishall'],
         self::MANAGER => ['view', 'publish', 'publishall', 'managescreens'],
     ];
 
@@ -192,6 +197,68 @@ class access {
         foreach (array_diff($want, $have) as $userid) {
             role_assign($roleid, $userid, $contextid, self::COMPONENT, $groupid);
         }
+    }
+
+    /**
+     * Who holds a capability of the plugin in the whole site, by name, and whether the panel may take it from them:
+     * only when it comes from the role given for it (plain, in the site), not from another role of Moodle.
+     *
+     * @param string $capability publishall or managescreens
+     * @param string $shortname the role that gives it
+     * @return array [{user, own}]
+     */
+    public static function holders(string $capability, string $shortname): array {
+        global $DB;
+        $system = \context_system::instance();
+        $fields = 'u.id, ' . \core_user\fields::for_name()->get_sql('u', false, '', '', false)->selects . ', u.department';
+        $roleid = (int) $DB->get_field('role', 'id', ['shortname' => $shortname]);
+        $own = $roleid ? array_map('intval', $DB->get_fieldset_select(
+            'role_assignments',
+            'userid',
+            "roleid = :roleid AND contextid = :contextid AND component = ''",
+            ['roleid' => $roleid, 'contextid' => $system->id]
+        )) : [];
+        $out = [];
+        $users = get_users_by_capability($system, 'local/oksigeniahechauka:' . $capability, $fields, 'u.lastname, u.firstname');
+        foreach ($users as $user) {
+            $out[] = ['user' => $user, 'own' => in_array((int) $user->id, $own)];
+        }
+        return $out;
+    }
+
+    /**
+     * Gives or takes one of the site-wide roles (publishes on every screen, runs the screens): a plain assignment in the
+     * whole site, the same one the administration would make, so it can also be undone there.
+     *
+     * @param string $shortname EVERYWHERE or MANAGER
+     * @param int $userid
+     * @param bool $give
+     * @return void
+     */
+    public static function set_site_role(string $shortname, int $userid, bool $give): void {
+        global $DB;
+        $roleid = (int) $DB->get_field('role', 'id', ['shortname' => $shortname]);
+        if (!$roleid || !array_key_exists($shortname, self::ROLES) || $shortname === self::PUBLISHER) {
+            throw new \moodle_exception('role_missing', self::COMPONENT);
+        }
+        $contextid = \context_system::instance()->id;
+        if ($give) {
+            role_assign($roleid, $userid, $contextid);
+        } else {
+            role_unassign($roleid, $userid, $contextid);
+        }
+    }
+
+    /**
+     * Whether the user may choose who runs the screens: whoever may give that role in Moodle (the administrator, and
+     * those the site lets give it).
+     *
+     * @return bool
+     */
+    public static function may_choose_managers(): bool {
+        global $DB;
+        $roleid = (int) $DB->get_field('role', 'id', ['shortname' => self::MANAGER]);
+        return $roleid && array_key_exists($roleid, get_assignable_roles(\context_system::instance()));
     }
 
     /**

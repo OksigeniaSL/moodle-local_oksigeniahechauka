@@ -95,20 +95,22 @@ class groupspage {
                 'menu' => $OUTPUT->render($menu),
             ];
         }
-        // Who publishes on every screen: given by the administration, not here.
+        // Who publishes on every screen: chosen here by whoever runs the screens. Those who have it by another role
+        // (running the screens, or a role of the site) are shown, but taken out only where they were given it.
+        $system = \context_system::instance();
         $everywhere = [];
-        $fields = 'u.id, ' . \core_user\fields::for_name()->get_sql('u', false, '', '', false)->selects . ', u.department';
-        foreach (
-            get_users_by_capability(
-                \context_system::instance(),
-                'local/oksigeniahechauka:publishall',
-                $fields,
-                'u.lastname, u.firstname',
-                0,
-                20
-            ) as $user
-        ) {
-            $everywhere[] = self::person($user);
+        foreach (access::holders('publishall', access::EVERYWHERE) as $h) {
+            $runs = has_capability('local/oksigeniahechauka:managescreens', $system, $h['user']->id);
+            $note = $h['own'] ? '' : get_string($runs ? 'groups_runs' : 'groups_byrole', $c);
+            $everywhere[] = self::person($h['user'], $note) +
+                ['own' => $h['own'], 'label' => get_string('groups_uneverywhere', $c, fullname($h['user']))];
+        }
+        // Who runs the screens: chosen here by whoever may give that role in Moodle (the administrator).
+        $choose = access::may_choose_managers();
+        $managers = [];
+        foreach (access::holders('managescreens', access::MANAGER) as $h) {
+            $managers[] = self::person($h['user'], $h['own'] ? '' : get_string('groups_byrole', $c)) +
+                ['own' => $h['own'] && $choose, 'label' => get_string('groups_unmanager', $c, fullname($h['user']))];
         }
         return [
             'style' => home::stages(),
@@ -122,6 +124,9 @@ class groupspage {
             'groups' => $cards,
             'everywhere' => $everywhere,
             'haseverywhere' => (bool) $everywhere,
+            'managers' => $managers,
+            'hasmanagers' => (bool) $managers,
+            'choosemanagers' => $choose,
             'player' => (new \moodle_url('/local/oksigeniahechauka/player/'))->out(false),
             'claim' => (new \moodle_url('/local/oksigeniahechauka/claim.php'))->out(false),
             'people' => (new \moodle_url('/local/oksigeniahechauka/people.php'))->out(false),
@@ -130,26 +135,29 @@ class groupspage {
             'icons' => ['qr' => icons::svg('qr'), 'x' => icons::svg('x'), 'plus' => icons::svg('plus'),
                 'search' => icons::svg('search'), 'sliders' => icons::svg('sliders'), 'copy' => icons::svg('copy')],
             'strings' => json_encode(
-                ['already' => get_string('groups_already', $c), 'none' => get_string('groups_nobody', $c)],
+                ['already' => get_string('groups_already', $c), 'none' => get_string('groups_nobody', $c),
+                    'everywhere' => get_string('groups_already_everywhere', $c),
+                    'managers' => get_string('groups_already_manager', $c)],
                 JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP
             ),
         ];
     }
 
     /**
-     * A person as the page draws them: initials, name, and their department if any.
+     * A person as the page draws them: initials, name, and under it a note or their department if any.
      *
      * @param \stdClass $user
+     * @param string $note
      * @return array
      */
-    protected static function person(\stdClass $user): array {
+    protected static function person(\stdClass $user, string $note = ''): array {
         $words = preg_split('/\s+/', trim(($user->firstname ?? '') . ' ' . ($user->lastname ?? '')));
         return [
             'userid' => (int) $user->id,
             'name' => fullname($user),
             'initials' => \core_text::strtoupper(\core_text::substr($words[0] ?? '', 0, 1) .
                 \core_text::substr(end($words) ?: '', 0, 1)),
-            'detail' => (string) ($user->department ?? ''),
+            'detail' => $note !== '' ? $note : (string) ($user->department ?? ''),
         ];
     }
 
@@ -198,6 +206,19 @@ class groupspage {
                 if ($exists) {
                     $user = optional_param('user', 0, PARAM_INT);
                     access::set_editors($group, array_diff(array_map('intval', array_keys(access::editors($group))), [$user]));
+                }
+                return null;
+            case 'addeverywhere':
+            case 'removeeverywhere':
+            case 'addmanager':
+            case 'removemanager':
+                $manager = strpos($action, 'manager') !== false;
+                if ($manager && !access::may_choose_managers()) {
+                    throw new \required_capability_exception(\context_system::instance(), 'moodle/role:assign', 'nopermissions', '');
+                }
+                $user = optional_param('user', 0, PARAM_INT);
+                if ($DB->record_exists('user', ['id' => $user, 'deleted' => 0]) && !isguestuser($user)) {
+                    access::set_site_role($manager ? access::MANAGER : access::EVERYWHERE, $user, strpos($action, 'add') === 0);
                 }
                 return null;
         }

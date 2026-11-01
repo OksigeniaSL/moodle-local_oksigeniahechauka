@@ -138,5 +138,11 @@ function xmldb_local_oksigeniahechauka_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026110200, 'local', 'oksigeniahechauka');
     }
 
+    if ($oldversion < 2026110202) {
+        // A third role, «Publishes on every screen»: what an office needs, without running the screens.
+        \local_oksigeniahechauka\local\access::create_roles();
+        upgrade_plugin_savepoint(true, 2026110202, 'local', 'oksigeniahechauka');
+    }
+
     return true;
 }

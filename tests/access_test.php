@@ -72,7 +72,7 @@ final class access_test extends \advanced_testcase {
     }
 
     /**
-     * The two roles are made at install, without archetype, with their capabilities, and the managers may give them.
+     * The three roles are made at install, without archetype, with their capabilities, and the managers may give them.
      */
     public function test_roles_made_at_install(): void {
         global $DB;
@@ -88,7 +88,7 @@ final class access_test extends \advanced_testcase {
                 $this->assertSame(in_array($capability, $capabilities), $given, $shortname . ' ' . $capability);
             }
         }
-        // Made twice, still two; one left without its capabilities gets them back.
+        // Made twice, still three; one left without its capabilities gets them back.
         $this->assertSame(0, access::create_roles());
         $publisher = (int) $DB->get_field('role', 'id', ['shortname' => access::PUBLISHER]);
         $DB->delete_records('role_capabilities', ['roleid' => $publisher]);
@@ -182,5 +182,54 @@ final class access_test extends \advanced_testcase {
         $this->assertSame([], access::groups_of($a));
         $this->assertFalse(access::can('publish', $a));
         $this->assertTrue(access::can('publish', $b));
+    }
+
+    /**
+     * Who publishes everywhere and who runs the screens are chosen in the panel: plain roles in the whole site, taken
+     * out only where they were given; those who have them by another role are shown but not taken out.
+     */
+    public function test_everywhere_and_managers_from_the_panel(): void {
+        global $DB;
+        $this->resetAfterTest();
+        $infantil = $this->group('Infantil');
+        $office = (int) $this->getDataGenerator()->create_user(['firstname' => 'Marta', 'lastname' => 'Gil'])->id;
+        $tech = (int) $this->getDataGenerator()->create_user(['firstname' => 'Javier', 'lastname' => 'Santana'])->id;
+        $sitemanager = (int) $this->getDataGenerator()->create_user(['firstname' => 'Luis', 'lastname' => 'Herrera'])->id;
+        role_assign((int) $DB->get_field('role', 'id', ['shortname' => 'manager']), $sitemanager, \context_system::instance());
+
+        access::set_site_role(access::EVERYWHERE, $office, true);
+        $this->assertTrue(access::can('publishall', $office));
+        $this->assertFalse(access::can('managescreens', $office));
+        $this->assertTrue(access::may_target(true, [], [], $office));
+        $this->assertTrue(access::may_target(false, [$infantil], [], $office));
+        $own = [];
+        foreach (access::holders('publishall', access::EVERYWHERE) as $h) {
+            $own[(int) $h['user']->id] = $h['own'];
+        }
+        $this->assertSame([$office => true, $sitemanager => false], $own);
+
+        access::set_site_role(access::MANAGER, $tech, true);
+        $own = [];
+        foreach (access::holders('managescreens', access::MANAGER) as $h) {
+            $own[(int) $h['user']->id] = $h['own'];
+        }
+        $this->assertSame([$sitemanager => false, $tech => true], $own);
+
+        access::set_site_role(access::EVERYWHERE, $office, false);
+        $this->assertFalse(access::can('publishall', $office));
+        $this->assertFalse(access::can('view', $office));
+        // The role of a group is never given or taken this way.
+        try {
+            access::set_site_role(access::PUBLISHER, $office, true);
+            $this->fail('A group role given as a site role');
+        } catch (\moodle_exception $e) {
+            $this->assertSame('role_missing', $e->errorcode);
+        }
+
+        // Who runs the screens is chosen by whoever may give that role in Moodle: the administrator, not the technician.
+        $this->setUser($tech);
+        $this->assertFalse(access::may_choose_managers());
+        $this->setAdminUser();
+        $this->assertTrue(access::may_choose_managers());
     }
 }

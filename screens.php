@@ -76,7 +76,8 @@ if ($action !== '' && confirm_sesskey()) {
     }
     $message = groupspage::act($action, $now);
     redirect(
-        new moodle_url($url, [], 'hkp-group-' . optional_param('group', 0, PARAM_INT)),
+        new moodle_url($url, [], strpos($action, 'everywhere') !== false ? 'hkp-all' :
+            (strpos($action, 'manager') !== false ? 'hkp-managers' : 'hkp-group-' . optional_param('group', 0, PARAM_INT))),
         $message,
         null,
         \core\output\notification::NOTIFY_SUCCESS

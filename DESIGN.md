@@ -276,7 +276,11 @@ Biblioteca, Secretaría y Comedor.» A teacher sees only their groups, already c
 - A card per group: «Sus pantallas» (chips, «+ Añadir»), «Quién publica aquí» (people with initials, role, «×» to
   take them off, with the name in its label), and a search field «Añadir a alguien del centro» (combobox: results
   with initials, the typed part underlined, «Ya publica aquí» disabled).
-- A dashed card «Todas las pantallas»: who publishes everywhere and «Lo decide el administrador del sitio.»
+- A dashed card «Todas las pantallas»: who publishes everywhere, with the same search; whoever runs the screens
+  chooses them. Those who have it by another role show why («Lleva las pantallas», «Por su rol en el sitio») instead of
+  «×».
+- A dashed card «Quién lleva las pantallas»: with the search for the administrator of the site; for the rest, the list
+  and «Lo decide el administrador del sitio.»
 - «Grupo nuevo»: a name and «Crear».
 
 ### «Tu centro»
@@ -378,7 +382,7 @@ Words of the panel:
 | Lo que sale · En pantalla ahora · Más adelante · Ya no sale | Contenidos activos, programados, caducados |
 | Aviso · Foto o vídeo · Evento · Línea de la cinta · Agenda | Item, slide, ticker, feed, iCal (only in the help) |
 | Cuándo · Dónde | Programación, destino |
-| Lleva las pantallas · Publica | Gestor, editor |
+| Lleva las pantallas · Publica · Publica en todas | Gestor, editor |
 | Ficha (of a screen) | Configuración, editar dispositivo |
 | Aviso urgente | Alerta de emergencia |
 

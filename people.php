@@ -33,9 +33,20 @@ access::require_cap('managescreens');
 require_sesskey();
 $query = trim(optional_param('q', '', PARAM_TEXT));
 $group = optional_param('group', 0, PARAM_INT);
+$list = optional_param('list', 'group', PARAM_ALPHA);
+if ($list === 'managers' && !access::may_choose_managers()) {
+    throw new required_capability_exception(context_system::instance(), 'moodle/role:assign', 'nopermissions', '');
+}
 $out = [];
 if (core_text::strlen($query) >= 2) {
-    $already = array_map('intval', array_keys(access::editors($group)));
+    if ($list === 'group') {
+        $already = array_map('intval', array_keys(access::editors($group)));
+    } else {
+        $already = array_map(function ($h) {
+            return (int) $h['user']->id;
+        }, $list === 'managers' ? access::holders('managescreens', access::MANAGER) :
+            access::holders('publishall', access::EVERYWHERE));
+    }
     $fields = \core_user\fields::for_name()->get_sql('u', false, '', '', false)->selects;
     $full = $DB->sql_concat('u.firstname', "' '", 'u.lastname');
     $sql = "SELECT u.id, u.department, $fields

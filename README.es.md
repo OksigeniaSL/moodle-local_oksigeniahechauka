@@ -28,8 +28,10 @@ pantallas. No es para sitios en producción.
   añada como contenido. Con `ffmpeg` en el servidor (basta una versión estática), cada vídeo que se sube se
   prepara para todas las pantallas: H.264, 1080p y 30 fps como mucho, de uno en uno.
 - **Quien lleva el panel** no tiene que ser administrador: cuatro capacidades (ver, publicar en sus grupos, publicar
-  en todas, llevar las pantallas) y dos roles creados al instalar, «Publica en las pantallas» y «Lleva las pantallas».
-  Quien lleva las pantallas elige, grupo a grupo, quién publica en cada uno.
+  en todas, llevar las pantallas) y tres roles creados al instalar: «Publica en las pantallas», «Publica en todas las
+  pantallas» y «Lleva las pantallas». Quien lleva las pantallas elige desde el panel quién publica en cada grupo y quién
+  publica en todas; el administrador elige allí mismo quién lleva las pantallas, sin pasar por la administración de
+  roles de Moodle.
 - **El reproductor** es una sola página web que abre cada pantalla: un ordenador pequeño con un navegador en modo
   quiosco, una tele inteligente con un navegador de quiosco o una pantalla profesional que carga una página web.
   Guarda en el aparato lo que necesita y sigue sin red.

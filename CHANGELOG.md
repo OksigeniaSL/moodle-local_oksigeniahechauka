@@ -4,6 +4,10 @@
 
 - «Tu centro»: a keyword added with Enter no longer shows twice, and one already there is not added again; «palabra»
   is now «palabra clave», with a hint of what to write and a help that says it.
+- **Who publishes everywhere and who runs the screens, chosen in the panel**, with the same search as the groups: a
+  third role, «Publica en todas las pantallas» (view, publish, publishall), given by whoever runs the screens from
+  «Todas las pantallas»; and «Quién lleva las pantallas», chosen there by whoever may give that role in Moodle (the
+  administrator). Both are plain role assignments in the site, so the administration sees and can undo them too.
 
 ## 0.6.1 (2026-11-01)
 
