@@ -197,3 +197,11 @@ dialog.hkp-dialog > footer {
     padding: 0;
     border: 0;
 }
+
+/* On a phone the cards and buttons keep 16 px from the edge, as the rest of the panel (Moodle's page gives 8). */
+@media (max-width: 575.98px) {
+    body.hkp-page #region-main .hkp {
+        padding-right: .5rem;
+        padding-left: .5rem;
+    }
+}
