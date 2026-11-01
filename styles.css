@@ -2624,3 +2624,23 @@ dialog.hkp-dialog > footer {
     letter-spacing: .08em;
     text-transform: uppercase;
 }
+
+/* In the list of screens, a screen with no picture yet is a light frame with the icon of its shape; black only when it
+   is really off or without signal (the art direction's review). */
+.hkp-glist .hkp-bezel > .hkp-mini-icon {
+    display: grid;
+    place-items: center;
+    background: var(--hkp-sunk);
+    color: var(--hkp-muted);
+}
+
+.hkp-glist .hkp-bezel > .hkp-mini-icon .hkp-i {
+    width: 1rem;
+    height: 1rem;
+}
+
+.hkp-glist .hkp-bezel[data-state="off"] > .hkp-mini-icon,
+.hkp-glist .hkp-bezel[data-state="down"] > .hkp-mini-icon {
+    background: #000;
+    color: #6c737b;
+}

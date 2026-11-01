@@ -49,7 +49,8 @@ class groupspage {
         foreach ($screens as $s) {
             $card = home::screen($s, $now, [], true);
             $vertical[(int) $s->id] = $card['vertical'];
-            $rows[] = $card + ['groupnames' => array_map(function ($g) use ($groups) {
+            $rows[] = $card + ['shapeicon' => icons::svg($card['vertical'] ? 'tvv' : 'tv'),
+                'groupnames' => array_map(function ($g) use ($groups) {
                 return ['name' => format_string($groups[$g] ?? '')];
             }, screens::groups_of((int) $s->id)), 'sheet' => (new \moodle_url(
                 '/local/oksigeniahechauka/screen.php',
