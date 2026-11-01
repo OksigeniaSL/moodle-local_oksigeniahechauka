@@ -97,6 +97,17 @@ export function menuParts(menu) {
 }
 
 /**
+ * What a menu is called on the screen: with its own name when a day has several, so the dishes of one are not taken for
+ * those of another («Menú de hoy · Infantil»).
+ *
+ * @param {object} menu {label, name}
+ * @returns {string}
+ */
+export function menuLabel(menu) {
+    return [menu.label, menu.name].filter(Boolean).join(' · ');
+}
+
+/**
  * What the week's strip says: what comes next and matters, «Jueves 5: Día del deporte». A big event of the next days
  * (the countdown's) before the nearest one. Empty when nothing comes.
  *
@@ -132,7 +143,7 @@ export function buildLead(p, today, l) {
     if (p.type === 'menu') {
         const m = today.menu;
         colour(s, 'marca-2', 'marca-2-oscuro');
-        s.appendChild(el('p', 'hk-lider-etiqueta', m.label || ''));
+        s.appendChild(el('p', 'hk-lider-etiqueta', menuLabel(m)));
         if (m.closed) {
             s.appendChild(el('h2', 'hk-lider-titular', m.closed));
         } else {
@@ -258,7 +269,7 @@ export function buildRest(today, lead, l, turn) {
         const m = today.menu;
         const main = m.closed ? m.closed : menuParts(m).main;
         if (main) {
-            items.push({group: m.label || '', colour: ['marca-2', 'marca-2-oscuro'], make: function () {
+            items.push({group: menuLabel(m), colour: ['marca-2', 'marca-2-oscuro'], make: function () {
                 return line(null, main, null);
             }});
         }

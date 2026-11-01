@@ -6,7 +6,7 @@ import {useOf} from '../src/rules.js';
 import {Composer, draftChoice} from '../src/compose.js';
 import {qrPath, shortWeb} from '../src/qr.js';
 import {agendaOf, monthOf} from '../src/agenda.js';
-import {leadsOf, menuParts, weekHeadline} from '../src/lead.js';
+import {leadsOf, menuLabel, menuParts, weekHeadline} from '../src/lead.js';
 
 const at = (dow, hm) => ({dow, min: parseInt(hm.slice(0, 2), 10) * 60 + parseInt(hm.slice(3), 10)});
 
@@ -164,6 +164,8 @@ test('what leads, in order; the main dish of a menu; what the week strip says', 
     assert.equal(parts.main, 'Merluza · Tortilla');
     assert.deepEqual(parts.others.map((o) => o.label), ['Primero', 'Postre']);
     assert.equal(menuParts({courses: [{label: 'Único', dishes: ['Paella']}]}).main, 'Paella');
+    assert.equal(menuLabel({label: 'Menú de hoy', name: 'Infantil'}), 'Menú de hoy · Infantil');
+    assert.equal(menuLabel({label: 'Menú de hoy', name: ''}), 'Menú de hoy');
     // The strip: the nearest event, or a big one of the next days.
     assert.equal(weekHeadline(today, S.days), 'jueves 5: Día del deporte');
     const soon = Object.assign({}, today, {countdown: {days: 3, title: 'Acampada', date: '2026-11-06'}});
