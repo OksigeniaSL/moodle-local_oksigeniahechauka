@@ -1,0 +1,1 @@
+{"meta":{"personaje":"nieve","tipo":"capas","base":1080,"dura":45,"entra":3,"sale":3,"capas":[{"image":"spr.nieve-1.webp","w":1040,"h":3120,"velocidad":[23.6667,71.0],"opacidad":1},{"image":"spr.nieve-2.webp","w":1536,"h":3584,"velocidad":[51.8571,121.0],"opacidad":1}],"peso":183786}}

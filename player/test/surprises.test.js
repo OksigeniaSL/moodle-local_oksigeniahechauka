@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {dueAfter, heightOf, pagesOf, scaleOf, Surprises, walkOf} from '../src/surprises.js';
+import {dueAfter, filesOf, heightOf, inSeason, pagesOf, scaleOf, Surprises, tileOf, walkOf} from '../src/surprises.js';
 
 const atlasOf = (id) => JSON.parse(readFileSync(new URL('../sorpresas/' + id + '/spr.' + id + '.atlas.json', import.meta.url), 'utf8'));
 const atlas = atlasOf('gusanito');
@@ -116,12 +116,49 @@ test('a flyer also starts out of sight and stops on the screen', () => {
     }
 });
 
+test('what falls closes its loop: a tile down is a whole number of tiles across, in whole pixels at any size', () => {
+    const snow = atlasOf('nieve');
+    assert.equal(snow.meta.tipo, 'capas');
+    assert.deepEqual(filesOf(snow), ['spr.nieve-1.webp', 'spr.nieve-2.webp']);
+    assert.deepEqual(filesOf(atlas), m.pages);
+    for (const capa of snow.meta.capas) {
+        const one = tileOf(capa, 1);
+        assert.equal(one.w, capa.w);
+        assert.equal(one.h, capa.h);
+        assert.ok(one.turns >= 1);
+        assert.ok(Math.abs(capa.velocidad[0] * one.seconds - one.turns * capa.w) < 0.5);
+        for (const scale of [1.25, 1.5, 2, 2.37]) {
+            const big = tileOf(capa, scale);
+            assert.ok(Number.isInteger(big.w) && Number.isInteger(big.h));
+            assert.equal(big.seconds, one.seconds);
+            assert.equal(big.turns, one.turns);
+        }
+    }
+    assert.ok(snow.meta.entra + snow.meta.sale < snow.meta.dura);
+});
+
+test('its season, year after year, also over New Year', () => {
+    const on = (month, day) => new Date(2027, month - 1, day, 12);
+    assert.equal(inSeason(undefined, on(7, 1)), true);
+    const summer = {from: '06-15', until: '08-31'};
+    assert.equal(inSeason(summer, on(6, 14)), false);
+    assert.equal(inSeason(summer, on(6, 15)), true);
+    assert.equal(inSeason(summer, on(8, 31)), true);
+    assert.equal(inSeason(summer, on(9, 1)), false);
+    const winter = {from: '12-15', until: '01-06'};
+    assert.equal(inSeason(winter, on(12, 14)), false);
+    assert.equal(inSeason(winter, on(12, 31)), true);
+    assert.equal(inSeason(winter, on(1, 1)), true);
+    assert.equal(inSeason(winter, on(1, 6)), true);
+    assert.equal(inSeason(winter, on(1, 7)), false);
+});
+
 /** Surprises with nothing of a page: it says who would come out, and nothing moves. */
 function fakeSurprises() {
     globalThis.document = {createElement: () => ({style: {}})};
     const s = new Surprises({}, {quiet: () => false, floor: () => null, note: () => null});
     s.gone = [];
-    s.go = (who) => s.gone.push(who.id);
+    s.go = (who) => who && s.gone.push(who.id);
     return s;
 }
 const WORM = {every: 20, characters: [{id: 'gusanito', atlas: 'https://example.org/spr.gusanito.atlas.json'}]};
@@ -171,6 +208,30 @@ test('by itself it comes when its time comes, and a change of how often counts a
     assert.ok(s.due > first);
     s.configure({every: 60, characters: WORM.characters}, 3, now);
     assert.ok(s.due >= now + 45 * 60000 && s.due <= now + 75 * 60000);
+});
+
+test('out of season it does not come by itself, but an order with nobody else in season is not lost', () => {
+    const s = fakeSurprises();
+    const now = new Date(2027, 6, 1, 12).getTime();
+    const snow = {id: 'nieve', atlas: 'x', season: {from: '12-15', until: '01-06'}};
+    s.configure({every: 20, characters: [snow]}, 3, now);
+    s.tick(now + 60 * 60000, true);
+    assert.deepEqual(s.gone, []);
+    s.askNow();
+    s.tick(now + 60 * 60000, true);
+    assert.deepEqual(s.gone, ['nieve']);
+
+    s.gone.length = 0;
+    s.configure({every: 20, characters: [snow, WORM.characters[0]]}, 3, now);
+    s.askNow();
+    s.tick(now + 60 * 60000, true);
+    assert.deepEqual(s.gone, ['gusanito']);
+
+    s.gone.length = 0;
+    s.configure({every: 20, characters: [snow]}, 3, new Date(2026, 11, 20, 12).getTime());
+    s.askNow();
+    s.tick(new Date(2026, 11, 20, 12).getTime(), true);
+    assert.deepEqual(s.gone, ['nieve']);
 });
 
 test('the panel\'s preview only asked', () => {

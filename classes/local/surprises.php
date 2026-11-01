@@ -34,6 +34,12 @@ class surprises {
     /** @var string[] Who there is: each has its folder in player/sorpresas. */
     const CHARACTERS = ['gusanito', 'abeja', 'mosca'];
 
+    /** @var string[] Who comes only on the dates the centre sets, and only if it asks for them: nobody has them by default. */
+    const SEASONAL = ['nieve'];
+
+    /** @var int[] The days of each month, leap year included: the same dates are for every year. */
+    const DAYS = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+
     /**
      * How often, as the centre has it.
      *
@@ -55,7 +61,55 @@ class surprises {
         if (!isset($config->surprisewho)) {
             return self::CHARACTERS;
         }
-        return array_values(array_intersect(self::CHARACTERS, explode(',', (string) $config->surprisewho)));
+        $all = array_merge(self::CHARACTERS, self::SEASONAL);
+        return array_values(array_intersect($all, explode(',', (string) $config->surprisewho)));
+    }
+
+    /**
+     * The dates of something seasonal.
+     *
+     * @param string $id
+     * @param \stdClass $config the plugin's
+     * @return array|null from and until, each as MM-DD; null if it has none, which means all year
+     */
+    protected static function season(string $id, \stdClass $config): ?array {
+        $saved = explode(',', (string) ($config->{'surpriseseason_' . $id} ?? ''));
+        return count($saved) === 2 ? ['from' => $saved[0], 'until' => $saved[1]] : null;
+    }
+
+    /**
+     * What its date selects show.
+     *
+     * @param string $date as MM-DD
+     * @return array
+     */
+    protected static function date_fields(string $date): array {
+        [$month, $day] = array_map('intval', explode('-', $date));
+        return [
+            'days' => array_map(function ($d) use ($day) {
+                return ['value' => $d, 'selected' => $d === $day];
+            }, range(1, 31)),
+            'months' => array_map(function ($m) use ($month) {
+                $name = userdate(mktime(12, 0, 0, $m, 15, 2026), '%B', 99, false);
+                return ['value' => $m, 'label' => $name, 'selected' => $m === $month];
+            }, range(1, 12)),
+        ];
+    }
+
+    /**
+     * A date that «Tu centro» sent.
+     *
+     * @param string $id
+     * @param string $end from or until
+     * @return string|null as MM-DD; null if it is not a date
+     */
+    protected static function sent_date(string $id, string $end): ?string {
+        $month = optional_param('surprise_' . $id . '_' . $end . 'month', 0, PARAM_INT);
+        $day = optional_param('surprise_' . $id . '_' . $end . 'day', 0, PARAM_INT);
+        if ($month < 1 || $month > 12 || $day < 1 || $day > 31) {
+            return null;
+        }
+        return sprintf('%02d-%02d', $month, min($day, self::DAYS[$month - 1]));
     }
 
     /**
@@ -83,8 +137,10 @@ class surprises {
         }
         return ['surprises' => [
             'every' => self::every($config),
-            'characters' => array_map(function ($id) {
-                return ['id' => $id, 'atlas' => self::url($id, 'spr.' . $id . '.atlas.json')];
+            'characters' => array_map(function ($id) use ($config) {
+                $one = ['id' => $id, 'atlas' => self::url($id, 'spr.' . $id . '.atlas.json')];
+                $season = self::season($id, $config);
+                return $season ? $one + ['season' => $season] : $one;
             }, $chosen),
         ]];
     }
@@ -99,17 +155,27 @@ class surprises {
         $c = self::C;
         $every = self::every($config);
         $chosen = self::chosen($config);
+        $row = function ($id) use ($chosen, $c) {
+            return ['id' => $id, 'name' => get_string('surprise_' . $id, $c),
+                'help' => get_string('surprise_' . $id . '_help', $c), 'picture' => self::url($id, 'retrato.webp'),
+                'atlas' => self::url($id, 'spr.' . $id . '.atlas.json'),
+                'checked' => in_array($id, $chosen), 'see' => get_string('surprise_see', $c)];
+        };
+        // Until it has its own, from today and for a month: it means the same in both hemispheres.
+        $today = new \DateTimeImmutable('now', \core_date::get_user_timezone_object());
         return [
             'on' => !empty($config->surprises),
             'every' => array_map(function ($m) use ($every, $c) {
                 return ['value' => $m, 'label' => get_string('surprises_every_' . $m, $c), 'checked' => $m === $every];
             }, self::EVERY),
-            'who' => array_map(function ($id) use ($chosen, $c) {
-                return ['id' => $id, 'name' => get_string('surprise_' . $id, $c),
-                    'help' => get_string('surprise_' . $id . '_help', $c), 'picture' => self::url($id, 'retrato.webp'),
-                    'atlas' => self::url($id, 'spr.' . $id . '.atlas.json'),
-                    'checked' => in_array($id, $chosen), 'see' => get_string('surprise_see', $c)];
-            }, self::CHARACTERS),
+            'who' => array_map($row, self::CHARACTERS),
+            'seasonal' => array_map(function ($id) use ($row, $config, $today) {
+                $season = self::season($id, $config);
+                return $row($id) + [
+                    'from' => self::date_fields($season['from'] ?? $today->format('m-d')),
+                    'until' => self::date_fields($season['until'] ?? $today->modify('+1 month')->format('m-d')),
+                ];
+            }, self::SEASONAL),
         ];
     }
 
@@ -127,7 +193,14 @@ class surprises {
         }
         // With the block closed, its boxes are still sent; a character without its box is one left out.
         $who = optional_param_array('surprisewho', [], PARAM_ALPHANUM);
-        set_config('surprisewho', implode(',', array_intersect(self::CHARACTERS, $who)), $c);
+        set_config('surprisewho', implode(',', array_intersect(array_merge(self::CHARACTERS, self::SEASONAL), $who)), $c);
+        foreach (self::SEASONAL as $id) {
+            $from = self::sent_date($id, 'from');
+            $until = self::sent_date($id, 'until');
+            if ($from && $until && in_array($id, $who)) {
+                set_config('surpriseseason_' . $id, $from . ',' . $until, $c);
+            }
+        }
     }
 
     /**

@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.7.7 (2026-11-01)
+
+- **Snow**, the first seasonal surprise: 45 seconds of snowfall over the whole screen, in two layers of tiles moved by the
+  compositor. It is off by default, and comes only between the dates the centre sets in «Tu centro», which repeat every
+  year. Each entry of `surprises.characters` may now bring its `season`, and an atlas `tipo: "capas"`.
+
 ## 0.7.6 (2026-11-01)
 
 - **The fly**, the third character of the surprises: it walks on the glass with its napkin round its neck, rubs its hands

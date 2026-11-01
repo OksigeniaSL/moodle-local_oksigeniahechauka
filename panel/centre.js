@@ -16,15 +16,20 @@
         side.style.top = Math.min(77, window.innerHeight - side.offsetHeight - 16) + 'px';
     };
     window.addEventListener('resize', fit);
-    fit();
+    new ResizeObserver(fit).observe(side);
 
     const surprises = document.getElementById('hkp-surprises');
     if (surprises) {
         surprises.addEventListener('change', () => {
             document.getElementById('hkp-surprises-box').hidden = !surprises.checked;
-            fit();
         });
     }
+    page.querySelectorAll('[data-surprise-dates]').forEach((dates) => {
+        const box = dates.parentNode.querySelector('input[type="checkbox"]');
+        box.addEventListener('change', () => {
+            dates.hidden = !box.checked;
+        });
+    });
     page.querySelectorAll('[data-surprise-atlas]').forEach((button) => {
         button.addEventListener('click', () => {
             frame.contentWindow.postMessage({hkSurprise: {id: button.getAttribute('data-surprise-id'),

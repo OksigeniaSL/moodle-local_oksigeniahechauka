@@ -7,6 +7,9 @@
 // `transform` (and the shadow's `opacity`), never `background-position`. The position goes forward with the frame (speed /
 // fps px at each change or, in what flies, the state's `avance`: a [dx, dy] per frame), never on a clock of its own: the sheet
 // is drawn in the frame that moves that way, so what is planted stays planted only if both change together.
+//
+// What falls over the whole screen (`tipo: capas`, snow) has no frames: tiles that join on their four sides, one element per
+// layer, each moved by a CSS animation of `transform` on the compositor, with no code per frame.
 
 const LEAST_MINUTES = 15;
 // An order waits this long for the manifest that says who comes out: it may have been given right after turning them on.
@@ -107,6 +110,48 @@ export function pagesOf(atlas, states) {
     return Object.keys(seen).map(Number).sort(function (a, b) {
         return a - b;
     });
+}
+
+/**
+ * The files of a surprise, beside its atlas.
+ *
+ * @param {object} atlas
+ * @returns {string[]}
+ */
+export function filesOf(atlas) {
+    return atlas.meta.pages || atlas.meta.capas.map(function (capa) {
+        return capa.image;
+    });
+}
+
+/**
+ * Whether a date is within the days a centre has set for something seasonal, year after year. It may go over New Year.
+ *
+ * @param {{from: string, until: string}|undefined} season each as "MM-DD"; nothing means all year
+ * @param {Date} date
+ * @returns {boolean}
+ */
+export function inSeason(season, date) {
+    if (!season) {
+        return true;
+    }
+    const two = (n) => (n < 10 ? '0' : '') + n;
+    const day = two(date.getMonth() + 1) + '-' + two(date.getDate());
+    return season.from <= season.until ? day >= season.from && day <= season.until : day >= season.from || day <= season.until;
+}
+
+/**
+ * A layer of what falls, at the size of the screen. While it falls one tile it drifts a whole number of tile widths, so its
+ * loop closes by itself; in whole pixels, or a fraction would show as a jump at each turn. The time does not change with the size.
+ *
+ * @param {object} capa the atlas's
+ * @param {number} scale
+ * @returns {{w: number, h: number, seconds: number, turns: number}}
+ */
+export function tileOf(capa, scale) {
+    const seconds = capa.h / capa.velocidad[1];
+    return {w: Math.round(capa.w * scale), h: Math.round(capa.h * scale), seconds,
+        turns: Math.round(capa.velocidad[0] * seconds / capa.w)};
 }
 
 function frameOf(atlas, state, i) {
@@ -264,6 +309,96 @@ class Walk {
     }
 }
 
+/** What falls over the whole screen, from the moment its tiles are ready until it has faded. */
+class Fall {
+    constructor(layer, atlas, base, width, height, scale) {
+        const m = atlas.meta;
+        this.timer = 0;
+        this.seconds = m.dura;
+        this.root = document.createElement('div');
+        css(this.root, {position: 'absolute', left: '0', top: '0', width: '100%', height: '100%', visibility: 'hidden'});
+        this.images = [];
+        this.layers = [];
+        this.moves = [];
+        const rules = [];
+        m.capas.forEach((capa, i) => {
+            const t = tileOf(capa, scale);
+            const name = 'hk-fall-' + i;
+            const shown = capa.opacidad === undefined ? 1 : capa.opacidad;
+            rules.push('@keyframes ' + name + '-m{from{transform:translate3d(' + (t.turns > 0 ? -t.turns * t.w : 0) + 'px,' + (-t.h) +
+                'px,0)}to{transform:translate3d(' + (t.turns < 0 ? t.turns * t.w : 0) + 'px,0,0)}}');
+            rules.push('@keyframes ' + name + '-f{0%{opacity:0}' + (100 * m.entra / m.dura) + '%{opacity:' + shown + '}' +
+                (100 * (m.dura - m.sale) / m.dura) + '%{opacity:' + shown + '}100%{opacity:0}}');
+            this.moves.push(name + '-m ' + t.seconds + 's linear infinite,' + name + '-f ' + m.dura + 's linear both');
+            const image = new Image();
+            image.src = base + capa.image;
+            this.images.push(image);
+            // Each with its own fade: on a common parent, the compositor would draw two whole screens into one surface more.
+            const el = document.createElement('div');
+            css(el, {position: 'absolute', left: '0', top: '0', width: (width + Math.abs(t.turns) * t.w) + 'px',
+                height: (height + t.h) + 'px', backgroundImage: 'url("' + base + capa.image + '")', backgroundRepeat: 'repeat',
+                backgroundSize: t.w + 'px ' + t.h + 'px', willChange: 'transform, opacity', opacity: '0.001'});
+            this.layers.push(el);
+            this.root.appendChild(el);
+        });
+        this.style = document.createElement('style');
+        this.style.textContent = rules.join('\n');
+        document.head.appendChild(this.style);
+        layer.appendChild(this.root);
+    }
+
+    /** Waits for the tiles and paints them once, almost invisible, so that decoding them does not land in the middle of the fall. */
+    prepare() {
+        return Promise.all(this.images.map(function (img) {
+            return new Promise(function (resolve, reject) {
+                if (img.complete && img.naturalWidth) {
+                    resolve();
+                    return;
+                }
+                img.onload = resolve;
+                img.onerror = reject;
+            });
+        })).then(() => new Promise(function (resolve) {
+            requestAnimationFrame(function () {
+                requestAnimationFrame(resolve);
+            });
+        })).then(() => {
+            this.root.style.visibility = 'visible';
+            return new Promise(function (resolve) {
+                requestAnimationFrame(function () {
+                    requestAnimationFrame(resolve);
+                });
+            });
+        });
+    }
+
+    /** @param {function(): void} done */
+    run(done) {
+        this.layers.forEach((el, i) => {
+            el.style.opacity = '';
+            el.style.animation = this.moves[i];
+        });
+        this.timer = setTimeout(done, this.seconds * 1000);
+    }
+
+    /** Off the screen, and its tiles and rules with it. */
+    remove() {
+        clearTimeout(this.timer);
+        if (this.root.parentNode) {
+            this.root.parentNode.removeChild(this.root);
+        }
+        if (this.style.parentNode) {
+            this.style.parentNode.removeChild(this.style);
+        }
+        this.images.forEach(function (img) {
+            img.onload = null;
+            img.onerror = null;
+            img.src = '';
+        });
+        this.images = [];
+    }
+}
+
 export class Surprises {
     /**
      * @param {HTMLElement} frame what it walks over
@@ -288,7 +423,7 @@ export class Surprises {
     /**
      * What the manifest says.
      *
-     * @param {object|undefined} surprises {every: minutes, characters: [{id, atlas}]}, or nothing if off
+     * @param {object|undefined} surprises {every: minutes, characters: [{id, atlas, season}]}, or nothing if off
      * @param {number} distance
      * @param {number} now
      */
@@ -316,8 +451,20 @@ export class Surprises {
         this.asked = {who: character || null, at: Date.now()};
     }
 
-    pick() {
-        return this.characters.length ? this.characters[Math.floor(Math.random() * this.characters.length)] : null;
+    /**
+     * Who comes out: those in their season. With an order, and nobody in season, any of those chosen, so that it is not lost.
+     *
+     * @param {number} now milliseconds
+     * @param {boolean} [ordered]
+     * @returns {{id: string, atlas: string}|null}
+     */
+    pick(now, ordered) {
+        const date = new Date(now);
+        const season = this.characters.filter(function (c) {
+            return inSeason(c.season, date);
+        });
+        const from = season.length || !ordered ? season : this.characters;
+        return from.length ? from[Math.floor(Math.random() * from.length)] : null;
     }
 
     /**
@@ -337,7 +484,7 @@ export class Surprises {
             return;
         }
         if (this.asked) {
-            const who = this.asked.who || this.pick();
+            const who = this.asked.who || this.pick(now, true);
             if (who) {
                 this.asked = null;
                 this.go(who);
@@ -349,7 +496,7 @@ export class Surprises {
         }
         if (!onlyAsked && this.every && now >= this.due) {
             this.due = dueAfter(now, this.every, Math.random);
-            this.go(this.pick());
+            this.go(this.pick(now));
         }
     }
 
@@ -369,21 +516,32 @@ export class Surprises {
             return r.json();
         })).then((atlas) => {
             this.atlases[character.id] = atlas;
-            const gestures = atlas.meta.gestos;
-            const gesture = gestures[Math.floor(Math.random() * gestures.length)];
             this.frame.appendChild(this.layer);
-            const walk = new Walk(this.layer, atlas, base, ['cruza', 'para', gesture, 'huye']);
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            const scale = scaleOf(width, height, this.distance);
+            const done = () => {
+                this.stop();
+            };
+            let walk;
+            let start;
+            if (atlas.meta.tipo === 'capas') {
+                walk = new Fall(this.layer, atlas, base, width, height, scale);
+                start = () => walk.run(done);
+            } else {
+                const gestures = atlas.meta.gestos;
+                const gesture = gestures[Math.floor(Math.random() * gestures.length)];
+                walk = new Walk(this.layer, atlas, base, ['cruza', 'para', gesture, 'huye']);
+                start = () => walk.run(walkOf(atlas.meta, width, scale, Math.random),
+                    heightOf(atlas.meta, height, scale, this.hooks.floor(), Math.random), scale, gesture, done);
+            }
             return walk.prepare().then(() => {
                 if (holding.cut) {
                     walk.remove();
                     return;
                 }
                 this.walk = walk;
-                const scale = scaleOf(window.innerWidth, window.innerHeight, this.distance);
-                walk.run(walkOf(atlas.meta, window.innerWidth, scale, Math.random),
-                    heightOf(atlas.meta, window.innerHeight, scale, this.hooks.floor(), Math.random), scale, gesture, () => {
-                        this.stop();
-                    });
+                start();
             }, function (e) {
                 walk.remove();
                 throw e;

@@ -3036,6 +3036,7 @@ dialog.hkp-dialog > footer {
     flex: none;
     width: 3.5rem;
     height: 3.5rem;
+    border-radius: var(--hkp-radius-sm);
     object-fit: contain;
 }
 .hkp-surprise b,
@@ -3048,6 +3049,20 @@ dialog.hkp-dialog > footer {
 .hkp-surprise .btn {
     flex: none;
     white-space: nowrap;
+}
+
+.hkp-surprise-dates {
+    display: flex;
+    flex: 1 1 100%;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .5rem;
+}
+.hkp-surprise-dates[hidden] {
+    display: none;
+}
+.hkp-surprise-dates .form-select {
+    width: auto;
 }
 
 /* «Tu centro»: the screen and, under it, the surprises. They stay in sight together while the long column goes by; taller

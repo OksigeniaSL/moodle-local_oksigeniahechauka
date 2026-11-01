@@ -15,11 +15,11 @@ import {Composer, draftChoice} from './compose.js';
 import {dayNumber, isDark, isLive, isPowerOn, liveItems, urgentOf, useOf, weekdayOf} from './rules.js';
 import {Screen} from './render.js';
 import {store} from './store.js';
-import {Surprises} from './surprises.js';
+import {filesOf, Surprises} from './surprises.js';
 import {countToday} from './today.js';
 import {weekOf} from './week.js';
 
-const VERSION = '0.7.6';
+const VERSION = '0.7.7';
 const COMING_DAYS = 7;
 const HEARTBEAT_MS = 60000;
 const REFRESH_MS = 15 * 60000;
@@ -234,7 +234,7 @@ class Player {
                     return hit || fetch(c.atlas).then(function (r) {
                         return r.json();
                     }).then(function (atlas) {
-                        return cache.addAll([c.atlas].concat(atlas.meta.pages.map(function (name) {
+                        return cache.addAll([c.atlas].concat(filesOf(atlas).map(function (name) {
                             return base + name;
                         })));
                     });

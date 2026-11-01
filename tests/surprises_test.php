@@ -101,6 +101,48 @@ final class surprises_test extends \advanced_testcase {
     }
 
     /**
+     * Nobody has what is seasonal until the centre chooses it; then it goes with its dates, which are for any year and whatever the
+     * length of the month.
+     */
+    public function test_seasonal(): void {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        set_config('surprises', 1, 'local_oksigeniahechauka');
+        $screen = $this->screen();
+        $ids = array_column(manifest::build($screen, time())['surprises']['characters'], 'id');
+        $this->assertSame(surprises::CHARACTERS, $ids);
+
+        $_POST = ['surprises' => 1, 'surpriseevery' => 20, 'surprisewho' => ['gusanito', 'nieve'],
+            'surprise_nieve_fromday' => 31, 'surprise_nieve_frommonth' => 11,
+            'surprise_nieve_untilday' => 6, 'surprise_nieve_untilmonth' => 1];
+        surprises::save_centre();
+        $people = manifest::build($screen, time())['surprises']['characters'];
+        $this->assertArrayNotHasKey('season', $people[0]);
+        $this->assertSame('nieve', $people[1]['id']);
+        $this->assertSame(['from' => '11-30', 'until' => '01-06'], $people[1]['season']);
+        $this->assertStringEndsWith('/player/sorpresas/nieve/spr.nieve.atlas.json', $people[1]['atlas']);
+
+        // What «Tu centro» shows, with those dates.
+        $seasonal = surprises::centre_context(get_config('local_oksigeniahechauka'))['seasonal'][0];
+        $this->assertTrue($seasonal['checked']);
+        $this->assertTrue($seasonal['from']['days'][29]['selected']);
+        $this->assertTrue($seasonal['from']['months'][10]['selected']);
+        $this->assertTrue($seasonal['until']['days'][5]['selected']);
+        $this->assertTrue($seasonal['until']['months'][0]['selected']);
+
+        // Dates that are none do not change those it has; unticking it keeps them for when it is ticked again.
+        $_POST = ['surprises' => 1, 'surprisewho' => ['nieve'], 'surprise_nieve_fromday' => 0, 'surprise_nieve_frommonth' => 13,
+            'surprise_nieve_untilday' => 6, 'surprise_nieve_untilmonth' => 1];
+        surprises::save_centre();
+        $this->assertSame('11-30,01-06', get_config('local_oksigeniahechauka', 'surpriseseason_nieve'));
+        $_POST = ['surprises' => 1, 'surprisewho' => ['gusanito']];
+        surprises::save_centre();
+        $this->assertSame('11-30,01-06', get_config('local_oksigeniahechauka', 'surpriseseason_nieve'));
+        $ids = array_column(manifest::build($screen, time())['surprises']['characters'], 'id');
+        $this->assertSame(['gusanito'], $ids);
+    }
+
+    /**
      * The order from a screen's sheet reaches the screen once.
      */
     public function test_asked_from_the_sheet(): void {
@@ -116,11 +158,12 @@ final class surprises_test extends \advanced_testcase {
      */
     public function test_files_are_there(): void {
         global $CFG;
-        foreach (surprises::CHARACTERS as $id) {
+        foreach (array_merge(surprises::CHARACTERS, surprises::SEASONAL) as $id) {
             $folder = $CFG->dirroot . '/local/oksigeniahechauka/player/sorpresas/' . $id . '/';
             $atlas = json_decode(file_get_contents($folder . 'spr.' . $id . '.atlas.json'), true);
-            $this->assertNotEmpty($atlas['meta']['pages']);
-            foreach ($atlas['meta']['pages'] as $page) {
+            $files = $atlas['meta']['pages'] ?? array_column($atlas['meta']['capas'], 'image');
+            $this->assertNotEmpty($files);
+            foreach ($files as $page) {
                 $this->assertFileExists($folder . $page);
             }
             $this->assertFileExists($folder . 'retrato.webp');
