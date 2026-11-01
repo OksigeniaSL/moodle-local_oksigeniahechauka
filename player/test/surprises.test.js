@@ -6,7 +6,7 @@ import {dueAfter, heightOf, pagesOf, scaleOf, Surprises, walkOf} from '../src/su
 const atlasOf = (id) => JSON.parse(readFileSync(new URL('../sorpresas/' + id + '/spr.' + id + '.atlas.json', import.meta.url), 'utf8'));
 const atlas = atlasOf('gusanito');
 const m = atlas.meta;
-const ALL = ['gusanito', 'abeja'];
+const ALL = ['gusanito', 'abeja', 'mosca'];
 const at = (v) => () => v;
 
 test('it comes now and then, never closer than a quarter of an hour', () => {
@@ -80,11 +80,13 @@ test('every frame of every state of everyone is in its atlas, and the states it 
 });
 
 test('what flies comes back to its height at the end of each turn of its loops, and its speed is its way forward', () => {
-    for (const state of ['cruza', 'huye']) {
-        const e = atlasOf('abeja').meta.estados[state];
-        const sum = (k) => e.avance.reduce((total, step) => total + step[k], 0);
-        assert.ok(Math.abs(sum(1)) < 0.01, state + ' dy ' + sum(1));
-        assert.ok(Math.abs(sum(0) - e.speed * e.frames / e.fps) < 0.5, state + ' dx ' + sum(0));
+    for (const id of ['abeja', 'mosca']) {
+        for (const state of ['cruza', 'huye']) {
+            const e = atlasOf(id).meta.estados[state];
+            const sum = (k) => e.avance.reduce((total, step) => total + step[k], 0);
+            assert.ok(Math.abs(sum(1)) < 0.01, id + ' ' + state + ' dy ' + sum(1));
+            assert.ok(Math.abs(sum(0) - e.speed * e.frames / e.fps) < 0.5, id + ' ' + state + ' dx ' + sum(0));
+        }
     }
 });
 
@@ -99,15 +101,17 @@ test('a walker goes on the ticker or the bottom edge; a flyer, within its height
 });
 
 test('a flyer also starts out of sight and stops on the screen', () => {
-    const bee = atlasOf('abeja').meta;
-    const cross = bee.estados.cruza;
-    const turn = cross.speed * cross.frames / cross.fps;
-    for (const width of [1920, 1080]) {
-        for (const r of [0, 0.49, 0.5, 0.999]) {
-            const w = walkOf(bee, width, 1, at(r));
-            const stop = w.from + w.dir * w.turns * turn;
-            assert.ok(stop > 0 && stop < width);
-            assert.ok(w.dir > 0 ? w.from + bee.cell.w - bee.anchor.x <= 0 : w.from - (bee.cell.w - bee.anchor.x) >= width);
+    for (const id of ['abeja', 'mosca']) {
+        const one = atlasOf(id).meta;
+        const cross = one.estados.cruza;
+        const turn = cross.speed * cross.frames / cross.fps;
+        for (const width of [1920, 1080]) {
+            for (const r of [0, 0.49, 0.5, 0.999]) {
+                const w = walkOf(one, width, 1, at(r));
+                const stop = w.from + w.dir * w.turns * turn;
+                assert.ok(stop > 0 && stop < width);
+                assert.ok(w.dir > 0 ? w.from + one.cell.w - one.anchor.x <= 0 : w.from - (one.cell.w - one.anchor.x) >= width);
+            }
         }
     }
 });

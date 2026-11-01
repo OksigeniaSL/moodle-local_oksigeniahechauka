@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.7.6 (2026-11-01)
+
+- **The fly**, the third character of the surprises: it walks on the glass with its napkin round its neck, rubs its hands
+  and, when it sees it has been caught, pretends nothing happened or gets its proboscis stuck.
+
 ## 0.7.5 (2026-11-01)
 
 - **The bee**, the second character of the surprises: it comes from afar, hits the glass of the screen, is left dazed and,
