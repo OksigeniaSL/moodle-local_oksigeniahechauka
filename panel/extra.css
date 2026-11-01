@@ -593,3 +593,21 @@ dialog.hkp-dialog > footer {
     flex: none;
     white-space: nowrap;
 }
+
+/* «Tu centro»: the screen and, under it, the surprises. They stay in sight together while the long column goes by; taller
+   than the window, panel/centre.js sets how far up they stick, so that their end can be reached. */
+.hkp-centre-side {
+    position: sticky;
+    top: calc(61px + 1rem);
+    display: grid;
+    gap: 1rem;
+    min-width: 0;
+}
+.hkp-centre-side > .hkp-preview {
+    position: static;
+}
+@container hkp (max-width: 60rem) {
+    .hkp-centre-side {
+        position: static;
+    }
+}

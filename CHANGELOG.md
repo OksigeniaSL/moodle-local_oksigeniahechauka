@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.7.3 (2026-11-01)
+
+- In «Tu centro», the surprises go under the screen, with a button of their own to save: at the end of the long column
+  they were too far down.
+
 ## 0.7.2 (2026-11-01)
 
 - **Surprises**: now and then a character crosses the screen, stops, looks at whoever is passing, makes a gesture and runs

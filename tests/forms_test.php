@@ -93,7 +93,11 @@ final class forms_test extends \advanced_testcase {
         $this->assertStringContainsString('hkp-sheet', $html);
         $this->assertStringContainsString('1080 × 1920', $html);
         $this->assertStringContainsString('hkp-group-' . $group, $render('groups', groupspage::context($now)));
-        $this->assertStringContainsString('hkp-colours', $render('centre', centre::context('', $now)));
+        $html = $render('centre', centre::context('', $now));
+        $this->assertStringContainsString('hkp-colours', $html);
+        // The surprises are outside the form, tied to it: without this they would not be saved.
+        $this->assertStringContainsString('name="surprises" form="hkp-centre-form"', $html);
+        $this->assertStringContainsString('name="surprisewho[]" form="hkp-centre-form"', $html);
         $code = screens::start_pairing(['width' => 1920, 'height' => 1080], $now)['code'];
         $pair = screens::pairing($code, $now);
         $this->assertStringContainsString('hkp-found', $render('claim', claimpage::form($pair, $code, $now, [])));

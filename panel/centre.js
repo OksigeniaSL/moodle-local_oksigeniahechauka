@@ -10,10 +10,19 @@
     const frame = document.getElementById('hkp-cpv');
     let mode = 'light';
 
+    // Sticks under the bar of the site; if it does not fit in the window, higher up, with its end in sight.
+    const side = page.querySelector('.hkp-centre-side');
+    const fit = () => {
+        side.style.top = Math.min(77, window.innerHeight - side.offsetHeight - 16) + 'px';
+    };
+    window.addEventListener('resize', fit);
+    fit();
+
     const surprises = document.getElementById('hkp-surprises');
     if (surprises) {
         surprises.addEventListener('change', () => {
             document.getElementById('hkp-surprises-box').hidden = !surprises.checked;
+            fit();
         });
     }
     page.querySelectorAll('[data-surprise-atlas]').forEach((button) => {

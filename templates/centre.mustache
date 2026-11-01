@@ -108,22 +108,25 @@
                     <p class="hkp-hint hkp-section-hint">{{#str}}centre_logo_help, local_oksigeniahechauka{{/str}}</p>
                     <div class="hkp-logos">{{#logos}}<div class="hkp-logo"><span class="hkp-logo-art{{#dark}} is-dark{{/dark}}">{{#url}}<img src="{{url}}" alt="{{alt}}">{{/url}}</span><b>{{label}}</b><label class="btn btn-sm btn-outline-secondary">{{#str}}compose_change, local_oksigeniahechauka{{/str}}<input class="visually-hidden sr-only" type="file" name="{{area}}" accept=".svg,.png,.jpg,.jpeg,.webp" data-logo="{{area}}"></label></div>{{/logos}}</div>
                 </section>
-                <section class="hkp-fs" aria-labelledby="hkp-sur-h">
-                    <h2 id="hkp-sur-h" class="hkp-label hkp-section-label">{{#str}}centre_surprises, local_oksigeniahechauka{{/str}}</h2>
-                    <p class="hkp-hint hkp-section-hint">{{#str}}centre_surprises_help, local_oksigeniahechauka{{/str}}</p>
-                    <div class="form-switch form-check"><input class="form-check-input" type="checkbox" role="switch" id="hkp-surprises" name="surprises" value="1"{{#surprises.on}} checked{{/surprises.on}}><div><label class="form-check-label" for="hkp-surprises"><b>{{#str}}centre_surprises_on, local_oksigeniahechauka{{/str}}</b></label><p class="hkp-hint">{{#str}}centre_surprises_on_help, local_oksigeniahechauka{{/str}}</p></div></div>
-                    <div id="hkp-surprises-box"{{^surprises.on}} hidden{{/surprises.on}}>
-                        <div class="hkp-field"><span class="hkp-label" id="hkp-sur-e">{{#str}}centre_surprises_every, local_oksigeniahechauka{{/str}}</span><div class="hkp-chips" role="radiogroup" aria-labelledby="hkp-sur-e">{{#surprises.every}}<label class="hkp-chip is-small"><input type="radio" name="surpriseevery" value="{{value}}"{{#checked}} checked{{/checked}}>{{label}}</label>{{/surprises.every}}</div></div>
-                        <div class="hkp-field"><span class="hkp-label" id="hkp-sur-w">{{#str}}centre_surprises_who, local_oksigeniahechauka{{/str}}</span><ul class="hkp-surprises" aria-labelledby="hkp-sur-w">{{#surprises.who}}<li class="hkp-surprise"><label><input type="checkbox" name="surprisewho[]" value="{{id}}"{{#checked}} checked{{/checked}}><img src="{{picture}}" alt=""><span><b>{{name}}</b><small>{{help}}</small></span></label><button type="button" class="btn btn-sm btn-outline-secondary" data-surprise-id="{{id}}" data-surprise-atlas="{{atlas}}">{{see}}</button></li>{{/surprises.who}}</ul></div>
-                    </div>
-                </section>
                 <div class="hkp-foot"><button type="submit" class="btn btn-primary btn-lg">{{#str}}centre_save, local_oksigeniahechauka{{/str}}</button><p class="hkp-hint">{{#str}}centre_technical, local_oksigeniahechauka{{/str}}{{#admin}} <a href="{{admin}}">{{#str}}centre_admin, local_oksigeniahechauka{{/str}}</a>{{/admin}}</p></div>
             </form>
         </div>
+        <div class="hkp-centre-side">
         <aside class="hkp-preview" aria-labelledby="hkp-cpv-h">
             <div class="hkp-preview-head"><h2 id="hkp-cpv-h">{{#str}}centre_preview, local_oksigeniahechauka{{/str}}</h2><div class="hkp-seg" role="group" aria-label="{{#str}}centre_theme, local_oksigeniahechauka{{/str}}"><button type="button" aria-pressed="true" data-ct="light">{{#str}}thememode_light, local_oksigeniahechauka{{/str}}</button><button type="button" aria-pressed="false" data-ct="dark">{{#str}}thememode_dark, local_oksigeniahechauka{{/str}}</button></div></div>
             <div class="hkp-stage"><span class="hkp-bezel" data-state="on"><iframe id="hkp-cpv" src="{{frame}}" title="{{#str}}centre_preview_title, local_oksigeniahechauka{{/str}}"></iframe><span class="hkp-led" aria-hidden="true"></span></span></div>
             {{#placename}}<p class="hkp-preview-note">{{#str}}centre_preview_note, local_oksigeniahechauka, {{placename}}{{/str}}</p>{{/placename}}
         </aside>
+                <section class="hkp-fs" aria-labelledby="hkp-sur-h">
+                    <h2 id="hkp-sur-h" class="hkp-label hkp-section-label">{{#str}}centre_surprises, local_oksigeniahechauka{{/str}}</h2>
+                    <p class="hkp-hint hkp-section-hint">{{#str}}centre_surprises_help, local_oksigeniahechauka{{/str}}</p>
+                    <div class="form-switch form-check"><input class="form-check-input" type="checkbox" role="switch" id="hkp-surprises" name="surprises" form="hkp-centre-form" value="1"{{#surprises.on}} checked{{/surprises.on}}><div><label class="form-check-label" for="hkp-surprises"><b>{{#str}}centre_surprises_on, local_oksigeniahechauka{{/str}}</b></label><p class="hkp-hint">{{#str}}centre_surprises_on_help, local_oksigeniahechauka{{/str}}</p></div></div>
+                    <div id="hkp-surprises-box"{{^surprises.on}} hidden{{/surprises.on}}>
+                        <div class="hkp-field"><span class="hkp-label" id="hkp-sur-e">{{#str}}centre_surprises_every, local_oksigeniahechauka{{/str}}</span><div class="hkp-chips" role="radiogroup" aria-labelledby="hkp-sur-e">{{#surprises.every}}<label class="hkp-chip is-small"><input type="radio" name="surpriseevery" form="hkp-centre-form" value="{{value}}"{{#checked}} checked{{/checked}}>{{label}}</label>{{/surprises.every}}</div></div>
+                        <div class="hkp-field"><span class="hkp-label" id="hkp-sur-w">{{#str}}centre_surprises_who, local_oksigeniahechauka{{/str}}</span><ul class="hkp-surprises" aria-labelledby="hkp-sur-w">{{#surprises.who}}<li class="hkp-surprise"><label><input type="checkbox" name="surprisewho[]" form="hkp-centre-form" value="{{id}}"{{#checked}} checked{{/checked}}><img src="{{picture}}" alt=""><span><b>{{name}}</b><small>{{help}}</small></span></label><button type="button" class="btn btn-sm btn-outline-secondary" data-surprise-id="{{id}}" data-surprise-atlas="{{atlas}}">{{see}}</button></li>{{/surprises.who}}</ul></div>
+                    </div>
+                    <div class="hkp-foot"><button type="submit" form="hkp-centre-form" class="btn btn-primary">{{#str}}centre_save, local_oksigeniahechauka{{/str}}</button></div>
+                </section>
+        </div>
     </div>
 </div>

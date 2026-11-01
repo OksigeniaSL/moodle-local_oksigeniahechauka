@@ -310,7 +310,7 @@ Biblioteca, Secretaría y Comedor.» A teacher sees only their groups, already c
   Moodle» (each linked to its course category, whose calendar events then show in its colour). Nothing in the product
   is one school's: Hechauka is installed by universities, academies and schools alike.
 - **The logo**: one for light screens and one for dark ones, each on its own background, with «Cambiar».
-- **The surprises**: off by default. A switch, «Cada cuánto» as chips (cada 20 minutos, cada hora, cada tres horas) and
+- **The surprises**: under the screen, with their own «Guardar», since the column of the form is long. Off by default. A switch, «Cada cuánto» as chips (cada 20 minutos, cada hora, cada tres horas) and
   «Quién sale», a row per character with its box, its portrait, what it does and «Verlo en la pantalla», which plays it on
   the screen beside. A character crosses over whatever is there and does not stay, so nothing looks for a gap: it comes
   out now and then, and only an urgent notice takes it off.
