@@ -1,0 +1,96 @@
+/* Oksigenia Hechauka 0.7.0: the ticker, sentence by sentence (Gaudí, 1 November 2026). Goes after distancia.css.
+ *
+ * The running crawl was what read worst (the three reviews of 31 October). Now one sentence at a time:
+ *   enters   it rises a little from below as it fades in (0.7 s), and does not move again;
+ *   holds    6 s, or 2 s plus 0.35 s a word if longer (up to 12 s): the player sets it;
+ *   changes  it fades out rising a little (0.45 s); 0.25 s later the next one enters.
+ * A counter «2/5» on the right says how many there are. With .hk-quieto (or the system's reduced motion) the
+ * sentences only fade. A sentence that does not fit in one line at --hk-t-lista goes in two at --hk-t-min
+ * (data-lineas="2"); if not even so, the player cuts it at a comma or a colon into two sentences that come one after
+ * the other. Only sentences that are not already in «Today» (the player's choice).
+ *
+ * Markup:
+ *   <footer class="hk-cinta hk-cinta-frases">
+ *     <b>Al día</b>
+ *     <div class="hk-cinta-pista">
+ *       <p class="hk-frase">…</p>                      (+ .hk-frase-dentro while it shows, .hk-frase-fuera leaving)
+ *     </div>
+ *     <p class="hk-cinta-cuenta"><b>2</b>/5</p>       (none with a single sentence)
+ *   </footer>
+ * At 8 m there is no ticker (distancia.css): its sentences are slides of their own («titular», usos.css). */
+
+.hk-cinta-frases .hk-cinta-pista {
+    position: relative;
+    height: 100%;
+    white-space: normal;
+}
+.hk-cinta-frases .hk-cinta-texto {
+    display: none;                        /* the 0.6 crawl */
+}
+.hk .hk-frase {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 3.6rem;
+    right: 2.4rem;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    font-size: var(--hk-t-lista);
+    font-weight: 800;
+    line-height: 1.08;
+    opacity: 0;
+    -webkit-transform: translate3d(0, 45%, 0);
+    transform: translate3d(0, 45%, 0);
+    -webkit-transition: opacity .7s ease, -webkit-transform .8s cubic-bezier(.2, .7, .2, 1);
+    transition: opacity .7s ease, transform .8s cubic-bezier(.2, .7, .2, 1);
+}
+.hk .hk-frase[data-lineas="2"] {
+    font-size: var(--hk-t-min);
+    line-height: 1.06;
+}
+.hk .hk-frase.hk-frase-dentro {
+    opacity: 1;
+    -webkit-transform: none;
+    transform: none;
+}
+.hk .hk-frase.hk-frase-fuera {
+    opacity: 0;
+    -webkit-transform: translate3d(0, -35%, 0);
+    transform: translate3d(0, -35%, 0);
+    -webkit-transition-duration: .45s;
+    transition-duration: .45s;
+}
+.hk .hk-cinta-cuenta {
+    flex: none;
+    padding: 0 4rem 0 2.4rem;
+    font-size: var(--hk-t-min);
+    font-weight: 700;
+    line-height: 1;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+.hk .hk-cinta .hk-cinta-cuenta b {        /* not the label's block (hechauka.css styles every b of the ticker) */
+    display: inline;
+    height: auto;
+    padding: 0;
+    background: none;
+    color: inherit;
+    font-size: inherit;
+    font-weight: 800;
+    letter-spacing: 0;
+    text-transform: none;
+}
+/* Still: only the fade. */
+.hk.hk-quieto .hk-frase,
+.hk.hk-quieto .hk-frase.hk-frase-fuera {
+    -webkit-transform: none;
+    transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+    .hk .hk-frase,
+    .hk .hk-frase.hk-frase-fuera {
+        -webkit-transform: none;
+        transform: none;
+    }
+}

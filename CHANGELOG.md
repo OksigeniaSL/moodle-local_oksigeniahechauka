@@ -1,26 +1,32 @@
 # Changelog
 
-## 0.7.0 (in progress)
+## 0.7.0 (2026-11-01)
 
-- **What each screen is for**, in its sheet: informative (inside: «Today», the menu, the notices, the agenda),
-  showcase (to be seen from afar and by people from outside: only pictures and videos over the whole screen, their
-  headline big, and their web with a QR) or mixed (also the weather in a third: today big and the next three days).
-  And another use at some hours: an entrance informative on weekdays and a showcase at the weekend. New fields `use`
-  and `useplan` in the manifest; the screens' `template` follows the use.
+The screens, read at a glance: the art direction's design of the compositions on the player.
+
+- **One thing big in each slide**, like the front page of a newspaper: what leads (the menu, a notice, the important
+  notice, an event or the countdown, a different one each time; around midday the menu first) and the rest in a third,
+  which turns a page with each slide. The important notice stays fixed on top, in the accent's colour, with its mark.
+- **The letters by the distance**: each screen says in its sheet from where it is read (3, 5 or 8 m) and whether it is
+  behind glass, and every size comes from that. From 5 m no week; from 8 m no thirds and no ticker: «Today» comes one
+  thing at a time, big, and the ticker's sentences come as slides of their own (`titular`, also for a countdown).
+- **What each screen is for**, in its sheet: informative, showcase (only pictures and videos over the whole screen, their
+  headline big, and their web with a QR, for people from outside and from afar) or mixed (also the weather in a third:
+  today big and the next three days). And another use at some hours: an entrance informative on weekdays and a showcase
+  at the weekend. New fields `use` and `useplan` in the manifest, `distance` and `glass` in its `screen`.
 - **A web for a picture or a video**: on a showcase it shows with a big QR to open it on a phone, and the address
   written short. The QR is made in the player (qrcode-generator, MIT), with no network.
-- The events come a month ahead (for the agenda that scrolls, into the next month), and the weather the next three
-  days.
-- A first look for the showcase and the weather in a third (`player/usos.css`), until the art direction's design.
-- **Headlines in two even lines**: a caption, a showcase's headline or a notice that takes two lines is cut where both
-  come out most alike (measured in the player: Chromium 56 has no `text-wrap: balance`); its box keeps its width.
-
-- **«Tomorrow» at the end of the day:** each centre sets in «Tu centro» when its day ends (16:00 by default; a
-  university with evening classes, at night). From then until midnight «Today» shows tomorrow's events under
-  «Tomorrow», the coming days start after it, and the menu switches at the same hour. New field `dayend` in the
-  manifest.
+- **Landscape videos have their own place** (`apaisado`): two thirds with their band under them, playing at once, and the
+  rest in the other third.
+- **The ticker, one sentence at a time**, instead of running; a long one is cut at a comma into two.
+- **Headlines by steps and in even lines**, measured in the player (Chromium 56 has no `text-wrap: balance`).
+- **«Tomorrow» at the end of the day:** each centre sets in «Tu centro» when its day ends (16:00 by default). From then
+  until midnight «Today» shows tomorrow's events under «Tomorrow», the coming days start after it, and the menu switches
+  at the same hour. New field `dayend` in the manifest.
 - «Today» lists the events that take place today by their own dates: an event shown days before its day stays in the
   coming days, and one of several days is on each of them.
+- The week has a strip with what comes next and matters.
+- The events come a month ahead and the weather the next three days, for what comes next: the agenda that scrolls.
 
 ## 0.6.3 (2026-11-01)
 

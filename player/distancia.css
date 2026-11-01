@@ -1,0 +1,195 @@
+/* Oksigenia Hechauka 0.7.0: type by viewing distance (Gaudí, 1 November 2026). Goes after the 0.6 sheets
+ * (hechauka.css, composiciones.css, tiempo.css, semana.css, proximos-dias.css) and before jerarquia.css.
+ *
+ * Each screen says where it is read from and whether it is behind glass, on .hk:
+ *   <div class="hk hk-horizontal" data-distancia="3|5|8" data-cristal>      (no data-distancia: 3)
+ * and every size of 0.7.0 comes from the tokens below. The values are for a 55" screen (1rem = 1/108 of the short
+ * side = 6.34 mm). Another diagonal declares the equivalent distance: d × 55 / inches (a 43" read from 3 m is a 55"
+ * read from 3.8 m: «5»). Up to 3.5 m equivalent, «3»; up to 6 m, «5»; beyond, «8».
+ *
+ * Where the numbers come from (LEEME.md, «La letra por la distancia»): a capital of Nunito is 0.705 of the font size.
+ *   - minimum (anything that has to be read, by someone who stops): capitals of 20 arcmin seen from that distance;
+ *     what is not the slide's lead is read from a little closer at 5 and 8 m (from 4 and 5 m: one steps closer);
+ *   - minimum title (read in passing, at a glance): the sign-writers' rule, 2.5 cm of capital for each 3 m
+ *     (≈ 28.6 arcmin, the «1 inch per 10 feet» of signage);
+ *   - the lead's headline: about two and a half times the rest, never under the minimum title.
+ * Behind glass every size takes 15 % more and the secondary grey becomes the text colour (reflections eat contrast).
+ *
+ * Chromium 56: only custom properties and plain values (no nested calc, no clamp/min/max). */
+
+/* --- The tokens ----------------------------------------------------------------------------------------------- */
+.hk {
+    --hk-t-min: 4rem;               /* labels, second lines, credits: the least that is read */
+    --hk-t-lista: 4.8rem;           /* the first line of what is not the lead (a dish, a notice, an event) */
+    --hk-t-entrada: 6rem;           /* the lead's second line, the band's title */
+    --hk-t-titulo-min: 5.6rem;      /* a title is never smaller than this: the headline's fit stops here */
+    --hk-t-titular: 12rem;          /* the lead's headline */
+    --hk-t-cifra: 10rem;            /* the clock, the temperature: numbers read as a scoreboard */
+    --hk-cabecera-alto: 10rem;
+    --hk-cinta-alto: 9.6rem;
+    --hk-hueco: 3.2rem;             /* the gutter between the zones */
+}
+.hk[data-distancia="5"] {
+    --hk-t-min: 5.2rem;
+    --hk-t-lista: 6.4rem;
+    --hk-t-entrada: 8rem;
+    --hk-t-titulo-min: 9.4rem;
+    --hk-t-titular: 16rem;
+    --hk-t-cifra: 12rem;
+    --hk-cabecera-alto: 12.4rem;
+    --hk-cinta-alto: 12.8rem;
+    --hk-hueco: 3.6rem;
+}
+.hk[data-distancia="8"] {
+    --hk-t-min: 6.6rem;
+    --hk-t-lista: 8rem;
+    --hk-t-entrada: 10.4rem;
+    --hk-t-titulo-min: 15rem;
+    --hk-t-titular: 20rem;
+    --hk-t-cifra: 14rem;
+    --hk-cabecera-alto: 14.4rem;
+    --hk-cinta-alto: 16rem;
+    --hk-hueco: 4rem;
+}
+.hk[data-cristal] {
+    --hk-t-min: 4.6rem;
+    --hk-t-lista: 5.5rem;
+    --hk-t-entrada: 6.9rem;
+    --hk-t-titulo-min: 6.4rem;
+    --hk-t-titular: 13.8rem;
+    --hk-t-cifra: 11.5rem;
+    --hk-cabecera-alto: 11.5rem;
+    --hk-cinta-alto: 11rem;
+}
+.hk[data-distancia="5"][data-cristal] {
+    --hk-t-min: 6rem;
+    --hk-t-lista: 7.4rem;
+    --hk-t-entrada: 9.2rem;
+    --hk-t-titulo-min: 10.8rem;
+    --hk-t-titular: 18.4rem;
+    --hk-t-cifra: 13.8rem;
+    --hk-cabecera-alto: 14.2rem;
+    --hk-cinta-alto: 14.6rem;
+}
+.hk[data-distancia="8"][data-cristal] {
+    --hk-t-min: 7.6rem;
+    --hk-t-lista: 9.2rem;
+    --hk-t-entrada: 12rem;
+    --hk-t-titulo-min: 17.2rem;
+    --hk-t-titular: 23rem;
+    --hk-t-cifra: 16rem;
+    --hk-cabecera-alto: 16.4rem;
+    --hk-cinta-alto: 18.4rem;
+}
+/* Behind glass: no secondary grey for what has to be read, and the full weight. */
+.hk[data-cristal] {
+    --hk-texto-suave: var(--hk-texto);
+}
+
+/* --- The header --------------------------------------------------------------------------------------------- */
+.hk > .hk-cabecera {
+    height: var(--hk-cabecera-alto);
+    margin-bottom: var(--hk-hueco);
+}
+.hk-completa .hk-cabecera {
+    height: var(--hk-cabecera-alto);
+}
+.hk-cabecera img {
+    height: calc(var(--hk-cabecera-alto) * .74);
+}
+.hk-lugar,
+.hk-fecha {
+    font-size: var(--hk-t-min);
+}
+.hk-reloj {
+    font-size: var(--hk-t-cifra);
+}
+.hk-tiempo-icono {
+    width: var(--hk-cabecera-alto);
+    height: var(--hk-cabecera-alto);
+}
+.hk-tiempo-grados {
+    font-size: calc(var(--hk-t-cifra) * .8);
+}
+.hk-tiempo-extremos,
+.hk-tiempo-lluvia {
+    font-size: var(--hk-t-min);
+}
+.hk-tiempo-lluvia svg {
+    width: calc(var(--hk-t-min) * .8);
+    height: var(--hk-t-min);
+}
+/* From 5 m the screen's own name goes: nobody reads it from there, and it was the header's secondary data. At 8 m
+   the date is one line and today's highest and lowest wait for their own moment. */
+.hk[data-distancia="5"] .hk-lugar,
+.hk[data-distancia="8"] .hk-lugar,
+.hk[data-distancia="8"] .hk-tiempo-extremos,
+.hk[data-distancia="8"] .hk-tiempo-lluvia {
+    display: none;
+}
+.hk[data-distancia="8"] .hk-fecha b {
+    display: inline;
+}
+/* On a vertical screen at 5 m the date goes in two lines over the clock; at 8 m only the weekday. */
+.hk.hk-vertical[data-distancia="5"] .hk-fecha b {
+    display: block;
+}
+.hk.hk-vertical[data-distancia="8"] .hk-fecha span {
+    display: none;
+}
+.hk-vertical[data-distancia="5"] > .hk-cabecera,
+.hk-vertical[data-distancia="5"] > .hk-cabecera.hk-con-tiempo {
+    height: calc(var(--hk-t-min) * 2.5 + var(--hk-t-cifra));
+}
+/* A vertical screen stacks the date over the clock: its header grows with both. */
+.hk-vertical > .hk-cabecera,
+.hk-vertical > .hk-cabecera.hk-con-tiempo {
+    height: calc(var(--hk-t-min) * 1.3 + var(--hk-t-cifra));
+}
+.hk-vertical .hk-tiempo-icono {
+    width: calc(var(--hk-t-cifra) * .9);
+    height: calc(var(--hk-t-cifra) * .9);
+}
+.hk-vertical .hk-tiempo-grados {
+    font-size: calc(var(--hk-t-cifra) * .8);
+}
+.hk-vertical .hk-con-tiempo .hk-lugar {
+    top: calc(var(--hk-cabecera-alto) * .82);
+    font-size: var(--hk-t-min);
+}
+
+/* --- The ticker ---------------------------------------------------------------------------------------------- */
+.hk > .hk-cinta {
+    height: var(--hk-cinta-alto);
+    margin-top: var(--hk-hueco);
+}
+.hk-cinta b {
+    font-size: var(--hk-t-min);
+}
+/* At 8 m a line of the ticker would not fit at a readable size: its sentences go into the rotation as slides of
+   their own (the «titular» composition, usos.css). */
+.hk[data-distancia="8"] > .hk-cinta {
+    display: none;
+}
+.hk[data-distancia="8"] {
+    padding-bottom: 3rem;
+}
+
+/* --- The weather's credit, the «example data» mark ---------------------------------------------------------- */
+.hk-credito-tiempo {
+    font-size: 2.2rem;                  /* a credit, not information: the one size that does not follow distance */
+}
+
+/* --- An overscan margin, for a television that crops its edges (4 % each side) ---------------------------------- */
+.hk[data-zona-segura] {
+    padding: 4.4rem 7.7rem 0;
+}
+.hk[data-zona-segura].hk-sin-cinta,
+.hk[data-zona-segura][data-distancia="8"] {
+    padding-bottom: 4.4rem;
+}
+.hk[data-zona-segura] > .hk-cinta {
+    margin-left: -7.7rem;
+    margin-right: -7.7rem;
+    padding-bottom: 0;
+}

@@ -137,6 +137,10 @@ changed, or the manifest with its `ETag` header:
   "use": "showcase"}]` (days 1 Monday to 7 Sunday, none for every day; an `until` before `from` crosses midnight).
 - `dayend`: when the day ends for the centre («HH:MM»). From then until midnight, «Today» shows tomorrow's events under
   «Tomorrow» and the coming days start after it; the server sends tomorrow's menu from the same hour.
+- `screen.distance`: from where it is read, in metres: `3`, `5` or `8`. Every size of the screen comes from it. From 5 m
+  there is no week; from 8 m no thirds and no ticker: «Today» comes one thing at a time and the ticker's sentences come
+  as slides of their own. Without it, `3`.
+- `screen.glass`: true behind glass: everything a bit bigger, and no secondary grey in what has to be read.
 - `screen.sound`: whether its videos play with their sound (most screens are muted: behind glass, or in a room that
   would hear the same thing forty times an hour).
 - `screen.timezone`: the time zone the screen should be in. The player reports its own offset in the heartbeat, so

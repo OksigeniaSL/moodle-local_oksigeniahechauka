@@ -154,6 +154,12 @@ class sheet {
                     'checked' => $u === uses::valid($screen->screenuse ?? null)];
             }, uses::USES),
             'plan' => self::plan_context($screen, $letters, $names),
+            'distances' => array_map(function ($d) use ($screen, $c) {
+                return ['value' => $d, 'label' => get_string('distance_' . $d, $c),
+                    'help' => get_string('distance_' . $d . '_help', $c),
+                    'checked' => $d === uses::distance($screen->distance ?? 3)];
+            }, uses::DISTANCES),
+            'glass' => !empty($screen->glass),
             'themes' => array_map(function ($t) use ($theme, $c) {
                 return ['value' => $t, 'label' => get_string('sheet_theme_' . $t, $c), 'checked' => $t === $theme];
             }, self::THEMES),
@@ -312,6 +318,8 @@ class sheet {
             'sound' => optional_param('sound', 0, PARAM_BOOL) ? 1 : 0,
             'theme' => in_array($theme, self::THEMES) ? $theme : 'site',
             'screenuse' => $use,
+            'distance' => uses::distance(optional_param('distance', 3, PARAM_INT)),
+            'glass' => optional_param('glass', 0, PARAM_BOOL) ? 1 : 0,
             'useplan' => $plan ? json_encode(array_values($plan)) : null,
             'timemodified' => time(),
         ]);

@@ -1,97 +1,83 @@
-// Headlines in two even lines (Chromium 56 has no «text-wrap: balance»): a headline that takes two lines is cut where
-// both come out most alike, with a line break between words. Its box keeps its width; only the break moves.
+// Headlines in even lines (Chromium 56 has no «text-wrap: balance»): each word is measured and the breaks go where
+// each line is closest to the same width, as <br>. Only headlines, never paragraphs; the box keeps its width. If the
+// even breaks would add a line, it stays as it was. The art direction's «equilibrar» (Gaudí, 1 November 2026).
+
+import {linesOf} from './lead.js';
 
 /**
- * Where to cut a list of words in two lines most alike: the index of the first word of the second line, or -1 when
- * it does not fit in two lines.
+ * Where the breaks go for n even lines: after which words, by their widths and the width of a space.
  *
- * @param {string[]} words
- * @param {function(string): number} widthOf the width of a text, in the headline's letters
- * @param {number} max the width of the headline's box
- * @returns {number}
+ * @param {number[]} widths each word's width
+ * @param {number} space a space's width
+ * @param {number} n how many lines
+ * @returns {number[]} the index of the last word of each line but the last
  */
-export function bestSplit(words, widthOf, max) {
-    let best = -1;
-    let bestWidth = Infinity;
-    for (let k = 1; k < words.length; k++) {
-        const a = widthOf(words.slice(0, k).join(' '));
-        const b = widthOf(words.slice(k).join(' '));
-        const wide = Math.max(a, b);
-        if (a <= max && b <= max && wide < bestWidth) {
-            best = k;
-            bestWidth = wide;
+export function cutsFor(widths, space, n) {
+    let total = 0;
+    widths.forEach(function (w) {
+        total += w;
+    });
+    total += space * (widths.length - 1);
+    const cuts = [];
+    let sum = 0;
+    const goal = total / n;
+    let k = 1;
+    for (let i = 0; i < widths.length - 1 && k < n; i++) {
+        sum += widths[i] + (i > 0 ? space : 0);
+        const next = sum + space + widths[i + 1];
+        if (Math.abs(next - goal * k) > Math.abs(sum - goal * k)) {
+            cuts.push(i);
+            k++;
         }
     }
-    return best;
-}
-
-let canvas = null;
-
-// How many lines a headline's text takes now.
-function lines(node) {
-    if (!document.createRange) {
-        return 1;
-    }
-    const range = document.createRange();
-    range.selectNodeContents(node);
-    const rects = range.getClientRects();
-    const tops = {};
-    let n = 0;
-    for (let i = 0; i < rects.length; i++) {
-        const top = Math.round(rects[i].top);
-        if (rects[i].width > 0 && !tops[top]) {
-            tops[top] = true;
-            n++;
-        }
-    }
-    return n;
+    return cuts;
 }
 
 /**
- * Evens out one headline in two lines. Text only; measured again from its words each time, so a change of size
- * (fitting «Today», the letters arriving) can call it again.
+ * Evens out a headline of two to four lines. Measured again from its words each time (its text is kept), so a
+ * change of size (a step down, the letters arriving) can call it again.
  *
- * @param {HTMLElement} node
+ * @param {HTMLElement} e
  */
-export function balance(node) {
-    let text = node.hkWords;
-    if (text === undefined) {
-        if (node.children.length) {
+export function even(e) {
+    if (e.hkWords === undefined) {
+        if (e.children.length) {
             return;
         }
-        text = node.textContent;
-        node.hkWords = text;
+        e.hkWords = e.textContent;
     }
-    node.textContent = text;
-    const words = text.split(/\s+/).filter(Boolean);
-    if (words.length < 3 || lines(node) !== 2) {
+    const text = e.hkWords;
+    e.textContent = text;
+    const n = linesOf(e);
+    const words = text.split(' ');
+    if (n < 2 || n > 4 || words.length < n + 1) {
         return;
     }
-    const style = window.getComputedStyle(node);
-    canvas = canvas || document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    ctx.font = [style.fontStyle, style.fontWeight, style.fontSize, style.fontFamily].join(' ');
-    const max = node.clientWidth - (parseFloat(style.paddingLeft) || 0) - (parseFloat(style.paddingRight) || 0);
-    // A hair of room: the canvas does not count the letters' spacing.
-    const k = bestSplit(words, function (t) {
-        return ctx.measureText(t).width * 1.02;
-    }, max);
-    if (k <= 0) {
-        return;
-    }
-    node.textContent = '';
-    node.appendChild(document.createTextNode(words.slice(0, k).join(' ')));
-    node.appendChild(document.createElement('br'));
-    node.appendChild(document.createTextNode(words.slice(k).join(' ')));
-}
-
-/** The headlines of a part of the screen: captions, the showcase, the notices. */
-export function balanceIn(root) {
-    if (!root || !root.querySelectorAll) {
-        return;
-    }
-    const heads = root.querySelectorAll('.hk-pie h2, .hk-aviso h3');
-    for (let i = 0; i < heads.length; i++) {
-        balance(heads[i]);
+    const meter = document.createElement('span');
+    meter.style.whiteSpace = 'nowrap';
+    e.appendChild(meter);
+    meter.textContent = 'a a';
+    let space = meter.offsetWidth;
+    meter.textContent = 'aa';
+    space -= meter.offsetWidth;
+    const widths = words.map(function (w) {
+        meter.textContent = w;
+        return meter.offsetWidth;
+    });
+    e.removeChild(meter);
+    const cuts = cutsFor(widths, space, n);
+    e.textContent = '';
+    let line = [];
+    words.forEach(function (w, j) {
+        line.push(w);
+        if (cuts.indexOf(j) !== -1) {
+            e.appendChild(document.createTextNode(line.join(' ')));
+            e.appendChild(document.createElement('br'));
+            line = [];
+        }
+    });
+    e.appendChild(document.createTextNode(line.join(' ')));
+    if (linesOf(e) > n) {
+        e.textContent = text;
     }
 }

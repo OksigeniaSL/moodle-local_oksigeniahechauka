@@ -1,0 +1,345 @@
+/* Oksigenia Hechauka 0.7.0: the picture in two thirds with its band, and the weather in a third (Gaudí, 1 November
+ * 2026). Goes after jerarquia.css. Drawn on the player's own markup (plugin commit 76fe193): the slot is the usual
+ * .hk-medio with its .hk-diapo and .hk-pie, and the weather is what buildWeatherThird() writes. Nothing new to build
+ * but the composition «apaisado».
+ *
+ *   tiempo-tercio  the weather in one third: today big under its label, the next three days under it; the picture
+ *                  (photo or video) in the other two thirds, its caption as a band under it. On a vertical screen
+ *                  the weather on top and the picture under it. At 8 m there are no thirds: the weather alone.
+ *   apaisado       (new) a landscape video or photo in a place of its own: two thirds, its caption as a band under
+ *                  it, and the rest (jerarquia.css) in the third beside it. On a vertical screen, 16:9 across the
+ *                  top with its band and the rest under it. Over the whole screen it is foto-completa, as before.
+ *
+ *   <div class="hk-cuerpo hk-capa" data-composicion="tiempo-tercio|apaisado">
+ *     <section class="hk-medio"><div class="hk-diapo hk-visible">img or video · <div class="hk-pie">h2 · p</div>
+ *       </div></section>
+ *     <aside class="hk-tercio-tiempo">                                       (tiempo-tercio)
+ *       <div class="hk-dia-tiempo hk-tercio-hoy">icon · .hk-dia-tiempo-texto (h3.hk-etiqueta, grados, cielo,
+ *         lluvia)</div>
+ *       <div class="hk-tercio-dias">three .hk-dia-tiempo, labelled with their weekday</div>
+ *     </aside>
+ *     <aside class="hk-resto">…</aside>                                       (apaisado)
+ *   </div>
+ *
+ * The band: the slide turns into a column (the picture over its caption, in the flow), so the caption never covers
+ * the picture and a video keeps it while it plays. The picture crops a little at the sides (cover): under 5 % for a
+ * 16:9 video in two thirds. */
+
+/* --- The picture over its band ---------------------------------------------------------------------------------- */
+.hk-horizontal .hk-cuerpo[data-composicion="tiempo-tercio"] > .hk-medio,
+.hk-horizontal .hk-cuerpo[data-composicion="apaisado"] > .hk-medio {
+    flex: 2 1 0px;
+}
+.hk-cuerpo[data-composicion="tiempo-tercio"] .hk-diapo,
+.hk-cuerpo[data-composicion="apaisado"] .hk-diapo {
+    display: flex;
+    flex-direction: column;
+    background: var(--hk-superficie);
+}
+.hk-cuerpo[data-composicion="tiempo-tercio"] .hk-diapo > img,
+.hk-cuerpo[data-composicion="tiempo-tercio"] .hk-diapo > video,
+.hk-cuerpo[data-composicion="apaisado"] .hk-diapo > img,
+.hk-cuerpo[data-composicion="apaisado"] .hk-diapo > video {
+    position: relative;
+    flex: 1 1 0px;
+    min-height: 0;
+    height: auto;
+}
+.hk .hk-cuerpo[data-composicion="tiempo-tercio"] .hk-pie,
+.hk .hk-cuerpo[data-composicion="apaisado"] .hk-pie {
+    position: relative;
+    flex: none;
+    padding: 2.2rem 4rem 2.6rem 4.8rem;
+    background: var(--hk-superficie);
+    color: var(--hk-texto);
+    text-shadow: none;
+}
+.hk-cuerpo[data-composicion="tiempo-tercio"] .hk-pie::before,
+.hk-cuerpo[data-composicion="apaisado"] .hk-pie::before {   /* the accent edge: this is the slide's headline */
+    content: "";
+    position: absolute;
+    top: 2.2rem;
+    bottom: 2.4rem;
+    left: 0;
+    width: 1rem;
+    border-radius: 0 1rem 1rem 0;
+    background: var(--hk-acento);
+}
+.hk .hk-cuerpo[data-composicion="tiempo-tercio"] .hk-pie h2,
+.hk .hk-cuerpo[data-composicion="apaisado"] .hk-pie h2 {
+    font-size: var(--hk-t-entrada);
+    line-height: 1.04;
+    letter-spacing: 0;
+}
+.hk .hk-cuerpo[data-composicion="tiempo-tercio"] .hk-pie[data-ajuste="1"] h2,
+.hk .hk-cuerpo[data-composicion="apaisado"] .hk-pie[data-ajuste="1"] h2 {
+    font-size: var(--hk-t-lista);
+}
+.hk .hk-cuerpo[data-composicion="tiempo-tercio"] .hk-pie p,
+.hk .hk-cuerpo[data-composicion="apaisado"] .hk-pie p {
+    margin-top: .8rem;
+    color: var(--hk-texto-suave);
+    font-size: var(--hk-t-min);
+    font-weight: 700;
+    line-height: 1.12;
+    opacity: 1;
+}
+/* the band stays while the video plays: it covers nothing */
+.hk-cuerpo[data-composicion="tiempo-tercio"] .hk-diapo.hk-reproduciendo .hk-pie,
+.hk-cuerpo[data-composicion="apaisado"] .hk-diapo.hk-reproduciendo .hk-pie {
+    opacity: 1;
+    -webkit-transform: none;
+    transform: none;
+}
+/* Vertical: the slot is 16:9 across the width (100 rem) plus a band of one line (with two, the picture crops a little
+   more). */
+.hk-vertical .hk-cuerpo[data-composicion="tiempo-tercio"] > .hk-medio,
+.hk-vertical .hk-cuerpo[data-composicion="apaisado"] > .hk-medio {
+    flex: none;
+    height: calc(56.25rem + var(--hk-t-entrada) * 1.1 + var(--hk-t-min) * 1.15 + 5.8rem);
+}
+.hk-vertical .hk-cuerpo[data-composicion="apaisado"] > .hk-resto {
+    flex: 1 1 auto;
+}
+
+/* --- The weather in a third ------------------------------------------------------------------------------------ */
+.hk .hk-tercio-tiempo {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+    padding: 3.6rem 3.6rem 3.2rem 4rem;
+    border-radius: 2.4rem;
+    background: var(--hk-superficie);
+    box-shadow: 0 .2rem .8rem rgba(0, 0, 0, .06);
+    color: var(--hk-texto);
+    font-size: 1rem;
+    justify-content: center;              /* today and the three days, together in the middle of the third */
+}
+.hk-horizontal .hk-cuerpo > .hk-tercio-tiempo {
+    flex: 1 1 0px;
+    margin-left: var(--hk-hueco);
+}
+/* Today: its label, then the icon and the degrees as a scoreboard, then the sky in words and the rain. */
+.hk .hk-tercio-hoy {
+    display: flex;
+    flex: none;
+    flex-direction: row;
+    align-items: flex-start;
+    margin: 0;
+    padding: 0 0 2.4rem;
+    border: 0;
+    border-bottom: .3rem solid var(--hk-linea);
+    font-size: 1rem;
+}
+.hk-tercio-hoy .hk-tiempo-icono {
+    flex: none;
+    width: calc(var(--hk-t-cifra) * 1.5);
+    height: calc(var(--hk-t-cifra) * 1.5);
+    margin: 0 2.4rem 0 -1rem;
+}
+.hk-tercio-hoy .hk-dia-tiempo-texto {
+    flex: 1 1 auto;
+    min-width: 0;
+    margin-top: calc(var(--hk-t-min) + 1.6rem);
+}
+.hk-tercio-tiempo .hk-etiqueta {
+    margin-bottom: 1.2rem;
+    color: var(--hk-primario);
+    font-size: var(--hk-t-min);
+    letter-spacing: .08em;
+}
+[data-tema="oscuro"] .hk-tercio-tiempo .hk-etiqueta {
+    color: var(--hk-texto);
+}
+.hk-tercio-hoy {
+    position: relative;
+}
+.hk-tercio-hoy .hk-etiqueta {
+    position: absolute;                  /* the label on top of the icon, as the slide's kicker */
+    top: 0;
+    left: 0;
+}
+.hk-tercio-hoy .hk-tiempo-icono {
+    margin-top: calc(var(--hk-t-min) + 1.6rem);
+}
+.hk-tercio-hoy .hk-dia-tiempo-grados {
+    font-size: calc(var(--hk-t-cifra) * 1.15);
+    line-height: .95;
+    letter-spacing: -.03em;
+}
+.hk-tercio-hoy .hk-dia-tiempo-grados small {
+    font-size: var(--hk-t-entrada);
+    letter-spacing: 0;
+}
+.hk-tercio-hoy .hk-dia-tiempo-cielo {
+    margin-top: 1.6rem;
+    font-size: var(--hk-t-lista);
+    font-weight: 800;
+    line-height: 1.08;
+}
+.hk-tercio-hoy .hk-dia-tiempo-lluvia {
+    margin-top: .8rem;
+    font-size: var(--hk-t-min);
+}
+/* The next three days: one line each, the weekday, its icon, the highest and the lowest. */
+.hk .hk-tercio-dias {
+    display: flex;
+    flex: none;
+    flex-direction: column;
+    padding-top: 2.4rem;
+}
+.hk .hk-tercio-dias .hk-dia-tiempo {
+    flex: none;
+    margin: 1.6rem 0 0;
+    padding: 0;
+    border: 0;
+}
+.hk .hk-tercio-dias .hk-dia-tiempo:first-child {
+    margin-top: 0;
+}
+.hk-tercio-dias .hk-tiempo-icono {
+    order: 2;
+    width: calc(var(--hk-t-lista) * 1.6);
+    height: calc(var(--hk-t-lista) * 1.6);
+    margin: 0 0 0 1.6rem;
+}
+.hk-tercio-dias .hk-dia-tiempo-texto {
+    display: flex;
+    flex: 1 1 auto;
+    align-items: baseline;
+    -webkit-box-ordinal-group: 2;
+    order: 1;
+}
+.hk-tercio-dias .hk-etiqueta {
+    flex: 1 1 auto;
+    min-width: 0;
+    margin: 0;
+    overflow: hidden;
+    color: var(--hk-texto);
+    font-size: var(--hk-t-lista);
+    letter-spacing: 0;
+    text-transform: none;
+    white-space: nowrap;
+}
+.hk-tercio-dias .hk-dia-tiempo-grados {
+    flex: none;
+    margin-left: 1.2rem;
+    font-size: var(--hk-t-lista);
+}
+.hk-tercio-dias .hk-dia-tiempo-grados small {
+    font-size: var(--hk-t-min);
+}
+.hk-tercio-dias .hk-dia-tiempo-cielo,
+.hk-tercio-dias .hk-dia-tiempo-lluvia {
+    display: none;                       /* the sky in words and the rain, only for today */
+}
+[data-tema="oscuro"] .hk-tercio-dias .hk-etiqueta {
+    color: var(--hk-texto);
+}
+/* Vertical: the weather first, across: today in a row (icon, degrees, the sky in words), the three days side by
+   side under it. */
+.hk-vertical .hk-cuerpo[data-composicion="tiempo-tercio"] {
+    flex-direction: column;
+}
+.hk-vertical .hk-cuerpo[data-composicion="tiempo-tercio"] > .hk-tercio-tiempo {
+    -webkit-box-ordinal-group: 0;
+    order: -1;
+    flex: 1 1 auto;
+    margin: 0 0 var(--hk-hueco);
+    padding: 3.6rem 4.4rem 3.2rem 4.8rem;
+}
+.hk-vertical .hk-tercio-hoy {
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+}
+.hk-vertical .hk-tercio-hoy .hk-tiempo-icono {
+    flex: none;
+    margin: calc(var(--hk-t-min) + 1.6rem) 3.6rem 0 0;
+}
+.hk-vertical .hk-tercio-hoy .hk-dia-tiempo-texto {
+    flex: 1 1 auto;
+    width: auto;
+    min-width: 0;
+    margin-top: calc(var(--hk-t-min) + 1.6rem);
+}
+.hk-vertical .hk-tercio-dias {
+    flex-direction: row;
+}
+.hk-vertical .hk-tercio-dias .hk-dia-tiempo,
+.hk-vertical .hk-tercio-dias .hk-dia-tiempo:first-child {
+    flex: 1 1 0px;
+    flex-direction: column;
+    margin: 0;
+}
+.hk-vertical .hk-tercio-dias .hk-dia-tiempo + .hk-dia-tiempo {
+    border-left: .3rem solid var(--hk-linea);
+}
+.hk-vertical .hk-tercio-dias .hk-dia-tiempo-texto {
+    flex-direction: column;
+    align-items: center;
+    -webkit-box-ordinal-group: 1;
+    order: 0;
+}
+.hk-vertical .hk-tercio-dias .hk-tiempo-icono {
+    margin: 1.2rem 0 0;
+}
+.hk-vertical .hk-tercio-dias .hk-etiqueta,
+.hk-vertical .hk-tercio-dias .hk-dia-tiempo-grados {
+    margin: 0;
+    text-align: center;
+}
+/* At 5 m: a little wider, the icon a little smaller, the rain only in the header. */
+.hk-horizontal[data-distancia="5"] .hk-cuerpo > .hk-tercio-tiempo {
+    flex: 1.25 1 0px;
+}
+.hk[data-distancia="5"] .hk-tercio-hoy .hk-tiempo-icono {
+    width: calc(var(--hk-t-cifra) * 1.25);
+    height: calc(var(--hk-t-cifra) * 1.25);
+}
+.hk[data-distancia="5"] .hk-tercio-hoy .hk-dia-tiempo-lluvia {
+    display: none;
+}
+.hk[data-distancia="5"] .hk-tercio-hoy .hk-dia-tiempo-cielo {
+    font-size: var(--hk-t-min);
+}
+.hk[data-distancia="5"] .hk-tercio-dias .hk-tiempo-icono {
+    width: calc(var(--hk-t-lista) * 1.25);
+    height: calc(var(--hk-t-lista) * 1.25);
+}
+/* At 8 m: no thirds. The weather alone, today on the left and the three days on the right. */
+.hk[data-distancia="8"] .hk-cuerpo[data-composicion="tiempo-tercio"] > .hk-medio {
+    display: none;
+}
+.hk[data-distancia="8"] .hk-cuerpo[data-composicion="tiempo-tercio"] > .hk-tercio-tiempo {
+    flex: 1 1 auto;
+    flex-direction: row;
+    margin: 0;
+    padding: 5rem 7rem;
+}
+.hk[data-distancia="8"].hk-horizontal .hk-tercio-hoy {
+    flex: 1 1 0px;
+    min-width: 0;
+    -webkit-align-self: center;
+    align-self: center;
+    padding: 0 6rem 0 0;
+    border-bottom: 0;
+    border-right: .3rem solid var(--hk-linea);
+}
+.hk[data-distancia="8"].hk-horizontal .hk-tercio-dias {
+    flex: none;
+    width: 56%;
+    justify-content: center;
+    padding: 0 0 0 6rem;
+}
+.hk[data-distancia="8"].hk-horizontal .hk-tercio-dias .hk-dia-tiempo {
+    margin-top: 4rem;
+}
+.hk[data-distancia="8"].hk-horizontal .hk-tercio-dias .hk-dia-tiempo:first-child {
+    margin-top: 0;
+}
+.hk[data-distancia="8"].hk-vertical .hk-cuerpo[data-composicion="tiempo-tercio"] > .hk-tercio-tiempo {
+    flex-direction: column;
+}

@@ -1,0 +1,521 @@
+/* Oksigenia Hechauka 0.7.0: one thing big on each slide (Gaudí, 1 November 2026). Goes after distancia.css.
+ *
+ * The reviews of 31 October: on the screens everything weighed the same and whoever passed did not know where to
+ * look. Now each slide is a newspaper front page: one thing leads (the photo with its headline, or one thing of
+ * «Today» set big: «the lead», .hk-lider) and the rest yields to about a third, in a column of its own («the rest»,
+ * .hk-resto). Every size comes from the distance tokens of distancia.css.
+ *
+ *   composition      leads                                   the rest
+ *   foto-hoy         the photo, its headline at --hk-t-titular   a third beside it (under it on a vertical screen)
+ *   vertical-hoy     one thing of «Today», big, beside the photo  nothing: the photo goes with the lead; its own
+ *                    (under it on a vertical screen)              caption shrinks to a credit line
+ *   dos-verticales   the pair of pictures                        a third beside them (under them on a vertical)
+ *   foto-sola        the photo and its headline                  nothing
+ *   solo-hoy         one thing of «Today», big                    a third beside it (under it on a vertical)
+ *   foto-completa    the photo and its headline, whole screen     nothing
+ *   semana           the next thing that matters, on a strip      the five days, under it
+ *   apaisado, tiempo (tercios.css)
+ * At 8 m there is no room for a third at a readable size: the rest goes and its things come one by one as the lead
+ * of their own slides.
+ *
+ * Markup of a layer (the 0.6 .hk-hoy and its columns are not used by these compositions):
+ *   <div class="hk-cuerpo hk-capa" data-composicion="solo-hoy">
+ *     <section class="hk-lider" data-tipo="menu|aviso|evento|cuenta" data-ajuste="0|1|2">   (the lead)
+ *       <p class="hk-lider-etiqueta">Menú de hoy</p>
+ *       <h2 class="hk-lider-titular">Merluza al horno con patatas</h2>
+ *       <p class="hk-lider-entrada">…</p>     (or .hk-lider-platos, .hk-lider-hora, .hk-lider-cifra: see below)
+ *     </section>
+ *     <aside class="hk-resto">                                                              (the rest)
+ *       <div class="hk-aviso-fijo">…</div>             (the important notice: fixed, never paged)
+ *       <div class="hk-resto-pagina">                  (one page per slide)
+ *         <p class="hk-resto-grupo">Avisos</p>
+ *         <div class="hk-linea"><span class="hk-linea-texto">Fotos de grupo<small>Martes y miércoles</small></span></div>
+ *         <div class="hk-linea"><b class="hk-linea-cuando">10:30</b><span class="hk-linea-texto">…</span></div>
+ *       </div>
+ *       <p class="hk-resto-paginas"><i class="hk-pagina-actual"></i><i></i></p>
+ *     </aside>
+ *   </div>
+ *
+ * Chromium 56: flexbox only, margins instead of gap, no grid, no aspect-ratio, no clamp(). */
+
+/* --- The zones of each composition --------------------------------------------------------------------------- */
+.hk .hk-cuerpo > .hk-lider,
+.hk .hk-cuerpo > .hk-resto {
+    min-width: 0;
+    min-height: 0;
+}
+/* Horizontal: the lead (photo or text) takes two thirds, the rest one; a gutter between them. */
+.hk-horizontal .hk-cuerpo[data-composicion="foto-hoy"] > .hk-medio,
+.hk-horizontal .hk-cuerpo[data-composicion="solo-hoy"] > .hk-lider {
+    flex: 2 1 0px;
+}
+.hk-horizontal .hk-cuerpo > .hk-resto {
+    flex: 1 1 0px;
+    margin-left: var(--hk-hueco);
+}
+.hk-horizontal[data-distancia="5"] .hk-cuerpo > .hk-resto {
+    flex: 1.25 1 0px;                     /* at 5 m a third is too narrow for its lines: 38 % */
+}
+.hk[data-distancia="5"] .hk-aviso-fijo p:not(.hk-aviso-fijo-marca) {
+    display: none;
+}
+.hk-horizontal .hk-cuerpo[data-composicion="dos-verticales"] > .hk-resto {
+    flex: 1 1 auto;                       /* the pair keeps its width; the rest takes what is left (66 rem or more) */
+    width: auto;
+}
+.hk-horizontal .hk-cuerpo[data-composicion="vertical-hoy"] > .hk-lider {
+    flex: 1 1 auto;
+    margin-left: var(--hk-hueco);
+}
+/* Vertical: the lead on top, two thirds; the rest under it. */
+.hk-vertical .hk-cuerpo[data-composicion="foto-hoy"] > .hk-medio,
+.hk.hk-vertical .hk-cuerpo[data-composicion="vertical-hoy"] > .hk-medio,
+.hk-vertical .hk-cuerpo[data-composicion="dos-verticales"] > .hk-pareja,
+.hk-vertical .hk-cuerpo[data-composicion="solo-hoy"] > .hk-lider {
+    flex: 2 1 0px;
+    height: auto;
+}
+.hk-vertical .hk-cuerpo > .hk-resto,
+.hk-vertical .hk-cuerpo[data-composicion="vertical-hoy"] > .hk-lider {
+    flex: 1 1 0px;
+    margin-top: var(--hk-hueco);
+}
+/* From 5 m, on a vertical screen, the lead beside a photo needs half the body. */
+.hk.hk-vertical[data-distancia="5"] .hk-cuerpo[data-composicion="vertical-hoy"] > .hk-medio,
+.hk.hk-vertical[data-distancia="8"] .hk-cuerpo[data-composicion="vertical-hoy"] > .hk-medio {
+    flex: 1 1 0px;
+}
+/* Without the rest (nothing in «Today», or at 8 m) the lead takes the whole body. */
+.hk[data-distancia="8"] .hk-cuerpo > .hk-resto {
+    display: none;
+}
+.hk-cuerpo > .hk-medio:only-child,
+.hk-cuerpo > .hk-lider:only-child,
+.hk-cuerpo > .hk-pareja:only-child {
+    flex: 1 1 auto;
+}
+
+/* --- The lead: one thing of «Today», big ----------------------------------------------------------------------- */
+.hk-lider {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    overflow: hidden;
+    padding: 4.4rem 6rem 4.8rem 7.2rem;
+    border-radius: 2.8rem;
+    background: var(--hk-superficie);
+    box-shadow: 0 .3rem 1.2rem rgba(0, 0, 0, .07);
+}
+.hk-lider::before {                      /* its kind, as a thick edge in its colour */
+    content: "";
+    position: absolute;
+    top: 4.4rem;
+    bottom: 4.4rem;
+    left: 0;
+    width: 1.4rem;
+    border-radius: 0 1.4rem 1.4rem 0;
+    background: var(--hk-color, var(--hk-primario));
+}
+.hk-lider > * {
+    flex: none;
+}
+.hk .hk-lider-etiqueta {
+    margin-bottom: 2.4rem;
+    color: var(--hk-color, var(--hk-primario));
+    font-size: var(--hk-t-min);
+    font-weight: 800;
+    letter-spacing: .08em;
+    line-height: 1;
+    text-transform: uppercase;
+}
+[data-tema="oscuro"] .hk-lider-etiqueta {
+    color: var(--hk-color-oscuro, var(--hk-texto));
+}
+.hk .hk-lider-titular {
+    font-family: var(--hk-letra-titulos);
+    font-size: var(--hk-t-titular);
+    font-weight: 800;
+    line-height: 1.02;
+    letter-spacing: -.015em;
+}
+/* The fit: the player lowers the headline a step (data-ajuste 1 to 3: 88, 76 and 64 %) while it takes more than
+   three lines (two on a vertical screen's third) or its box overflows; never under --hk-t-titulo-min (the steps are
+   drawn so that each stays over it: at 8 m the last one is .76). */
+.hk-lider[data-ajuste="1"] .hk-lider-titular {
+    font-size: calc(var(--hk-t-titular) * .88);
+}
+.hk-lider[data-ajuste="2"] .hk-lider-titular {
+    font-size: calc(var(--hk-t-titular) * .76);
+}
+.hk-lider[data-ajuste="3"] .hk-lider-titular {
+    font-size: calc(var(--hk-t-titular) * .64);
+}
+.hk[data-distancia="8"] .hk-lider[data-ajuste="3"] .hk-lider-titular {
+    font-size: calc(var(--hk-t-titular) * .76);
+}
+.hk .hk-lider-entrada {
+    margin-top: 2.4rem;
+    color: var(--hk-texto-suave);
+    font-size: var(--hk-t-entrada);
+    font-weight: 700;
+    line-height: 1.12;
+}
+/* the menu: the main dish is the headline; the others under it, each with its course */
+.hk .hk-lider-platos {
+    margin-top: 2.8rem;
+}
+.hk .hk-lider-plato {
+    display: flex;
+    align-items: baseline;
+    margin-top: 1.6rem;
+    font-size: calc(var(--hk-t-entrada) * 1.15);
+    font-weight: 700;
+    line-height: 1.12;
+}
+.hk .hk-lider-plato small {
+    flex: none;
+    width: calc(var(--hk-t-lista) * 4.4);
+    color: var(--hk-texto-suave);
+    font-size: var(--hk-t-lista);
+    font-weight: 800;
+}
+/* on a vertical screen and at 8 m the course goes over its dish: beside it, it leaves the dish no room */
+.hk-vertical .hk-lider-plato,
+.hk[data-distancia="8"] .hk-lider-plato {
+    display: block;
+}
+.hk-vertical .hk-lider-plato small,
+.hk[data-distancia="8"] .hk-lider-plato small {
+    display: block;
+    width: auto;
+    margin-bottom: .4rem;
+}
+/* an event: its hour as a scoreboard over the headline */
+.hk .hk-lider-hora {
+    align-self: flex-start;
+    margin-bottom: 2.4rem;
+    padding: .12em .45em;
+    border-radius: .3em;
+    background: var(--hk-ev, var(--hk-primario));
+    color: var(--hk-sobre-ev, #fff);
+    font-family: var(--hk-letra-titulos);
+    font-size: calc(var(--hk-t-cifra) * .9);
+    font-weight: 800;
+    line-height: 1.05;
+    font-variant-numeric: tabular-nums;
+}
+/* a countdown: «Faltan 12 días para…», the number as big as the headline allows */
+.hk .hk-lider-cuenta {
+    display: flex;
+    align-items: baseline;
+    margin-bottom: 1.6rem;
+}
+.hk-lider-cifra {
+    margin-right: 2.4rem;
+    color: var(--hk-color, var(--hk-primario));
+    font-family: var(--hk-letra-titulos);
+    font-size: calc(var(--hk-t-titular) * 1.7);
+    font-weight: 800;
+    line-height: .86;
+    letter-spacing: -.03em;
+    font-variant-numeric: tabular-nums;
+}
+[data-tema="oscuro"] .hk-lider-cifra {
+    color: var(--hk-color-oscuro, var(--hk-texto));
+}
+.hk .hk-lider-cuenta small {
+    font-size: var(--hk-t-entrada);
+    font-weight: 800;
+}
+.hk-lider[data-tipo="cuenta"] .hk-lider-titular {
+    font-size: calc(var(--hk-t-titular) * .76);
+}
+/* the important notice as the lead: the accent's colour, its mark, no edge */
+.hk-lider.hk-lider-importante {
+    background: var(--hk-acento);
+    color: var(--hk-sobre-acento);
+}
+.hk-lider.hk-lider-importante::before {
+    display: none;
+}
+.hk-lider-importante .hk-lider-etiqueta,
+.hk-lider-importante .hk-lider-entrada {
+    color: var(--hk-sobre-acento);
+}
+.hk-lider-importante .hk-lider-etiqueta svg,
+.hk .hk-aviso-fijo-marca svg {
+    width: 1.1em;
+    height: 1.1em;
+    margin-right: .35em;
+    fill: currentColor;
+    vertical-align: -.2em;
+}
+
+/* --- The rest: the other things of «Today», at a third ------------------------------------------------------- */
+.hk-resto {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    padding: 3.2rem 3.4rem 3rem 3.6rem;
+    border-radius: 2.4rem;
+    background: var(--hk-superficie);
+    box-shadow: 0 .2rem .8rem rgba(0, 0, 0, .06);
+}
+.hk-resto > * {
+    flex: none;
+}
+.hk-resto-pagina {
+    position: relative;                   /* the player measures its lines against it */
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden;
+    -webkit-transition: opacity .5s ease;
+    transition: opacity .5s ease;
+}
+.hk-resto-pagina.hk-cambiando {          /* a new page, with each slide: out, the lines change, in */
+    opacity: 0;
+}
+.hk .hk-resto-grupo {
+    margin: 3.2rem 0 1.4rem;
+    color: var(--hk-color, var(--hk-primario));
+    font-size: var(--hk-t-min);
+    font-weight: 800;
+    letter-spacing: .06em;
+    line-height: 1;
+    text-transform: uppercase;
+}
+.hk .hk-resto-grupo:first-child {
+    margin-top: 0;
+}
+[data-tema="oscuro"] .hk-resto-grupo {
+    color: var(--hk-color-oscuro, var(--hk-texto));
+}
+.hk-linea {
+    display: flex;
+    align-items: flex-start;
+    margin-top: 2rem;
+}
+.hk .hk-resto-grupo + .hk-linea {
+    margin-top: 0;
+}
+.hk-linea-cuando {                       /* the hour (or the day), filled with the colour of whom it is for */
+    flex: none;
+    min-width: 3.1em;
+    margin: .12em 1.4rem 0 0;
+    padding: .1em .3em;
+    border-radius: .3em;
+    background: var(--hk-ev, var(--hk-primario));
+    color: var(--hk-sobre-ev, #fff);
+    font-size: var(--hk-t-min);
+    font-weight: 800;
+    line-height: 1.15;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+}
+.hk-linea-proxima .hk-linea-cuando {     /* a coming day: outlined, so today's hours read first */
+    border: .08em solid var(--hk-linea);
+    border-left: .3em solid var(--hk-ev, var(--hk-primario));
+    background: transparent;
+    color: var(--hk-texto);
+}
+.hk-linea-texto {
+    flex: 1 1 auto;
+    min-width: 0;
+    font-size: var(--hk-t-lista);
+    font-weight: 800;
+    line-height: 1.08;
+}
+.hk-linea-texto small {
+    display: block;
+    margin-top: .2em;
+    color: var(--hk-texto-suave);
+    font-size: var(--hk-t-min);
+    font-weight: 700;
+    line-height: 1.12;
+}
+.hk .hk-resto-paginas {
+    margin-top: 1.6rem;
+    line-height: 1;
+    text-align: right;
+}
+.hk .hk-resto-paginas i {
+    display: inline-block;
+    width: calc(var(--hk-t-min) * .36);
+    height: calc(var(--hk-t-min) * .36);
+    margin-left: calc(var(--hk-t-min) * .22);
+    border: .3rem solid var(--hk-texto-suave);
+    border-radius: 50%;
+}
+.hk .hk-resto-paginas i.hk-pagina-actual {
+    border-color: var(--hk-texto);
+    background: var(--hk-texto);
+}
+/* --- The important notice: fixed at the top of the rest, never paged ------------------------------------------ */
+.hk-aviso-fijo {
+    position: relative;
+    z-index: 0;
+    margin: 0 0 2.8rem;
+    padding: 2.2rem 2.8rem 2.6rem 3.6rem;
+    overflow: hidden;
+    border-radius: 1.8rem;
+    color: var(--hk-texto);
+}
+.hk-aviso-fijo::before,
+.hk-aviso-fijo::after {                  /* a tint of the accent and its edge: it stands out without outweighing the lead */
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: -1;
+}
+.hk-aviso-fijo::before {
+    right: 0;
+    background: var(--hk-acento);
+    opacity: .16;
+}
+.hk-aviso-fijo::after {
+    width: 1.2rem;
+    background: var(--hk-acento);
+}
+[data-tema="oscuro"] .hk-aviso-fijo::before {
+    opacity: .2;
+}
+.hk .hk-aviso-fijo-marca {
+    color: var(--hk-acento-texto);
+    font-size: var(--hk-t-min);
+    font-weight: 800;
+    letter-spacing: .06em;
+    line-height: 1;
+    text-transform: uppercase;
+}
+.hk-aviso-fijo h3 {
+    margin-top: 1.2rem;
+    font-size: var(--hk-t-lista);
+    font-weight: 800;
+    line-height: 1.08;
+}
+.hk-aviso-fijo p {
+    margin-top: .8rem;
+    font-size: var(--hk-t-min);
+    font-weight: 700;
+    line-height: 1.12;
+}
+/* several important ones take turns in the same place, one per slide */
+.hk-aviso-fijo > div {
+    -webkit-transition: opacity .5s ease;
+    transition: opacity .5s ease;
+}
+.hk-aviso-fijo.hk-cambiando > div {
+    opacity: 0;
+}
+
+/* --- Captions: the photo's headline is the lead -------------------------------------------------------------- */
+.hk-pie {
+    padding: calc(var(--hk-t-titular) * .6) 4.4rem 3.6rem;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, .6) 30%, rgba(0, 0, 0, .86));
+}
+.hk-pie h2 {
+    font-size: var(--hk-t-titular);
+    line-height: 1.02;
+    letter-spacing: -.01em;
+}
+.hk-pie p {
+    margin-top: 1.4rem;
+    font-size: var(--hk-t-lista);
+}
+/* beside the lead, a picture's caption is a credit line: no headline of its own competes with it */
+.hk .hk-cuerpo[data-composicion="vertical-hoy"] .hk-pie,
+.hk .hk-pareja .hk-pie {
+    padding: 8rem 3.2rem 2.8rem;
+}
+.hk .hk-cuerpo[data-composicion="vertical-hoy"] .hk-pie h2,
+.hk .hk-pareja .hk-pie h2 {
+    font-size: var(--hk-t-lista);
+    line-height: 1.08;
+}
+.hk .hk-cuerpo[data-composicion="vertical-hoy"] .hk-pie p,
+.hk .hk-pareja .hk-pie p {
+    margin-top: .6rem;
+    font-size: var(--hk-t-min);
+}
+.hk .hk-completa .hk-pie {
+    padding: calc(var(--hk-t-titular) * 1.4) 6rem 6rem;
+}
+.hk .hk-completa .hk-pie h2,
+.hk.hk-vertical .hk-completa .hk-pie h2 {
+    font-size: var(--hk-t-titular);
+}
+.hk .hk-completa .hk-pie p {
+    font-size: var(--hk-t-entrada);
+}
+/* the captions' fit, the same steps as the lead's (after the rules above, which they override) */
+.hk .hk-pie[data-ajuste="1"] h2 {
+    font-size: calc(var(--hk-t-titular) * .88);
+}
+.hk .hk-pie[data-ajuste="2"] h2 {
+    font-size: calc(var(--hk-t-titular) * .76);
+}
+.hk .hk-pie[data-ajuste="3"] h2 {
+    font-size: calc(var(--hk-t-titular) * .64);
+}
+.hk[data-distancia="8"] .hk-pie[data-ajuste="3"] h2 {
+    font-size: calc(var(--hk-t-titular) * .76);
+}
+
+/* The last resort of the fit, when even the last step does not fit: the caption keeps only its headline, the lead
+   loses its second line (the player adds the class and tries the steps again). */
+.hk .hk-pie.hk-pie-corto p,
+.hk .hk-lider.hk-lider-corto .hk-lider-entrada,
+.hk .hk-lider.hk-lider-corto .hk-lider-platos {
+    display: none;
+}
+
+/* --- La semana: the next thing that matters on a strip, the days under it ----------------------------------- */
+.hk-cuerpo[data-composicion="semana"] {
+    flex-direction: column;
+}
+.hk .hk-semana-titular {
+    display: flex;
+    flex: none;
+    align-items: center;
+    margin-bottom: var(--hk-hueco);
+    padding: 2rem 4rem 2.2rem;
+    overflow: hidden;
+    border-radius: 2.4rem;
+    background: var(--hk-primario);
+    color: var(--hk-sobre-primario);
+}
+.hk .hk-semana-titular small {
+    flex: none;
+    margin-right: 3.2rem;
+    padding-right: 3.2rem;
+    border-right: .3rem solid currentColor;
+    font-size: var(--hk-t-min);
+    font-weight: 800;
+    letter-spacing: .06em;
+    line-height: 1;
+    text-transform: uppercase;
+}
+.hk .hk-semana-titular b {
+    flex: 1 1 auto;
+    min-width: 0;
+    font-family: var(--hk-letra-titulos);
+    font-size: calc(var(--hk-t-entrada) * 1.2);
+    font-weight: 800;
+    line-height: 1.04;
+}
+.hk .hk-semana-titular[data-ajuste="1"] b {
+    font-size: var(--hk-t-entrada);
+}
+/* the days' lists a step larger than 0.6: at data-escala 0 the title is 4 rem and its second line 3.3 rem (2.8em ×
+   1.18rem), a little under --hk-t-min: five columns do not allow more without breaking words («📚 Celebración» is one
+   word). The agenda that scrolls (next) replaces this week; until then it only comes at 3 m. */
+.hk .hk-dia-lista { font-size: 1.18rem; }
+.hk .hk-dia-lista[data-escala="1"] { font-size: 1.28rem; }
+.hk .hk-dia-lista[data-escala="2"] { font-size: 1.4rem; }
+.hk .hk-dia-lista[data-escala="3"] { font-size: 1.52rem; }
+.hk .hk-dia-nombre {
+    font-size: var(--hk-t-min);
+}

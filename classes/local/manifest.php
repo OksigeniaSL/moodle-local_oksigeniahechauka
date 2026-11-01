@@ -65,6 +65,8 @@ class manifest {
                 'timezone' => \core_date::get_server_timezone(),
                 'lang' => current_language(),
                 'sound' => !empty($screen->sound),
+                'distance' => uses::distance($screen->distance ?? 3),
+                'glass' => !empty($screen->glass),
             ],
             'template' => uses::valid($screen->screenuse ?? null) === 'showcase' ? 'full' : 'zones',
             'theme' => self::theme($screen, $config),

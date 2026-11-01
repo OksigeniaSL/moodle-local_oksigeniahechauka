@@ -61,6 +61,12 @@ class player_page {
             'week_from' => get_string('week_from', $c),
             'week_until' => get_string('week_until', $c),
             'date_format' => get_string('date_format', $c),
+            'important' => get_string('label_important', $c),
+            'notice' => get_string('label_notice', $c),
+            'countdown' => get_string('label_countdown', $c),
+            'daysfor' => get_string('label_daysfor', $c),
+            'scan' => get_string('label_scan', $c),
+            'thisweek' => get_string('label_thisweek', $c),
         ];
     }
 
@@ -143,7 +149,7 @@ class player_page {
         $sheets = '';
         foreach (
             ['hechauka.css', 'composiciones.css', 'tiempo.css', 'semana.css', 'proximos-dias.css', 'urgente.css',
-            'usos.css'] as $file
+            'distancia.css', 'jerarquia.css', 'tercios.css', 'cinta.css', 'usos.css'] as $file
         ) {
             $sheets .= '<link rel="stylesheet" href="' . $url($file) . '">';
         }

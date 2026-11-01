@@ -34,6 +34,19 @@ class uses {
     /** @var string[] The uses, the default first. */
     const USES = ['info', 'showcase', 'mixed'];
 
+    /** @var int[] From where a screen is read, in metres: the letters grow with it. The default first. */
+    const DISTANCES = [3, 5, 8];
+
+    /**
+     * A distance as it came, or the default.
+     *
+     * @param mixed $distance
+     * @return int
+     */
+    public static function distance($distance): int {
+        return in_array((int) $distance, self::DISTANCES, true) ? (int) $distance : self::DISTANCES[0];
+    }
+
     /**
      * A use as it came, or the default.
      *

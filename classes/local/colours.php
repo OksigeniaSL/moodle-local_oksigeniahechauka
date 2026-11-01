@@ -140,6 +140,7 @@ class colours {
             $vars[str_replace('--hk-', '--hk-sobre-', $var)] = self::on($hex);
             if ($setting === 'colouraccent') {
                 $vars['--hk-acento-texto'] = self::readable($hex, self::LIGHT_SURFACE);
+                $vars['--hk-acento-oscuro'] = self::readable($hex, self::DARK_SURFACE);
             } else if ($setting !== 'colourprimary') {
                 $vars[$var . '-oscuro'] = self::readable($hex, self::DARK_SURFACE);
             }

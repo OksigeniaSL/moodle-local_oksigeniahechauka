@@ -53,6 +53,7 @@ final class centre_test extends \advanced_testcase {
         $this->assertSame('#f2c200', $vars['--hk-primario']);
         $this->assertSame(colours::DARK, $vars['--hk-sobre-primario']);
         $this->assertArrayHasKey('--hk-acento-texto', $vars);
+        $this->assertArrayHasKey('--hk-acento-oscuro', $vars);
         $this->assertArrayHasKey('--hk-marca-2-oscuro', $vars);
         $this->assertArrayNotHasKey('--hk-marca-3', $vars);
     }

@@ -160,5 +160,19 @@ function xmldb_local_oksigeniahechauka_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026110204, 'local', 'oksigeniahechauka');
     }
 
+    if ($oldversion < 2026110205) {
+        // From where each screen is read (3, 5 or 8 m) and whether it is behind glass: the size of its letters.
+        $table = new xmldb_table('local_oksigeniahechauka_screen');
+        $field = new xmldb_field('distance', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '3', 'useplan');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        $field = new xmldb_field('glass', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'distance');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        upgrade_plugin_savepoint(true, 2026110205, 'local', 'oksigeniahechauka');
+    }
+
     return true;
 }

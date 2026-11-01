@@ -11,7 +11,9 @@
     "width": 1920,
     "height": 1080,
     "timezone": "Atlantic/Canary",
-    "lang": "es"
+    "lang": "es",
+    "distance": 3,
+    "glass": false
   },
   "template": "zones",
   "theme": {
@@ -404,7 +406,33 @@
       "rain": 70,
       "text": "Lluvia débil"
     },
-    "credit": "Datos de MET Norway"
+    "credit": "Datos de MET Norway",
+    "days": [
+      {
+        "date": "2026-11-03",
+        "max": 21,
+        "min": 16,
+        "symbol": "partlycloudy_day",
+        "text": "Intervalos nubosos",
+        "rain": 10
+      },
+      {
+        "date": "2026-11-04",
+        "max": 19,
+        "min": 15,
+        "symbol": "rain",
+        "text": "Lluvia",
+        "rain": 80
+      },
+      {
+        "date": "2026-11-05",
+        "max": 23,
+        "min": 17,
+        "symbol": "clearsky_day",
+        "text": "Despejado",
+        "rain": 0
+      }
+    ]
   },
   "categories": [
     {
@@ -438,5 +466,6 @@
         "bachillerato"
       ]
     }
-  ]
+  ],
+  "use": "info"
 }

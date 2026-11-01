@@ -4,9 +4,10 @@
 // screen that runs for months does not pile up nodes.
 
 import {shapeOf} from './compose.js';
-import {buildToday, buildWeatherThird, fitToday, turnPages} from './today.js';
+import {buildWeatherThird} from './today.js';
+import {buildLead, buildRest, fitHeadline, leadsOf, linesOf, paginateRest, showRestPage, turnFixed, weekHeadline} from './lead.js';
 import {qrPath, shortWeb} from './qr.js';
-import {balanceIn} from './balance.js';
+import {even} from './balance.js';
 import {buildWeek, fitWeek} from './weekview.js';
 
 const CAPTION_MS = 2800;
@@ -83,13 +84,13 @@ export class Screen {
         this.frame = el('div', 'hk hk-horizontal');
         this.frame.appendChild(this.header());
         this.stage = el('main', 'hk-escena');
-        this.ticker = el('footer', 'hk-cinta');
+        this.ticker = el('footer', 'hk-cinta hk-cinta-frases');
         this.tickerLabel = el('b');
-        const track = el('div', 'hk-cinta-pista');
-        this.tickerTrack = el('span', 'hk-cinta-texto');
-        track.appendChild(this.tickerTrack);
+        this.tickerTrack = el('div', 'hk-cinta-pista');
+        this.tickerCount = el('p', 'hk-cinta-cuenta');
         this.ticker.appendChild(this.tickerLabel);
-        this.ticker.appendChild(track);
+        this.ticker.appendChild(this.tickerTrack);
+        this.ticker.appendChild(this.tickerCount);
         this.full = el('div', 'hk-completa hk-sobre-foto');
         this.credit = el('p', 'hk-credito-tiempo');
         this.sample = el('span', 'hk-muestra', this.s.sample || 'Sample data');
@@ -108,6 +109,9 @@ export class Screen {
         logo.alt = '';
         const logoDark = el('img', 'hk-logo-oscuro');
         logoDark.alt = '';
+        // A logo takes its width when it arrives: then the date may no longer fit in one line.
+        logo.addEventListener('load', () => this.fitHeaders());
+        logoDark.addEventListener('load', () => this.fitHeaders());
         const place = el('p', 'hk-lugar');
         const weather = el('div', 'hk-tiempo');
         const hour = el('div', 'hk-hora');
@@ -143,6 +147,14 @@ export class Screen {
         this.frame.classList.toggle('hk-horizontal', this.horizontal);
         this.frame.classList.toggle('hk-vertical', !this.horizontal);
         this.frame.classList.toggle('hk-quieto', !!scr.still);
+        // From where it is read, and behind glass: every size of the art direction's 0.7.0 comes from these.
+        this.distance = [3, 5, 8].indexOf(scr.distance) !== -1 ? scr.distance : 3;
+        this.frame.setAttribute('data-distancia', String(this.distance));
+        if (scr.glass) {
+            this.frame.setAttribute('data-cristal', '');
+        } else {
+            this.frame.removeAttribute('data-cristal');
+        }
         this.noToday = manifest.template === 'full';
         this.sound = !!scr.sound;
         this.labels = manifest.labels || {};
@@ -307,6 +319,31 @@ export class Screen {
         }
     }
 
+    /**
+     * The clock is never cut. It depends on the centre's letter, on the screen's and on the day («Miércoles 30 de
+     * septiembre»), so it is measured: when the header does not fit, it gives way by steps: the date in two lines, the
+     * clock and the degrees a bit smaller, and at last the weather leaves the header.
+     */
+    fitHeaders() {
+        const steps = ['hk-fecha-larga', 'hk-cab-justa', 'hk-cab-sin-tiempo'];
+        this.headers.forEach(function (p) {
+            steps.forEach(function (c) {
+                p.node.classList.remove(c);
+            });
+            const hour = p.node.querySelector('.hk-hora');
+            if (!hour) {
+                return;
+            }
+            const fits = function () {
+                const box = p.node.getBoundingClientRect();
+                return box.width === 0 || hour.getBoundingClientRect().right <= box.right + 1;
+            };
+            for (let i = 0; i < steps.length && !fits(); i++) {
+                p.node.classList.add(steps[i]);
+            }
+        });
+    }
+
     // --- The slides -------------------------------------------------------------------------------------------------
 
     /** A picture or a video with its caption. A video shows its caption over the still, then plays clean. */
@@ -380,15 +417,16 @@ export class Screen {
     }
 
     // A video waits a moment with its caption over the still, then plays and the caption goes.
-    startVideo(d) {
+    startVideo(d, comp) {
         if (!d.hkVideo) {
             return;
         }
+        const band = comp === 'apaisado' || comp === 'tiempo-tercio';
         d.hkTimer = setTimeout(function () {
             d.classList.add('hk-reproduciendo');
             d.hkVideo.hkStarted = true;
             quiet(d.hkVideo.play());
-        }, CAPTION_MS);
+        }, band ? 300 : CAPTION_MS);
     }
 
     stopSlide(slide) {
@@ -425,17 +463,25 @@ export class Screen {
         const d = this.slide(item);
         d.classList.add('hk-visible');
         s.appendChild(d);
-        this.startVideo(d);
+        this.startVideo(d, comp);
         return s;
     }
 
     // --- The compositions -------------------------------------------------------------------------------------------
 
-    makeLayer(comp, items, today, week) {
+    makeLayer(comp, items, today, week, extra) {
         const c = el('div', 'hk-cuerpo hk-capa');
         c.setAttribute('data-composicion', comp);
         if (comp === 'semana') {
             const l = this.labelsFull();
+            // What comes next and matters, in a strip in the centre's colour; the five days under it.
+            const said = weekHeadline(today, this.s.days);
+            if (said) {
+                const strip = el('div', 'hk-semana-titular');
+                strip.appendChild(el('small', '', this.s.thisweek || ''));
+                strip.appendChild(el('b', '', said));
+                c.appendChild(strip);
+            }
             c.hkWeek = buildWeek(week, {today: l.today, tomorrow: l.tomorrow, none: this.s.week_none || '',
                 more: this.s.week_more || '+{n}'});
             c.appendChild(c.hkWeek);
@@ -448,24 +494,176 @@ export class Screen {
             }
             return c;
         }
+        // One thing big: what leads (a different one each time) and the rest in a third, never from 8 m.
+        const far = this.distance === 8;
+        const l = this.labelsLead();
+        const self = this;
+        const withRest = function (lead) {
+            if (far || self.noToday) {
+                return;
+            }
+            const r = buildRest(today, lead, l, self.turn || 0);
+            if (r) {
+                c.appendChild(r);
+                c.hkRest = r;
+            }
+        };
+        const nextLead = function () {
+            const all = leadsOf(today, today.noon);
+            if (!all.length || self.noToday) {
+                return null;
+            }
+            self.leadTurn = (self.leadTurn || 0) + 1;
+            return all[(self.leadTurn - 1) % all.length];
+        };
+        if (comp === 'titular') {
+            c.appendChild(this.typographic(extra || {type: 'frase', text: ''}, today));
+            return c;
+        }
         if (comp === 'dos-verticales') {
             const pair = el('div', 'hk-pareja');
             pair.setAttribute('data-forma', shapeOf(items[0]) || '2x3');
             pair.appendChild(this.slot(items[0], comp));
             pair.appendChild(this.slot(items[1], comp));
             c.appendChild(pair);
-        } else if (comp !== 'solo-hoy') {
-            c.appendChild(this.slot(items[0], comp));
+            withRest(null);
+            return c;
         }
-        if (comp !== 'foto-sola' && !this.noToday) {
-            const aside = buildToday(today, this.labelsFull(), comp === 'solo-hoy', this.horizontal,
-                this.weather ? this.sky : null);
-            if (aside) {
-                c.appendChild(aside);
+        if (comp === 'solo-hoy') {
+            const p = nextLead();
+            if (p) {
+                c.appendChild(buildLead(p, today, l));
             }
-            c.hkToday = aside;
+            withRest(p);
+            return c;
+        }
+        c.appendChild(this.slot(items[0], comp));
+        if (comp === 'vertical-hoy') {
+            const p = nextLead();
+            if (p) {
+                c.appendChild(buildLead(p, today, l));
+            }
+        } else if (comp === 'foto-hoy' || comp === 'apaisado') {
+            withRest(null);
         }
         return c;
+    }
+
+    /** The words of what leads and the rest. */
+    labelsLead() {
+        const l = this.labels || {};
+        const s = this.s;
+        return {
+            important: s.important || '',
+            notice: s.notice || '',
+            events: l.events || s.events || '',
+            countdown: s.countdown || '',
+            daysfor: s.daysfor || '',
+            notices: l.notices || s.notices || '',
+            upcoming: l.upcoming || s.upcoming || '',
+        };
+    }
+
+    /** A sentence or the countdown over the whole body, in the centre's colour (the art direction's «titular»). */
+    typographic(x, today) {
+        const s = el('section', 'hk-tipografica');
+        s.setAttribute('data-tipo', x.type === 'cuenta' ? 'cuenta' : 'frase');
+        const l = this.labelsLead();
+        const c = today && today.countdown;
+        if (x.type === 'cuenta' && c) {
+            s.appendChild(el('p', 'hk-tipografica-etiqueta', l.countdown));
+            const n = el('p', 'hk-tipografica-cuenta');
+            n.appendChild(el('b', '', String(c.days)));
+            n.appendChild(el('span', '', l.daysfor));
+            s.appendChild(n);
+            s.appendChild(el('h2', 'hk-tipografica-texto', c.title));
+            const foot = [c.day, c.group].filter(Boolean).join(' · ');
+            if (foot) {
+                s.appendChild(el('p', 'hk-tipografica-pie', foot));
+            }
+        } else {
+            s.appendChild(el('p', 'hk-tipografica-etiqueta', this.tickerLabel.textContent));
+            s.appendChild(el('h2', 'hk-tipografica-texto', x.text || ''));
+        }
+        return s;
+    }
+
+    /** The headline of each picture's caption, by steps and evened; in a band, one line or the smaller step. */
+    fitCaptions(c, comp) {
+        const vertical = !this.horizontal;
+        const media = c.querySelectorAll('.hk-medio');
+        for (let i = 0; i < media.length; i++) {
+            const m = media[i];
+            const pies = m.querySelectorAll('.hk-pie');
+            const pie = pies[pies.length - 1];
+            const h2 = pie && pie.querySelector('h2');
+            if (pie && comp === 'dos-verticales') {
+                // The pair's captions are small: from afar, or when long, without their second line, or none at all,
+                // rather than covering the picture.
+                pie.classList.remove('hk-pie-corto');
+                pie.style.display = '';
+                if (pie.offsetHeight > m.clientHeight * 0.6) {
+                    pie.classList.add('hk-pie-corto');
+                    if (pie.offsetHeight > m.clientHeight * 0.6) {
+                        pie.style.display = 'none';
+                    }
+                }
+                continue;
+            }
+            if (!h2 || comp === 'vertical-hoy') {
+                continue;
+            }
+            if (comp === 'apaisado' || comp === 'tiempo-tercio') {
+                pie.setAttribute('data-ajuste', '0');
+                if (linesOf(h2) > 1) {
+                    pie.setAttribute('data-ajuste', '1');
+                }
+                even(h2);
+                continue;
+            }
+            pie.hkShort = 'hk-pie-corto';
+            fitHeadline(pie, h2, comp === 'foto-hoy' && !vertical ? 2 : 3, function () {
+                return pie.offsetHeight > m.clientHeight * 0.62;
+            });
+            even(h2);
+        }
+    }
+
+    /** The week's strip: its line at its size, or a step smaller when it takes two. */
+    fitStrip(c) {
+        const strip = c.querySelector('.hk-semana-titular');
+        if (strip) {
+            strip.setAttribute('data-ajuste', '0');
+            if (linesOf(strip.querySelector('b')) > 1) {
+                strip.setAttribute('data-ajuste', '1');
+            }
+        }
+    }
+
+    /** Once the layer is in the page: the headlines by steps and evened, the rest in its pages. */
+    adjustLayer(c) {
+        const vertical = !this.horizontal;
+        const comp = c.getAttribute('data-composicion');
+        const lead = c.querySelector('.hk-lider');
+        if (lead) {
+            const t = lead.querySelector('.hk-lider-titular');
+            lead.hkShort = 'hk-lider-corto';
+            fitHeadline(lead, t, comp === 'vertical-hoy' && vertical ? 2 : 3, function () {
+                return lead.scrollHeight > lead.clientHeight + 1 || lead.scrollWidth > lead.clientWidth + 1;
+            });
+            even(t);
+        }
+        this.fitCaptions(c, comp);
+        const type = c.querySelector('.hk-tipografica-texto');
+        if (type) {
+            const box = c.querySelector('.hk-tipografica');
+            type.hkSteps = 4;
+            fitHeadline(type, type, vertical ? 7 : 4, function () {
+                return box.scrollHeight > box.clientHeight + 1 || box.scrollWidth > box.clientWidth + 1;
+            });
+            even(type);
+        }
+        paginateRest(c.hkRest, this.turn || 0);
     }
 
     labelsFull() {
@@ -495,11 +693,19 @@ export class Screen {
         this.full.appendChild(this.header());
         if (pie) {
             this.full.appendChild(pie);
+            const h2 = pie.querySelector('h2');
+            if (h2) {
+                const full = this.full;
+                pie.hkShort = 'hk-pie-corto';
+                fitHeadline(pie, h2, 3, function () {
+                    return pie.offsetHeight > full.clientHeight * 0.6;
+                });
+                even(h2);
+            }
         }
         if (this.weather) {
             this.full.appendChild(el('p', 'hk-credito-tiempo', this.credit.textContent));
         }
-        balanceIn(this.full);
         if (d.hkVideo) {
             d.hkTimer = setTimeout(function () {
                 if (pie) {
@@ -512,25 +718,62 @@ export class Screen {
     }
 
     /**
-     * A showcase (provisional look, until the art direction's): the picture or video over the whole screen, its
-     * headline big over a veil, and its web with a big QR and the address written short. Without any picture, the
-     * centre's header alone.
+     * A showcase slide (the art direction's «mostrarEscaparate»): the picture or video over the whole screen, its
+     * headline big and its web with a QR. From one to the next the layer is not emptied: the new picture, headline and
+     * QR come in over the old ones (.hk-entrando, then the old ones .hk-saliendo) and the old ones leave when covered;
+     * the veil and the header stay on top. The picture takes .hk-visible on the next frame, so it dissolves in and
+     * starts its slow move. A video's headline stays. Without any picture, the header alone.
      *
      * @param {object|undefined} item
      */
     fillShowcase(item) {
+        const full = this.full;
         if (!item) {
             this.clearFull();
-            this.full.appendChild(el('div', 'hk-completa-velo'));
-            this.full.appendChild(this.header());
+            full.appendChild(el('div', 'hk-completa-velo'));
+            full.appendChild(this.header());
             return;
         }
-        this.fillFull(item);
-        const pie = this.full.querySelector('.hk-pie');
-        if (pie) {
-            // In a showcase the headline stays: it is what is read from afar.
-            pie.style.opacity = '';
-            pie.classList.add('hk-pie-escaparate');
+        const olds = Array.prototype.slice.call(full.childNodes);
+        const fresh = [];
+        const put = function (n) {
+            n.classList.add('hk-entrando');
+            full.appendChild(n);
+            fresh.push(n);
+        };
+        const d = this.slide(item);
+        const inner = d.querySelector('.hk-pie');
+        if (inner) {
+            d.removeChild(inner);
+        }
+        put(d);
+        const img = d.querySelector('img');
+        if (img) {
+            img.style.webkitTransitionDuration = '17s';
+            img.style.transitionDuration = '17s';
+        }
+        const veil = full.querySelector('.hk-completa-velo');
+        if (!veil) {
+            full.appendChild(el('div', 'hk-completa-velo'));
+            full.appendChild(this.header());
+        } else {
+            full.appendChild(veil);
+            const head = full.querySelector('.hk-cabecera');
+            if (head) {
+                full.appendChild(head);
+            }
+        }
+        const cap = item.caption || {};
+        let pie = null;
+        if (cap.title || cap.text) {
+            pie = el('div', 'hk-pie hk-pie-escaparate');
+            if (cap.title) {
+                pie.appendChild(el('h2', '', cap.title));
+            }
+            if (cap.text) {
+                pie.appendChild(el('p', '', cap.text));
+            }
+            put(pie);
         }
         if (item.web) {
             const box = el('div', 'hk-qr');
@@ -543,10 +786,57 @@ export class Screen {
             path.setAttribute('d', q.d);
             svg.appendChild(path);
             box.appendChild(svg);
-            // A long address goes on after a slash, never in the middle of a word.
-            box.appendChild(el('p', 'hk-qr-web', shortWeb(item.web).replace(/\//g, '/\u200B')));
-            this.full.appendChild(box);
+            // The short address may break after «/» or «.», never in the middle of a word.
+            const web = el('p', 'hk-qr-web');
+            shortWeb(item.web).split(/([/.])/).forEach(function (part) {
+                if (part) {
+                    web.appendChild(document.createTextNode(part));
+                }
+                if (part === '/' || part === '.') {
+                    web.appendChild(el('wbr'));
+                }
+            });
+            box.appendChild(web);
+            if (this.s.scan) {
+                box.appendChild(el('p', 'hk-qr-llamada', this.s.scan));
+            }
+            put(box);
         }
+        const h2 = pie && pie.querySelector('h2');
+        if (h2) {
+            pie.hkSteps = 2;
+            fitHeadline(pie, h2, this.horizontal ? 2 : 3);
+            even(h2);
+        }
+        void full.offsetWidth;
+        requestAnimationFrame(function () {
+            fresh.forEach(function (n) {
+                n.classList.remove('hk-entrando');
+            });
+            d.classList.add('hk-visible');
+            olds.forEach(function (n) {
+                if (!n.classList.contains('hk-completa-velo') && !n.classList.contains('hk-cabecera')) {
+                    n.classList.add('hk-saliendo');
+                }
+            });
+        });
+        if (d.hkVideo) {
+            d.hkTimer = setTimeout(function () {
+                d.hkVideo.hkStarted = true;
+                quiet(d.hkVideo.play());
+            }, 400);
+        }
+        const self = this;
+        setTimeout(function () {
+            olds.forEach(function (n) {
+                if (n.classList.contains('hk-saliendo') && n.parentNode) {
+                    if (n.classList.contains('hk-diapo')) {
+                        self.stopSlide(n);
+                    }
+                    n.parentNode.removeChild(n);
+                }
+            });
+        }, 2200);
     }
 
     /**
@@ -560,35 +850,39 @@ export class Screen {
     show(choice, today, week) {
         const comp = choice.comp;
         const items = choice.items;
+        // Each slide turns the page of the rest and the important notice in the fixed place.
+        this.turn = (this.turn || 0) + 1;
         const wasFull = !!FULL[this.frame.getAttribute('data-composicion')];
         if (FULL[comp]) {
             // Under the full screen the layer stays, still: its videos stop.
             if (this.layer) {
                 this.stopSlides(this.layer);
             }
+            // Set first: the headline and the header are measured with the layer in its place.
+            this.frame.setAttribute('data-composicion', comp);
+            this.comp = comp;
             if (comp === 'escaparate') {
                 this.fillShowcase(items[0]);
             } else {
                 this.fillFull(items[0]);
             }
-            this.frame.setAttribute('data-composicion', comp);
-            this.comp = comp;
+            this.fitHeaders();
             return;
         }
+        this.fitHeaders();
         const shapes = items.map(shapeOf).join(',');
         const todayKey = JSON.stringify(today);
         if (this.layer && this.comp === comp && this.shapes === shapes && comp !== 'solo-hoy' && comp !== 'semana' &&
-                !wasFull) {
+                comp !== 'titular' && !wasFull && todayKey === this.todayKey) {
             const slots = this.layer.querySelectorAll('.hk-medio');
             for (let i = 0; i < slots.length; i++) {
                 const slot = slots[i];
                 const olds = slot.querySelectorAll('.hk-diapo');
                 const fresh = this.slide(items[i]);
                 slot.appendChild(fresh);
-                balanceIn(fresh);
                 void slot.offsetWidth;
                 fresh.classList.add('hk-visible');
-                this.startVideo(fresh);
+                this.startVideo(fresh, comp);
                 const self = this;
                 // Every slide that was there goes, also one still fading in from a slide just before.
                 for (let k = 0; k < olds.length; k++) {
@@ -602,33 +896,30 @@ export class Screen {
                     }
                 }, 900);
             }
-            if (todayKey !== this.todayKey) {
-                this.refreshToday(comp, today);
-            }
-            this.todayKey = todayKey;
+            this.fitCaptions(this.layer, comp);
+            showRestPage(this.layer.hkRest, this.turn, true);
+            turnFixed(this.layer.hkRest, this.turn, this.labelsLead());
             return;
         }
         const old = this.layer;
-        const layer = this.makeLayer(comp, items, today, week);
+        const layer = this.makeLayer(comp, items, today, week, choice.extra);
         this.stage.appendChild(layer);
+        this.fitStrip(layer);
         if (layer.hkWeek) {
             fitWeek(layer.hkWeek, this.horizontal);
         }
-        layer.hkPaging = turnPages(fitToday(layer.hkToday));
-        balanceIn(layer);
+        this.adjustLayer(layer);
         // Measured while the screens' letters were still arriving: once they are here (wider, as a rule), «Today» and
         // the week are measured again, so no title ends up in three lines.
         if (document.fonts && document.fonts.status === 'loading') {
             const self = this;
             document.fonts.ready.then(function () {
                 if (self.layer === layer) {
-                    self.todayKey = '';
-                    self.refreshToday(comp, today);
-                    self.todayKey = JSON.stringify(today);
+                    self.fitStrip(layer);
                     if (layer.hkWeek) {
                         fitWeek(layer.hkWeek, self.horizontal);
                     }
-                    balanceIn(layer);
+                    self.adjustLayer(layer);
                 }
             });
         }
@@ -656,7 +947,6 @@ export class Screen {
 
     leave(layer) {
         layer.classList.add('hk-fuera');
-        clearInterval(layer.hkPaging);
         const self = this;
         setTimeout(function () {
             self.stopSlides(layer);
@@ -664,26 +954,6 @@ export class Screen {
                 layer.parentNode.removeChild(layer);
             }
         }, PASS_MS);
-    }
-
-    // «Today» changed under the same composition (a notice published, the menu of the afternoon): only it is rebuilt.
-    refreshToday(comp, today) {
-        const layer = this.layer;
-        if (!layer || this.noToday || comp === 'foto-sola') {
-            return;
-        }
-        clearInterval(layer.hkPaging);
-        if (layer.hkToday && layer.hkToday.parentNode) {
-            layer.hkToday.parentNode.removeChild(layer.hkToday);
-        }
-        const aside = buildToday(today, this.labelsFull(), comp === 'solo-hoy', this.horizontal,
-            this.weather ? this.sky : null);
-        if (aside) {
-            layer.appendChild(aside);
-        }
-        layer.hkToday = aside;
-        layer.hkPaging = turnPages(fitToday(aside));
-        balanceIn(aside);
     }
 
     // --- The ticker -------------------------------------------------------------------------------------------------
@@ -727,6 +997,13 @@ export class Screen {
         }
     }
 
+    /**
+     * The ticker, one sentence at a time (the art direction's «cinta.css»): each in one line at --hk-t-lista; if not,
+     * in two at --hk-t-min; if not even so, cut at a comma or a colon near the middle into two that come one after the
+     * other. A sentence stays 6 s, or 2 s and 0.35 s a word, up to 12 s; a counter says which.
+     *
+     * @param {string[]} texts
+     */
     showTicker(texts) {
         const text = texts.join('\u0000');
         if (text === this.tickerText) {
@@ -734,19 +1011,123 @@ export class Screen {
         }
         this.tickerText = text;
         this.frame.classList.toggle('hk-sin-cinta', !texts.length);
+        clearTimeout(this.phraseTimer);
         clear(this.tickerTrack);
-        texts.forEach((t, i) => {
-            if (i > 0) {
-                this.tickerTrack.appendChild(el('i'));
+        clear(this.tickerCount);
+        this.phraseNode = null;
+        this.phraseAt = 0;
+        this.phrases = texts.length ? this.preparePhrases(texts) : [];
+        if (this.phrases.length) {
+            this.nextPhrase();
+        }
+    }
+
+    preparePhrases(texts) {
+        const track = this.tickerTrack;
+        const out = [];
+        // Measured with the counter in place.
+        this.tickerCount.textContent = '8/8';
+        const node = function (t) {
+            const p = el('p', 'hk-frase');
+            p.appendChild(el('span', '', t));
+            return p;
+        };
+        const tryOne = function (t, cuts) {
+            const p = node(t);
+            p.style.visibility = 'hidden';
+            track.appendChild(p);
+            const span = p.firstChild;
+            let r = null;
+            if (linesOf(span) <= 1) {
+                r = {text: t, lines: 1};
+            } else {
+                p.setAttribute('data-lineas', '2');
+                if (linesOf(span) <= 2 && span.offsetHeight <= p.clientHeight) {
+                    r = {text: t, lines: 2};
+                }
             }
-            this.tickerTrack.appendChild(document.createTextNode(t));
+            track.removeChild(p);
+            if (r) {
+                out.push(r);
+                return;
+            }
+            const half = t.length / 2;
+            let best = -1;
+            let skip = 2;
+            t.replace(/[,:;]\s/g, function (x, i) {
+                if (best === -1 || Math.abs(i - half) < Math.abs(best - half)) {
+                    best = i;
+                }
+                return x;
+            });
+            if (best === -1) {
+                skip = 1;
+                t.replace(/\s/g, function (x, i) {
+                    if (best === -1 || Math.abs(i - half) < Math.abs(best - half)) {
+                        best = i;
+                    }
+                    return x;
+                });
+            }
+            if (best > 0 && cuts < 2) {
+                tryOne(t.slice(0, best) + '…', cuts + 1);
+                tryOne('…' + t.slice(best + skip), cuts + 1);
+            } else {
+                out.push({text: t, lines: 2});
+            }
+        };
+        texts.forEach(function (t) {
+            tryOne(t, 0);
         });
-        // About 140 px a second on a screen of 1080: read without chasing it.
-        const short = Math.min(window.innerWidth, window.innerHeight) || 1080;
-        const speed = 140 * short / 1080;
-        const seconds = Math.max(8, this.tickerTrack.offsetWidth / speed);
-        this.tickerTrack.style.webkitAnimationDuration = seconds + 's';
-        this.tickerTrack.style.animationDuration = seconds + 's';
+        clear(this.tickerCount);
+        return out;
+    }
+
+    nextPhrase() {
+        const list = this.phrases || [];
+        if (!list.length) {
+            return;
+        }
+        const i = this.phraseAt % list.length;
+        const f = list[i];
+        const track = this.tickerTrack;
+        const old = this.phraseNode;
+        if (old) {
+            old.classList.remove('hk-frase-dentro');
+            old.classList.add('hk-frase-fuera');
+            setTimeout(function () {
+                if (old.parentNode) {
+                    old.parentNode.removeChild(old);
+                }
+            }, 600);
+        }
+        const fresh = el('p', 'hk-frase');
+        fresh.appendChild(el('span', '', f.text));
+        if (f.lines === 2) {
+            fresh.setAttribute('data-lineas', '2');
+        }
+        setTimeout(function () {
+            track.appendChild(fresh);
+            void fresh.offsetWidth;
+            requestAnimationFrame(function () {
+                fresh.classList.add('hk-frase-dentro');
+            });
+        }, old ? 700 : 0);
+        this.phraseNode = fresh;
+        clear(this.tickerCount);
+        if (list.length > 1) {
+            this.tickerCount.appendChild(el('b', '', String(i + 1)));
+            this.tickerCount.appendChild(document.createTextNode('/' + list.length));
+        }
+        this.phraseAt++;
+        if (list.length > 1) {
+            const words = f.text.split(/\s+/).length;
+            const wait = Math.min(12, Math.max(6, 2 + 0.35 * words));
+            const self = this;
+            this.phraseTimer = setTimeout(function () {
+                self.nextPhrase();
+            }, wait * 1000);
+        }
     }
 
     /** What the screen is for now, on the frame: a showcase hides the ticker (nothing in detail). */

@@ -6,6 +6,7 @@ import {useOf} from '../src/rules.js';
 import {Composer, draftChoice} from '../src/compose.js';
 import {qrPath, shortWeb} from '../src/qr.js';
 import {agendaOf, monthOf} from '../src/agenda.js';
+import {leadsOf, menuParts, weekHeadline} from '../src/lead.js';
 
 const at = (dow, hm) => ({dow, min: parseInt(hm.slice(0, 2), 10) * 60 + parseInt(hm.slice(3), 10)});
 
@@ -114,4 +115,58 @@ test('the month above the agenda: Monday first, today, the past, and the colours
     assert.equal(day(26).past, true);
     assert.deepEqual(day(28).marks, [3, 2, 0]);
     assert.deepEqual(day(30).marks, []);
+});
+
+test('by the distance: no week from 5 m; from 8 m no thirds, and the sentences as slides of their own', () => {
+    const queue = [photo('a'), photo('b'), photo('c')];
+    const week = {things: 9, weekday: 2};
+    const run = (opts, n) => {
+        const c = new Composer();
+        const out = [];
+        for (let i = 0; i < n; i++) {
+            out.push(c.next(queue, 4, true, opts));
+        }
+        return out;
+    };
+    assert.ok(run({distance: 3, week}, 16).some((x) => x.comp === 'semana'));
+    assert.ok(!run({distance: 5, week}, 16).some((x) => x.comp === 'semana'));
+    const far = run({distance: 8, week, phrases: ['Uno', 'Dos'], countdown: true}, 16);
+    assert.ok(!far.some((x) => x.comp === 'semana' || x.comp === 'foto-hoy'));
+    const types = far.filter((x) => x.comp === 'titular').map((x) => x.extra.type + ':' + (x.extra.text || ''));
+    assert.deepEqual(types, ['frase:Uno', 'frase:Dos', 'cuenta:', 'frase:Uno']);
+});
+
+test('a landscape video goes to its own place: two thirds with its band, or the whole screen from afar', () => {
+    const video = {id: 'v', type: 'video', media: {width: 1920, height: 1080, duration: 20}};
+    const c = new Composer();
+    c.sinceFull = 0;
+    assert.equal(c.next([video], 3, true, {distance: 3}).comp, 'apaisado');
+    const f = new Composer();
+    f.sinceFull = 0;
+    assert.equal(f.next([video], 3, true, {distance: 8}).comp, 'foto-completa');
+});
+
+test('what leads, in order; the main dish of a menu; what the week strip says', () => {
+    const today = {
+        menu: {label: 'Menú', courses: [{label: 'Primero', dishes: ['Crema']}, {label: 'Segundo', dishes: ['Merluza', 'Tortilla']},
+            {label: 'Postre', dishes: ['Fruta']}]},
+        notices: [{title: 'Fotos', tone: 'normal'}, {title: 'Salida', tone: 'important'}],
+        events: [{time: '10:30', title: 'Teatro'}, {time: '12:00', title: 'Charla'}],
+        countdown: {days: 12, title: 'Puertas abiertas', date: '2026-11-14'},
+        upcoming: [{date: '2026-11-05', title: 'Día del deporte'}],
+    };
+    const order = (x) => x.map((p) => p.type + (p.notice ? ':' + p.notice.title : ''));
+    assert.deepEqual(order(leadsOf(today)), ['notice:Salida', 'menu', 'event', 'countdown', 'notice:Fotos']);
+    // Around midday the menu goes first.
+    assert.deepEqual(order(leadsOf(today, true)).slice(0, 2), ['menu', 'notice:Salida']);
+    assert.deepEqual(leadsOf({}), []);
+    const parts = menuParts(today.menu);
+    assert.equal(parts.main, 'Merluza · Tortilla');
+    assert.deepEqual(parts.others.map((o) => o.label), ['Primero', 'Postre']);
+    assert.equal(menuParts({courses: [{label: 'Único', dishes: ['Paella']}]}).main, 'Paella');
+    // The strip: the nearest event, or a big one of the next days.
+    assert.equal(weekHeadline(today, S.days), 'jueves 5: Día del deporte');
+    const soon = Object.assign({}, today, {countdown: {days: 3, title: 'Acampada', date: '2026-11-06'}});
+    assert.equal(weekHeadline(soon, S.days), 'viernes 6: Acampada');
+    assert.equal(weekHeadline({}, S.days), '');
 });

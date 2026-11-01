@@ -1,27 +1,50 @@
-/* Hechauka — the uses of a screen: the showcase and the weather in a third (mixed). A first look that works, made by
- * the plugin until the art direction's design arrives; then this file takes its markup and its classes.
- * Sizes in rem, as the rest: 1 rem is a hundredth of the short side… of the screen's own scale. */
+/* Oksigenia Hechauka 0.7.0: what each screen is for (Gaudí, 1 November 2026). Replaces the plugin's provisional
+ * player/usos.css, on the same markup (plugin commit 76fe193). Goes last of the 0.7.0 sheets, before the client's.
+ *
+ * <div class="hk" data-uso="info|showcase|mixed">
+ *   info       corridors and the hall: «Today», the menu, the notices, the agenda; calm passes (composiciones.css).
+ *   showcase   entrances and outside, seen from far by people from outside (the families of other centres at a
+ *              weekend championship): only big photos and videos, one by one over the whole screen, with a headline
+ *              that catches the eye, the centre's web and a big QR to open it on the phone, the logo small in a
+ *              corner. No clock, no menu, no agenda, no ticker. Slow, cinematic passes.
+ *   mixed      the informative rotation with the weather in a third every other slide (tiempo-tercio, tercios.css).
+ *
+ * The showcase slide, in the full-screen layer (the player's fillShowcase):
+ *   <div class="hk" data-composicion="escaparate">
+ *     <div class="hk-completa hk-sobre-foto">
+ *       <div class="hk-diapo hk-visible">img or video</div>          (.hk-visible on the next frame: the photo moves)
+ *       <div class="hk-completa-velo"></div>
+ *       <header class="hk-cabecera">…</header>                       (only the logo shows, small, in its corner)
+ *       <div class="hk-pie hk-pie-escaparate"><h2>Campus de verano de baloncesto</h2><p>Abierto a todos</p></div>
+ *       <div class="hk-qr"><svg>(one path)</svg><p class="hk-qr-web">example.org/verano</p>
+ *         <p class="hk-qr-llamada">Ábrelo en el móvil</p></div>      (.hk-qr-llamada: proposed, optional string)
+ *     </div>
+ *   </div>
+ * Without any photo or video, only the velo and the header: then the header is the slide, big and centred.
+ *
+ * From one showcase slide to the next (proposed to the player, done in the demo): the layer is not emptied. The new
+ * .hk-diapo, .hk-pie and .hk-qr come in with .hk-entrando over the old ones; on the next frame .hk-entrando goes and
+ * the old ones take .hk-saliendo; after 2 s the old ones leave the page. So the new photo dissolves over the old one
+ * (1.8 s), and its words and its QR arrive after it.
+ *
+ * The typographic slide («titular», a proposal): one fact or headline over the whole body, in the centre's colour.
+ * For a sentence of the ticker at 8 m, a notice that deserves a slide of its own, or a countdown.
+ *   <div class="hk-cuerpo hk-capa" data-composicion="titular">
+ *     <section class="hk-tipografica" data-tipo="frase|cuenta">
+ *       <p class="hk-tipografica-etiqueta">Al día</p>
+ *       (cuenta: <p class="hk-tipografica-cuenta"><b>12</b><span>días para</span></p>)
+ *       <h2 class="hk-tipografica-texto" data-ajuste="0|1|2">El viernes, festival de otoño en el patio</h2>
+ *       <p class="hk-tipografica-pie">A las 16:00</p>
+ *     </section>
+ *   </div> */
 
-/* A showcase hides the ticker: nothing in detail. */
-.hk[data-uso="showcase"] .hk-cinta {
+/* --- Showcase: no ticker, nothing in detail ------------------------------------------------------------------- */
+.hk[data-uso="showcase"] > .hk-cinta {
     display: none;
 }
-
-/* The showcase is shown in the full-screen layer, as «foto-completa»: the rest steps back. */
-.hk[data-composicion="escaparate"] .hk-completa {
-    opacity: 1;
-}
-.hk[data-composicion="escaparate"] .hk-completa .hk-diapo img {
-    -webkit-transform: none;
-    transform: none;
-}
-.hk[data-composicion="escaparate"] .hk-completa .hk-pie {
-    -webkit-transform: none;
-    transform: none;
-    opacity: 1;
-}
 .hk[data-composicion="escaparate"] > .hk-cabecera,
-.hk[data-composicion="escaparate"] > .hk-escena {
+.hk[data-composicion="escaparate"] > .hk-escena,
+.hk[data-composicion="escaparate"] > .hk-credito-tiempo {
     opacity: 0;
 }
 .hk[data-composicion="escaparate"] > .hk-cinta {
@@ -29,96 +52,352 @@
     -webkit-transform: translate3d(0, 100%, 0);
     transform: translate3d(0, 100%, 0);
 }
+.hk[data-composicion="escaparate"] .hk-completa {
+    opacity: 1;
+    -webkit-transition-duration: 1.8s;
+    transition-duration: 1.8s;
+}
 
-/* The headline of a showcase: big, to be read from afar, and it stays. */
-.hk-completa .hk-pie-escaparate {
-    padding: 16rem 6rem 6rem;
-    padding-right: 34rem;
+/* --- The photo: a long dissolve, and it moves very slowly for the whole slide ----------------------------------- */
+.hk[data-composicion="escaparate"] .hk-completa .hk-diapo {
+    opacity: 0;
+    -webkit-transition: opacity 1.8s ease;
+    transition: opacity 1.8s ease;
 }
-.hk-completa .hk-pie-escaparate h2 {
-    font-size: 8.4rem;
-    line-height: 1.02;
-    letter-spacing: -.01em;
+.hk[data-composicion="escaparate"] .hk-completa .hk-diapo.hk-visible {
+    opacity: 1;
 }
-.hk-completa .hk-pie-escaparate p {
-    margin-top: 1.4rem;
-    font-size: 3.4rem;
+.hk[data-composicion="escaparate"] .hk-completa .hk-diapo img {
+    -webkit-transform: scale(1.07);
+    transform: scale(1.07);
+    -webkit-transition: -webkit-transform 17s linear;
+    transition: transform 17s linear;
+}
+.hk[data-composicion="escaparate"] .hk-completa .hk-diapo.hk-visible img {
+    -webkit-transform: scale(1);
+    transform: scale(1);
+}
+/* the veil: dark where the words and the QR go (bottom), lighter at the top for the logo; white text at AA over a
+   white photo */
+.hk[data-composicion="escaparate"] .hk-completa-velo {
+    height: 100%;
+    background:
+        radial-gradient(ellipse 70% 60% at 18% 82%, rgba(0, 0, 0, .35), rgba(0, 0, 0, 0)),
+        linear-gradient(to bottom, rgba(0, 0, 0, .5), rgba(0, 0, 0, 0) 22%),
+        linear-gradient(to top, rgba(0, 0, 0, .86), rgba(0, 0, 0, .66) 40%, rgba(0, 0, 0, .2) 66%, rgba(0, 0, 0, 0) 82%);
+}
+.hk-vertical[data-composicion="escaparate"] .hk-completa-velo {
+    background:
+        linear-gradient(to bottom, rgba(0, 0, 0, .5), rgba(0, 0, 0, 0) 14%),
+        linear-gradient(to top, rgba(0, 0, 0, .9), rgba(0, 0, 0, .72) 45%, rgba(0, 0, 0, .5) 75%, rgba(0, 0, 0, .2) 90%, rgba(0, 0, 0, 0));
+}
+
+/* --- The header: only the logo, small, in its corner ----------------------------------------------------------- */
+.hk[data-composicion="escaparate"] .hk-completa .hk-cabecera {
+    top: 4.4rem;
+    left: 6.4rem;
+    height: 6.4rem;
+}
+.hk[data-composicion="escaparate"] .hk-completa .hk-cabecera img {
+    height: 6.4rem;
+}
+.hk[data-composicion="escaparate"] .hk-completa .hk-lugar,
+.hk[data-composicion="escaparate"] .hk-completa .hk-tiempo,
+.hk[data-composicion="escaparate"] .hk-completa .hk-hora,
+.hk[data-composicion="escaparate"] .hk-completa .hk-credito-tiempo {
+    display: none;
+}
+/* no photo at all: the header is the slide, big and in the middle, over the dark */
+.hk[data-composicion="escaparate"] .hk-completa > .hk-completa-velo:first-child ~ .hk-cabecera {
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: auto;
+    flex-direction: column;
+    justify-content: center;
+}
+.hk[data-composicion="escaparate"] .hk-completa > .hk-completa-velo:first-child ~ .hk-cabecera img {
+    height: 24rem;
+}
+.hk[data-composicion="escaparate"] .hk-completa > .hk-completa-velo:first-child ~ .hk-cabecera .hk-hora {
+    display: flex;
+    margin: 6rem 0 0;
+}
+
+/* --- The headline: big, read from afar, and it stays (also over a video) ------------------------------------- */
+.hk .hk-completa .hk-pie-escaparate {
+    right: 51rem;                         /* the QR's column on the right */
+    padding: 0 0 7.2rem 7.2rem;
+    background: none;
+    text-shadow: 0 .2rem 1.6rem rgba(0, 0, 0, .4);
+    opacity: 1 !important;                /* the player's video timer hides a caption at 3 s: not this one */
+    -webkit-transform: none;
+    transform: none;
+}
+.hk .hk-completa .hk-pie-escaparate h2 {
+    font-size: var(--hk-t-titular);
+    line-height: 1;
+    letter-spacing: -.02em;
+}
+.hk .hk-completa .hk-pie-escaparate[data-ajuste="1"] h2 {
+    font-size: calc(var(--hk-t-titular) * .88);
+}
+.hk .hk-completa .hk-pie-escaparate[data-ajuste="2"] h2 {
+    font-size: calc(var(--hk-t-titular) * .76);
+}
+.hk .hk-completa .hk-pie-escaparate h2::before {   /* a short bar in the accent over the headline */
+    content: "";
+    display: block;
+    width: 9rem;
+    height: 1.2rem;
+    margin-bottom: 3.2rem;
+    border-radius: .6rem;
+    background: var(--hk-acento);
+}
+.hk .hk-completa .hk-pie-escaparate p {
+    margin-top: 2.4rem;
+    font-size: var(--hk-t-entrada);
+    font-weight: 700;
+    line-height: 1.1;
+    opacity: 1;
 }
 .hk-vertical .hk-completa .hk-pie-escaparate {
-    padding: 14rem 5rem 30rem;
+    right: 6.4rem;
+    bottom: 74rem;
+    padding: 0 0 0 6.4rem;
 }
 
-/* Its web: a big QR on white, and the address written short. */
-.hk-qr {
+/* --- The QR: dark on white, about 20 cm on a 55" screen; its words are read from where one scans (2.5 m) ----- */
+.hk-completa .hk-qr {
     position: absolute;
-    right: 5rem;
-    bottom: 5rem;
+    right: 7.2rem;
+    bottom: 7.2rem;
     z-index: 3;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 25.6rem;
-    padding: 1.8rem 1.8rem 1.2rem;
-    border-radius: 1.6rem;
+    width: 39.2rem;
+    padding: 3.6rem 3.6rem 2.6rem;        /* the white around the code is its quiet zone (the path has none) */
+    border-radius: 2.6rem;
     background: #fff;
-    box-shadow: 0 1rem 3rem rgba(0, 0, 0, .35);
-}
-.hk-qr svg {
-    display: block;
-    width: 22rem;
-    height: 22rem;
-}
-.hk-qr path {
-    fill: #111;
-}
-.hk-qr-web {
-    width: 100%;
-    margin: 1rem 0 0;
-    color: #111;
-    font-size: 1.8rem;
-    font-weight: 700;
-    line-height: 1.2;
+    box-shadow: 0 1rem 4rem rgba(0, 0, 0, .35);
+    color: #16191d;
     text-align: center;
+    -webkit-transform: none;
+    transform: none;
 }
-.hk-vertical .hk-qr {
-    right: 50%;
-    bottom: 6rem;
-    transform: translateX(50%);
+.hk-completa .hk-qr svg {
+    display: block;
+    width: 32rem;
+    height: 32rem;
+}
+.hk-completa .hk-qr path {
+    fill: #16191d;
+}
+.hk-completa .hk-qr-web {
+    margin-top: 2rem;
+    color: #16191d;
+    font-size: 3.4rem;                    /* read from where one scans: 20 arcmin at 2.5 m */
+    font-weight: 800;
+    line-height: 1.05;
+    word-wrap: break-word;
+}
+.hk-completa .hk-qr-llamada {
+    margin-top: .6rem;
+    color: #4b5563;
+    font-size: 3.4rem;
+    font-weight: 700;
+    line-height: 1.1;
+}
+.hk-vertical .hk-completa .hk-qr {
+    right: 6.4rem;
+    bottom: 8rem;
+    width: 42.4rem;
+}
+.hk-vertical .hk-completa .hk-qr svg {
+    width: 35.2rem;
+    height: 35.2rem;
 }
 
-/* Mixed: the picture or video in two thirds, the weather in the other. */
-.hk-cuerpo[data-composicion="tiempo-tercio"] > .hk-medio {
-    flex: 2 1 0px;
+/* --- From one showcase slide to the next: the new over the old ------------------------------------------------ */
+.hk-completa > .hk-pie-escaparate,
+.hk-completa > .hk-qr {
+    -webkit-transition: opacity 1.2s ease 1s, -webkit-transform 1.6s cubic-bezier(.2, .7, .2, 1) 1s;
+    transition: opacity 1.2s ease 1s, transform 1.6s cubic-bezier(.2, .7, .2, 1) 1s;
 }
-.hk-tercio-tiempo {
-    display: flex;
-    flex: 1 1 0px;
-    flex-direction: column;
-    min-width: 0;
-    padding: 3rem 3.2rem;
-    background: var(--hk-superficie);
-    color: var(--hk-texto);
+.hk-completa > .hk-qr {
+    -webkit-transition-delay: 1.8s;
+    transition-delay: 1.8s;
 }
-.hk-tercio-tiempo .hk-dia-tiempo {
-    flex: 0 0 auto;
+.hk .hk-completa > .hk-entrando {
+    opacity: 0 !important;
+    -webkit-transform: translate3d(0, 4rem, 0);
+    transform: translate3d(0, 4rem, 0);
 }
-.hk-tercio-tiempo .hk-dia-tiempo + .hk-dia-tiempo {
-    margin: 0;
-    padding: 0;
-    border: 0;
+.hk .hk-completa > .hk-diapo.hk-entrando {
+    -webkit-transform: none;
+    transform: none;
 }
-.hk-tercio-hoy {
-    padding-bottom: 2.6rem;
-    border-bottom: .2rem solid var(--hk-linea);
-    font-size: 1.5em;
+.hk .hk-completa > .hk-saliendo {
+    opacity: 0 !important;
+    -webkit-transition: opacity .8s ease;
+    transition: opacity .8s ease;
 }
-.hk-tercio-dias {
-    display: flex;
+.hk .hk-completa > .hk-diapo.hk-saliendo {
+    opacity: 1 !important;                /* the old photo stays under the new one until it is covered */
+}
+/* Still: the dissolves stay, nothing moves. */
+.hk-quieto[data-composicion="escaparate"] .hk-completa .hk-diapo img,
+.hk-quieto[data-composicion="escaparate"] .hk-completa .hk-diapo.hk-visible img,
+.hk-quieto .hk-completa > .hk-entrando {
+    -webkit-transform: none;
+    transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+    .hk[data-composicion="escaparate"] .hk-completa .hk-diapo img,
+    .hk[data-composicion="escaparate"] .hk-completa .hk-diapo.hk-visible img,
+    .hk .hk-completa > .hk-entrando {
+        -webkit-transform: none;
+        transform: none;
+    }
+}
+
+/* --- The typographic slide ------------------------------------------------------------------------------------- */
+.hk-cuerpo[data-composicion="titular"] > .hk-tipografica {
     flex: 1 1 auto;
-    flex-direction: column;
-    justify-content: space-around;
-    padding-top: 1.6rem;
 }
-.hk-vertical .hk-cuerpo[data-composicion="tiempo-tercio"] {
+.hk-tipografica {
+    position: relative;
+    display: flex;
     flex-direction: column;
+    justify-content: center;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+    padding: 6rem 10rem 6.4rem;
+    border-radius: 2.8rem;
+    background-color: var(--hk-primario);
+    background-image: radial-gradient(circle at 88% 12%, rgba(255, 255, 255, .16), rgba(255, 255, 255, 0) 52%);
+    color: var(--hk-sobre-primario);
+}
+.hk-tipografica > * {
+    flex: none;
+}
+.hk .hk-tipografica-etiqueta {
+    display: flex;
+    align-items: center;
+    margin-bottom: 3.6rem;
+    font-size: var(--hk-t-min);
+    font-weight: 800;
+    letter-spacing: .1em;
+    line-height: 1;
+    text-transform: uppercase;
+}
+.hk .hk-tipografica-etiqueta::before {        /* the accent as a short bar: the client's two colours, nothing else */
+    content: "";
+    width: 7rem;
+    height: 1.2rem;
+    margin-right: 2.4rem;
+    border-radius: .6rem;
+    background: var(--hk-acento);
+}
+.hk .hk-tipografica-texto {
+    font-family: var(--hk-letra-titulos);
+    font-size: calc(var(--hk-t-titular) * 1.1);
+    font-weight: 800;
+    line-height: 1.02;
+    letter-spacing: -.02em;
+}
+.hk .hk-tipografica-texto[data-ajuste="1"] {
+    font-size: calc(var(--hk-t-titular) * .94);
+}
+.hk .hk-tipografica-texto[data-ajuste="2"] {
+    font-size: calc(var(--hk-t-titular) * .8);
+}
+.hk .hk-tipografica-pie {
+    margin-top: 3.2rem;
+    font-size: var(--hk-t-entrada);
+    font-weight: 700;
+    line-height: 1.1;
+}
+.hk .hk-tipografica-cuenta {
+    display: flex;
+    align-items: baseline;
+    margin-bottom: 1.6rem;
+    font-family: var(--hk-letra-titulos);
+}
+.hk .hk-tipografica-cuenta b {
+    margin-right: 3.2rem;
+    font-size: calc(var(--hk-t-titular) * 2.3);
+    font-weight: 800;
+    line-height: .82;
+    letter-spacing: -.04em;
+    font-variant-numeric: tabular-nums;
+}
+.hk .hk-tipografica-cuenta span {
+    font-size: var(--hk-t-entrada);
+    font-weight: 800;
+    line-height: 1;
+}
+.hk-tipografica[data-tipo="cuenta"] .hk-tipografica-texto {
+    font-size: calc(var(--hk-t-titular) * .9);
+}
+
+/* --- Made in the player, with the real data of any centre ------------------------------------------------------ */
+/* The date of a vertical screen when it does not fit in one line (Renderer.fitHeaders). */
+.hk.hk-vertical .hk-cabecera.hk-fecha-larga .hk-fecha b {
+    display: block;
+}
+.hk-vertical > .hk-cabecera.hk-fecha-larga,
+.hk-vertical > .hk-cabecera.hk-con-tiempo.hk-fecha-larga {
+    height: calc(var(--hk-t-min) * 2.5 + var(--hk-t-cifra));
+}
+/* A header that does not fit even so: the clock and the degrees a bit smaller, and at last without the weather. */
+.hk .hk-cab-justa .hk-reloj {
+    font-size: calc(var(--hk-t-cifra) * .8);
+}
+.hk .hk-cab-justa .hk-tiempo-grados {
+    font-size: calc(var(--hk-t-cifra) * .62);
+}
+.hk .hk-cab-justa .hk-tiempo-icono {
+    width: calc(var(--hk-t-cifra) * .68);
+    height: calc(var(--hk-t-cifra) * .68);
+}
+.hk .hk-cab-sin-tiempo .hk-tiempo {
+    display: none;
+}
+.hk .hk-cab-sin-tiempo .hk-hora {
+    margin-left: auto;
+}
+/* The important notice's word on a dark surface: the accent made readable for each centre. */
+[data-tema="oscuro"] .hk .hk-aviso-fijo-marca {
+    color: var(--hk-acento-oscuro, var(--hk-acento));
+}
+/* A long sentence or a long word on the typographic slide, from afar: down to the distance's minimum title, and then
+   to the size of an entry, rather than cutting it. A vertical screen has less width, so less margin. */
+.hk-vertical .hk-tipografica {
+    padding-right: 6rem;
+    padding-left: 6rem;
+}
+.hk .hk-tipografica-texto[data-ajuste="3"] {
+    font-size: var(--hk-t-titulo-min);
+}
+.hk .hk-tipografica-texto[data-ajuste="4"] {
+    font-size: var(--hk-t-entrada);
+}
+/* The countdown there: the figure gives way first, so the title and its date fit in the body. */
+.hk[data-distancia="8"] .hk-tipografica-cuenta b {
+    font-size: calc(var(--hk-t-titular) * 1.6);
+}
+.hk-tipografica[data-tipo="cuenta"] .hk-tipografica-texto[data-ajuste="1"] {
+    font-size: calc(var(--hk-t-titular) * .8);
+}
+.hk-tipografica[data-tipo="cuenta"] .hk-tipografica-texto[data-ajuste="2"],
+.hk-tipografica[data-tipo="cuenta"] .hk-tipografica-texto[data-ajuste="3"] {
+    font-size: var(--hk-t-titulo-min);
+}
+.hk-tipografica[data-tipo="cuenta"] .hk-tipografica-texto[data-ajuste="4"] {
+    font-size: var(--hk-t-entrada);
+}
+/* The last line of a page of the rest needs no margin under it: it would count as overflowing a short page. */
+.hk-resto-pagina > :last-child {
+    margin-bottom: 0;
 }

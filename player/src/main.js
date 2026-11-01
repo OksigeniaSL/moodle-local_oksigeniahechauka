@@ -16,7 +16,7 @@ import {store} from './store.js';
 import {countToday} from './today.js';
 import {weekOf} from './week.js';
 
-const VERSION = '0.6.3';
+const VERSION = '0.7.0';
 const COMING_DAYS = 7;
 const HEARTBEAT_MS = 60000;
 const REFRESH_MS = 15 * 60000;
@@ -284,6 +284,8 @@ class Player {
             }), wall.date, COMING_DAYS, names, over ? 1 : 0),
             countdown: big,
             eventsLabel: over ? names.tomorrow : '',
+            // Around midday the menu leads first.
+            noon: wall.min >= 11 * 60 + 30 && wall.min < 14 * 60 + 30,
             weather: this.manifest.weather || null,
         };
     }
@@ -392,6 +394,11 @@ class Player {
         const choice = this.composer.next(this.mainList(wall), countToday(today) + coming, this.screen.horizontal,
             {menu: !!today.menu, noToday: m.template === 'full', use,
                 weather: !!(m.weather && m.weather.days && m.weather.days.length),
+                distance: (m.screen && m.screen.distance) || 3,
+                countdown: !!today.countdown,
+                phrases: liveItems(m.items || [], 'ticker', wall).map(function (it) {
+                    return it.text || it.title || '';
+                }).filter(Boolean),
                 week: week ? {things: week.things, weekday: weekdayOf(dayNumber(wall.date))} : null});
         this.menuTurn++;
         this.screen.show(choice, today, week);

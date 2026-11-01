@@ -269,6 +269,9 @@ Biblioteca, Secretaría y Comedor.» A teacher sees only their groups, already c
   `btn-outline-danger`, confirmation that says what is kept).
 - The save bar appears, sticky at the bottom, with the first change: «Hay cambios sin guardar.» «Guardar cambios»,
   «Deshacer». Leaving with changes asks first.
+- «Para qué es» (informativa, escaparate o mixta) and «Desde dónde se lee» (de cerca, a media distancia, de lejos): three
+  small cards to choose from, each saying what it means, with the same shape. Under them, «Otro uso a ciertas horas»
+  (its days, its hours and the use then) and «Detrás de un cristal».
 
 ### Screens and groups
 

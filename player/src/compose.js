@@ -10,6 +10,12 @@
 // semana          the next five school days, each with its events
 // escaparate      a showcase: the picture or video over the whole screen, its headline big, its web with a QR
 // tiempo-tercio   mixed: the picture or video in two thirds, the weather in the other (today big, three days under)
+// apaisado        a landscape video in two thirds with its band, the rest of «Today» in the other
+// titular         a sentence (of the ticker, at 8 m) or the countdown, over the whole body in the centre's colour
+//
+// By the distance it is read from (the art direction's 0.7.0): at 3 m, all; at 5 m, all but «semana»; at 8 m, no
+// thirds (foto-hoy is foto-sola, a landscape video is foto-completa, «Today» comes one thing at a time) and the
+// ticker's sentences come as slides of their own.
 
 /** Width over height of an item's picture or video; landscape when it does not say. */
 export function ratio(item) {
@@ -78,7 +84,9 @@ export class Composer {
      * @param {boolean} horizontal the shape of the screen
      * @param {object} [opts] {menu: «Today» has a menu, noToday: the screen never shows «Today»,
      *     week: {things: what the week has beyond today, weekday: 1 Monday … 7 Sunday},
-     *     use: info, showcase or mixed (what the screen is for now), weather: the weather has the coming days}
+     *     use: info, showcase or mixed (what the screen is for now), weather: the weather has the coming days,
+     *     distance: 3, 5 or 8 (metres), phrases: the ticker's sentences (slides of their own at 8 m),
+     *     countdown: «Today» has a countdown}
      * @returns {{comp: string, items: object[], seconds: number}}
      */
     next(queue, today, horizontal, opts) {
@@ -86,16 +94,18 @@ export class Composer {
         const h = o.noToday ? 0 : today;
         this.n++;
         this.sinceWeek++;
-        const pick = (comp, items, seconds) => {
+        const far = o.distance === 8;
+        const pick = (comp, items, seconds, extra) => {
             this.last = comp;
             if (items.length) {
                 this.lastId = items[items.length - 1].id;
             }
-            return {comp, items, seconds};
+            return extra ? {comp, items, seconds, extra} : {comp, items, seconds};
         };
         // «La semana»: every 8 slides (5 on Mondays and Fridays, when the next week matters; 3 without pictures), only
         // when the week has something beyond today, never right after the moment of «Today» or the full screen.
-        const week = o.week && !o.noToday ? o.week : null;
+        // «La semana» only from close: its five columns do not read from farther.
+        const week = o.week && !o.noToday && !far && o.distance !== 5 ? o.week : null;
         const weekDue = (every, alternate) => {
             // Without pictures every slide is the moment of «Today»: then the two take turns.
             if (week && week.things > 0 && this.sinceWeek >= every && (alternate || this.last !== 'solo-hoy') &&
@@ -113,6 +123,18 @@ export class Composer {
             }
             const it = queue[this.position(queue)];
             return pick('escaparate', [it], it.web && it.type !== 'video' ? Math.max(15, secondsOf(it)) : secondsOf(it));
+        }
+        // At 8 m the ticker's sentences and the countdown come as slides of their own, one every four.
+        if (far && this.n % 4 === 3) {
+            const phrases = o.phrases || [];
+            this.sinceType = (this.sinceType || 0) + 1;
+            if (o.countdown && (!phrases.length || this.sinceType % 3 === 0)) {
+                return pick('titular', [], 9, {type: 'cuenta'});
+            }
+            if (phrases.length) {
+                this.phrase = ((this.phrase === undefined ? -1 : this.phrase) + 1) % phrases.length;
+                return pick('titular', [], 9, {type: 'frase', text: phrases[this.phrase]});
+            }
         }
         if (!queue.length) {
             return weekDue(3, true) || pick('solo-hoy', [], o.menu ? 15 : 12);
@@ -142,6 +164,10 @@ export class Composer {
             this.sinceFull = 0;
             return pick('foto-completa', [it], it.type === 'video' ? secondsOf(it) : 9);
         }
+        // A landscape video has its own place: two thirds with its band (from afar, the whole screen).
+        if (it.type === 'video' && a >= 1.45) {
+            return far ? pick('foto-completa', [it], secondsOf(it)) : pick('apaisado', [it], secondsOf(it));
+        }
         if (!horizontal && a < 0.63) {
             return pick('foto-sola', [it], secondsOf(it));
         }
@@ -152,7 +178,7 @@ export class Composer {
         if (a < 1.2) {
             return pick('vertical-hoy', [it], secondsOf(it));
         }
-        return pick(h || !horizontal ? 'foto-hoy' : 'foto-sola', [it], secondsOf(it));
+        return pick((h || !horizontal) && !far ? 'foto-hoy' : 'foto-sola', [it], secondsOf(it));
     }
 }
 

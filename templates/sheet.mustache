@@ -31,7 +31,7 @@
         "groups": [{"id": 1, "name": "Zonas comunes", "checked": true}], "hasgroups": true,
         "always": false, "days": [{"n": 1, "letter": "L", "name": "lunes", "on": true}], "on": "07:30", "off": "18:30",
         "bars": [{"letter": "L", "segments": [{"left": 31.25, "right": 22.92}]}],
-        "sentence": "Encendida de lunes a viernes, de 07:30 a 18:30.", "alerts": true, "sound": false, "uses": [], "plan": {"on": false, "days": [], "from": "00:00", "until": "23:59", "uses": []},
+        "sentence": "Encendida de lunes a viernes, de 07:30 a 18:30.", "alerts": true, "sound": false, "uses": [], "plan": {"on": false, "days": [], "from": "00:00", "until": "23:59", "uses": []}, "distances": [], "glass": false,
         "themes": [{"value": "site", "label": "Como el sitio", "checked": true}], "remove": "#",
         "errors": {}, "haserrors": false, "strings": "{}"
     }
@@ -69,6 +69,11 @@
                         <div class="hkp-field"><label class="form-label" for="hkp-puse">{{#str}}sheet_useplan_use, local_oksigeniahechauka{{/str}}</label><select class="form-select" id="hkp-puse" name="planuse">{{#plan.uses}}<option value="{{value}}"{{#selected}} selected{{/selected}}>{{label}}</option>{{/plan.uses}}</select></div>
                         {{#errors.useplan}}<p class="hkp-hint"><b class="text-danger">{{errors.useplan}}</b></p>{{/errors.useplan}}
                     </div>
+                </section>
+                <section class="hkp-card"><h2>{{#str}}sheet_distance, local_oksigeniahechauka{{/str}}</h2>
+                    <div class="hkp-uses" role="radiogroup" aria-label="{{#str}}sheet_distance, local_oksigeniahechauka{{/str}}">{{#distances}}<label class="hkp-use"><input type="radio" name="distance" value="{{value}}"{{#checked}} checked{{/checked}}><span><b>{{label}}</b><small>{{help}}</small></span></label>{{/distances}}</div>
+                    <div class="form-switch form-check"><input class="form-check-input" type="checkbox" role="switch" id="hkp-glass" name="glass" value="1"{{#glass}} checked{{/glass}}><div><label class="form-check-label" for="hkp-glass"><b>{{#str}}sheet_glass, local_oksigeniahechauka{{/str}}</b></label><p class="hkp-hint">{{#str}}sheet_glass_help, local_oksigeniahechauka{{/str}}</p></div></div>
+                    <p class="hkp-hint">{{#str}}sheet_distance_help, local_oksigeniahechauka{{/str}}</p>
                 </section>
                 <section class="hkp-card"><h2>{{#str}}power, local_oksigeniahechauka{{/str}}</h2>
                     <div class="form-switch form-check"><input class="form-check-input" type="checkbox" role="switch" id="hkp-always" name="always" value="1"{{#always}} checked{{/always}}><label class="form-check-label" for="hkp-always"><b>{{#str}}sheet_always, local_oksigeniahechauka{{/str}}</b></label></div>

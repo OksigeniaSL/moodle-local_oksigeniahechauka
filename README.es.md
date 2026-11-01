@@ -32,6 +32,9 @@ pantallas. No es para sitios en producción.
   pantallas» y «Lleva las pantallas». Quien lleva las pantallas elige desde el panel quién publica en cada grupo y quién
   publica en todas; el administrador elige allí mismo quién lleva las pantallas, sin pasar por la administración de
   roles de Moodle.
+- **Cada pantalla dice para qué es** (informativa, escaparate o mixta, y otro uso a ciertas horas) y desde dónde se lee
+  (3, 5 u 8 m, y si está tras un cristal): de ahí salen sus composiciones y el tamaño de su letra. En cada diapositiva
+  manda una cosa; lo demás cede a un tercio o, de lejos, llega de una en una.
 - **El reproductor** es una sola página web que abre cada pantalla: un ordenador pequeño con un navegador en modo
   quiosco, una tele inteligente con un navegador de quiosco o una pantalla profesional que carga una página web.
   Guarda en el aparato lo que necesita y sigue sin red.
