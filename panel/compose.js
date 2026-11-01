@@ -209,6 +209,10 @@
                         item.caption.text = body;
                     }
                 }
+                const web = String(f.web || '').trim();
+                if (/^[^\s/]+\.[^\s/]+/.test(web.replace(/^https?:\/\//i, ''))) {
+                    item.web = /^https?:\/\//i.test(web) ? web : 'https://' + web;
+                }
                 return item;
             }
         }
@@ -287,6 +291,7 @@
                 body: value('#hkp-body'),
                 important: q('#hkp-imp') && q('#hkp-imp').checked,
                 caption: q('#hkp-cap') && q('#hkp-cap').checked,
+                web: value('#hkp-web'),
                 eventDay: value('#hkp-eday'),
                 eventFrom: value('#hkp-ef'),
                 eventTo: value('#hkp-et'),

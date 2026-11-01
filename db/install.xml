@@ -19,6 +19,8 @@
         <FIELD NAME="alerted" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="When the warning that it went down was sent; 0 while it is up"/>
         <FIELD NAME="command" TYPE="char" LENGTH="20" NOTNULL="false" SEQUENCE="false" COMMENT="What the screen does at its next heartbeat (reload), or null"/>
         <FIELD NAME="sound" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Whether its videos play with their sound"/>
+        <FIELD NAME="screenuse" TYPE="char" LENGTH="10" NOTNULL="true" DEFAULT="info" SEQUENCE="false" COMMENT="What it is for: info, showcase or mixed"/>
+        <FIELD NAME="useplan" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Another use at some hours, as JSON: [{days, from, until, use}]"/>
         <FIELD NAME="sortorder" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>

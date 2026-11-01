@@ -144,5 +144,21 @@ function xmldb_local_oksigeniahechauka_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026110202, 'local', 'oksigeniahechauka');
     }
 
+    if ($oldversion < 2026110204) {
+        // What each screen is for (informative, showcase or mixed), and another use at some hours; a screen of
+        // pictures alone becomes a showcase.
+        $table = new xmldb_table('local_oksigeniahechauka_screen');
+        $field = new xmldb_field('screenuse', XMLDB_TYPE_CHAR, '10', null, XMLDB_NOTNULL, null, 'info', 'sound');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        $field = new xmldb_field('useplan', XMLDB_TYPE_TEXT, null, null, null, null, null, 'screenuse');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        $DB->set_field('local_oksigeniahechauka_screen', 'screenuse', 'showcase', ['template' => 'full']);
+        upgrade_plugin_savepoint(true, 2026110204, 'local', 'oksigeniahechauka');
+    }
+
     return true;
 }

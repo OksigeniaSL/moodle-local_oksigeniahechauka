@@ -31,6 +31,9 @@ class manifest {
     /** Days ahead the manifest has data for. */
     const HORIZON = 14;
 
+    /** @var int How many days ahead the events come, for the agenda that scrolls (a month, into the next one). */
+    const AGENDA_DAYS = 31;
+
     /** Days ahead for the menus: each one is a call to Meals. */
     const MENU_DAYS = 7;
 
@@ -63,7 +66,7 @@ class manifest {
                 'lang' => current_language(),
                 'sound' => !empty($screen->sound),
             ],
-            'template' => $screen->template === 'full' ? 'full' : 'zones',
+            'template' => uses::valid($screen->screenuse ?? null) === 'showcase' ? 'full' : 'zones',
             'theme' => self::theme($screen, $config),
             'labels' => [
                 'menu' => get_string('label_menu', 'local_oksigeniahechauka'),
@@ -90,6 +93,7 @@ class manifest {
                 $m['weather'] = $weather;
             }
         }
+        $m += uses::contract($screen);
         $m['categories'] = categories::contract();
         $m['items'] = self::unique(array_merge(self::own_items($screen, $now), self::source_items($config, $now)));
         $m['etag'] = self::etag($m);
@@ -220,7 +224,7 @@ class manifest {
             $items = array_merge($items, sources::menus($now, self::MENU_DAYS, $centre ?: null));
         }
         if (!empty($config->sourcecalendar)) {
-            $items = array_merge($items, sources::events($now, self::HORIZON));
+            $items = array_merge($items, sources::events($now, self::AGENDA_DAYS));
         }
         if (!empty($config->sourcenews)) {
             $items = array_merge($items, sources::news($now, (int) ($config->newsdays ?? 7) ?: 7));

@@ -10,7 +10,7 @@ import {MediaStore, mediaOf} from './media.js';
 import {pair} from './pairing.js';
 import {afterDayEnd, countdown, dayLabel, eventsOn, upcoming} from './agenda.js';
 import {Composer, draftChoice} from './compose.js';
-import {dayNumber, isDark, isLive, isPowerOn, liveItems, urgentOf, weekdayOf} from './rules.js';
+import {dayNumber, isDark, isLive, isPowerOn, liveItems, urgentOf, useOf, weekdayOf} from './rules.js';
 import {Screen} from './render.js';
 import {store} from './store.js';
 import {countToday} from './today.js';
@@ -348,8 +348,10 @@ class Player {
             const main = this.mainList(wall).filter(function (it) {
                 return it.id !== 'draft' && String(it.id).indexOf('sample') !== 0;
             });
-            this.screen.show(draftChoice(this.draft.item, this.draft.focus || 'main', main, this.screen.horizontal), today,
-                week);
+            const use = useOf(merged, wall);
+            this.screen.setUse(use);
+            this.screen.show(draftChoice(this.draft.item, this.draft.focus || 'main', main, this.screen.horizontal, use),
+                today, week);
         } finally {
             this.manifest = keep;
         }
@@ -384,9 +386,12 @@ class Player {
         }
         const today = this.todayOf(wall);
         const coming = today.upcoming.length || today.countdown ? 1 : 0;
-        const week = m.template === 'full' ? null : this.weekOf(wall);
+        const use = useOf(m, wall);
+        const week = m.template === 'full' || use === 'showcase' ? null : this.weekOf(wall);
+        this.screen.setUse(use);
         const choice = this.composer.next(this.mainList(wall), countToday(today) + coming, this.screen.horizontal,
-            {menu: !!today.menu, noToday: m.template === 'full',
+            {menu: !!today.menu, noToday: m.template === 'full', use,
+                weather: !!(m.weather && m.weather.days && m.weather.days.length),
                 week: week ? {things: week.things, weekday: weekdayOf(dayNumber(wall.date))} : null});
         this.menuTurn++;
         this.screen.show(choice, today, week);

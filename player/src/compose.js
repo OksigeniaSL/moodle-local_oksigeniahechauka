@@ -8,6 +8,8 @@
 // solo-hoy        «Today» alone, the menu big, the weather for today and tomorrow
 // foto-completa   the picture over the whole screen, with its caption
 // semana          the next five school days, each with its events
+// escaparate      a showcase: the picture or video over the whole screen, its headline big, its web with a QR
+// tiempo-tercio   mixed: the picture or video in two thirds, the weather in the other (today big, three days under)
 
 /** Width over height of an item's picture or video; landscape when it does not say. */
 export function ratio(item) {
@@ -75,7 +77,8 @@ export class Composer {
      * @param {number} today how many things «Today» has (the menu counts as one; each notice and event, one)
      * @param {boolean} horizontal the shape of the screen
      * @param {object} [opts] {menu: «Today» has a menu, noToday: the screen never shows «Today»,
-     *     week: {things: what the week has beyond today, weekday: 1 Monday … 7 Sunday}}
+     *     week: {things: what the week has beyond today, weekday: 1 Monday … 7 Sunday},
+     *     use: info, showcase or mixed (what the screen is for now), weather: the weather has the coming days}
      * @returns {{comp: string, items: object[], seconds: number}}
      */
     next(queue, today, horizontal, opts) {
@@ -102,8 +105,22 @@ export class Composer {
             }
             return null;
         };
+        // A showcase: only pictures and videos, each over the whole screen; one with a web stays long enough to scan
+        // its QR. Without any, the centre's own slide.
+        if (o.use === 'showcase') {
+            if (!queue.length) {
+                return pick('escaparate', [], 20);
+            }
+            const it = queue[this.position(queue)];
+            return pick('escaparate', [it], it.web && it.type !== 'video' ? Math.max(15, secondsOf(it)) : secondsOf(it));
+        }
         if (!queue.length) {
             return weekDue(3, true) || pick('solo-hoy', [], o.menu ? 15 : 12);
+        }
+        // Mixed: every other slide, a picture or video with the weather in a third.
+        if (o.use === 'mixed' && o.weather && this.n % 2 === 0) {
+            const it = queue[this.position(queue)];
+            return pick('tiempo-tercio', [it], secondsOf(it));
         }
         // The moment of «Today»: more often when it has much, less when it has little; never right after the full
         // screen or the week, and it uses no picture of the queue.
@@ -148,9 +165,10 @@ export class Composer {
  * @param {string} focus main, full, today or week
  * @param {object[]} main the screen's pictures and videos
  * @param {boolean} horizontal
+ * @param {string} [use] what the screen is for now: a showcase shows a picture or video as it will be there
  * @returns {{comp: string, items: object[], seconds: number}}
  */
-export function draftChoice(item, focus, main, horizontal) {
+export function draftChoice(item, focus, main, horizontal, use) {
     const at = (it) => {
         const a = ratio(it);
         if (!horizontal && a < 0.63) {
@@ -159,6 +177,9 @@ export function draftChoice(item, focus, main, horizontal) {
         return {comp: a < 1.2 ? 'vertical-hoy' : 'foto-hoy', items: [it], seconds: 0};
     };
     const isMedia = item && (item.type === 'image' || item.type === 'video');
+    if (isMedia && use === 'showcase') {
+        return {comp: 'escaparate', items: [item], seconds: 0};
+    }
     if (isMedia) {
         return focus === 'full' ? {comp: 'foto-completa', items: [item], seconds: 0} : at(item);
     }

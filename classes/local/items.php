@@ -170,6 +170,10 @@ class items {
         if (!empty($data['caption']) && ($title !== '' || $body !== '')) {
             $item['caption'] = array_filter(['title' => $title, 'text' => $body]);
         }
+        if (!empty($data['web']) && preg_match('#^https?://#i', (string) $data['web'])) {
+            // Its web, for a QR on the screen and the address written short under it.
+            $item['web'] = (string) $data['web'];
+        }
         return $item;
     }
 

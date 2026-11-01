@@ -2912,3 +2912,53 @@ dialog.hkp-dialog > footer {
 .hkp .hkp-day .form-control {
     inline-size: auto;
 }
+
+/* The sheet: what the screen is for, three choices as small cards. */
+.hkp-uses {
+    display: grid;
+    /* stylelint-disable-next-line csstree/validator */
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr));
+    gap: .5rem;
+    margin: 0 0 1rem;
+}
+
+.hkp-use {
+    position: relative;
+    display: block;
+    padding: .7rem .8rem;
+    border: 1px solid var(--hkp-line);
+    border-radius: var(--hkp-radius-sm);
+    background: var(--hkp-card);
+    cursor: pointer;
+}
+
+.hkp-use input {
+    position: absolute;
+    opacity: 0;
+}
+
+.hkp-use b {
+    display: block;
+}
+
+.hkp-use small {
+    display: block;
+    margin-top: .2rem;
+    color: var(--hkp-muted);
+    font-size: .8125rem;
+}
+
+.hkp-use:has(input:checked) {
+    border-color: var(--hkp-accent-edge);
+    background: var(--hkp-accent-tint);
+    box-shadow: inset 0 0 0 1px var(--hkp-accent-edge);
+}
+
+.hkp-use:has(input:focus-visible) {
+    outline: 3px solid var(--bs-focus-ring-color, rgba(15, 108, 191, .75));
+    outline-offset: 2px;
+}
+
+#hkp-plan-box {
+    margin-top: .75rem;
+}

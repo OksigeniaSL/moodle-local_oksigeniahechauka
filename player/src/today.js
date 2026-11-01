@@ -463,3 +463,27 @@ export function turnPages(blocks) {
 export function countToday(data) {
     return (data.menu ? 1 : 0) + data.notices.length + data.events.length;
 }
+
+/**
+ * The weather in a third of the screen (the mixed screens): today big under its label, and the next three days under
+ * it, each with its weekday.
+ *
+ * @param {object} w the weather of the manifest (today, days)
+ * @param {object} labels today
+ * @param {object} sky the weather icons
+ * @param {string[]} days the weekdays' names, Sunday first
+ * @returns {HTMLElement}
+ */
+export function buildWeatherThird(w, labels, sky, days) {
+    const aside = el('aside', 'hk-tercio-tiempo');
+    const today = weatherDay(labels.today, w.today, sky);
+    today.classList.add('hk-tercio-hoy');
+    aside.appendChild(today);
+    const list = el('div', 'hk-tercio-dias');
+    each(w.days || [], function (d) {
+        const n = new Date(d.date + 'T12:00:00Z').getUTCDay();
+        list.appendChild(weatherDay(days[n] || d.date, d, sky));
+    });
+    aside.appendChild(list);
+    return aside;
+}

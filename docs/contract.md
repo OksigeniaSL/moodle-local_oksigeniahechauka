@@ -129,6 +129,12 @@ changed, or the manifest with its `ETag` header:
 - `horizon`: the last day the manifest has data for. The server sends what is due from today to the horizon (two
   weeks is a good default), so a screen without a network keeps going. After the horizon the player keeps showing what
   it has and reports itself as stale.
+- `use`: what the screen is for: `info` (inside: «Today», the menu, the notices, the agenda, with pictures and
+  videos), `showcase` (seen from afar and by people from outside: only pictures and videos over the whole screen, their
+  headline big and their web with a QR; no ticker) or `mixed` (also the weather in a third beside a picture or video).
+  Without it, `info`.
+- `useplan`: another use at some hours, as the power hours: `[{"days": [6, 7], "from": "00:00", "until": "24:00",
+  "use": "showcase"}]` (days 1 Monday to 7 Sunday, none for every day; an `until` before `from` crosses midnight).
 - `dayend`: when the day ends for the centre («HH:MM»). From then until midnight, «Today» shows tomorrow's events under
   «Tomorrow» and the coming days start after it; the server sends tomorrow's menu from the same hour.
 - `screen.sound`: whether its videos play with their sound (most screens are muted: behind glass, or in a room that
@@ -148,7 +154,7 @@ changed, or the manifest with its `ETag` header:
 - `labels`: the titles of the blocks and the ticker, and the words of the coming days, in the language of the screen.
 - `weather`: optional. The sky as a `symbol_code` of MET Norway (the player has an icon for each), temperatures in
   degrees Celsius, `rain` the chance of rain in percent only where the source gives it, `text` the sky in words, and
-  the `credit` the source asks to show. `now` is the current hour; `today` and `tomorrow`, days of the site's calendar.
+  the `credit` the source asks to show. `now` is the current hour; `today` and `tomorrow`, days of the site's calendar. `days`: the next three days, each with its `date` (for the weather in a third).
 - `sample`: true when the manifest carries example data; the screen says so in a corner.
 - `power`: when the screen should be on. Outside these hours the player shows black and a device agent may turn the
   display off. Without `power`, always on.
@@ -161,8 +167,8 @@ length unless it has a duration.
 
 | `type` | Zone | Fields |
 |---|---|---|
-| `image` | `main` | `media`, `fit` (`cover`, `contain` or `blur`), `focus` (`[x, y]` from 0 to 1, for `cover`), `caption` |
-| `video` | `main` | `media`, `poster` and `backdrop` (still images), `fit`, `caption` |
+| `image` | `main` | `media`, `fit` (`cover`, `contain` or `blur`), `focus` (`[x, y]` from 0 to 1, for `cover`), `caption`, `web` (optional: its web, shown on a showcase with a QR) |
+| `video` | `main` | `media`, `poster` and `backdrop` (still images), `fit`, `caption`, `web` |
 | `notice` | `side` | `title`, `body` (one short line), `tone` (`normal` or `important`) |
 | `event` | `side` | `title`, `detail` (who or where, one line), `start` and `end` (`"2026-11-02T10:00"`), `allday`, `color` (1 to 6, optional: the centre's category), `holiday` (optional). A title «3º ESO - Acampada» reads as «Acampada» with «3º ESO» under it |
 | `menu` | `side` | `date`, `label`, `menus`, `closed`, `title`, `note` |

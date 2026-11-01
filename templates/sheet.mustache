@@ -31,7 +31,7 @@
         "groups": [{"id": 1, "name": "Zonas comunes", "checked": true}], "hasgroups": true,
         "always": false, "days": [{"n": 1, "letter": "L", "name": "lunes", "on": true}], "on": "07:30", "off": "18:30",
         "bars": [{"letter": "L", "segments": [{"left": 31.25, "right": 22.92}]}],
-        "sentence": "Encendida de lunes a viernes, de 07:30 a 18:30.", "alerts": true, "sound": false,
+        "sentence": "Encendida de lunes a viernes, de 07:30 a 18:30.", "alerts": true, "sound": false, "uses": [], "plan": {"on": false, "days": [], "from": "00:00", "until": "23:59", "uses": []},
         "themes": [{"value": "site", "label": "Como el sitio", "checked": true}], "remove": "#",
         "errors": {}, "haserrors": false, "strings": "{}"
     }
@@ -59,6 +59,16 @@
                 <section class="hkp-card"><h2>{{#str}}sheet_namegroups, local_oksigeniahechauka{{/str}}</h2>
                     <div class="hkp-field"><label class="form-label" for="hkp-sn">{{#str}}name, local_oksigeniahechauka{{/str}}</label><input class="form-control{{#errors.name}} is-invalid{{/errors.name}}" id="hkp-sn" name="name" value="{{rawname}}" maxlength="100" autocomplete="off" required>{{#errors.name}}<p class="hkp-hint"><b class="text-danger">{{errors.name}}</b></p>{{/errors.name}}</div>
                     {{#hasgroups}}<div class="hkp-field"><span class="hkp-label">{{#str}}groups, local_oksigeniahechauka{{/str}}</span><div class="hkp-chips">{{#groups}}<label class="hkp-chip is-small"><input type="checkbox" name="groups[]" value="{{id}}"{{#checked}} checked{{/checked}}>{{name}}</label>{{/groups}}</div><p class="hkp-hint">{{#str}}sheet_groups_help, local_oksigeniahechauka{{/str}}</p></div>{{/hasgroups}}
+                </section>
+                <section class="hkp-card"><h2>{{#str}}sheet_use, local_oksigeniahechauka{{/str}}</h2>
+                    <div class="hkp-uses" role="radiogroup" aria-label="{{#str}}sheet_use, local_oksigeniahechauka{{/str}}">{{#uses}}<label class="hkp-use"><input type="radio" name="screenuse" value="{{value}}"{{#checked}} checked{{/checked}}><span><b>{{label}}</b><small>{{help}}</small></span></label>{{/uses}}</div>
+                    <div class="form-switch form-check"><input class="form-check-input" type="checkbox" role="switch" id="hkp-plan" name="planon" value="1"{{#plan.on}} checked{{/plan.on}}><div><label class="form-check-label" for="hkp-plan"><b>{{#str}}sheet_useplan, local_oksigeniahechauka{{/str}}</b></label><p class="hkp-hint">{{#str}}sheet_useplan_help, local_oksigeniahechauka{{/str}}</p></div></div>
+                    <div id="hkp-plan-box"{{^plan.on}} hidden{{/plan.on}}>
+                        <div class="hkp-field"><span class="hkp-label" id="hkp-pl-l">{{#str}}compose_days, local_oksigeniahechauka{{/str}}</span><div class="hkp-days" role="group" aria-labelledby="hkp-pl-l">{{#plan.days}}<button type="button" aria-pressed="{{#on}}true{{/on}}{{^on}}false{{/on}}" data-plan-day="{{n}}" aria-label="{{name}}">{{letter}}</button>{{/plan.days}}</div><div id="hkp-plan-inputs">{{#plan.days}}{{#on}}<input type="hidden" name="plandays[]" value="{{n}}">{{/on}}{{/plan.days}}</div></div>
+                        <div class="hkp-time"><label for="hkp-pf">{{#str}}compose_hour_from, local_oksigeniahechauka{{/str}}</label><input class="form-control" type="time" id="hkp-pf" name="planfrom" value="{{plan.from}}"><label for="hkp-pu">{{#str}}compose_hour_to, local_oksigeniahechauka{{/str}}</label><input class="form-control" type="time" id="hkp-pu" name="planuntil" value="{{plan.until}}"></div>
+                        <div class="hkp-field"><label class="form-label" for="hkp-puse">{{#str}}sheet_useplan_use, local_oksigeniahechauka{{/str}}</label><select class="form-select" id="hkp-puse" name="planuse">{{#plan.uses}}<option value="{{value}}"{{#selected}} selected{{/selected}}>{{label}}</option>{{/plan.uses}}</select></div>
+                        {{#errors.useplan}}<p class="hkp-hint"><b class="text-danger">{{errors.useplan}}</b></p>{{/errors.useplan}}
+                    </div>
                 </section>
                 <section class="hkp-card"><h2>{{#str}}power, local_oksigeniahechauka{{/str}}</h2>
                     <div class="form-switch form-check"><input class="form-check-input" type="checkbox" role="switch" id="hkp-always" name="always" value="1"{{#always}} checked{{/always}}><label class="form-check-label" for="hkp-always"><b>{{#str}}sheet_always, local_oksigeniahechauka{{/str}}</b></label></div>
@@ -153,6 +163,29 @@
     });
     page.querySelector('#hkp-always').addEventListener('change', function() {
         page.querySelector('#hkp-power-hours').hidden = this.checked;
+    });
+    // Another use at some hours: its days, kept in hidden inputs as the power's.
+    page.querySelectorAll('[data-plan-day]').forEach(function(b) {
+        b.addEventListener('click', function() {
+            var on = b.getAttribute('aria-pressed') !== 'true';
+            if (!on && page.querySelectorAll('[data-plan-day][aria-pressed="true"]').length === 1) {
+                return;
+            }
+            b.setAttribute('aria-pressed', on ? 'true' : 'false');
+            var box = page.querySelector('#hkp-plan-inputs');
+            box.textContent = '';
+            page.querySelectorAll('[data-plan-day][aria-pressed="true"]').forEach(function(x) {
+                var input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'plandays[]';
+                input.value = x.getAttribute('data-plan-day');
+                box.appendChild(input);
+            });
+            changed();
+        });
+    });
+    page.querySelector('#hkp-plan').addEventListener('change', function() {
+        page.querySelector('#hkp-plan-box').hidden = !this.checked;
     });
     form.addEventListener('input', changed);
     form.addEventListener('change', changed);

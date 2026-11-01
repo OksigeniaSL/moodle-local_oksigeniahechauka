@@ -141,7 +141,10 @@ class player_page {
         // The templates, the compositions, the weather and the coming days, in this order; the weather icons before
         // the player, which takes them from the page.
         $sheets = '';
-        foreach (['hechauka.css', 'composiciones.css', 'tiempo.css', 'semana.css', 'proximos-dias.css', 'urgente.css'] as $file) {
+        foreach (
+            ['hechauka.css', 'composiciones.css', 'tiempo.css', 'semana.css', 'proximos-dias.css', 'urgente.css',
+            'usos.css'] as $file
+        ) {
             $sheets .= '<link rel="stylesheet" href="' . $url($file) . '">';
         }
         $json = json_encode($boot, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP);

@@ -2,6 +2,17 @@
 
 ## 0.7.0 (in progress)
 
+- **What each screen is for**, in its sheet: informative (inside: «Today», the menu, the notices, the agenda),
+  showcase (to be seen from afar and by people from outside: only pictures and videos over the whole screen, their
+  headline big, and their web with a QR) or mixed (also the weather in a third: today big and the next three days).
+  And another use at some hours: an entrance informative on weekdays and a showcase at the weekend. New fields `use`
+  and `useplan` in the manifest; the screens' `template` follows the use.
+- **A web for a picture or a video**: on a showcase it shows with a big QR to open it on a phone, and the address
+  written short. The QR is made in the player (qrcode-generator, MIT), with no network.
+- The events come a month ahead (for the agenda that scrolls, into the next month), and the weather the next three
+  days.
+- A first look for the showcase and the weather in a third (`player/usos.css`), until the art direction's design.
+
 - **«Tomorrow» at the end of the day:** each centre sets in «Tu centro» when its day ends (16:00 by default; a
   university with evening classes, at night). From then until midnight «Today» shows tomorrow's events under
   «Tomorrow», the coming days start after it, and the menu switches at the same hour. New field `dayend` in the

@@ -149,6 +149,11 @@ class sheet {
             'sentence' => self::sentence($power, $names),
             'alerts' => !empty($screen->alerts),
             'sound' => !empty($screen->sound),
+            'uses' => array_map(function ($u) use ($screen, $c) {
+                return ['value' => $u, 'label' => get_string('use_' . $u, $c), 'help' => get_string('use_' . $u . '_help', $c),
+                    'checked' => $u === uses::valid($screen->screenuse ?? null)];
+            }, uses::USES),
+            'plan' => self::plan_context($screen, $letters, $names),
             'themes' => array_map(function ($t) use ($theme, $c) {
                 return ['value' => $t, 'label' => get_string('sheet_theme_' . $t, $c), 'checked' => $t === $theme];
             }, self::THEMES),
@@ -167,6 +172,35 @@ class sheet {
                 'names' => $names,
                 'plural' => [get_string('compose_plural_saturday', $c), get_string('compose_plural_sunday', $c)],
             ], JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP),
+        ];
+    }
+
+    /**
+     * The other use at some hours, as this page shows it (the first window; the rare others are kept as they are).
+     *
+     * @param \stdClass $screen
+     * @param string[] $letters
+     * @param string[] $names
+     * @return array
+     */
+    protected static function plan_context(\stdClass $screen, array $letters, array $names): array {
+        $c = self::C;
+        $plan = uses::plan($screen->useplan ?? null);
+        $window = $plan[0] ?? ['days' => [6, 7], 'from' => '00:00', 'until' => '24:00', 'use' => 'showcase'];
+        $days = $window['days'] ?: [1, 2, 3, 4, 5, 6, 7];
+        $buttons = [];
+        for ($d = 1; $d <= 7; $d++) {
+            $buttons[] = ['n' => $d, 'letter' => $letters[$d - 1] ?? '', 'name' => $names[$d - 1] ?? '',
+                'on' => in_array($d, $days)];
+        }
+        return [
+            'on' => (bool) $plan,
+            'days' => $buttons,
+            'from' => $window['from'],
+            'until' => $window['until'] === '24:00' ? '23:59' : $window['until'],
+            'uses' => array_map(function ($u) use ($window, $c) {
+                return ['value' => $u, 'label' => get_string('use_' . $u, $c), 'selected' => $u === $window['use']];
+            }, uses::USES),
         ];
     }
 
@@ -253,6 +287,23 @@ class sheet {
             $power = json_encode(array_values($windows));
         }
         $theme = optional_param('theme', 'site', PARAM_ALPHA);
+        // What it is for, and another use at some hours (the first window; the others are kept).
+        $use = uses::valid(optional_param('screenuse', 'info', PARAM_ALPHA));
+        $plan = uses::plan($screen->useplan ?? null);
+        if (optional_param('planon', 0, PARAM_BOOL)) {
+            $from = optional_param('planfrom', '', PARAM_RAW_TRIMMED);
+            $until = optional_param('planuntil', '', PARAM_RAW_TRIMMED);
+            $until = $until === '23:59' ? '24:00' : $until;
+            $plandays = array_map('intval', optional_param_array('plandays', [], PARAM_INT));
+            $window = uses::plan(json_encode([['days' => $plandays, 'from' => $from, 'until' => $until,
+                'use' => optional_param('planuse', '', PARAM_ALPHA)]]));
+            if (!$window || !$plandays) {
+                return ['useplan' => get_string('sheet_useplan_bad', $c)];
+            }
+            $plan[0] = $window[0];
+        } else {
+            $plan = [];
+        }
         $DB->update_record('local_oksigeniahechauka_screen', (object) [
             'id' => $screen->id,
             'name' => $name,
@@ -260,6 +311,8 @@ class sheet {
             'alerts' => optional_param('alerts', 0, PARAM_BOOL) ? 1 : 0,
             'sound' => optional_param('sound', 0, PARAM_BOOL) ? 1 : 0,
             'theme' => in_array($theme, self::THEMES) ? $theme : 'site',
+            'screenuse' => $use,
+            'useplan' => $plan ? json_encode(array_values($plan)) : null,
             'timemodified' => time(),
         ]);
         screens::set_groups((int) $screen->id, array_map('intval', optional_param_array('groups', [], PARAM_INT)));

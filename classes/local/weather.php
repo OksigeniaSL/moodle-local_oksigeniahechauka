@@ -228,6 +228,18 @@ class weather {
         if ($tomorrow) {
             $out['tomorrow'] = $tomorrow;
         }
+        // The next three days, for the weather in a third of the screen: each with its date.
+        $days = [];
+        for ($i = 1; $i <= 3; $i++) {
+            $date = schedule::day($now, $i);
+            $day = self::day($hours, $date);
+            if ($day) {
+                $days[] = ['date' => $date] + $day;
+            }
+        }
+        if ($days) {
+            $out['days'] = $days;
+        }
         return $out;
     }
 

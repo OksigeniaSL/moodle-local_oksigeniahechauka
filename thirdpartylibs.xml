@@ -3,12 +3,23 @@
     <library>
         <location>data/land.json</location>
         <name>Natural Earth 1:50m land</name>
-        <description>The land of the world, simplified to about 1.5 km, for the small locator map of the school's place.</description>
+        <description>The land of the world, simplified to about 1.5 km, for the small locator map of the centre's place.</description>
         <version>5.1.2</version>
         <license>Public Domain</license>
         <repository>https://github.com/nvkelso/natural-earth-vector</repository>
         <copyrights>
             <copyright>Natural Earth (naturalearthdata.com), public domain</copyright>
+        </copyrights>
+    </library>
+    <library>
+        <location>player/build/hechauka.js</location>
+        <name>qrcode-generator</name>
+        <description>Makes the QR of the web of a picture or video on the showcase screens, without a network. Bundled into the player's build with its own code.</description>
+        <version>2.0.4</version>
+        <license>MIT</license>
+        <repository>https://github.com/kazuhikoarase/qrcode-generator</repository>
+        <copyrights>
+            <copyright>2009 Kazuhiko Arase</copyright>
         </copyrights>
     </library>
 </libraries>

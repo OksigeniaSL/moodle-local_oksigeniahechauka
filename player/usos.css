@@ -1,0 +1,126 @@
+/* Hechauka — the uses of a screen: the showcase and the weather in a third (mixed). A first look that works, made by
+ * the plugin until the art direction's design arrives; then this file takes its markup and its classes.
+ * Sizes in rem, as the rest: 1 rem is a hundredth of the short side… of the screen's own scale. */
+
+/* A showcase hides the ticker: nothing in detail. */
+.hk[data-uso="showcase"] .hk-cinta {
+    display: none;
+}
+
+/* The showcase is shown in the full-screen layer, as «foto-completa»: the rest steps back. */
+.hk[data-composicion="escaparate"] .hk-completa {
+    opacity: 1;
+}
+.hk[data-composicion="escaparate"] .hk-completa .hk-diapo img {
+    -webkit-transform: none;
+    transform: none;
+}
+.hk[data-composicion="escaparate"] .hk-completa .hk-pie {
+    -webkit-transform: none;
+    transform: none;
+    opacity: 1;
+}
+.hk[data-composicion="escaparate"] > .hk-cabecera,
+.hk[data-composicion="escaparate"] > .hk-escena {
+    opacity: 0;
+}
+.hk[data-composicion="escaparate"] > .hk-cinta {
+    opacity: 0;
+    -webkit-transform: translate3d(0, 100%, 0);
+    transform: translate3d(0, 100%, 0);
+}
+
+/* The headline of a showcase: big, to be read from afar, and it stays. */
+.hk-completa .hk-pie-escaparate {
+    padding: 16rem 6rem 6rem;
+    padding-right: 34rem;
+}
+.hk-completa .hk-pie-escaparate h2 {
+    font-size: 8.4rem;
+    line-height: 1.02;
+    letter-spacing: -.01em;
+}
+.hk-completa .hk-pie-escaparate p {
+    margin-top: 1.4rem;
+    font-size: 3.4rem;
+}
+.hk-vertical .hk-completa .hk-pie-escaparate {
+    padding: 14rem 5rem 30rem;
+}
+
+/* Its web: a big QR on white, and the address written short. */
+.hk-qr {
+    position: absolute;
+    right: 5rem;
+    bottom: 5rem;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 25.6rem;
+    padding: 1.8rem 1.8rem 1.2rem;
+    border-radius: 1.6rem;
+    background: #fff;
+    box-shadow: 0 1rem 3rem rgba(0, 0, 0, .35);
+}
+.hk-qr svg {
+    display: block;
+    width: 22rem;
+    height: 22rem;
+}
+.hk-qr path {
+    fill: #111;
+}
+.hk-qr-web {
+    width: 100%;
+    margin: 1rem 0 0;
+    color: #111;
+    font-size: 1.8rem;
+    font-weight: 700;
+    line-height: 1.2;
+    text-align: center;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+}
+.hk-vertical .hk-qr {
+    right: 50%;
+    bottom: 6rem;
+    transform: translateX(50%);
+}
+
+/* Mixed: the picture or video in two thirds, the weather in the other. */
+.hk-cuerpo[data-composicion="tiempo-tercio"] > .hk-medio {
+    flex: 2 1 0px;
+}
+.hk-tercio-tiempo {
+    display: flex;
+    flex: 1 1 0px;
+    flex-direction: column;
+    min-width: 0;
+    padding: 3rem 3.2rem;
+    background: var(--hk-superficie);
+    color: var(--hk-texto);
+}
+.hk-tercio-tiempo .hk-dia-tiempo {
+    flex: 0 0 auto;
+}
+.hk-tercio-tiempo .hk-dia-tiempo + .hk-dia-tiempo {
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+.hk-tercio-hoy {
+    padding-bottom: 2.6rem;
+    border-bottom: .2rem solid var(--hk-linea);
+    font-size: 1.5em;
+}
+.hk-tercio-dias {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    justify-content: space-around;
+    padding-top: 1.6rem;
+}
+.hk-vertical .hk-cuerpo[data-composicion="tiempo-tercio"] {
+    flex-direction: column;
+}

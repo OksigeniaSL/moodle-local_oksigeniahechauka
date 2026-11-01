@@ -32,6 +32,11 @@ export function dayNumber(ymd) {
     return Math.floor(Date.UTC(+p[0], +p[1] - 1, +p[2]) / MS_DAY);
 }
 
+/** "YYYY-MM-DD" of a day number (dayNumber's inverse). */
+export function dateFromNumber(n) {
+    return new Date(n * MS_DAY).toISOString().slice(0, 10);
+}
+
 /** ISO weekday (1 Monday … 7 Sunday) of a day number: 1970-01-01 was a Thursday. */
 export function weekdayOf(day) {
     return ((day + 3) % 7 + 7) % 7 + 1;
@@ -180,4 +185,29 @@ export function urgentOf(items, wall) {
         }
     });
     return found;
+}
+
+/** The uses a screen can have; the first is the default. */
+export const USES = ['info', 'showcase', 'mixed'];
+
+/**
+ * What the screen is for now: its use, or another one at some hours («useplan», days 1 Monday to 7 Sunday, from and
+ * until, until before from crossing midnight, «24:00» the end of the day).
+ *
+ * @param {object} m the manifest
+ * @param {{dow: number, min: number}} wall
+ * @returns {string} info, showcase or mixed
+ */
+export function useOf(m, wall) {
+    const plan = (m && m.useplan) || [];
+    for (let i = 0; i < plan.length; i++) {
+        const w = plan[i];
+        if (!w || USES.indexOf(w.use) === -1 || (w.days && w.days.length && w.days.indexOf(wall.dow) === -1)) {
+            continue;
+        }
+        if (inRange([w.from, w.until === '24:00' ? '00:00' : w.until], wall.min)) {
+            return w.use;
+        }
+    }
+    return m && USES.indexOf(m.use) !== -1 ? m.use : USES[0];
 }

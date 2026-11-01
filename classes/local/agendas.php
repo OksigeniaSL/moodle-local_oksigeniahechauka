@@ -72,7 +72,7 @@ class agendas {
             } else {
                 $zone = \core_date::get_server_timezone_object();
                 $from = usergetmidnight($now, \core_date::get_server_timezone()) - self::BEHIND * DAYSECS;
-                $to = $from + (self::BEHIND + manifest::HORIZON + 1) * DAYSECS;
+                $to = $from + (self::BEHIND + manifest::AGENDA_DAYS + 1) * DAYSECS;
                 $events = ical::events((string) $body, $from, $to, $zone);
             }
         }
@@ -141,7 +141,7 @@ class agendas {
         // One category for all its events, or (0) each by its own words.
         $color = categories::resolve($data['category'] ?? ($data['color'] ?? 0));
         $from = usergetmidnight($now, \core_date::get_server_timezone());
-        $to = $from + (manifest::HORIZON + 1) * DAYSECS;
+        $to = $from + (manifest::AGENDA_DAYS + 1) * DAYSECS;
         $rows = $DB->get_records_select(
             self::TABLE,
             'itemid = :item AND timestart < :to AND

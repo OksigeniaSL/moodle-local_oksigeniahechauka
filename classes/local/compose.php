@@ -155,6 +155,7 @@ class compose {
             'important' => (bool) $v('important', !empty($data['important'])),
             'caption' => (bool) $v('caption', $item ? !empty($data['caption']) : true),
             'url' => (string) $v('url', $data['url'] ?? ''),
+            'web' => (string) $v('web', $data['web'] ?? ''),
             'eventday' => (string) $v('eventday', $eventday),
             'eventfrom' => (string) $v('eventfrom', $start ? phrases::hour($start) : '10:00'),
             'eventto' => (string) $v('eventto', $end ? phrases::hour($end) : ''),
@@ -428,6 +429,7 @@ class compose {
             'important' => optional_param('important', 0, PARAM_BOOL),
             'caption' => optional_param('caption', 0, PARAM_BOOL),
             'url' => trim(optional_param('url', '', PARAM_RAW_TRIMMED)),
+            'web' => trim(optional_param('web', '', PARAM_RAW_TRIMMED)),
             'colour' => optional_param('colour', '', PARAM_ALPHANUM),
             'eventday' => optional_param('eventday', '', PARAM_RAW_TRIMMED),
             'eventfrom' => optional_param('eventfrom', '', PARAM_RAW_TRIMMED),
@@ -453,6 +455,15 @@ class compose {
         }
         if ($type === 'agenda' && !preg_match('#^(https?|webcal)://#i', $in['url'])) {
             $errors['url'] = get_string('agenda_bad_url', $c);
+        }
+        // The web of a picture or a video, for its QR: written as people write it («lamaresia.com») or whole.
+        if ($type === 'media' && $in['web'] !== '') {
+            $web = preg_match('#^https?://#i', $in['web']) ? $in['web'] : 'https://' . $in['web'];
+            if (clean_param($web, PARAM_URL) === '' || !preg_match('#^https?://[^/\s]+\.[^/\s]+#i', $web)) {
+                $errors['web'] = get_string('compose_web_bad', $c);
+            } else {
+                $in['web'] = $web;
+            }
         }
         $eventstart = 0;
         $eventend = 0;
@@ -568,6 +579,10 @@ class compose {
         } else if ($type === 'media') {
             $extra['caption'] = (bool) $in['caption'];
             $extra['fit'] = $extra['fit'] ?? 'cover';
+            $extra['web'] = $in['web'];
+            if ($extra['web'] === '') {
+                unset($extra['web']);
+            }
         } else if ($type === 'event') {
             $extra['start'] = $eventstart;
             $extra['end'] = $eventend;

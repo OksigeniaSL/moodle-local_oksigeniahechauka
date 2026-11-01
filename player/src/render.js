@@ -4,10 +4,14 @@
 // screen that runs for months does not pile up nodes.
 
 import {shapeOf} from './compose.js';
-import {buildToday, fitToday, turnPages} from './today.js';
+import {buildToday, buildWeatherThird, fitToday, turnPages} from './today.js';
+import {qrPath, shortWeb} from './qr.js';
 import {buildWeek, fitWeek} from './weekview.js';
 
 const CAPTION_MS = 2800;
+
+/** The compositions over the whole screen, in their own layer. */
+const FULL = {'foto-completa': true, 'escaparate': true};
 const PASS_MS = 1000;
 
 function el(tag, cls, text) {
@@ -436,6 +440,13 @@ export class Screen {
             c.appendChild(c.hkWeek);
             return c;
         }
+        if (comp === 'tiempo-tercio') {
+            c.appendChild(this.slot(items[0], comp));
+            if (this.weather && this.sky) {
+                c.appendChild(buildWeatherThird(this.weather, this.labelsFull(), this.sky, this.s.days || []));
+            }
+            return c;
+        }
         if (comp === 'dos-verticales') {
             const pair = el('div', 'hk-pareja');
             pair.setAttribute('data-forma', shapeOf(items[0]) || '2x3');
@@ -499,6 +510,43 @@ export class Screen {
     }
 
     /**
+     * A showcase (provisional look, until the art direction's): the picture or video over the whole screen, its
+     * headline big over a veil, and its web with a big QR and the address written short. Without any picture, the
+     * centre's header alone.
+     *
+     * @param {object|undefined} item
+     */
+    fillShowcase(item) {
+        if (!item) {
+            this.clearFull();
+            this.full.appendChild(el('div', 'hk-completa-velo'));
+            this.full.appendChild(this.header());
+            return;
+        }
+        this.fillFull(item);
+        const pie = this.full.querySelector('.hk-pie');
+        if (pie) {
+            // In a showcase the headline stays: it is what is read from afar.
+            pie.style.opacity = '';
+            pie.classList.add('hk-pie-escaparate');
+        }
+        if (item.web) {
+            const box = el('div', 'hk-qr');
+            const q = qrPath(item.web);
+            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.setAttribute('viewBox', '0 0 ' + q.size + ' ' + q.size);
+            svg.setAttribute('shape-rendering', 'crispEdges');
+            svg.setAttribute('aria-hidden', 'true');
+            const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            path.setAttribute('d', q.d);
+            svg.appendChild(path);
+            box.appendChild(svg);
+            box.appendChild(el('p', 'hk-qr-web', shortWeb(item.web)));
+            this.full.appendChild(box);
+        }
+    }
+
+    /**
      * Shows a slide. The same composition with the same shapes: only the pictures change, with the slides' own fade,
      * so «Today» does not blink. Another one: a new layer comes in while the old one leaves.
      *
@@ -509,13 +557,17 @@ export class Screen {
     show(choice, today, week) {
         const comp = choice.comp;
         const items = choice.items;
-        const wasFull = this.frame.getAttribute('data-composicion') === 'foto-completa';
-        if (comp === 'foto-completa') {
+        const wasFull = !!FULL[this.frame.getAttribute('data-composicion')];
+        if (FULL[comp]) {
             // Under the full screen the layer stays, still: its videos stop.
             if (this.layer) {
                 this.stopSlides(this.layer);
             }
-            this.fillFull(items[0]);
+            if (comp === 'escaparate') {
+                this.fillShowcase(items[0]);
+            } else {
+                this.fillFull(items[0]);
+            }
             this.frame.setAttribute('data-composicion', comp);
             this.comp = comp;
             return;
@@ -584,7 +636,7 @@ export class Screen {
         if (wasFull) {
             const self = this;
             setTimeout(function () {
-                if (self.frame.getAttribute('data-composicion') !== 'foto-completa') {
+                if (!FULL[self.frame.getAttribute('data-composicion')]) {
                     self.clearFull();
                 }
             }, PASS_MS + 200);
@@ -690,10 +742,17 @@ export class Screen {
         this.tickerTrack.style.animationDuration = seconds + 's';
     }
 
+    /** What the screen is for now, on the frame: a showcase hides the ticker (nothing in detail). */
+    setUse(use) {
+        if (this.frame.getAttribute('data-uso') !== use) {
+            this.frame.setAttribute('data-uso', use);
+        }
+    }
+
     /** What is on the screen now, for the heartbeat. */
     showing() {
         const out = [];
-        const scope = this.comp === 'foto-completa' ? this.full : this.layer;
+        const scope = FULL[this.comp] ? this.full : this.layer;
         if (scope) {
             const slides = scope.querySelectorAll('.hk-diapo');
             for (let i = 0; i < slides.length; i++) {
