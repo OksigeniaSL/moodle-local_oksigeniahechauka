@@ -5,7 +5,7 @@
 
 import {shapeOf} from './compose.js';
 import {buildWeatherThird} from './today.js';
-import {buildLead, buildRest, fitHeadline, leadsOf, linesOf, paginateRest, showRestPage, turnFixed, weekHeadline} from './lead.js';
+import {buildLead, buildRest, fitHeadline, fitWord, leadsOf, linesOf, paginateRest, showRestPage, turnFixed, weekHeadline} from './lead.js';
 import {qrPath, shortWeb} from './qr.js';
 import {even} from './balance.js';
 import {buildAgenda, startAgenda} from './agendaview.js';
@@ -866,7 +866,10 @@ export class Screen {
         }
         full.setAttribute('data-muro', '');
         bill.hkSteps = 2;
-        fitHeadline(bill, h2, this.horizontal ? 2 : 3);
+        fitHeadline(bill, h2, this.horizontal ? 2 : 3, function () {
+            return h2.scrollWidth > h2.clientWidth + 1;
+        });
+        fitWord(h2);
         even(h2);
         const seconds = startWall(canvas, album, true);
         this.posterStop = canvas.hkStop;
@@ -966,7 +969,10 @@ export class Screen {
         const h2 = pie && pie.querySelector('h2');
         if (h2) {
             pie.hkSteps = 2;
-            fitHeadline(pie, h2, this.horizontal ? 2 : 3);
+            fitHeadline(pie, h2, this.horizontal ? 2 : 3, function () {
+                return h2.scrollWidth > h2.clientWidth + 1;
+            });
+            fitWord(h2);
             even(h2);
         }
         void full.offsetWidth;

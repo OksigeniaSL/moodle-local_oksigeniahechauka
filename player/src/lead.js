@@ -469,6 +469,18 @@ export function linesOf(e) {
 }
 
 /**
+ * A word too long for its box whatever the step: the letter that makes it fit, rather than cutting it at the screen's edge.
+ *
+ * @param {HTMLElement} headline
+ */
+export function fitWord(headline) {
+    if (headline.scrollWidth > headline.clientWidth + 1) {
+        const size = parseFloat(getComputedStyle(headline).fontSize);
+        headline.style.fontSize = Math.floor(size * headline.clientWidth / headline.scrollWidth) + 'px';
+    }
+}
+
+/**
  * A headline in steps (data-ajuste 0 to 3 on its box: 100, 88, 76 and 64 % of --hk-t-titular; the sheets keep the last
  * over the distance's minimum title) until it takes no more than maxLines and its box does not overflow. If even the
  * last step does not fit, the box loses its second line (box.hkShort, the class) and tries again.

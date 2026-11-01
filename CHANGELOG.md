@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- A long word in a headline on a showcase or a poster fits the screen: the letter goes down in steps and, if a word is
+  still too long, as far as it takes.
+
 ## 0.7.1 (2026-11-01)
 
 - **The agenda that goes up** (`agenda`): the month with its days marked in the colours of their categories, and a diary of
