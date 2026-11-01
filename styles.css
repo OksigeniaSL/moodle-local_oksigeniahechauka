@@ -2813,7 +2813,8 @@ dialog.hkp-dialog > footer {
 }
 
 .hkp .hkp-word-input {
-    width: 9rem;
+    width: 16rem;
+    max-width: 100%;
     border: 1px solid var(--hkp-accent-edge);
     background: var(--hkp-card);
     color: var(--hkp-ink);

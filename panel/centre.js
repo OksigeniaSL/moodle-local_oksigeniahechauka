@@ -193,12 +193,20 @@
             const field = document.createElement('input');
             field.className = 'hkp-word-input';
             field.setAttribute('aria-label', plus.textContent.trim());
+            field.placeholder = plus.getAttribute('title') || '';
             plus.hidden = true;
             box.insertBefore(field, plus);
             field.focus();
+            // Once: removing the field also takes its focus away, and that must not add the word a second time.
+            let finished = false;
             const done = (keep) => {
+                if (finished) {
+                    return;
+                }
+                finished = true;
                 const word = field.value.trim().toLowerCase();
-                if (keep && word) {
+                const have = Array.prototype.map.call(box.querySelectorAll('.hkp-word'), (w) => w.firstChild.textContent);
+                if (keep && word && have.indexOf(word) < 0) {
                     box.insertBefore(pill(word), field);
                     sync();
                 }
@@ -215,11 +223,7 @@
                     plus.focus();
                 }
             });
-            field.addEventListener('blur', () => {
-                if (field.isConnected) {
-                    done(true);
-                }
-            });
+            field.addEventListener('blur', () => done(true));
         });
     };
     const add = page.querySelector('#hkp-cat-add');

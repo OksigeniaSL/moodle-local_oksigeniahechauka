@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.6.2 (2026-11-01)
+
+- «Tu centro»: a keyword added with Enter no longer shows twice, and one already there is not added again; «palabra»
+  is now «palabra clave», with a hint of what to write and a help that says it.
+
 ## 0.6.1 (2026-11-01)
 
 - **Each centre names its own categories** to colour its events (the stages of a school, the faculties of a
