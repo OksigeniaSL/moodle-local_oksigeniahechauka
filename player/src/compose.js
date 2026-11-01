@@ -12,6 +12,9 @@
 // tiempo-tercio   mixed: the picture or video in two thirds, the weather in the other (today big, three days under)
 // apaisado        a landscape video in two thirds with its band, the rest of «Today» in the other
 // titular         a sentence (of the ticker, at 8 m) or the countdown, over the whole body in the centre's colour
+// agenda          the month and a diary of the next thirty days that goes up by stretches and stops to be read
+// fotos-tercio    an album's photos, one at a time, in a third, and what leads in the other two
+// muro            three to five photos of an album, one changing at a time; on a showcase, with a poster and its QR
 //
 // By the distance it is read from (the art direction's 0.7.0): at 3 m, all; at 5 m, all but «semana»; at 8 m, no
 // thirds (foto-hoy is foto-sola, a landscape video is foto-completa, «Today» comes one thing at a time) and the
@@ -86,7 +89,8 @@ export class Composer {
      *     week: {things: what the week has beyond today, weekday: 1 Monday … 7 Sunday},
      *     use: info, showcase or mixed (what the screen is for now), weather: the weather has the coming days,
      *     distance: 3, 5 or 8 (metres), phrases: the ticker's sentences (slides of their own at 8 m),
-     *     countdown: «Today» has a countdown}
+     *     countdown: «Today» has a countdown, agenda: the next thirty days have something,
+     *     albums: [{id, count}], the albums that can be shown}
      * @returns {{comp: string, items: object[], seconds: number}}
      */
     next(queue, today, horizontal, opts) {
@@ -102,16 +106,28 @@ export class Composer {
             }
             return extra ? {comp, items, seconds, extra} : {comp, items, seconds};
         };
-        // «La semana»: every 8 slides (5 on Mondays and Fridays, when the next week matters; 3 without pictures), only
-        // when the week has something beyond today, never right after the moment of «Today» or the full screen.
-        // «La semana» only from close: its five columns do not read from farther.
-        const week = o.week && !o.noToday && !far && o.distance !== 5 ? o.week : null;
+        // The turn of the coming days. From 5 and 8 m, the agenda: «La semana» reads only from close, and there it keeps
+        // Mondays and Fridays, when the week is what matters; the other turns are the agenda's.
+        const flagDay = !!(o.week && (o.week.weekday === 1 || o.week.weekday === 5));
+        const close = !o.distance || o.distance === 3;
+        const useWeek = !!(o.week && !o.noToday && close && o.week.things > 0 && (!o.agenda || flagDay));
+        const useAgenda = !!(o.agenda && !o.noToday && !useWeek);
+        const albumOf = (min) => {
+            const list = (o.albums || []).filter((a) => a.count >= min);
+            if (!list.length) {
+                return null;
+            }
+            this.albumTurn = (this.albumTurn || 0) + 1;
+            return list[this.albumTurn % list.length];
+        };
+        // Every 8 slides (5 on Mondays and Fridays; 3 without pictures), only when there is something, never right after the
+        // moment of «Today» or the full screen.
         const weekDue = (every, alternate) => {
             // Without pictures every slide is the moment of «Today»: then the two take turns.
-            if (week && week.things > 0 && this.sinceWeek >= every && (alternate || this.last !== 'solo-hoy') &&
+            if ((useWeek || useAgenda) && this.sinceWeek >= every && (alternate || this.last !== 'solo-hoy') &&
                     this.last !== 'foto-completa') {
                 this.sinceWeek = 0;
-                return pick('semana', [], week.things >= 8 ? 18 : 14);
+                return useWeek ? pick('semana', [], o.week.things >= 8 ? 18 : 14) : pick('agenda', [], 70);
             }
             return null;
         };
@@ -120,6 +136,11 @@ export class Composer {
         if (o.use === 'showcase') {
             if (!queue.length) {
                 return pick('escaparate', [], 20);
+            }
+            // One slide in four, the wall of an album, as a poster.
+            const poster = this.n % 4 === 0 ? albumOf(4) : null;
+            if (poster) {
+                return pick('muro', [], 30, {album: poster.id, poster: true});
             }
             const it = queue[this.position(queue)];
             return pick('escaparate', [it], it.web && it.type !== 'video' ? Math.max(15, secondsOf(it)) : secondsOf(it));
@@ -139,6 +160,13 @@ export class Composer {
         if (!queue.length) {
             return weekDue(3, true) || pick('solo-hoy', [], o.menu ? 15 : 12);
         }
+        // Mixed: one slide in ten, the wall of an album, from any distance.
+        if (o.use === 'mixed' && this.n % 10 === 0) {
+            const wall = albumOf(4);
+            if (wall) {
+                return pick('muro', [], 30, {album: wall.id});
+            }
+        }
         // Mixed: every other slide, a picture or video with the weather in a third.
         if (o.use === 'mixed' && o.weather && this.n % 2 === 0) {
             const it = queue[this.position(queue)];
@@ -147,19 +175,29 @@ export class Composer {
         // The moment of «Today»: more often when it has much, less when it has little; never right after the full
         // screen or the week, and it uses no picture of the queue.
         const cadence = h >= 6 ? 4 : (h <= 2 ? 8 : 6);
-        if (h > 0 && this.n % cadence === 0 && this.last !== 'foto-completa' && this.last !== 'semana') {
+        if (h > 0 && this.n % cadence === 0 && this.last !== 'foto-completa' && this.last !== 'semana' &&
+                this.last !== 'agenda') {
             return pick('solo-hoy', [], o.menu ? 15 : 12);
         }
-        const theWeek = weekDue(week && (week.weekday === 1 || week.weekday === 5) ? 5 : 8);
+        const theWeek = weekDue(flagDay ? 5 : 8);
         if (theWeek) {
             return theWeek;
+        }
+        // An album's photos in a third, instead of a picture beside «Today», one slide in six: never from afar.
+        this.sinceAlbum = (this.sinceAlbum === undefined ? 3 : this.sinceAlbum) + 1;
+        if (!far && h > 0 && this.sinceAlbum >= 6) {
+            const third = albumOf(3);
+            if (third) {
+                this.sinceAlbum = 0;
+                return pick('fotos-tercio', [], 24, {album: third.id});
+            }
         }
         const i = this.position(queue);
         const it = queue[i];
         const next = queue[(i + 1) % queue.length];
         const a = ratio(it);
         this.sinceFull++;
-        const fullDue = this.sinceFull > 3 && this.last !== 'solo-hoy' && this.last !== 'semana';
+        const fullDue = this.sinceFull > 3 && this.last !== 'solo-hoy' && this.last !== 'semana' && this.last !== 'agenda';
         if (fullDue && (horizontal ? a >= 1.45 : a < 0.63)) {
             this.sinceFull = 0;
             return pick('foto-completa', [it], it.type === 'video' ? secondsOf(it) : 9);

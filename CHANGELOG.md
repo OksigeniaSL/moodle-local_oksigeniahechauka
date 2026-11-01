@@ -1,7 +1,18 @@
 # Changelog
 
-## Unreleased
+## 0.7.1 (2026-11-01)
 
+- **The agenda that goes up** (`agenda`): the month with its days marked in the colours of their categories, and a diary of
+  the next thirty days that rises by stretches and stops to be read, into the next month if it comes to that. Nothing is
+  ever cut, holidays are told apart, and a quiet month says so. From 8 m, and 5 m behind glass, the month and the diary
+  take turns over the whole body. It takes the turn of the coming days: always from 5 m; from close, all but Mondays and
+  Fridays, which stay with the week.
+- **Albums**, a new kind of content: several photos at once, with a name, a line and a web. On the screens they go **in a
+  third** (`fotos-tercio`, from three photos: one at a time, beside what leads) and **on a wall** (`muro`, from four: a
+  mosaic where one changes at a time; on a showcase, with a poster and its QR). Among the pictures, an album takes the turn
+  of one thing and gives the next photo each time, so a large one does not push out the rest.
+- A picture without words on a showcase is no longer darkened for words that are not there.
+- Uploading a picture or a video failed since 0.6.0: the file library was not loaded. Fixed.
 - «Duplicar» in a content's menu: a copy with the same text, destinations and files, unpublished, open to change.
 - «Recargando…» on a screen's card until the screen takes the order, then «Recargada».
 - A menu says its own name on the screens when a day has several («Menú de hoy · D»).

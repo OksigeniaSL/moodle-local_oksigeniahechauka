@@ -8,7 +8,9 @@ import {makeApi} from './api.js';
 import {realClock, simulatedClock} from './clock.js';
 import {MediaStore, mediaOf} from './media.js';
 import {pair} from './pairing.js';
-import {afterDayEnd, countdown, dayLabel, eventsOn, upcoming} from './agenda.js';
+import {afterDayEnd, agendaOf, countdown, dayLabel, eventsOn, monthOf, upcoming} from './agenda.js';
+import {AGENDA_DAYS, AGENDA_TOP} from './agendaview.js';
+import {albumsOf, oneOfEachAlbum} from './photos.js';
 import {Composer, draftChoice} from './compose.js';
 import {dayNumber, isDark, isLive, isPowerOn, liveItems, urgentOf, useOf, weekdayOf} from './rules.js';
 import {Screen} from './render.js';
@@ -16,7 +18,7 @@ import {store} from './store.js';
 import {countToday} from './today.js';
 import {weekOf} from './week.js';
 
-const VERSION = '0.7.0';
+const VERSION = '0.7.1';
 const COMING_DAYS = 7;
 const HEARTBEAT_MS = 60000;
 const REFRESH_MS = 15 * 60000;
@@ -43,6 +45,7 @@ class Player {
         this.startedAt = Date.now();
         this.errors = [];
         this.bad = {};
+        this.albumTurns = {};
         this.manifest = null;
         const q = query();
         const at = this.mode === 'screen' ? null : (q.at || boot.at);
@@ -290,6 +293,35 @@ class Player {
         };
     }
 
+    /** The words the agenda's days are said with. */
+    agendaNames(m) {
+        const s = this.strings;
+        const labels = m.labels || {};
+        return {days: s.days, months: s.months, categories: m.categories || [], today: labels.today || s.today,
+            tomorrow: labels.tomorrow || s.tomorrow, until: s.week_until, until_tomorrow: s.until_tomorrow,
+            date_format: s.date_format, holiday: s.week_holiday};
+    }
+
+    /** The agenda of the next thirty days, as much as the distance it is read from can take. */
+    agendaOfNow(wall, m) {
+        const events = (m.items || []).filter(function (it) {
+            return it.type === 'event';
+        });
+        const top = AGENDA_TOP[(m.screen && m.screen.distance) || 3] || AGENDA_TOP[3];
+        return agendaOf(events, wall.date, AGENDA_DAYS, top, this.agendaNames(m));
+    }
+
+    /** What the agenda's slide needs: the diary, and a month for each it reaches. */
+    agendaData(wall, m) {
+        const events = (m.items || []).filter(function (it) {
+            return it.type === 'event';
+        });
+        const cats = m.categories || [];
+        return {agenda: this.agendaOfNow(wall, m), today: wall.date, monthOf: function (date) {
+            return monthOf(date, wall.date, events, cats);
+        }};
+    }
+
     /** The next five school days with their events, for «La semana». */
     weekOf(wall) {
         const s = this.strings;
@@ -391,20 +423,44 @@ class Player {
         const use = useOf(m, wall);
         const week = m.template === 'full' || use === 'showcase' ? null : this.weekOf(wall);
         this.screen.setUse(use);
-        const choice = this.composer.next(this.mainList(wall), countToday(today) + coming, this.screen.horizontal,
+        const queue = this.mainList(wall);
+        const media = this.media;
+        const albums = albumsOf(queue, function (ref) {
+            return media.url(ref);
+        });
+        const agenda = this.agendaOfNow(wall, m);
+        const turns = this.albumTurns;
+        const choice = this.composer.next(oneOfEachAlbum(queue, turns), countToday(today) + coming, this.screen.horizontal,
             {menu: !!today.menu, noToday: m.template === 'full', use,
                 weather: !!(m.weather && m.weather.days && m.weather.days.length),
                 distance: (m.screen && m.screen.distance) || 3,
                 countdown: !!today.countdown,
+                agenda: agenda.count > 0,
+                albums: albums.map(function (a) {
+                    return {id: a.id, count: a.photos.length};
+                }),
                 phrases: liveItems(m.items || [], 'ticker', wall).map(function (it) {
                     return it.text || it.title || '';
                 }).filter(Boolean),
                 week: week ? {things: week.things, weekday: weekdayOf(dayNumber(wall.date))} : null});
         this.menuTurn++;
-        this.screen.show(choice, today, week);
+        choice.items.forEach(function (it) {
+            if (it.album) {
+                turns[it.album.id] = (turns[it.album.id] || 0) + 1;
+            }
+        });
+        if (choice.comp === 'agenda') {
+            choice.extra = {data: this.agendaData(wall, m)};
+        } else if (choice.extra && choice.extra.album) {
+            choice.extra.albumData = albums.filter(function (a) {
+                return a.id === choice.extra.album;
+            })[0];
+        }
+        // Some know how long they last only once they are in the page.
+        const seconds = this.screen.show(choice, today, week) || choice.seconds;
         this.timer = setTimeout(function () {
             self.next();
-        }, choice.seconds * 1000 + (choice.items.some(function (it) {
+        }, seconds * 1000 + (choice.items.some(function (it) {
             return it.type === 'video';
         }) ? 5000 : 0));
     }

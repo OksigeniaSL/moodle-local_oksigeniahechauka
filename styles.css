@@ -2970,3 +2970,36 @@ dialog.hkp-dialog > footer {
     font-size: .875rem;
     font-weight: 600;
 }
+
+/* An album in the panel: its photos as small tiles. */
+.hkp-album {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+    margin: .75rem 0;
+    padding: 0;
+    list-style: none;
+}
+
+.hkp-album:empty {
+    display: none;
+}
+
+.hkp-album li {
+    width: 7.5rem;
+}
+
+.hkp-album img {
+    display: block;
+    width: 100%;
+    height: 5.25rem;
+    border-radius: var(--hkp-radius-sm);
+    object-fit: cover;
+}
+
+.hkp-album label {
+    display: block;
+    margin-top: .2rem;
+    color: var(--hkp-muted);
+    font-size: .8125rem;
+}

@@ -1,0 +1,727 @@
+/* Oksigenia Hechauka 0.7.x: the agenda that runs (Gaudí, 1 November 2026). Goes after usos.css and before the client's
+ * sheet. It takes the turn of «La semana» wherever that one breaks the minimum size (LEEME.md, «La agenda que corre»).
+ *
+ * A wall calendar and, beside it (under it on a vertical screen), a diary of the next 30 days that rises a stretch at a
+ * time and stands still to be read. A ring on the calendar follows the day at the top of the list; when the list enters
+ * the next month, the calendar turns to it.
+ *
+ *   <div class="hk-cuerpo hk-capa" data-composicion="agenda" data-densidad="poca" data-vista="mes|lista">
+ *     <section class="hk-agenda-mes">
+ *       <div class="hk-mes hk-mes-activo">                                          (one per month the list reaches)
+ *         <h3 class="hk-mes-titulo">Noviembre <small>2026</small></h3>
+ *         <div class="hk-mes-nombres"><span>L</span>… <span data-finde>S</span><span data-finde>D</span></div>
+ *         <div class="hk-mes-semanas">
+ *           <div class="hk-mes-semana">
+ *             <span class="hk-mes-dia" data-fecha="2026-11-05" data-hoy data-pasado data-finde data-festivo>
+ *               <b>5</b><span class="hk-mes-marcas"><i style="--hk-ev…"></i></span></span>…    (up to three marks)
+ *           </div>…
+ *           <i class="hk-mes-foco"></i>                                             (the ring: moved by transform)
+ *         </div>
+ *       </div>
+ *     </section>
+ *     <section class="hk-agenda-lista"><div class="hk-agenda-pista">
+ *       <div class="hk-agenda-bloque">
+ *         <p class="hk-agenda-cambio">Diciembre</p>                                 (only where the month changes)
+ *         <article class="hk-agenda-dia" data-fecha="2026-11-05" data-hoy>
+ *           <header class="hk-agenda-cabeza">
+ *             <b class="hk-agenda-num">5</b><p class="hk-agenda-nombre">Jueves</p>  (<span class="hk-agenda-marca">Hoy</span>)
+ *           </header>
+ *           <div class="hk-agenda-eventos">
+ *             <div class="hk-linea" style="--hk-ev…"><b class="hk-linea-cuando">10:30</b>
+ *               <span class="hk-linea-texto"><span class="hk-linea-titulo">Teatro</span>
+ *                 <small>3.º de Primaria</small></span></div>                               (with an hour)
+ *             <div class="hk-agenda-banda" data-sigue style="--hk-ev…"><b>Acampada</b>
+ *               <small>3.º de ESO · hasta el viernes</small></div>                  (all day, or several days)
+ *             <div class="hk-agenda-rayas"><p><small>Festivo</small><b>Fiesta local</b></p></div>   (a holiday)
+ *           </div>
+ *         </article>
+ *       </div>…
+ *       <p class="hk-agenda-pie">+6 más en los próximos días</p>
+ *     </div></section>
+ *   </div>
+ *
+ * Chromium 56: flexbox only, margins instead of gap, transform and opacity for everything that moves. */
+
+/* --- The two panels ------------------------------------------------------------------------------------------- */
+.hk-horizontal .hk-cuerpo[data-composicion="agenda"] {
+    flex-direction: row;
+}
+.hk-vertical .hk-cuerpo[data-composicion="agenda"] {
+    flex-direction: column;
+}
+.hk-agenda-mes,
+.hk-agenda-lista {
+    position: relative;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+    border-radius: 2.4rem;
+    background: var(--hk-superficie);
+    box-shadow: 0 .2rem .8rem rgba(0, 0, 0, .06);
+}
+.hk-agenda-mes {
+    flex: none;
+}
+.hk-agenda-lista {
+    flex: 1 1 0px;
+}
+.hk-horizontal .hk-agenda-mes {
+    width: 36%;
+}
+.hk-horizontal[data-distancia="5"] .hk-agenda-mes {
+    width: 42%;
+}
+.hk-horizontal .hk-agenda-lista {
+    margin-left: var(--hk-hueco);
+}
+/* On a vertical screen the calendar's height comes from the size of its rows; the list takes the rest. */
+.hk-vertical {
+    --hk-mes-fila: 8.8rem;
+}
+.hk-vertical[data-distancia="5"] {
+    --hk-mes-fila: 9.4rem;
+}
+.hk-vertical .hk-agenda-mes {
+    height: calc(var(--hk-t-entrada) * 1.05 + 2.8rem + var(--hk-t-min) + 1.6rem + var(--hk-mes-fila) * 6 + 1.2rem);
+}
+.hk-vertical .hk-agenda-lista {
+    margin-top: var(--hk-hueco);
+}
+
+/* --- The month: a wall calendar ------------------------------------------------------------------------------- */
+.hk-mes {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    -webkit-transition: opacity .9s ease;
+    transition: opacity .9s ease;
+}
+.hk-mes.hk-mes-activo {
+    opacity: 1;
+}
+.hk .hk-mes-titulo {
+    display: flex;
+    flex: none;
+    align-items: baseline;
+    justify-content: space-between;
+    padding: 1.2rem 3.2rem 1.6rem;
+    background: var(--hk-primario);
+    color: var(--hk-sobre-primario);
+    font-family: var(--hk-letra-titulos);
+    font-size: var(--hk-t-entrada);
+    font-weight: 800;
+    line-height: 1.05;
+}
+.hk .hk-mes-titulo small {
+    font-size: var(--hk-t-min);
+    font-weight: 700;
+}
+.hk-mes-nombres {
+    display: flex;
+    flex: none;
+    padding: 1.2rem 1.6rem .4rem;
+}
+.hk .hk-mes-nombres span {
+    flex: 1 1 0px;
+    width: 0;
+    color: var(--hk-texto-suave);
+    font-size: var(--hk-t-min);
+    font-weight: 800;
+    line-height: 1;
+    text-align: center;
+}
+.hk-mes-semanas {
+    position: relative;
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-height: 0;
+    padding: 0 1.6rem 1.2rem;
+}
+.hk-mes-semana {
+    display: flex;
+    flex: 1 1 0px;
+    min-height: 0;
+}
+.hk-mes-dia {
+    position: relative;
+    display: flex;
+    flex: 1 1 0px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 0;
+    min-width: 0;
+    margin: .2rem;
+    border-radius: 1.2rem;
+}
+/* a day on the list right now: a soft tint that comes and goes as the list rises */
+.hk-mes-dia::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    border-radius: inherit;
+    background: var(--hk-acento);
+    opacity: 0;
+    -webkit-transition: opacity .9s ease;
+    transition: opacity .9s ease;
+}
+.hk-mes-dia.hk-mes-en-lista::before {
+    opacity: .2;
+}
+.hk-mes-dia[data-hoy]::before {
+    display: none;
+}
+.hk-mes-dia > b,
+.hk-mes-dia > .hk-mes-marcas {
+    position: relative;
+}
+.hk .hk-mes-dia > b {
+    color: var(--hk-texto-suave);
+    font-size: var(--hk-t-min);
+    font-weight: 700;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+}
+/* the marks: one dot per category of that day, up to three; a day with something weighs more than a day without */
+.hk-mes-marcas {
+    display: flex;
+    flex: none;
+    justify-content: center;
+    height: calc(var(--hk-t-min) * .36);
+    margin-top: calc(var(--hk-t-min) * .14);
+}
+.hk-mes-marcas i {
+    width: calc(var(--hk-t-min) * .36);
+    height: calc(var(--hk-t-min) * .36);
+    margin: 0 calc(var(--hk-t-min) * .05);
+    border-radius: 50%;
+    background: var(--hk-ev, var(--hk-texto-suave));
+}
+[data-tema="oscuro"] .hk-mes-marcas i {
+    background: var(--hk-ev-oscuro, var(--hk-texto-suave));
+}
+.hk .hk-mes-dia.hk-mes-con-algo > b {
+    color: var(--hk-texto);
+    font-weight: 800;
+}
+/* the weekend: a quiet tile, so the working weeks read at once */
+.hk-mes-dia[data-finde] {
+    background: var(--hk-fondo);
+}
+/* today: the whole day filled in the centre's colour, as in «La semana»; the marks keep a rim of the surface, so a
+   category with the centre's own colour still shows */
+.hk-mes-dia[data-hoy] {
+    background: var(--hk-primario);
+}
+.hk .hk-mes-dia[data-hoy] > b {
+    color: var(--hk-sobre-primario);
+    font-weight: 800;
+}
+.hk-mes-dia[data-hoy] .hk-mes-marcas i {
+    box-shadow: 0 0 0 .25rem var(--hk-superficie);
+}
+/* the past fades out and loses its marks: an agenda is for the days to come */
+.hk .hk-mes-dia[data-pasado] > b {
+    color: var(--hk-texto);
+    font-weight: 600;
+    opacity: .55;
+}
+.hk-mes-dia[data-pasado] .hk-mes-marcas {
+    visibility: hidden;
+}
+/* a holiday: striped, as in «La semana»; never mistaken for a day with activities, which has dots */
+.hk-mes-dia[data-festivo] {
+    background: repeating-linear-gradient(135deg, transparent 0, transparent .7rem,
+        var(--hk-linea) .7rem, var(--hk-linea) 1.2rem);
+    box-shadow: inset 0 0 0 .2rem var(--hk-linea);
+}
+.hk .hk-mes-dia[data-festivo] > b {
+    color: var(--hk-texto);
+    font-weight: 800;
+}
+.hk-mes-vacio {
+    visibility: hidden;
+}
+/* the ring: the day at the top of the list, moved from day to day with the list */
+.hk-mes-foco {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 2;
+    border: .5rem solid var(--hk-acento);
+    border-radius: 1.5rem;
+    box-shadow: 0 .2rem 1rem rgba(0, 0, 0, .18);
+    -webkit-transition: -webkit-transform 1.6s cubic-bezier(.45, .05, .2, 1);
+    transition: transform 1.6s cubic-bezier(.45, .05, .2, 1);
+    will-change: transform;
+}
+.hk-mes-foco[style] {
+    display: block;
+}
+
+/* --- The list: a diary that rises and stands still --------------------------------------------------------------- */
+.hk-agenda-pista {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    -webkit-transition: -webkit-transform 1.6s cubic-bezier(.45, .05, .2, 1), opacity .5s ease;
+    transition: transform 1.6s cubic-bezier(.45, .05, .2, 1), opacity .5s ease;
+    will-change: transform;
+}
+.hk-agenda-pista.hk-agenda-cambiando {   /* a new page: out, it changes, in */
+    opacity: 0;
+}
+.hk-agenda-pista.hk-agenda-sin-viaje {
+    -webkit-transition: opacity .5s ease;
+    transition: opacity .5s ease;
+}
+.hk-agenda-pista > * {
+    -webkit-transition: opacity .8s ease;
+    transition: opacity .8s ease;
+}
+/* What does not fit whole at this stop is not shown: no line is ever cut at the edge of the panel. */
+.hk-agenda-pista > .hk-agenda-oculto,
+.hk-agenda-eventos > .hk-agenda-oculta {
+    opacity: 0;
+}
+.hk-agenda-eventos > * {
+    -webkit-transition: opacity .8s ease;
+    transition: opacity .8s ease;
+}
+.hk-agenda-dia {
+    display: flex;
+    padding: 2.4rem 3.2rem 2.4rem 3.6rem;
+}
+.hk-agenda-bloque + .hk-agenda-bloque .hk-agenda-dia {
+    border-top: .2rem solid var(--hk-linea);
+}
+.hk-agenda-bloque .hk-agenda-cambio + .hk-agenda-dia {
+    border-top: 0;
+    padding-top: 1.6rem;
+}
+.hk-agenda-cabeza {
+    flex: none;
+    width: calc(var(--hk-t-min) * 5.4);
+    padding-right: 1.6rem;
+}
+.hk .hk-agenda-num {
+    display: block;
+    font-family: var(--hk-letra-titulos);
+    font-size: calc(var(--hk-t-cifra) * .84);
+    font-weight: 800;
+    line-height: .92;
+    letter-spacing: -.02em;
+    font-variant-numeric: tabular-nums;
+}
+.hk .hk-agenda-nombre {
+    margin-top: .6rem;
+    color: var(--hk-texto-suave);
+    font-size: var(--hk-t-min);
+    font-weight: 800;
+    line-height: 1.12;
+}
+.hk .hk-agenda-marca {                   /* «Hoy» as in «La semana»: the accent's chip; «Mañana», the same with no fill */
+    display: inline-block;
+    color: var(--hk-texto);
+    font-size: var(--hk-t-min);
+    font-weight: 800;
+    line-height: 1.12;
+}
+.hk .hk-agenda-dia[data-hoy] .hk-agenda-marca {
+    padding: .04em .36em .08em;
+    border-radius: .3em;
+    background: var(--hk-acento);
+    color: var(--hk-sobre-acento);
+}
+.hk-agenda-dia[data-hoy] .hk-agenda-num {
+    color: var(--hk-primario);
+}
+[data-tema="oscuro"] .hk-agenda-dia[data-hoy] .hk-agenda-num {
+    color: var(--hk-texto);
+}
+.hk .hk-agenda-nombre small {            /* a thin list: how far away it is */
+    display: block;
+    margin-top: .3em;
+    font-size: var(--hk-t-min);
+    font-weight: 700;
+}
+.hk-agenda-eventos {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+.hk-agenda-eventos > :first-child {
+    margin-top: 0;
+}
+.hk-agenda-eventos .hk-linea-cuando {
+    margin-top: .1em;
+}
+/* The title and whom it is for share a line wherever they fit: more days in sight at the same size. Flex items that
+   wrap, with a shared margin the container takes back, so a group that drops to its own line stays aligned. */
+.hk-agenda-eventos .hk-linea {
+    margin-top: 1.6rem;
+}
+.hk-agenda-eventos .hk-linea-texto {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    margin-left: calc(var(--hk-t-lista) * -.42);
+}
+.hk-agenda-eventos .hk-linea-titulo,
+.hk .hk-agenda-eventos .hk-linea-texto small {
+    margin: 0 0 0 calc(var(--hk-t-lista) * .42);
+}
+.hk .hk-agenda-eventos .hk-linea-texto small {
+    line-height: 1.2;
+}
+/* All day or several days: the thing itself, filled in its colour, because «is it sports day on Thursday?» is what
+   people come to look for. A band of several days ends in a point: it goes on. */
+.hk-agenda-banda {
+    margin-top: 1.6rem;
+    padding: 1rem 2.4rem 1.2rem;
+    border-radius: 1.2rem;
+    background: var(--hk-ev, var(--hk-texto-suave));
+    color: var(--hk-sobre-ev, var(--hk-superficie));
+}
+.hk-agenda-banda[data-sigue] {
+    padding-right: 5rem;
+    border-radius: 1.2rem 0 0 1.2rem;
+    -webkit-clip-path: polygon(0 0, calc(100% - 2.8rem) 0, 100% 50%, calc(100% - 2.8rem) 100%, 0 100%);
+    clip-path: polygon(0 0, calc(100% - 2.8rem) 0, 100% 50%, calc(100% - 2.8rem) 100%, 0 100%);
+}
+[data-tema="oscuro"] .hk-agenda-banda {
+    background: var(--hk-ev-oscuro, var(--hk-texto-suave));
+    color: var(--hk-fondo);
+}
+.hk .hk-agenda-banda b {
+    display: block;
+    font-size: var(--hk-t-lista);
+    font-weight: 800;
+    line-height: 1.08;
+}
+.hk .hk-agenda-banda small {
+    display: block;
+    margin-top: .2em;
+    font-size: var(--hk-t-min);
+    font-weight: 700;
+    line-height: 1.12;
+}
+/* A holiday: the stripes of «La semana», with its plate. */
+.hk-agenda-rayas {
+    margin-top: 1.6rem;
+    padding: 1.2rem 1.6rem;
+    border-radius: 1.2rem;
+    background: repeating-linear-gradient(135deg, transparent 0, transparent 1.2rem,
+        var(--hk-linea) 1.2rem, var(--hk-linea) 2rem);
+    box-shadow: inset 0 0 0 .2rem var(--hk-linea);
+}
+.hk .hk-agenda-rayas p {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    padding: .8rem 2rem 1rem;
+    border-radius: .9rem;
+    background: var(--hk-superficie);
+}
+.hk .hk-agenda-rayas small {
+    margin-right: .6em;
+    color: var(--hk-acento-texto);
+    font-size: var(--hk-t-min);
+    font-weight: 800;
+    letter-spacing: .06em;
+    line-height: 1.12;
+    text-transform: uppercase;
+}
+.hk .hk-agenda-rayas b {
+    font-size: var(--hk-t-lista);
+    font-weight: 800;
+    line-height: 1.08;
+}
+.hk .hk-agenda-rayas em {
+    display: block;
+    width: 100%;
+    margin-top: .2em;
+    color: var(--hk-texto-suave);
+    font-size: var(--hk-t-min);
+    font-style: normal;
+    font-weight: 700;
+    line-height: 1.12;
+}
+/* Where the month changes: its name, as a chapter. */
+.hk .hk-agenda-cambio {
+    display: flex;
+    align-items: center;
+    padding: 2.4rem 3.2rem 0 3.6rem;
+    color: var(--hk-primario);
+    font-family: var(--hk-letra-titulos);
+    font-size: var(--hk-t-entrada);
+    font-weight: 800;
+    line-height: 1.05;
+}
+.hk-agenda-cambio::after {
+    content: "";
+    flex: 1 1 auto;
+    height: .5rem;
+    margin-left: 2.4rem;
+    border-radius: .5rem;
+    background: var(--hk-acento);
+}
+[data-tema="oscuro"] .hk-agenda-cambio {
+    color: var(--hk-texto);
+}
+.hk .hk-agenda-pie {
+    padding: 1.6rem 3.2rem 2.4rem 3.6rem;
+    border-top: .2rem solid var(--hk-linea);
+    color: var(--hk-texto-suave);
+    font-size: var(--hk-t-min);
+    font-weight: 700;
+    line-height: 1.12;
+}
+
+/* --- A day's header above its events, where a rail would leave no room for the titles -------------------------- */
+.hk-vertical .hk-agenda-dia,
+.hk-horizontal[data-distancia="5"] .hk-agenda-dia {
+    flex-direction: column;
+}
+.hk-vertical .hk-agenda-cabeza,
+.hk-horizontal[data-distancia="5"] .hk-agenda-cabeza {
+    display: flex;
+    align-items: baseline;
+    width: auto;
+    margin-bottom: 1.4rem;
+    padding-right: 0;
+}
+.hk-vertical .hk-agenda-num,
+.hk-horizontal[data-distancia="5"] .hk-agenda-num {
+    margin-right: 1.6rem;
+    font-size: var(--hk-t-entrada);
+    line-height: 1;
+}
+.hk .hk-vertical .hk-agenda-nombre,
+.hk-vertical .hk-agenda-nombre,
+.hk-horizontal[data-distancia="5"] .hk-agenda-nombre {
+    margin-top: 0;
+    font-size: var(--hk-t-lista);
+    line-height: 1.1;
+}
+.hk-vertical .hk-agenda-marca,
+.hk-horizontal[data-distancia="5"] .hk-agenda-marca {
+    font-size: var(--hk-t-lista);
+    line-height: 1.1;
+}
+.hk-vertical .hk-agenda-nombre small,
+.hk-horizontal[data-distancia="5"] .hk-agenda-nombre small {
+    display: inline;
+    margin: 0 0 0 .6em;
+    font-size: var(--hk-t-min);
+}
+
+/* --- A thin month: what there is, large and at ease; a month with little in it is news too ---------------------- */
+.hk-cuerpo[data-densidad="poca"] .hk-agenda-pista {
+    top: 50%;
+    -webkit-transform: translate3d(0, -50%, 0);
+    transform: translate3d(0, -50%, 0);
+    -webkit-transition: none;
+    transition: none;
+}
+.hk-cuerpo[data-densidad="poca"] .hk-agenda-num {
+    font-size: var(--hk-t-cifra);
+}
+.hk-horizontal .hk-cuerpo[data-densidad="poca"] .hk-agenda-cabeza {
+    width: calc(var(--hk-t-min) * 10);
+}
+.hk .hk-cuerpo[data-densidad="poca"] .hk-linea-texto,
+.hk .hk-cuerpo[data-densidad="poca"] .hk-agenda-banda b,
+.hk .hk-cuerpo[data-densidad="poca"] .hk-agenda-rayas b {
+    font-size: var(--hk-t-entrada);
+}
+.hk .hk-cuerpo[data-densidad="poca"] .hk-linea-texto small {
+    font-size: var(--hk-t-lista);
+}
+.hk .hk-cuerpo[data-densidad="poca"] .hk-agenda-eventos .hk-linea-texto {
+    margin-left: calc(var(--hk-t-entrada) * -.42);
+}
+.hk .hk-cuerpo[data-densidad="poca"] .hk-agenda-eventos .hk-linea-titulo,
+.hk .hk-cuerpo[data-densidad="poca"] .hk-agenda-eventos .hk-linea-texto small {
+    margin-left: calc(var(--hk-t-entrada) * .42);
+}
+.hk .hk-cuerpo[data-densidad="poca"] .hk-agenda-pie {
+    border-top: 0;
+    font-size: var(--hk-t-min);
+}
+/* Nothing at all: the calendar, and one quiet sentence. */
+.hk-agenda-nada {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 0 6rem;
+}
+.hk .hk-agenda-nada h3 {
+    font-family: var(--hk-letra-titulos);
+    font-size: var(--hk-t-titular);
+    font-weight: 800;
+    line-height: 1.02;
+}
+.hk .hk-agenda-nada p {
+    margin-top: 2rem;
+    color: var(--hk-texto-suave);
+    font-size: var(--hk-t-entrada);
+    font-weight: 700;
+    line-height: 1.12;
+}
+
+/* --- From far: the month and the diary take turns, each over the whole body -------------------------------------
+   At 8 m (and at 5 m behind glass) the calendar beside or over the list leaves neither readable: on a vertical screen,
+   one event at a time. It is the same rule as «no thirds». The month first, as a big wall calendar; then the diary in
+   pages. */
+.hk[data-distancia="8"] .hk-agenda-mes,
+.hk[data-distancia="5"][data-cristal] .hk-agenda-mes,
+.hk[data-distancia="8"] .hk-agenda-lista,
+.hk[data-distancia="5"][data-cristal] .hk-agenda-lista {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: auto;
+    height: auto;
+    margin: 0;
+    -webkit-transition: opacity .45s ease .45s;       /* coming in: once the other has gone, never one through the other */
+    transition: opacity .45s ease .45s;
+}
+.hk[data-distancia="8"] [data-vista="lista"] > .hk-agenda-mes,
+.hk[data-distancia="8"] [data-vista="mes"] > .hk-agenda-lista,
+.hk[data-distancia="5"][data-cristal] [data-vista="lista"] > .hk-agenda-mes,
+.hk[data-distancia="5"][data-cristal] [data-vista="mes"] > .hk-agenda-lista {
+    opacity: 0;
+    -webkit-transition: opacity .45s ease;
+    transition: opacity .45s ease;
+}
+/* the big calendar on a vertical screen: tall cells, the number at the size of a line */
+.hk.hk-vertical[data-distancia="8"] .hk-mes-dia > b,
+.hk.hk-vertical[data-distancia="5"][data-cristal] .hk-mes-dia > b {
+    font-size: var(--hk-t-lista);
+}
+.hk.hk-vertical[data-distancia="8"] .hk-mes-marcas,
+.hk.hk-vertical[data-distancia="5"][data-cristal] .hk-mes-marcas {
+    height: calc(var(--hk-t-lista) * .3);
+    margin-top: calc(var(--hk-t-lista) * .2);
+}
+.hk.hk-vertical[data-distancia="8"] .hk-mes-marcas i,
+.hk.hk-vertical[data-distancia="5"][data-cristal] .hk-mes-marcas i {
+    width: calc(var(--hk-t-lista) * .3);
+    height: calc(var(--hk-t-lista) * .3);
+}
+.hk-horizontal[data-distancia="8"] .hk-mes-dia,
+.hk-horizontal[data-distancia="5"][data-cristal] .hk-mes-dia {
+    flex-direction: row;
+    justify-content: flex-start;
+    margin: .3rem;
+    padding-left: 1.6rem;
+}
+.hk-horizontal[data-distancia="8"] .hk-mes-dia > b,
+.hk-horizontal[data-distancia="5"][data-cristal] .hk-mes-dia > b {
+    flex: none;
+    width: calc(var(--hk-t-min) * 1.24);
+}
+.hk-horizontal[data-distancia="8"] .hk .hk-mes-nombres span,
+.hk.hk-horizontal[data-distancia="8"] .hk-mes-nombres span,
+.hk.hk-horizontal[data-distancia="5"][data-cristal] .hk-mes-nombres span {
+    padding-left: 1.9rem;
+    text-align: left;
+}
+.hk-horizontal[data-distancia="8"] .hk-mes-marcas,
+.hk-horizontal[data-distancia="5"][data-cristal] .hk-mes-marcas {
+    height: calc(var(--hk-t-min) * .4);
+    margin: 0 0 0 calc(var(--hk-t-min) * .2);
+}
+.hk-horizontal[data-distancia="8"] .hk-mes-marcas i,
+.hk-horizontal[data-distancia="5"][data-cristal] .hk-mes-marcas i {
+    width: calc(var(--hk-t-min) * .42);
+    height: calc(var(--hk-t-min) * .4);
+    margin: 0 calc(var(--hk-t-min) * .05);
+    border-radius: calc(var(--hk-t-min) * .1);
+}
+.hk-horizontal[data-distancia="8"] .hk-agenda-cabeza,
+.hk-horizontal[data-distancia="5"][data-cristal] .hk-agenda-cabeza {
+    display: block;
+    width: calc(var(--hk-t-min) * 5.6);
+    margin-bottom: 0;
+}
+.hk-horizontal[data-distancia="8"] .hk-agenda-dia,
+.hk-horizontal[data-distancia="5"][data-cristal] .hk-agenda-dia {
+    flex-direction: row;
+    padding: 2rem 4rem 2rem 4.4rem;
+}
+.hk-horizontal[data-distancia="8"] .hk-agenda-num,
+.hk-horizontal[data-distancia="5"][data-cristal] .hk-agenda-num {
+    margin: 0;
+    font-size: var(--hk-t-titulo-min);
+    line-height: .9;
+}
+.hk-horizontal[data-distancia="8"] .hk-agenda-nombre,
+.hk-horizontal[data-distancia="5"][data-cristal] .hk-agenda-nombre,
+.hk-horizontal[data-distancia="5"][data-cristal] .hk-agenda-marca {
+    margin-top: .6rem;
+    font-size: var(--hk-t-min);
+}
+.hk-horizontal[data-distancia="8"] .hk-agenda-eventos .hk-linea-cuando,
+.hk-horizontal[data-distancia="5"][data-cristal] .hk-agenda-eventos .hk-linea-cuando {
+    min-width: 3.2em;
+}
+
+/* Behind glass, every line counts: the month's own title and gaps give way to its six weeks. */
+.hk.hk-horizontal[data-distancia="8"][data-cristal] .hk-mes-titulo,
+.hk.hk-horizontal[data-distancia="5"][data-cristal] .hk-mes-titulo {
+    padding-top: .8rem;
+    padding-bottom: 1rem;
+    font-size: var(--hk-t-lista);
+}
+.hk.hk-horizontal[data-distancia="8"][data-cristal] .hk-mes-nombres,
+.hk.hk-horizontal[data-distancia="5"][data-cristal] .hk-mes-nombres {
+    padding-top: .6rem;
+    padding-bottom: 0;
+}
+.hk.hk-horizontal[data-distancia="8"][data-cristal] .hk-mes-dia,
+.hk.hk-horizontal[data-distancia="5"][data-cristal] .hk-mes-dia {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+.hk.hk-horizontal[data-distancia="8"][data-cristal] .hk-mes-semanas,
+.hk.hk-horizontal[data-distancia="5"][data-cristal] .hk-mes-semanas {
+    padding-bottom: 0;
+}
+
+/* --- The header at 5 m behind glass (any composition): the date must not break into three lines ------------------ */
+.hk-horizontal[data-distancia="5"][data-cristal] .hk-tiempo-extremos {
+    display: none;
+}
+
+/* --- Still ------------------------------------------------------------------------------------------------------ */
+.hk-quieto .hk-agenda-pista,
+.hk-quieto .hk-mes-foco {
+    -webkit-transition: opacity .5s ease;
+    transition: opacity .5s ease;
+}
+@media (prefers-reduced-motion: reduce) {
+    .hk .hk-agenda-pista,
+    .hk .hk-mes-foco {
+        transition: opacity .5s ease;
+    }
+}

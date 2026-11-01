@@ -64,6 +64,10 @@ class home {
         $titles = [];
         foreach ($items as $item) {
             $titles['i' . $item->id] = format_string($item->title);
+            if ($item->type === 'album') {
+                // An album goes out as one thing, with this name, whichever of its photos is on.
+                $titles['album-a' . $item->id] = format_string($item->title);
+            }
         }
 
         // The urgent notices on now, newest last, and the screens each one reaches.
@@ -519,7 +523,7 @@ class home {
             if ($moment !== 'done') {
                 $counts['all']++;
                 // An urgent notice counts among the notices.
-                $counts[$item->type === 'urgent' ? 'notice' : $item->type]++;
+                $counts[$item->type === 'urgent' ? 'notice' : ($item->type === 'album' ? 'media' : $item->type)]++;
                 $mine += $row['mine'] ? 1 : 0;
             }
         }
@@ -582,6 +586,7 @@ class home {
         $title = format_string($item->title);
         $thumb = self::thumb($item, $data);
         $kind = $item->type === 'media' ? ($thumb['video'] ? 'video' : 'photo') : $item->type;
+        $photos = $item->type === 'album' ? count(items::album_files((int) $item->id)) : 0;
         $meta = [];
         if ($item->type === 'notice' && !empty($data['important'])) {
             $meta[] = ['flag' => true, 'text' => get_string('flag_important', $c), 'icon' => icons::svg('urgent')];
@@ -662,13 +667,14 @@ class home {
 
         return [
             'id' => (int) $item->id,
-            'type' => $item->type === 'urgent' ? 'notice' : $item->type,
+            'type' => $item->type === 'urgent' ? 'notice' : ($item->type === 'album' ? 'media' : $item->type),
             'mine' => (int) ($item->createdby ?? 0) === $userid,
             'title' => $title,
             'thumb' => $thumb,
-            'kind' => get_string('kind_' . $kind, $c) . ($thumb['video'] ? ' · ' . $thumb['video'] : ''),
-            'kindicon' => icons::svg(['photo' => 'photo', 'video' => 'video', 'notice' => 'notice', 'event' => 'event',
-                'ticker' => 'ticker', 'agenda' => 'agenda', 'urgent' => 'urgent'][$kind]),
+            'kind' => get_string('kind_' . $kind, $c) . ($thumb['video'] ? ' · ' . $thumb['video'] : '') .
+                ($photos ? ' · ' . get_string('kind_album_photos', $c, $photos) : ''),
+            'kindicon' => icons::svg(['photo' => 'photo', 'video' => 'video', 'album' => 'photo', 'notice' => 'notice',
+                'event' => 'event', 'ticker' => 'ticker', 'agenda' => 'agenda', 'urgent' => 'urgent'][$kind]),
             'meta' => $meta,
             'when' => $when['when'],
             'whensmall' => $when['small'],
@@ -692,7 +698,8 @@ class home {
     protected static function thumb(\stdClass $item, array $data): array {
         $out = ['type' => $item->type, 'image' => '', 'vertical' => false, 'video' => '', 'important' => false,
             'stage' => 0, 'day' => '', 'num' => '', 'agenda' => []];
-        if ($item->type === 'media') {
+        if ($item->type === 'media' || $item->type === 'album') {
+            $out['type'] = 'media';
             $media = files::first(files::MEDIA, (int) $item->id);
             $poster = files::first(files::POSTER, (int) $item->id);
             $image = $poster ?: ($media && $media->is_valid_image() ? $media : null);

@@ -171,7 +171,7 @@ length unless it has a duration.
 
 | `type` | Zone | Fields |
 |---|---|---|
-| `image` | `main` | `media`, `fit` (`cover`, `contain` or `blur`), `focus` (`[x, y]` from 0 to 1, for `cover`), `caption`, `web` (optional: its web, shown on a showcase with a QR) |
+| `image` | `main` | `media`, `fit` (`cover`, `contain` or `blur`), `focus` (`[x, y]` from 0 to 1, for `cover`), `caption`, `web` (optional: its web, shown on a showcase with a QR), `album` (optional, `{id, name, headline, subtitle, web}`: the album it belongs to; from three photos the player shows them in a third, from four on a wall, and among the pictures the album takes the turn of one thing) |
 | `video` | `main` | `media`, `poster` and `backdrop` (still images), `fit`, `caption`, `web` |
 | `notice` | `side` | `title`, `body` (one short line), `tone` (`normal` or `important`) |
 | `event` | `side` | `title`, `detail` (who or where, one line), `start` and `end` (`"2026-11-02T10:00"`), `allday`, `color` (1 to 6, optional: the centre's category), `holiday` (optional). A title «3º ESO - Acampada» reads as «Acampada» with «3º ESO» under it |

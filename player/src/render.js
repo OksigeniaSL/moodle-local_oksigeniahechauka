@@ -8,9 +8,14 @@ import {buildWeatherThird} from './today.js';
 import {buildLead, buildRest, fitHeadline, leadsOf, linesOf, paginateRest, showRestPage, turnFixed, weekHeadline} from './lead.js';
 import {qrPath, shortWeb} from './qr.js';
 import {even} from './balance.js';
+import {buildAgenda, startAgenda} from './agendaview.js';
+import {buildCarousel, buildWall, buildWallBand, startCarousel, startWall, wallCount} from './photos.js';
 import {buildWeek, fitWeek} from './weekview.js';
 
 const CAPTION_MS = 2800;
+
+/** The compositions that are made anew each time, never only their pictures changed. */
+const NEW_EACH = {'solo-hoy': true, semana: true, titular: true, agenda: true, muro: true, 'fotos-tercio': true};
 
 /** The compositions over the whole screen, in their own layer. */
 const FULL = {'foto-completa': true, 'escaparate': true};
@@ -147,6 +152,7 @@ export class Screen {
         this.frame.classList.toggle('hk-horizontal', this.horizontal);
         this.frame.classList.toggle('hk-vertical', !this.horizontal);
         this.frame.classList.toggle('hk-quieto', !!scr.still);
+        this.glass = !!scr.glass;
         // From where it is read, and behind glass: every size of the art direction's 0.7.0 comes from these.
         this.distance = [3, 5, 8].indexOf(scr.distance) !== -1 ? scr.distance : 3;
         this.frame.setAttribute('data-distancia', String(this.distance));
@@ -447,6 +453,11 @@ export class Screen {
 
     // Empties the full-screen layer; its header stops getting the clock.
     clearFull() {
+        if (this.posterStop) {
+            this.posterStop();
+            this.posterStop = null;
+        }
+        this.full.removeAttribute('data-muro');
         this.stopSlides(this.full);
         clear(this.full);
         this.headers = this.headers.filter(function (p) {
@@ -520,6 +531,26 @@ export class Screen {
             c.appendChild(this.typographic(extra || {type: 'frase', text: ''}, today));
             return c;
         }
+        if (comp === 'agenda') {
+            buildAgenda(c, extra.data, this.agendaWords());
+            return c;
+        }
+        if (comp === 'muro') {
+            c.appendChild(buildWall(wallCount(extra.albumData, this.distance)));
+            c.appendChild(buildWallBand(extra.albumData));
+            c.hkAlbum = extra.albumData;
+            return c;
+        }
+        if (comp === 'fotos-tercio') {
+            const p = nextLead();
+            if (p) {
+                c.appendChild(buildLead(p, today, l));
+            } else {
+                withRest(null);
+            }
+            c.appendChild(buildCarousel(extra.albumData));
+            return c;
+        }
         if (comp === 'dos-verticales') {
             const pair = el('div', 'hk-pareja');
             pair.setAttribute('data-forma', shapeOf(items[0]) || '2x3');
@@ -562,6 +593,32 @@ export class Screen {
             notices: l.notices || s.notices || '',
             upcoming: l.upcoming || s.upcoming || '',
         };
+    }
+
+    /** The words of the agenda. */
+    agendaWords() {
+        const s = this.s;
+        return {months: s.months, letters: s.letters, date_format: s.date_format, agenda_in: s.agenda_in,
+            agenda_more: s.agenda_more, agenda_nomore: s.agenda_nomore, agenda_quiet_title: s.agenda_quiet_title,
+            agenda_quiet: s.agenda_quiet};
+    }
+
+    /** What moves by itself in a layer, once in the page and with its letters: it says how long the slide lasts. */
+    startMoving(c) {
+        const comp = c.getAttribute('data-composicion');
+        if (comp === 'agenda') {
+            c.hkSeconds = startAgenda(c, {distance: this.distance, glass: !!this.glass,
+                still: this.frame.classList.contains('hk-quieto') ||
+                    !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches)});
+        } else if (comp === 'fotos-tercio') {
+            const self = this;
+            c.hkSeconds = startCarousel(c, function () {
+                self.turn++;
+                showRestPage(c.hkRest, self.turn, true);
+            }, linesOf);
+        } else if (comp === 'muro') {
+            c.hkSeconds = startWall(c, c.hkAlbum, false);
+        }
     }
 
     /** A sentence or the countdown over the whole body, in the centre's colour (the art direction's «titular»). */
@@ -718,6 +775,125 @@ export class Screen {
     }
 
     /**
+     * A web's QR on its white card, with the address written short and, if the site says it, what to do.
+     *
+     * @param {string} url
+     * @param {boolean} wrap its words in one box beside it (the poster's)
+     * @returns {HTMLElement}
+     */
+    qrBox(url, wrap) {
+        const box = el('div', 'hk-qr');
+        const q = qrPath(url);
+        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.setAttribute('viewBox', '0 0 ' + q.size + ' ' + q.size);
+        svg.setAttribute('shape-rendering', 'crispEdges');
+        svg.setAttribute('aria-hidden', 'true');
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        path.setAttribute('d', q.d);
+        svg.appendChild(path);
+        box.appendChild(svg);
+        const words = wrap ? el('div', 'hk-qr-textos') : box;
+        // The short address may break after «/» or «.», never in the middle of a word.
+        const web = el('p', 'hk-qr-web');
+        shortWeb(url).split(/([/.])/).forEach(function (part) {
+            if (part) {
+                web.appendChild(document.createTextNode(part));
+            }
+            if (part === '/' || part === '.') {
+                web.appendChild(el('wbr'));
+            }
+        });
+        words.appendChild(web);
+        if (this.s.scan) {
+            words.appendChild(el('p', 'hk-qr-llamada', this.s.scan));
+        }
+        if (wrap) {
+            box.appendChild(words);
+        }
+        return box;
+    }
+
+    /**
+     * The wall of a showcase (the art direction's «mostrarMuroEscaparate»): the mosaic over the whole screen and under it
+     * a poster in the centre's colour, its headline big and its QR if the album has a web. Over the previous slide as a
+     * photo comes over another.
+     *
+     * @param {object} album
+     * @returns {number} the seconds of the slide
+     */
+    fillPoster(album) {
+        const full = this.full;
+        if (this.posterStop) {
+            this.posterStop();
+        }
+        const olds = Array.prototype.slice.call(full.childNodes);
+        const canvas = el('div', 'hk-muro-lienzo hk-entrando');
+        const logos = el('div', 'hk-muro-logo');
+        const id = this.identity || {};
+        [['hk-logo-claro', id.light], ['hk-logo-oscuro', id.dark]].forEach(function (l) {
+            if (l[1]) {
+                const im = el('img', l[0]);
+                im.src = l[1];
+                im.alt = '';
+                logos.appendChild(im);
+            }
+        });
+        canvas.appendChild(logos);
+        canvas.appendChild(buildWall(wallCount(album, this.distance)));
+        const bill = el('div', 'hk-muro-cartel');
+        const text = el('div', 'hk-muro-cartel-texto');
+        const h2 = el('h2', '', album.headline || album.name);
+        text.appendChild(h2);
+        if (album.subtitle) {
+            text.appendChild(el('p', '', album.subtitle));
+        }
+        bill.appendChild(text);
+        if (album.web) {
+            bill.appendChild(this.qrBox(album.web, true));
+        }
+        canvas.appendChild(bill);
+        full.appendChild(canvas);
+        const veil = full.querySelector('.hk-completa-velo');
+        if (!veil) {
+            full.appendChild(el('div', 'hk-completa-velo'));
+            full.appendChild(this.header());
+        } else {
+            full.appendChild(veil);
+            const head = full.querySelector('.hk-cabecera');
+            if (head) {
+                full.appendChild(head);
+            }
+        }
+        full.setAttribute('data-muro', '');
+        bill.hkSteps = 2;
+        fitHeadline(bill, h2, this.horizontal ? 2 : 3);
+        even(h2);
+        const seconds = startWall(canvas, album, true);
+        this.posterStop = canvas.hkStop;
+        void full.offsetWidth;
+        requestAnimationFrame(function () {
+            canvas.classList.remove('hk-entrando');
+            olds.forEach(function (n) {
+                if (n.classList && !n.classList.contains('hk-completa-velo') && !n.classList.contains('hk-cabecera')) {
+                    n.classList.add('hk-saliendo');
+                }
+            });
+        });
+        const self = this;
+        setTimeout(function () {
+            olds.forEach(function (n) {
+                if (n.classList && n.classList.contains('hk-saliendo') && n.parentNode) {
+                    if (n.classList.contains('hk-diapo')) {
+                        self.stopSlide(n);
+                    }
+                    n.parentNode.removeChild(n);
+                }
+            });
+        }, 2200);
+        return seconds;
+    }
+
+    /**
      * A showcase slide (the art direction's «mostrarEscaparate»): the picture or video over the whole screen, its
      * headline big and its web with a QR. From one to the next the layer is not emptied: the new picture, headline and
      * QR come in over the old ones (.hk-entrando, then the old ones .hk-saliendo) and the old ones leave when covered;
@@ -728,6 +904,13 @@ export class Screen {
      */
     fillShowcase(item) {
         const full = this.full;
+        // Back from a wall: one photo over it, as any other.
+        if (this.posterStop) {
+            this.posterStop();
+            this.posterStop = null;
+        }
+        full.removeAttribute('data-muro');
+        full.removeAttribute('data-sin-pie');
         if (!item) {
             this.clearFull();
             full.appendChild(el('div', 'hk-completa-velo'));
@@ -774,33 +957,11 @@ export class Screen {
                 pie.appendChild(el('p', '', cap.text));
             }
             put(pie);
+        } else {
+            full.setAttribute('data-sin-pie', '1');
         }
         if (item.web) {
-            const box = el('div', 'hk-qr');
-            const q = qrPath(item.web);
-            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-            svg.setAttribute('viewBox', '0 0 ' + q.size + ' ' + q.size);
-            svg.setAttribute('shape-rendering', 'crispEdges');
-            svg.setAttribute('aria-hidden', 'true');
-            const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-            path.setAttribute('d', q.d);
-            svg.appendChild(path);
-            box.appendChild(svg);
-            // The short address may break after «/» or «.», never in the middle of a word.
-            const web = el('p', 'hk-qr-web');
-            shortWeb(item.web).split(/([/.])/).forEach(function (part) {
-                if (part) {
-                    web.appendChild(document.createTextNode(part));
-                }
-                if (part === '/' || part === '.') {
-                    web.appendChild(el('wbr'));
-                }
-            });
-            box.appendChild(web);
-            if (this.s.scan) {
-                box.appendChild(el('p', 'hk-qr-llamada', this.s.scan));
-            }
-            put(box);
+            put(this.qrBox(item.web, false));
         }
         const h2 = pie && pie.querySelector('h2');
         if (h2) {
@@ -853,27 +1014,32 @@ export class Screen {
         // Each slide turns the page of the rest and the important notice in the fixed place.
         this.turn = (this.turn || 0) + 1;
         const wasFull = !!FULL[this.frame.getAttribute('data-composicion')];
-        if (FULL[comp]) {
+        const poster = comp === 'muro' && choice.extra && choice.extra.poster;
+        if (FULL[comp] || poster) {
             // Under the full screen the layer stays, still: its videos stop.
             if (this.layer) {
                 this.stopSlides(this.layer);
             }
             // Set first: the headline and the header are measured with the layer in its place.
-            this.frame.setAttribute('data-composicion', comp);
-            this.comp = comp;
-            if (comp === 'escaparate') {
+            const shown = poster ? 'escaparate' : comp;
+            this.frame.setAttribute('data-composicion', shown);
+            this.comp = shown;
+            let seconds;
+            if (poster) {
+                seconds = this.fillPoster(choice.extra.albumData);
+            } else if (comp === 'escaparate') {
                 this.fillShowcase(items[0]);
             } else {
                 this.fillFull(items[0]);
             }
             this.fitHeaders();
-            return;
+            return seconds;
         }
         this.fitHeaders();
         const shapes = items.map(shapeOf).join(',');
         const todayKey = JSON.stringify(today);
-        if (this.layer && this.comp === comp && this.shapes === shapes && comp !== 'solo-hoy' && comp !== 'semana' &&
-                comp !== 'titular' && !wasFull && todayKey === this.todayKey) {
+        if (this.layer && this.comp === comp && this.shapes === shapes && !NEW_EACH[comp] && !wasFull &&
+                todayKey === this.todayKey) {
             const slots = this.layer.querySelectorAll('.hk-medio');
             for (let i = 0; i < slots.length; i++) {
                 const slot = slots[i];
@@ -909,6 +1075,11 @@ export class Screen {
             fitWeek(layer.hkWeek, this.horizontal);
         }
         this.adjustLayer(layer);
+        // What moves, measured with its letters.
+        const fontsComing = document.fonts && document.fonts.status === 'loading';
+        if (!fontsComing) {
+            this.startMoving(layer);
+        }
         // Measured while the screens' letters were still arriving: once they are here (wider, as a rule), «Today» and
         // the week are measured again, so no title ends up in three lines.
         if (document.fonts && document.fonts.status === 'loading') {
@@ -920,6 +1091,7 @@ export class Screen {
                         fitWeek(layer.hkWeek, self.horizontal);
                     }
                     self.adjustLayer(layer);
+                    self.startMoving(layer);
                 }
             });
         }
@@ -943,10 +1115,14 @@ export class Screen {
         this.shapes = shapes;
         this.layer = layer;
         this.todayKey = todayKey;
+        return layer.hkSeconds;
     }
 
     leave(layer) {
         layer.classList.add('hk-fuera');
+        if (layer.hkStop) {
+            layer.hkStop();
+        }
         const self = this;
         setTimeout(function () {
             self.stopSlides(layer);
@@ -1026,7 +1202,7 @@ export class Screen {
         const track = this.tickerTrack;
         const out = [];
         // Measured with the counter in place.
-        this.tickerCount.textContent = '8/8';
+        this.tickerCount.textContent = '88/88';
         const node = function (t) {
             const p = el('p', 'hk-frase');
             p.appendChild(el('span', '', t));

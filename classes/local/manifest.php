@@ -201,6 +201,10 @@ class manifest {
                 $items = array_merge($items, agendas::contract($record, $now));
                 continue;
             }
+            if ($record->type === 'album') {
+                $items = array_merge($items, items::album_items($record));
+                continue;
+            }
             if ($record->type === 'urgent' && !items::urgent_on($record, $now)) {
                 continue;
             }

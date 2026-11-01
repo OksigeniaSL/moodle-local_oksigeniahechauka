@@ -263,9 +263,25 @@ class compose {
             }
         }
 
+        // The photos of an album.
+        $photos = [];
+        if ($type === 'album' && $item) {
+            foreach (items::album_files((int) $item->id) as $photo) {
+                $photos[] = ['id' => (int) $photo->get_id(), 'name' => $photo->get_filename(),
+                    'thumb' => \moodle_url::make_pluginfile_url(
+                        $photo->get_contextid(),
+                        $c,
+                        $photo->get_filearea(),
+                        $item->id,
+                        '/',
+                        $photo->get_filename()
+                    )->out(false)];
+            }
+        }
+
         $types = [];
         foreach (
-            ['notice' => 'notice', 'media' => 'photo', 'event' => 'event', 'ticker' => 'ticker',
+            ['notice' => 'notice', 'media' => 'photo', 'album' => 'photo', 'event' => 'event', 'ticker' => 'ticker',
             'agenda' => 'agenda'] as $t => $icon
         ) {
             if ($t === 'agenda' && !access::can('publishall')) {
@@ -301,6 +317,9 @@ class compose {
             'hascategories' => count($stages) > 1,
             'centre' => access::can('managescreens') ? (new \moodle_url('/local/oksigeniahechauka/centre.php'))->out(false) : '',
             'file' => $file,
+            'photos' => $photos,
+            'hasphotos' => (bool) $photos,
+            'albummax' => items::ALBUM_MAX,
             'maxbytes' => display_size(get_max_upload_file_size()),
             'shortcuts' => $shortcuts,
             'datesopen' => $when === 'dates',
@@ -340,6 +359,9 @@ class compose {
                 'members' => (object) $members,
                 'preview' => (new \moodle_url('/local/oksigeniahechauka/preview.php', ['frame' => 1]))->out(false),
                 'file' => $file,
+            'photos' => $photos,
+            'hasphotos' => (bool) $photos,
+            'albummax' => items::ALBUM_MAX,
                 'short' => self::SHORT,
                 'strings' => self::strings(),
             ], JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP),
@@ -420,7 +442,8 @@ class compose {
      * @return array [the id saved or 0, what came in (to show again), field => error]
      */
     public static function save(?\stdClass $item, string $type, int $now): array {
-        global $DB, $USER;
+        global $CFG, $DB, $USER;
+        require_once($CFG->libdir . '/filelib.php');
         $c = self::C;
         $today = schedule::day($now);
         $in = [
@@ -457,7 +480,7 @@ class compose {
             $errors['url'] = get_string('agenda_bad_url', $c);
         }
         // The web of a picture or a video, for its QR: written as people write it («lamaresia.com») or whole.
-        if ($type === 'media' && $in['web'] !== '') {
+        if (($type === 'media' || $type === 'album') && $in['web'] !== '') {
             $web = preg_match('#^https?://#i', $in['web']) ? $in['web'] : 'https://' . $in['web'];
             if (clean_param($web, PARAM_URL) === '' || !preg_match('#^https?://[^/\s]+\.[^/\s]+#i', $web)) {
                 $errors['web'] = get_string('compose_web_bad', $c);
@@ -547,6 +570,39 @@ class compose {
                 $errors['file'] = get_string('compose_filesize', $c, display_size(get_max_upload_file_size()));
             }
         }
+        // The photos of an album: several images at once, none too large, the ones it has minus those taken out.
+        $newphotos = [];
+        $dropped = [];
+        if ($type === 'album') {
+            $dropped = array_map('intval', optional_param_array('dropphoto', [], PARAM_INT));
+            $sent = $_FILES['photos'] ?? null;
+            $count = is_array($sent['name'] ?? null) ? count($sent['name']) : 0;
+            for ($i = 0; $i < $count; $i++) {
+                if ($sent['name'][$i] === '') {
+                    continue;
+                }
+                if (!empty($sent['error'][$i]) || !is_uploaded_file($sent['tmp_name'][$i])) {
+                    $errors['file'] = get_string('compose_filefailed', $c);
+                } else if (strpos(mimeinfo('type', $sent['name'][$i]), 'image/') !== 0) {
+                    $errors['file'] = get_string('compose_album_onlyphotos', $c);
+                } else if ($sent['size'][$i] > get_max_upload_file_size()) {
+                    $errors['file'] = get_string('compose_filesize', $c, display_size(get_max_upload_file_size()));
+                } else {
+                    $newphotos[] = ['name' => $sent['name'][$i], 'tmp_name' => $sent['tmp_name'][$i]];
+                }
+            }
+            $kept = 0;
+            if ($item) {
+                foreach (items::album_files((int) $item->id) as $photo) {
+                    $kept += in_array((int) $photo->get_id(), $dropped, true) ? 0 : 1;
+                }
+            }
+            if (!isset($errors['file']) && $kept + count($newphotos) < 1) {
+                $errors['file'] = get_string('compose_album_needphotos', $c);
+            } else if ($kept + count($newphotos) > items::ALBUM_MAX) {
+                $errors['file'] = get_string('compose_album_toomany', $c, items::ALBUM_MAX);
+            }
+        }
         if ($errors) {
             return [0, $in, $errors];
         }
@@ -576,6 +632,11 @@ class compose {
         $record->everyweeks = $type !== 'agenda' && !$single && $in['every'] > 1 ? min(4, $in['every']) : 0;
         if ($type === 'notice') {
             $extra['important'] = (bool) $in['important'];
+        } else if ($type === 'album') {
+            $extra['web'] = $in['web'];
+            if ($extra['web'] === '') {
+                unset($extra['web']);
+            }
         } else if ($type === 'media') {
             $extra['caption'] = (bool) $in['caption'];
             $extra['fit'] = $extra['fit'] ?? 'cover';
@@ -620,6 +681,27 @@ class compose {
                 $DB->set_field('local_oksigeniahechauka_item', 'data', json_encode($extra), ['id' => $record->id]);
             }
             video::queue((int) $record->id);
+        }
+        if ($type === 'album') {
+            $fs = get_file_storage();
+            $context = \context_system::instance();
+            foreach (items::album_files((int) $record->id) as $photo) {
+                if (in_array((int) $photo->get_id(), $dropped, true)) {
+                    $photo->delete();
+                }
+            }
+            foreach ($newphotos as $i => $photo) {
+                $name = clean_filename($photo['name']);
+                // Two photos with one name, from two folders or two days: both stay.
+                if ($fs->file_exists($context->id, $c, files::MEDIA, $record->id, '/', $name)) {
+                    $name = time() . '-' . $i . '-' . $name;
+                }
+                $fs->create_file_from_pathname(
+                    ['contextid' => $context->id, 'component' => $c, 'filearea' => files::MEDIA,
+                    'itemid' => $record->id, 'filepath' => '/', 'filename' => $name],
+                    $photo['tmp_name']
+                );
+            }
         }
         items::set_targets((int) $record->id, $groups, $screens);
         return [(int) $record->id, $in, []];

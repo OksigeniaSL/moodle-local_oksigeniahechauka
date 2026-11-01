@@ -67,6 +67,13 @@ class player_page {
             'daysfor' => get_string('label_daysfor', $c),
             'scan' => get_string('label_scan', $c),
             'thisweek' => get_string('label_thisweek', $c),
+            'letters' => explode(',', get_string('days_letters', $c)),
+            'until_tomorrow' => get_string('agenda_until_tomorrow', $c),
+            'agenda_in' => get_string('agenda_in', $c),
+            'agenda_more' => get_string('agenda_more', $c),
+            'agenda_nomore' => get_string('agenda_nomore', $c),
+            'agenda_quiet_title' => get_string('agenda_quiet_title', $c),
+            'agenda_quiet' => get_string('agenda_quiet', $c),
         ];
     }
 
@@ -149,7 +156,7 @@ class player_page {
         $sheets = '';
         foreach (
             ['hechauka.css', 'composiciones.css', 'tiempo.css', 'semana.css', 'proximos-dias.css', 'urgente.css',
-            'distancia.css', 'jerarquia.css', 'tercios.css', 'cinta.css', 'usos.css'] as $file
+            'distancia.css', 'jerarquia.css', 'tercios.css', 'cinta.css', 'usos.css', 'agenda.css', 'fotos.css'] as $file
         ) {
             $sheets .= '<link rel="stylesheet" href="' . $url($file) . '">';
         }

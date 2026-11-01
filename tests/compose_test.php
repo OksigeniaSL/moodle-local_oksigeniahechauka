@@ -148,4 +148,35 @@ final class compose_test extends \advanced_testcase {
         $this->assertFalse(items::copyable((object) ['type' => 'agenda']));
         $this->assertFalse(items::copyable((object) ['type' => 'urgent']));
     }
+
+    /**
+     * An album reaches the screens as its photos, each saying which album it belongs to, with its name, line and web.
+     */
+    public function test_album_reaches_the_screens(): void {
+        global $DB;
+        $this->resetAfterTest();
+        $id = (int) $DB->insert_record('local_oksigeniahechauka_item', (object) ['type' => 'album', 'title' => 'El huerto',
+            'body' => 'Fotos del año pasado', 'data' => json_encode(['web' => 'https://example.org/huerto']), 'duration' => 0,
+            'sortorder' => 1, 'visible' => 1, 'targetall' => 1, 'everyweeks' => 0, 'createdby' => 2, 'usermodified' => 2,
+            'timecreated' => 1, 'timemodified' => 1]);
+        $fs = get_file_storage();
+        $png = base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==');
+        foreach (['uno.png', 'dos.png'] as $name) {
+            $fs->create_file_from_string(['contextid' => \context_system::instance()->id,
+                'component' => 'local_oksigeniahechauka', 'filearea' => 'media', 'itemid' => $id, 'filepath' => '/',
+                'filename' => $name], $png);
+        }
+        $item = $DB->get_record('local_oksigeniahechauka_item', ['id' => $id]);
+        $photos = items::album_items($item);
+        $this->assertCount(2, $photos);
+        $this->assertSame('image', $photos[0]['type']);
+        $this->assertSame('main', $photos[0]['zone']);
+        $this->assertNotSame($photos[0]['id'], $photos[1]['id']);
+        $this->assertSame(['id' => 'a' . $id, 'name' => 'El huerto', 'headline' => 'El huerto',
+            'subtitle' => 'Fotos del año pasado', 'web' => 'https://example.org/huerto'], $photos[0]['album']);
+        $this->assertTrue(items::copyable($item));
+        // A copy brings its photos.
+        $copy = $DB->get_record('local_oksigeniahechauka_item', ['id' => items::duplicate($item, 2, time())]);
+        $this->assertCount(2, items::album_files((int) $copy->id));
+    }
 }

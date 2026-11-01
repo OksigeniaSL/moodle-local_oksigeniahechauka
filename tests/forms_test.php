@@ -85,7 +85,7 @@ final class forms_test extends \advanced_testcase {
         $this->assertStringContainsString('hkp-wall', $html);
         $this->assertStringContainsString('hkp-urgent-on', $html);
         $this->assertStringContainsString('hkp-urgent-dialog', $html);
-        foreach (['notice', 'media', 'event', 'ticker', 'agenda'] as $type) {
+        foreach (['notice', 'media', 'album', 'event', 'ticker', 'agenda'] as $type) {
             $this->assertStringContainsString('hkp-compose', $render('compose', compose::context(null, $type, $now)), $type);
         }
         $this->assertStringContainsString('Fotos de grupo', $render('compose', compose::context($item, 'notice', $now)));

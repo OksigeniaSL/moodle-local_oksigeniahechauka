@@ -77,6 +77,20 @@
             <div class="hkp-switch form-switch form-check"><input class="form-check-input" type="checkbox" role="switch" id="hkp-cap" name="caption" value="1"{{#values.caption}} checked{{/values.caption}}><div><label class="form-check-label" for="hkp-cap">{{#str}}compose_caption, local_oksigeniahechauka{{/str}}</label><p>{{#str}}compose_caption_help, local_oksigeniahechauka{{/str}}</p></div></div>
             <div class="hkp-field"><label class="form-label" for="hkp-web">{{#str}}compose_web, local_oksigeniahechauka{{/str}}</label><input class="form-control{{#errors.web}} is-invalid{{/errors.web}}" id="hkp-web" name="web" value="{{values.web}}" maxlength="200" inputmode="url" autocomplete="off" spellcheck="false" placeholder="{{#str}}compose_web_example, local_oksigeniahechauka{{/str}}"><p class="hkp-hint">{{#errors.web}}<b class="text-danger">{{errors.web}}</b> {{/errors.web}}{{#str}}compose_web_help, local_oksigeniahechauka{{/str}}</p></div>
             {{/ismedia}}
+            {{#isalbum}}
+            <legend>{{#str}}compose_album, local_oksigeniahechauka{{/str}}</legend>
+            <div class="hkp-field"><label class="form-label" for="hkp-title">{{#str}}compose_album_name, local_oksigeniahechauka{{/str}}</label><input class="form-control is-big{{#errors.title}} is-invalid{{/errors.title}}" id="hkp-title" name="title" value="{{values.title}}" maxlength="120" autocomplete="off" required>{{#errors.title}}<p class="hkp-hint"><b class="text-danger">{{errors.title}}</b></p>{{/errors.title}}</div>
+            <div class="hkp-field"><label class="form-label" for="hkp-body">{{#str}}compose_secondline, local_oksigeniahechauka{{/str}}</label><input class="form-control" id="hkp-body" name="body" value="{{values.body}}" maxlength="120" autocomplete="off"></div>
+            <label class="hkp-drop" for="hkp-photos">
+                <span class="hkp-thumb" data-type="media" aria-hidden="true"></span>
+                <div><b id="hkp-photos-name">{{#str}}compose_album_pick, local_oksigeniahechauka{{/str}}</b><span>{{#str}}compose_album_help, local_oksigeniahechauka, {{albummax}}{{/str}}</span></div>
+                <span class="btn btn-outline-secondary">{{#str}}compose_pick, local_oksigeniahechauka{{/str}}</span>
+                <input class="visually-hidden sr-only" type="file" id="hkp-photos" name="photos[]" accept="image/*" multiple>
+            </label>
+            {{#errors.file}}<p class="hkp-hint"><b class="text-danger">{{errors.file}}</b></p>{{/errors.file}}
+            <ul class="hkp-album" id="hkp-album">{{#photos}}<li><img src="{{thumb}}" alt=""><label><input type="checkbox" name="dropphoto[]" value="{{id}}"> {{#str}}compose_album_drop, local_oksigeniahechauka{{/str}}</label></li>{{/photos}}</ul>
+            <div class="hkp-field"><label class="form-label" for="hkp-web">{{#str}}compose_web, local_oksigeniahechauka{{/str}}</label><input class="form-control{{#errors.web}} is-invalid{{/errors.web}}" id="hkp-web" name="web" value="{{values.web}}" maxlength="200" inputmode="url" autocomplete="off" spellcheck="false" placeholder="{{#str}}compose_web_example, local_oksigeniahechauka{{/str}}"><p class="hkp-hint">{{#errors.web}}<b class="text-danger">{{errors.web}}</b> {{/errors.web}}{{#str}}compose_album_web_help, local_oksigeniahechauka{{/str}}</p></div>
+            {{/isalbum}}
             {{#isevent}}
             <legend>{{#str}}compose_event, local_oksigeniahechauka{{/str}}</legend>
             <div class="hkp-field"><label class="form-label" for="hkp-title">{{#str}}compose_what, local_oksigeniahechauka{{/str}}</label><input class="form-control is-big{{#errors.title}} is-invalid{{/errors.title}}" id="hkp-title" name="title" value="{{values.title}}" maxlength="120" autocomplete="off" required><p class="hkp-hint" id="hkp-len">{{#errors.title}}{{errors.title}}{{/errors.title}}</p></div>

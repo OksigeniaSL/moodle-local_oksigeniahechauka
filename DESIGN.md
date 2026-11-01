@@ -386,7 +386,7 @@ Words of the panel:
 |---|---|
 | Pantallas (the page and the link) | Pantallas informativas (outside the plugin's name), cartelería |
 | Lo que sale · En pantalla ahora · Más adelante · Ya no sale | Contenidos activos, programados, caducados |
-| Aviso · Foto o vídeo · Evento · Línea de la cinta · Agenda | Item, slide, ticker, feed, iCal (only in the help) |
+| Aviso · Foto o vídeo · Álbum · Evento · Línea de la cinta · Agenda | Item, slide, ticker, feed, iCal (only in the help) |
 | Cuándo · Dónde | Programación, destino |
 | Lleva las pantallas · Publica · Publica en todas | Gestor, editor |
 | Ficha (of a screen) | Configuración, editar dispositivo |

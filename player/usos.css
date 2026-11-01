@@ -415,3 +415,29 @@
 .hk-resto-pagina > :last-child {
     margin-bottom: 0;
 }
+/* A showcase picture without words keeps the veil of the logo and loses the one of the words, gently. */
+.hk[data-composicion="escaparate"] .hk-completa-velo {
+    background: linear-gradient(to bottom, rgba(0, 0, 0, .5), rgba(0, 0, 0, 0) 22%);
+}
+.hk-vertical[data-composicion="escaparate"] .hk-completa-velo {
+    background: linear-gradient(to bottom, rgba(0, 0, 0, .5), rgba(0, 0, 0, 0) 14%);
+}
+.hk[data-composicion="escaparate"] .hk-completa-velo::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background:
+        radial-gradient(ellipse 70% 60% at 18% 82%, rgba(0, 0, 0, .35), rgba(0, 0, 0, 0)),
+        linear-gradient(to top, rgba(0, 0, 0, .86), rgba(0, 0, 0, .66) 40%, rgba(0, 0, 0, .2) 66%, rgba(0, 0, 0, 0) 82%);
+    -webkit-transition: opacity 1.8s;
+    transition: opacity 1.8s;
+}
+.hk-vertical[data-composicion="escaparate"] .hk-completa-velo::after {
+    background: linear-gradient(to top, rgba(0, 0, 0, .9), rgba(0, 0, 0, .72) 45%, rgba(0, 0, 0, .5) 75%, rgba(0, 0, 0, .2) 90%, rgba(0, 0, 0, 0));
+}
+.hk-completa[data-sin-pie] .hk-completa-velo::after {
+    opacity: 0;
+}

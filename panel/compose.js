@@ -301,7 +301,7 @@
         };
 
         const send = function () {
-            if (!frame || !frame.contentWindow || cfg.type === 'agenda') {
+            if (!frame || !frame.contentWindow || cfg.type === 'agenda' || cfg.type === 'album') {
                 return;
             }
             const item = draft();
@@ -609,6 +609,29 @@
             });
         }
         // The file: shown at once, before it is sent.
+        // An album: the photos just chosen, seen at once among those it has.
+        const photos = q('#hkp-photos');
+        if (photos) {
+            photos.addEventListener('change', function () {
+                const list = q('#hkp-album');
+                list.querySelectorAll('[data-new]').forEach(function (n) {
+                    n.remove();
+                });
+                Array.prototype.forEach.call(photos.files, function (f) {
+                    const li = doc.createElement('li');
+                    li.setAttribute('data-new', '1');
+                    const img = doc.createElement('img');
+                    img.alt = '';
+                    img.src = URL.createObjectURL(f);
+                    li.appendChild(img);
+                    list.appendChild(li);
+                });
+                const name = q('#hkp-photos-name');
+                if (name && photos.files.length) {
+                    name.textContent = String(photos.files.length) + ' · ' + photos.files[0].name;
+                }
+            });
+        }
         const file = q('#hkp-file');
         if (file) {
             file.addEventListener('change', function () {

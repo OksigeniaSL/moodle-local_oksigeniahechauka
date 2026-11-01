@@ -29,7 +29,10 @@ namespace local_oksigeniahechauka\local;
  */
 class items {
     /** The types the panel makes. */
-    const TYPES = ['media', 'notice', 'event', 'ticker', 'agenda', 'urgent'];
+    const TYPES = ['media', 'album', 'notice', 'event', 'ticker', 'agenda', 'urgent'];
+
+    /** @var int How many photos an album can have. */
+    const ALBUM_MAX = 20;
 
     /**
      * A text for the screens: through the filters (multilang), as plain text. The player writes it with textContent,
@@ -178,6 +181,50 @@ class items {
     }
 
     /**
+     * An album as the contract says it: its photos, each a picture that says which album it belongs to, with the album's
+     * name, its line and its web. On the screens they go in turn like any picture, in a third (from three) and on a wall
+     * (from four).
+     *
+     * @param \stdClass $record
+     * @return array items of the contract
+     */
+    public static function album_items(\stdClass $record): array {
+        $data = self::data($record);
+        $name = self::plain((string) $record->title);
+        $album = array_filter(['id' => 'a' . $record->id, 'name' => $name, 'headline' => $name,
+            'subtitle' => trim(strip_tags((string) $record->body)),
+            'web' => preg_match('#^https?://#i', (string) ($data['web'] ?? '')) ? (string) $data['web'] : '']);
+        $base = ['order' => (int) $record->sortorder];
+        $when = schedule::when($record);
+        if ($when) {
+            $base['when'] = $when;
+        }
+        $out = [];
+        foreach (self::album_files((int) $record->id) as $file) {
+            $out[] = $base + ['id' => 'i' . $record->id . '-' . $file->get_id(), 'type' => 'image', 'zone' => 'main',
+                'fit' => 'cover', 'media' => files::media($file), 'album' => $album];
+        }
+        return $out;
+    }
+
+    /**
+     * The photos of an album, by the order they were added.
+     *
+     * @param int $itemid
+     * @return \stored_file[]
+     */
+    public static function album_files(int $itemid): array {
+        return array_values(get_file_storage()->get_area_files(
+            files::context()->id,
+            files::COMPONENT,
+            files::MEDIA,
+            $itemid,
+            'id',
+            false
+        ));
+    }
+
+    /**
      * Whether a screen may read the files of an item: the item is published and reaches the screen.
      *
      * @param int $itemid
@@ -255,7 +302,7 @@ class items {
      * @return bool
      */
     public static function copyable(\stdClass $item): bool {
-        return in_array($item->type, ['media', 'notice', 'event', 'ticker'], true);
+        return in_array($item->type, ['media', 'album', 'notice', 'event', 'ticker'], true);
     }
 
     /**

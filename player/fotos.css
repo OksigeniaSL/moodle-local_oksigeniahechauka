@@ -1,0 +1,476 @@
+/* Oksigenia Hechauka 0.7.x: the photos of an album, the carousel in a third and the wall (Gaudí, 1 November 2026). Goes
+ * after agenda.css and before the client's sheet. Flexbox only, margins instead of gap; only opacity and transform move.
+ *
+ *   fotos-tercio  tiempo-tercio's sibling: photos of one album changing one at a time in one third, with the album's
+ *                 name in a band under them; a lead (or the list of «Today») in the other two. On a vertical screen the
+ *                 photos on top, as with the weather. At 8 m there are no thirds: the player sends it to the wall.
+ *
+ *   <div class="hk-cuerpo hk-capa" data-composicion="fotos-tercio">
+ *     <section class="hk-lider" …>…</section>                       (or <aside class="hk-resto">…, as in jerarquia.css)
+ *     <aside class="hk-carrusel">
+ *       <div class="hk-carrusel-fotos">
+ *         <div class="hk-foto hk-visible"><img alt="" src="…" style="object-position: 50% 60%"></div>
+ *       </div>
+ *       <div class="hk-carrusel-pie"><h3>El huerto</h3>
+ *         <p class="hk-carrusel-puntos"><i class="hk-punto-actual"></i><i></i><i></i></p></div>
+ *     </aside>
+ *   </div>
+ *
+ *   muro          three to five photos of an album, each changing on its own turn, never two at once. In the body, with
+ *                 the album's name in a band (mixed use). Over the whole screen in the showcase use, with a poster
+ *                 in the centre's colour that holds the headline and the QR, so nothing is written over the photos.
+ *
+ *   <div class="hk-cuerpo hk-capa" data-composicion="muro">                                                  (mixed)
+ *     <div class="hk-muro" data-fotos="5">
+ *       <div class="hk-muro-grupo"><div class="hk-muro-celda">.hk-foto…</div></div>                          (the big one)
+ *       <div class="hk-muro-grupo"><div class="hk-muro-celda">…</div><div class="hk-muro-celda">…</div></div>
+ *       <div class="hk-muro-grupo"><div class="hk-muro-celda">…</div><div class="hk-muro-celda">…</div></div>
+ *     </div>
+ *     <div class="hk-muro-banda"><h2>El huerto, listo para la siembra</h2><p>Fotos de esta semana</p></div>
+ *   </div>
+ *
+ *   <div class="hk-completa" data-muro>                     (showcase: on .hk, data-composicion="escaparate", as ever)
+ *     <div class="hk-muro-lienzo">
+ *       <div class="hk-muro-logo"><img class="hk-logo-claro"…><img class="hk-logo-oscuro"…></div>
+ *       <div class="hk-muro" data-fotos="5">…</div>
+ *       <div class="hk-muro-cartel" data-ajuste="0">
+ *         <div class="hk-muro-cartel-texto"><h2>Campus de verano</h2><p>Abierto a todos</p></div>
+ *         <div class="hk-qr"><svg>…</svg><div class="hk-qr-textos"><p class="hk-qr-web">…</p>
+ *           <p class="hk-qr-llamada">…</p></div></div>
+ *       </div>
+ *     </div>
+ *     .hk-completa-velo · .hk-cabecera                                             (hidden while the wall is there)
+ *   </div>
+ *
+ *   The groups by number of photos: 3 [A][B C]; 4 [A][B [C D]]; 5 [A][B C][D E]. A group of a group runs the other way,
+ *   so the same markup makes the mosaic of both orientations. */
+
+/* --- A photo that dissolves in over the one before, and settles slowly --------------------------------------------- */
+.hk-foto {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    overflow: hidden;
+    opacity: 0;
+    -webkit-transition: opacity 1.8s ease;
+    transition: opacity 1.8s ease;
+}
+.hk-foto.hk-visible {
+    opacity: 1;
+}
+.hk-foto img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    -webkit-transform: scale(1.05);
+    transform: scale(1.05);
+    -webkit-transition: -webkit-transform 8s cubic-bezier(.2, .5, .3, 1);
+    transition: transform 8s cubic-bezier(.2, .5, .3, 1);
+}
+.hk-foto.hk-visible img {
+    -webkit-transform: none;
+    transform: none;
+}
+.hk-foto.hk-sin-paso,
+.hk-foto.hk-sin-paso img {
+    -webkit-transition: none;
+    transition: none;
+}
+/* Still: the dissolves stay, nothing moves. */
+.hk-quieto .hk-foto img {
+    -webkit-transform: none;
+    transform: none;
+    -webkit-transition: none;
+    transition: none;
+}
+@media (prefers-reduced-motion: reduce) {
+    .hk .hk-foto img {
+        transform: none;
+        transition: none;
+    }
+}
+
+/* --- The carousel: the third ---------------------------------------------------------------------------------- */
+.hk-horizontal .hk-cuerpo[data-composicion="fotos-tercio"] > .hk-lider,
+.hk-horizontal .hk-cuerpo[data-composicion="fotos-tercio"] > .hk-resto {
+    flex: 2 1 0px;
+    margin-left: 0;
+}
+.hk-horizontal .hk-cuerpo[data-composicion="fotos-tercio"] > .hk-carrusel {
+    flex: 1 1 0px;
+    margin-left: var(--hk-hueco);
+}
+.hk-vertical .hk-cuerpo[data-composicion="fotos-tercio"] > .hk-carrusel {
+    order: -1;
+    flex: 1 1 0px;
+    margin-bottom: var(--hk-hueco);
+}
+.hk.hk-vertical .hk-cuerpo[data-composicion="fotos-tercio"] > .hk-lider,
+.hk.hk-vertical .hk-cuerpo[data-composicion="fotos-tercio"] > .hk-resto {
+    flex: 2 1 0px;
+    height: auto;
+    margin-top: 0;
+}
+.hk-carrusel {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+    border-radius: 2.4rem;
+    background: var(--hk-superficie);
+    box-shadow: 0 .2rem .8rem rgba(0, 0, 0, .06);
+}
+.hk-carrusel-fotos {
+    position: relative;
+    flex: 1 1 0px;
+    min-height: 0;
+    overflow: hidden;
+}
+.hk-carrusel-pie {                       /* the band of tiempo-tercio, with its accent edge */
+    position: relative;
+    display: flex;
+    flex: none;
+    align-items: center;
+    padding: 1.8rem 3.2rem 2.2rem 4rem;
+}
+.hk-carrusel-pie::before {
+    content: "";
+    position: absolute;
+    top: 1.8rem;
+    bottom: 2rem;
+    left: 0;
+    width: 1rem;
+    border-radius: 0 1rem 1rem 0;
+    background: var(--hk-acento);
+}
+.hk .hk-carrusel-pie h3 {
+    flex: 1 1 0px;
+    min-width: 0;
+    font-size: var(--hk-t-lista);
+    font-weight: 800;
+    line-height: 1.08;
+}
+.hk .hk-carrusel-pie[data-ajuste="1"] h3 {
+    font-size: var(--hk-t-min);
+}
+.hk .hk-carrusel-puntos {
+    display: flex;
+    flex: none;
+    margin-left: 2rem;
+}
+.hk-carrusel-puntos i {
+    width: 1.4rem;
+    height: 1.4rem;
+    margin-left: .8rem;
+    border-radius: 50%;
+    background: var(--hk-linea);
+    -webkit-transition: background-color .8s ease;
+    transition: background-color .8s ease;
+}
+.hk-carrusel-puntos i.hk-punto-actual {
+    background: var(--hk-acento);
+}
+/* From 8 m there are no thirds. If it still comes (the player sends it to the wall): the photos alone, over the body. */
+.hk[data-distancia="8"] .hk-cuerpo[data-composicion="fotos-tercio"] > .hk-lider {
+    display: none;
+}
+.hk.hk[data-distancia="8"] .hk-cuerpo[data-composicion="fotos-tercio"] > .hk-carrusel {
+    flex: 1 1 auto;
+    margin: 0;
+}
+.hk .hk-cuerpo > .hk-carrusel:only-child {
+    flex: 1 1 auto;
+    margin: 0;
+}
+
+/* --- The wall: a mosaic of three to five ------------------------------------------------------------------------ */
+.hk-cuerpo[data-composicion="muro"] {
+    flex-direction: column;
+    --hk-muro-hueco: var(--hk-hueco);
+}
+.hk-muro {
+    display: flex;
+    flex: 1 1 0px;
+    min-width: 0;
+    min-height: 0;
+}
+.hk-muro-grupo {
+    display: flex;
+    flex: 1 1 0px;
+    min-width: 0;
+    min-height: 0;
+}
+.hk-muro-celda {
+    position: relative;
+    flex: 1 1 0px;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+    border-radius: 2.4rem;
+    background: var(--hk-superficie);
+}
+.hk-horizontal .hk-muro {
+    flex-direction: row;
+}
+.hk-horizontal .hk-muro-grupo {
+    flex-direction: column;
+}
+.hk-horizontal .hk-muro-grupo .hk-muro-grupo {
+    flex-direction: row;
+}
+.hk-vertical .hk-muro {
+    flex-direction: column;
+}
+.hk-vertical .hk-muro-grupo {
+    flex-direction: row;
+}
+.hk-vertical .hk-muro-grupo .hk-muro-grupo {
+    flex-direction: column;
+}
+/* The gutters: on whatever axis each level runs. */
+.hk-horizontal .hk-muro > * + *,
+.hk-vertical .hk-muro-grupo > * + *,
+.hk-horizontal .hk-muro-grupo .hk-muro-grupo > * + * {
+    margin-top: 0;
+    margin-left: var(--hk-muro-hueco);
+}
+.hk-vertical .hk-muro > * + *,
+.hk-horizontal .hk-muro-grupo > * + *,
+.hk-vertical .hk-muro-grupo .hk-muro-grupo > * + * {
+    margin-top: var(--hk-muro-hueco);
+    margin-left: 0;
+}
+/* The big one, by how many there are. */
+.hk-muro[data-fotos="3"] > .hk-muro-grupo:first-child {
+    flex-grow: 1.55;
+}
+.hk-muro[data-fotos="4"] > .hk-muro-grupo:first-child {
+    flex-grow: 1.15;
+}
+.hk-muro[data-fotos="5"] > .hk-muro-grupo:first-child {
+    flex-grow: 1.4;
+}
+/* The album's name, in the band of tiempo-tercio. */
+.hk .hk-muro-banda {
+    position: relative;
+    display: flex;
+    flex: none;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-top: var(--hk-hueco);
+    padding: 1.6rem 4rem 2rem 4.8rem;
+    border-radius: 2.4rem;
+    background: var(--hk-superficie);
+    box-shadow: 0 .2rem .8rem rgba(0, 0, 0, .06);
+}
+.hk-muro-banda::before {
+    content: "";
+    position: absolute;
+    top: 1.8rem;
+    bottom: 2rem;
+    left: 0;
+    width: 1rem;
+    border-radius: 0 1rem 1rem 0;
+    background: var(--hk-acento);
+}
+.hk .hk-muro-banda h2 {
+    margin-right: 3.2rem;
+    font-family: var(--hk-letra-titulos);
+    font-size: var(--hk-t-entrada);
+    font-weight: 800;
+    line-height: 1.08;
+}
+.hk .hk-muro-banda[data-ajuste="1"] h2 {
+    font-size: var(--hk-t-lista);
+}
+.hk .hk-muro-banda p {
+    color: var(--hk-texto-suave);
+    font-size: var(--hk-t-min);
+    font-weight: 700;
+    line-height: 1.12;
+}
+
+/* --- The wall of a showcase: the whole screen, thin seams, and a poster instead of letters over the photos ------- */
+.hk-muro-lienzo {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 0;                          /* its own stacking: the QR's z-index stays inside, under the next photo */
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    background: var(--hk-fondo);
+    --hk-muro-hueco: .6rem;
+    -webkit-transition: opacity 1.8s ease;
+    transition: opacity 1.8s ease;
+}
+.hk-muro-lienzo .hk-muro-celda {
+    border-radius: 0;
+}
+.hk .hk-completa > .hk-muro-lienzo.hk-entrando {
+    -webkit-transform: none;
+    transform: none;
+}
+.hk .hk-completa > .hk-muro-lienzo.hk-saliendo {
+    opacity: 1 !important;               /* as with a photo: it stays under the new one until it is covered */
+}
+.hk[data-composicion="escaparate"] .hk-completa-velo {
+    -webkit-transition: opacity 1.2s ease;
+    transition: opacity 1.2s ease;
+}
+.hk[data-composicion="escaparate"] .hk-completa[data-muro] .hk-completa-velo {
+    opacity: 0;
+}
+/* The logo: on a tab of the surface, cut from the corner of the first photo, so any logo reads over any photo without a
+   veil. It belongs to the wall and comes with it; the layer's own header gives way meanwhile. */
+.hk-muro-logo {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    padding: 2.4rem 3.6rem 2.4rem 3.2rem;
+    border-radius: 0 0 2.4rem 0;
+    background: var(--hk-superficie);
+    font-size: 0;
+}
+.hk-completa .hk-muro-logo img {
+    height: 6.4rem;
+}
+.hk-completa .hk-muro-logo .hk-logo-claro {
+    display: block;
+}
+.hk-completa .hk-muro-logo .hk-logo-oscuro,
+[data-tema="oscuro"] .hk-completa .hk-muro-logo .hk-logo-claro {
+    display: none;
+}
+[data-tema="oscuro"] .hk-completa .hk-muro-logo .hk-logo-oscuro {
+    display: block;
+}
+.hk[data-composicion="escaparate"] .hk-completa .hk-cabecera {
+    -webkit-transition: opacity 1.2s ease;
+    transition: opacity 1.2s ease;
+}
+.hk[data-composicion="escaparate"] .hk-completa[data-muro] .hk-cabecera {
+    opacity: 0;
+}
+.hk .hk-completa .hk-muro-cartel {
+    position: relative;
+    display: flex;
+    flex: none;
+    align-items: center;
+    padding: 2.8rem 3.2rem 2.8rem 7.2rem;
+    background: var(--hk-primario);
+    color: var(--hk-sobre-primario);
+}
+.hk-muro-cartel-texto {
+    flex: 1 1 0px;
+    min-width: 0;
+}
+.hk .hk-muro-cartel h2 {
+    font-family: var(--hk-letra-titulos);
+    font-size: var(--hk-t-titular);
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -.02em;
+}
+.hk .hk-muro-cartel[data-ajuste="1"] h2 {
+    font-size: calc(var(--hk-t-titular) * .88);
+}
+.hk .hk-muro-cartel[data-ajuste="2"] h2 {
+    font-size: calc(var(--hk-t-titular) * .76);
+}
+.hk .hk-muro-cartel h2::before {         /* the short bar of the showcase */
+    content: "";
+    display: block;
+    width: 9rem;
+    height: 1.2rem;
+    margin-bottom: 2.4rem;
+    border-radius: .6rem;
+    background: var(--hk-acento);
+}
+.hk .hk-muro-cartel-texto p {
+    margin-top: 1.6rem;
+    font-size: var(--hk-t-entrada);
+    font-weight: 700;
+    line-height: 1.1;
+}
+/* From 8 m, the headline needs the room: no second line, and the QR's words under it. */
+.hk[data-distancia="8"] .hk-muro-cartel-texto p,
+.hk-vertical[data-distancia="5"] .hk-muro-cartel-texto p {
+    display: none;
+}
+.hk[data-distancia="8"] .hk-completa .hk-muro-cartel {
+    padding-top: 1.8rem;
+    padding-bottom: 3.2rem;
+}
+.hk-completa .hk-muro-cartel .hk-qr {    /* the showcase's QR, in the poster: the same card, its words at its side */
+    position: relative;
+    top: auto;
+    right: auto;
+    bottom: auto;
+    display: flex;
+    flex: none;
+    align-items: center;
+    width: auto;
+    margin-left: 3.2rem;
+    padding: 2.4rem;
+    border-radius: 2.6rem;
+    box-shadow: none;
+    text-align: left;
+}
+.hk-completa .hk-muro-cartel .hk-qr svg {
+    flex: none;
+    width: 30rem;
+    height: 30rem;
+}
+.hk-qr-textos {
+    width: 27rem;
+    margin-left: 2.4rem;
+}
+.hk-completa .hk-qr-textos .hk-qr-web {
+    margin-top: 0;
+}
+.hk-completa .hk-qr-textos .hk-qr-llamada {
+    margin-top: 1.2rem;
+}
+.hk-horizontal[data-distancia="8"] .hk-completa .hk-muro-cartel .hk-qr {
+    flex-direction: column;
+    max-width: 46rem;
+    padding: 2rem 2.4rem 1.6rem;
+    text-align: center;
+}
+.hk-horizontal[data-distancia="8"] .hk-completa .hk-muro-cartel .hk-qr svg {
+    width: 28rem;
+    height: 28rem;
+}
+.hk-horizontal[data-distancia="8"] .hk-qr-textos {
+    width: auto;
+    margin: 1.4rem 0 0;
+}
+.hk-horizontal[data-distancia="8"] .hk-completa .hk-qr-textos .hk-qr-llamada {
+    margin-top: .4rem;
+}
+.hk-vertical .hk-completa .hk-muro-cartel {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 4rem 6.4rem 4.8rem;
+}
+.hk-vertical .hk-completa .hk-muro-cartel .hk-qr {
+    margin: 3.2rem 0 0;
+}
+.hk-vertical .hk-completa .hk-muro-cartel .hk-qr svg {
+    width: 32rem;
+    height: 32rem;
+}
+.hk-vertical .hk-qr-textos {
+    flex: 1 1 0px;
+    width: auto;
+    margin-left: 3.2rem;
+}
