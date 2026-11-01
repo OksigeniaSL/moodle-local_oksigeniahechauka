@@ -25,6 +25,7 @@
 require(__DIR__ . '/../../config.php');
 
 use local_oksigeniahechauka\local\access;
+use local_oksigeniahechauka\local\screens;
 use local_oksigeniahechauka\local\sheet;
 
 $id = required_param('id', PARAM_INT);
@@ -41,6 +42,11 @@ $PAGE->add_body_class('hkp-page');
 $PAGE->set_title(format_string($screen->name));
 $PAGE->set_heading('');
 $PAGE->set_primary_active_tab('local_oksigeniahechauka');
+
+if (optional_param('action', '', PARAM_ALPHA) === 'surprise' && confirm_sesskey()) {
+    screens::ask($id, 'surprise');
+    redirect($url, get_string('sheet_surprise_asked', $c), null, \core\output\notification::NOTIFY_SUCCESS);
+}
 
 $errors = [];
 if (data_submitted() && confirm_sesskey()) {

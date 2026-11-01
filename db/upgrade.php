@@ -174,5 +174,15 @@ function xmldb_local_oksigeniahechauka_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026110205, 'local', 'oksigeniahechauka');
     }
 
+    if ($oldversion < 2026110207) {
+        // Surprises: the centre turns them on; each screen can do without them.
+        $table = new xmldb_table('local_oksigeniahechauka_screen');
+        $field = new xmldb_field('surprises', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '1', 'glass');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        upgrade_plugin_savepoint(true, 2026110207, 'local', 'oksigeniahechauka');
+    }
+
     return true;
 }

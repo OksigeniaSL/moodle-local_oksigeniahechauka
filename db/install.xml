@@ -23,6 +23,7 @@
         <FIELD NAME="useplan" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Another use at some hours, as JSON: [{days, from, until, use}]"/>
         <FIELD NAME="distance" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="3" SEQUENCE="false" COMMENT="From where it is read, in metres: 3, 5 or 8"/>
         <FIELD NAME="glass" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Whether it is behind glass"/>
+        <FIELD NAME="surprises" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="Whether surprises come out on it, when the centre has them on"/>
         <FIELD NAME="sortorder" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>

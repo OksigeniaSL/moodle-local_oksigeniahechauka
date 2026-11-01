@@ -177,6 +177,7 @@ class centre {
             'max' => categories::MAX,
             'logos' => $logos,
             'dayend' => sources::day_end(),
+            'surprises' => surprises::centre_context($config),
             'frame' => (new \moodle_url('/local/oksigeniahechauka/preview.php', ['frame' => 1, 'screen' => $first]))->out(false),
             'placename' => $place['name'] ?? '',
             'admin' => has_capability('moodle/site:config', \context_system::instance()) ?
@@ -254,6 +255,7 @@ class centre {
             }
         }
         categories::save($list);
+        surprises::save_centre();
         $fs = get_file_storage();
         $context = \context_system::instance();
         foreach ([files::LOGO => 'logo', files::LOGODARK => 'logodark'] as $area => $setting) {

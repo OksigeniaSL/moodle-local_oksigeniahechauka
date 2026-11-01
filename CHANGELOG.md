@@ -1,7 +1,13 @@
 # Changelog
 
-## Unreleased
+## 0.7.2 (2026-11-01)
 
+- **Surprises**: now and then a character crosses the screen, stops, looks at whoever is passing, makes a gesture and runs
+  away, on a layer of its own over whatever is there; slides go on changing under it, and only an urgent notice takes it
+  off. The first one is the little worm, in 3D from the art direction, which either takes fright or sticks out its tongue.
+  Off by default: «Tu centro» turns them on, with how often (every 20 minutes, every hour or every three hours, never at a
+  fixed beat) and who comes out, and «See it on the screen» plays it in the preview. Each screen can leave them out in its
+  sheet, which also has «Show one now». New field `surprises` in the manifest and command `surprise` in the heartbeat.
 - A long word in a headline on a showcase or a poster fits the screen: the letter goes down in steps and, if a word is
   still too long, as far as it takes.
 

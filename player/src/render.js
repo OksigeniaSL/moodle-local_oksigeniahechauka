@@ -142,6 +142,21 @@ export class Screen {
         return h;
     }
 
+    /** A screen that keeps still: nothing crosses it. */
+    keepsStill() {
+        return this.frame.classList.contains('hk-quieto') ||
+            !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    }
+
+    /** Where the ticker starts, when it is in sight: something to walk on. */
+    tickerTop() {
+        if (FULL[this.frame.getAttribute('data-composicion')]) {
+            return null;
+        }
+        const box = this.ticker.getBoundingClientRect();
+        return box.height > 0 && box.top < window.innerHeight ? box.top : null;
+    }
+
     /** What does not change with each slide: shape, identity, labels, weather. */
     configure(manifest) {
         const scr = manifest.screen || {};
@@ -608,8 +623,7 @@ export class Screen {
         const comp = c.getAttribute('data-composicion');
         if (comp === 'agenda') {
             c.hkSeconds = startAgenda(c, {distance: this.distance, glass: !!this.glass,
-                still: this.frame.classList.contains('hk-quieto') ||
-                    !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches)});
+                still: this.keepsStill()});
         } else if (comp === 'fotos-tercio') {
             const self = this;
             c.hkSeconds = startCarousel(c, function () {

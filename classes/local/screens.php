@@ -241,7 +241,7 @@ class screens {
      * Asks screens to do something at their next heartbeat.
      *
      * @param int $screenid a screen, or 0 for every screen
-     * @param string $command reload
+     * @param string $command reload or surprise
      * @return void
      */
     public static function ask(int $screenid, string $command): void {

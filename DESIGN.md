@@ -272,6 +272,8 @@ Biblioteca, Secretaría y Comedor.» A teacher sees only their groups, already c
 - «Para qué es» (informativa, escaparate o mixta) and «Desde dónde se lee» (de cerca, a media distancia, de lejos): three
   small cards to choose from, each saying what it means, with the same shape. Under them, «Otro uso a ciertas horas»
   (its days, its hours and the use then) and «Detrás de un cristal».
+- «Sorpresas»: the switch «Sorpresas en esta pantalla» and «Que salga una ahora», to see it on the screen itself. With the
+  surprises off in «Tu centro», only a line that says so, with the way there.
 
 ### Screens and groups
 
@@ -308,6 +310,10 @@ Biblioteca, Secretaría y Comedor.» A teacher sees only their groups, already c
   Moodle» (each linked to its course category, whose calendar events then show in its colour). Nothing in the product
   is one school's: Hechauka is installed by universities, academies and schools alike.
 - **The logo**: one for light screens and one for dark ones, each on its own background, with «Cambiar».
+- **The surprises**: off by default. A switch, «Cada cuánto» as chips (cada 20 minutos, cada hora, cada tres horas) and
+  «Quién sale», a row per character with its box, its portrait, what it does and «Verlo en la pantalla», which plays it on
+  the screen beside. A character crosses over whatever is there and does not stay, so nothing looks for a gap: it comes
+  out now and then, and only an urgent notice takes it off.
 - Beside, the screen live with these colours, this logo and this weather, in «Claro» or «Oscuro».
 - Under «Guardar»: «Lo técnico, como la preparación de los vídeos, sigue en la administración del sitio.»
 
@@ -386,7 +392,7 @@ Words of the panel:
 |---|---|
 | Pantallas (the page and the link) | Pantallas informativas (outside the plugin's name), cartelería |
 | Lo que sale · En pantalla ahora · Más adelante · Ya no sale | Contenidos activos, programados, caducados |
-| Aviso · Foto o vídeo · Álbum · Evento · Línea de la cinta · Agenda | Item, slide, ticker, feed, iCal (only in the help) |
+| Aviso · Foto o vídeo · Álbum · Evento · Línea de la cinta · Agenda · Sorpresas | Item, slide, ticker, feed, iCal (only in the help) |
 | Cuándo · Dónde | Programación, destino |
 | Lleva las pantallas · Publica · Publica en todas | Gestor, editor |
 | Ficha (of a screen) | Configuración, editar dispositivo |

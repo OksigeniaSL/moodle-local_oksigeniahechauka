@@ -36,6 +36,8 @@ pantallas. No es para sitios en producción.
   (3, 5 u 8 m, y si está tras un cristal): de ahí salen sus composiciones y el tamaño de su letra. En cada diapositiva
   manda una cosa; lo demás cede a un tercio o, de lejos, llega de una en una. Hay agenda que sube con el mes al lado, y
   álbumes de fotos que salen en un tercio o en un mosaico.
+- **Sorpresas**, si el centro quiere: de vez en cuando, un personaje en 3D cruza la pantalla, se para, mira a quien pasa, hace
+  un gesto y se va corriendo.
 - **El reproductor** es una sola página web que abre cada pantalla: un ordenador pequeño con un navegador en modo
   quiosco, una tele inteligente con un navegador de quiosco o una pantalla profesional que carga una página web.
   Guarda en el aparato lo que necesita y sigue sin red.

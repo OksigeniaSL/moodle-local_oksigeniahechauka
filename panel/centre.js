@@ -10,6 +10,19 @@
     const frame = document.getElementById('hkp-cpv');
     let mode = 'light';
 
+    const surprises = document.getElementById('hkp-surprises');
+    if (surprises) {
+        surprises.addEventListener('change', () => {
+            document.getElementById('hkp-surprises-box').hidden = !surprises.checked;
+        });
+    }
+    page.querySelectorAll('[data-surprise-atlas]').forEach((button) => {
+        button.addEventListener('click', () => {
+            frame.contentWindow.postMessage({hkSurprise: {id: button.getAttribute('data-surprise-id'),
+                atlas: button.getAttribute('data-surprise-atlas')}}, location.origin);
+        });
+    });
+
     const rgb = (hex) => [1, 3, 5].map((i) => parseInt(hex.substr(i, 2), 16));
     const luminance = (hex) => {
         const c = rgb(hex).map((v) => {

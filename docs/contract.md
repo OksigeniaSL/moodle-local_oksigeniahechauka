@@ -140,6 +140,12 @@ changed, or the manifest with its `ETag` header:
 - `screen.distance`: from where it is read, in metres: `3`, `5` or `8`. Every size of the screen comes from it. From 5 m
   there is no week; from 8 m no thirds and no ticker: «Today» comes one thing at a time and the ticker's sentences come
   as slides of their own. Without it, `3`.
+- `surprises`: now and then a character crosses the screen on a layer of its own, over whatever is there. Absent: none.
+  `every`: about how many minutes between one and the next (the player varies it, and never less than 15).
+  `characters`: `[{"id": "gusanito", "atlas": "https://…/spr.gusanito.atlas.json"}]`, one of them each time. The atlas
+  says its pages (beside it), states, frames per second, speed and shadow. Only an urgent notice takes it off; a screen
+  that is off or keeps still has none. The player keeps its files like the rest of the page, so they also come out
+  without a network.
 - `screen.glass`: true behind glass: everything a bit bigger, and no secondary grey in what has to be read.
 - `screen.sound`: whether its videos play with their sound (most screens are muted: behind glass, or in a room that
   would hear the same thing forty times an hour).
@@ -247,7 +253,7 @@ Answer:
 
 - When `manifest` differs from the etag the player holds, it fetches the manifest again.
 - `commands`: what the screen was asked to do, handed out once. `reload`: the page loads again (at its next change of
-  slide). Restart and «screenshot now» will go here too.
+  slide). `surprise`: one of its `surprises` comes out now. Restart and «screenshot now» will go here too.
 - `build`: the build of the player on the server, the same value as `build` in the boot block. A screen whose page
   came with another build reloads, at its next change of slide, to pick up the new player.
 

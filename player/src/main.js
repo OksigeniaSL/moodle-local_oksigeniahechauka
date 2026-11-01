@@ -15,10 +15,11 @@ import {Composer, draftChoice} from './compose.js';
 import {dayNumber, isDark, isLive, isPowerOn, liveItems, urgentOf, useOf, weekdayOf} from './rules.js';
 import {Screen} from './render.js';
 import {store} from './store.js';
+import {Surprises} from './surprises.js';
 import {countToday} from './today.js';
 import {weekOf} from './week.js';
 
-const VERSION = '0.7.1';
+const VERSION = '0.7.2';
 const COMING_DAYS = 7;
 const HEARTBEAT_MS = 60000;
 const REFRESH_MS = 15 * 60000;
@@ -94,6 +95,18 @@ class Player {
                 }
             },
         });
+        const screen = this.screen;
+        this.surprises = new Surprises(screen.frame, {
+            quiet: function () {
+                return screen.keepsStill();
+            },
+            floor: function () {
+                return screen.tickerTop();
+            },
+            note: function (text) {
+                self.note(text);
+            },
+        });
         if (this.mode === 'screen') {
             this.registerWorker();
             const stored = store.manifest();
@@ -111,6 +124,10 @@ class Player {
                 }
                 if (ev.data.hkDraft !== undefined) {
                     self.setDraft(ev.data.hkDraft);
+                }
+                if (ev.data.hkSurprise) {
+                    // «Tu centro»: to see what a character does before choosing it.
+                    self.surprises.askNow(ev.data.hkSurprise);
                 }
                 if (ev.data.hkTheme) {
                     // «Tu centro»: the colours being chosen, and light or dark, before they are saved.
@@ -193,11 +210,40 @@ class Player {
         }
         document.documentElement.lang = (m.screen && m.screen.lang) || this.boot.lang || 'en';
         this.screen.configure(m);
+        this.surprises.configure(m.surprises, (m.screen && m.screen.distance) || 3, Date.now());
+        if (this.mode === 'screen') {
+            this.keepSurprises(m.surprises);
+        }
         const self = this;
         this.media.sync(mediaOf(m)).then(function () {
             if (self.manifest === m) {
                 self.screen.applyTheme(m.theme || {});
             }
+        });
+    }
+
+    /** The files of the characters, kept like the rest of the page, so that they also come out without a network. */
+    keepSurprises(surprises) {
+        if (!surprises || !window.caches) {
+            return;
+        }
+        window.caches.open('hechauka-shell-1').then(function (cache) {
+            (surprises.characters || []).forEach(function (c) {
+                const base = c.atlas.slice(0, c.atlas.lastIndexOf('/') + 1);
+                cache.match(c.atlas).then(function (hit) {
+                    return hit || fetch(c.atlas).then(function (r) {
+                        return r.json();
+                    }).then(function (atlas) {
+                        return cache.addAll([c.atlas].concat(atlas.meta.pages.map(function (name) {
+                            return base + name;
+                        })));
+                    });
+                }).catch(function () {
+                    return null;
+                });
+            });
+        }).catch(function () {
+            return null;
         });
     }
 
@@ -476,13 +522,14 @@ class Player {
         this.nightly(wall);
         const on = isPowerOn(m.power, wall);
         this.screen.setPower(on);
+        const urgent = urgentOf(m.items, wall);
+        this.surprises.tick(Date.now(), on && !urgent, this.mode === 'preview');
         if (!on) {
             return;
         }
         this.screen.setDark(this.forcedTheme !== undefined ? this.forcedTheme : isDark(m.theme, wall));
         this.screen.setClock(this.clock.date());
         // An urgent notice covers everything until it is taken off; then the turns go on.
-        const urgent = urgentOf(m.items, wall);
         const was = this.urgentOn;
         this.urgentOn = !!urgent;
         this.screen.showUrgent(urgent);
@@ -532,6 +579,9 @@ class Player {
             }
             // Asked from the panel, or a new player on the server: reload at the next change of slide.
             const asked = r && r.commands && r.commands.indexOf('reload') !== -1;
+            if (r && r.commands && r.commands.indexOf('surprise') !== -1) {
+                self.surprises.askNow();
+            }
             const newer = r && r.build && self.boot.build && r.build !== self.boot.build;
             if ((asked || newer) && !self.reloadAt) {
                 self.reloadAt = Date.now();

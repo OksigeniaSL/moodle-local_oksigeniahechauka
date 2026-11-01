@@ -26,7 +26,7 @@ function isShell(url) {
         return false;
     }
     const rest = url.slice(scope.length).split('?')[0];
-    return rest === '' || rest === 'index.php' || /\.(js|css|svg|woff2?)$/.test(rest);
+    return rest === '' || rest === 'index.php' || /\.(js|css|svg|woff2?|webp|json)$/.test(rest);
 }
 
 // The copy of a request kept in the shell cache, with or without its query.

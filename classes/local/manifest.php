@@ -96,6 +96,7 @@ class manifest {
             }
         }
         $m += uses::contract($screen);
+        $m += surprises::contract($screen, $config);
         $m['categories'] = categories::contract();
         $m['items'] = self::unique(array_merge(self::own_items($screen, $now), self::source_items($config, $now)));
         $m['etag'] = self::etag($m);
