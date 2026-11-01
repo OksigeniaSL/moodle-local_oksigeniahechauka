@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- In «Tu centro», «Verlo en la vista previa» instead of «Verlo en la pantalla»: it plays in the preview, not on the real
+  screens, and the old words said otherwise.
+
 ## 0.7.4 (2026-11-01)
 
 - «Show one now» given right after turning the surprises on was lost: the order reached the screen before the manifest

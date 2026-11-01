@@ -311,8 +311,8 @@ Biblioteca, Secretaría y Comedor.» A teacher sees only their groups, already c
   is one school's: Hechauka is installed by universities, academies and schools alike.
 - **The logo**: one for light screens and one for dark ones, each on its own background, with «Cambiar».
 - **The surprises**: under the screen, with their own «Guardar», since the column of the form is long. Off by default. A switch, «Cada cuánto» as chips (cada 20 minutos, cada hora, cada tres horas) and
-  «Quién sale», a row per character with its box, its portrait, what it does and «Verlo en la pantalla», which plays it on
-  the screen beside. A character crosses over whatever is there and does not stay, so nothing looks for a gap: it comes
+  «Quién sale», a row per character with its box, its portrait, what it does and «Verlo en la vista previa», which plays it on
+  the screen above. A character crosses over whatever is there and does not stay, so nothing looks for a gap: it comes
   out now and then, and only an urgent notice takes it off.
 - Beside, the screen live with these colours, this logo and this weather, in «Claro» or «Oscuro».
 - Under «Guardar»: «Lo técnico, como la preparación de los vídeos, sigue en la administración del sitio.»
