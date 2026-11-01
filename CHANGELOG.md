@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- «Duplicar» in a content's menu: a copy with the same text, destinations and files, unpublished, open to change.
+- «Recargando…» on a screen's card until the screen takes the order, then «Recargada».
+- A menu says its own name on the screens when a day has several («Menú de hoy · D»).
+
 ## 0.7.0 (2026-11-01)
 
 The screens, read at a glance: the art direction's design of the compositions on the player.

@@ -40,7 +40,8 @@
         "reload": "https://example.com/local/oksigeniahechauka/index.php?action=reload&id=3",
         "reloadicon": "",
         "previewlabel": "Vista previa de Entrada",
-        "reloadlabel": "Recargar Entrada"
+        "reloadlabel": "Recargar Entrada",
+        "reloading": false, "id": 3
     }
 }}
 <div class="hkp-slot">
@@ -58,5 +59,5 @@
 </div>
 <div class="hkp-screen-actions">
     <a class="btn btn-sm btn-outline-secondary" href="{{preview}}" aria-label="{{previewlabel}}" title="{{previewlabel}}">{{{previewicon}}}<span class="hkp-lbl">{{#str}}preview, local_oksigeniahechauka{{/str}}</span></a>
-    {{#reload}}<a class="btn btn-sm btn-outline-secondary" href="{{reload}}" aria-label="{{reloadlabel}}" title="{{reloadlabel}}">{{{reloadicon}}}<span class="hkp-lbl">{{#str}}reload, local_oksigeniahechauka{{/str}}</span></a>{{/reload}}
+    {{#reload}}<a class="btn btn-sm btn-outline-secondary" href="{{reload}}" aria-label="{{reloadlabel}}" title="{{reloadlabel}}" data-hkp-reload="{{id}}"{{#reloading}} hidden{{/reloading}}>{{{reloadicon}}}<span class="hkp-lbl">{{#str}}reload, local_oksigeniahechauka{{/str}}</span></a><span class="hkp-reloading" role="status" data-hkp-reloading="{{id}}"{{^reloading}} hidden{{/reloading}}>{{#str}}reloading, local_oksigeniahechauka{{/str}}</span>{{/reload}}
 </div>

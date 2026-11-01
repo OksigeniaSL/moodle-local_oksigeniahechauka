@@ -25,6 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['act_down'] = 'Move down';
+$string['act_duplicate'] = 'Duplicate';
 $string['act_hide'] = 'Take off the screens';
 $string['act_show'] = 'Put it on again';
 $string['act_up'] = 'Move up';
@@ -323,6 +324,7 @@ $string['distance_5'] = 'Middle distance';
 $string['distance_5_help'] = 'About 5 m: a hall, a dining room. Bigger letters and a bit less at a time.';
 $string['distance_8'] = 'From afar';
 $string['distance_8_help'] = '8 m or more: a yard, an entrance. One thing at a time, very big, no ticker.';
+$string['duplicate_done'] = 'Copy made. Change what you want and publish it: it is not on any screen yet.';
 $string['duration'] = 'Seconds on screen';
 $string['duration_help'] = 'Empty for the default: ten seconds for a picture, the whole video for a video.';
 $string['empty_mine_text'] = 'What you add shows on the screens of {$a}, with what comes on its own.';
@@ -512,6 +514,8 @@ $string['reload_done'] = 'The screen reloads within a minute.';
 $string['reload_of'] = 'Reload {$a}';
 $string['reloadall'] = 'Reload every screen';
 $string['reloadall_done'] = 'Every screen reloads within a minute.';
+$string['reloaded'] = 'Reloaded';
+$string['reloading'] = 'Reloading…';
 $string['remove'] = 'Remove';
 $string['role_missing'] = 'The role «Publishes on the screens» is not on the site; reinstall the plugin or ask the administration.';
 $string['role_oksigeniahechauka_manager'] = 'Runs the screens';

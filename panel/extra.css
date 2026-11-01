@@ -506,3 +506,11 @@ dialog.hkp-dialog > footer {
 #hkp-plan-box {
     margin-top: .75rem;
 }
+
+/* «Recargando…» on a screen's card, in place of its button, until the screen takes the order. */
+.hkp-reloading {
+    align-self: center;
+    color: var(--hkp-muted);
+    font-size: .875rem;
+    font-weight: 600;
+}

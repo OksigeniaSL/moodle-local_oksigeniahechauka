@@ -34,14 +34,14 @@
         "minefirst": false,
         "urgent": null,
         "dialog": null,
-        "wall": {"title": "Ahora en cada pantalla", "count": 0, "screens": [], "reloadall": "", "reloadicon": "",
+        "wall": {"title": "Ahora en cada pantalla", "count": 0, "screens": [], "reloadall": "", "reloadicon": "", "reloading": "",
             "add": "", "addicon": ""},
         "content": {
             "empty": {"title": "Tus pantallas ya enseñan el menú", "text": "Llegan solos.", "add": [], "section": "Lo que sale"}
         }
     }
 }}
-<div class="hkp" id="hkp-home"{{#style}} style="{{style}}"{{/style}}>
+<div class="hkp" id="hkp-home"{{#style}} style="{{style}}"{{/style}} data-reloading="{{wall.reloading}}" data-reloaded="{{#str}}reloaded, local_oksigeniahechauka{{/str}}">
     <header class="hkp-head">
         <div class="hkp-head-title">
             <h1>{{title}}</h1>
@@ -74,6 +74,43 @@
     var root = document.getElementById('hkp-home');
     if (!root) {
         return;
+    }
+    // A screen takes the order to reload with its next signal, in under a minute: until then, «Recargando…».
+    var waiting = root.querySelectorAll('[data-hkp-reloading]:not([hidden])');
+    if (waiting.length && root.getAttribute('data-reloading')) {
+        var tries = 0;
+        var look = function() {
+            tries++;
+            fetch(root.getAttribute('data-reloading'), {credentials: 'same-origin'}).then(function(r) {
+                return r.json();
+            }).then(function(pending) {
+                var left = 0;
+                waiting.forEach(function(note) {
+                    var id = Number(note.getAttribute('data-hkp-reloading'));
+                    if (pending.indexOf(id) !== -1) {
+                        left++;
+                    } else if (!note.hasAttribute('data-done')) {
+                        note.setAttribute('data-done', '1');
+                        note.textContent = root.getAttribute('data-reloaded');
+                        setTimeout(function() {
+                            note.hidden = true;
+                            var link = root.querySelector('[data-hkp-reload="' + id + '"]');
+                            if (link) {
+                                link.hidden = false;
+                            }
+                        }, 6000);
+                    }
+                });
+                // Three minutes at most: one that does not answer shows it in its state.
+                if (left && tries < 36) {
+                    setTimeout(look, 5000);
+                }
+                return null;
+            }).catch(function() {
+                return null;
+            });
+        };
+        setTimeout(look, 4000);
     }
     var type = 'all';
     var scope = 'all';

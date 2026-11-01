@@ -104,4 +104,48 @@ final class compose_test extends \advanced_testcase {
         $this->assertArrayHasKey('title', $errors);
         $_POST = [];
     }
+
+    /**
+     * A copy keeps the content, the destinations and the files; it is unpublished and of whoever copies it. An agenda or
+     * an urgent notice is not copied.
+     */
+    public function test_duplicate(): void {
+        global $DB;
+        $this->resetAfterTest();
+        $author = (int) $this->getDataGenerator()->create_user()->id;
+        $other = (int) $this->getDataGenerator()->create_user()->id;
+        $group = (int) $DB->insert_record('local_oksigeniahechauka_group', (object) ['name' => 'Entrada', 'sortorder' => 0,
+            'timecreated' => 1, 'timemodified' => 1]);
+        $now = time();
+        $id = (int) $DB->insert_record('local_oksigeniahechauka_item', (object) ['type' => 'media', 'title' => 'El huerto',
+            'body' => 'Una línea', 'data' => json_encode(['caption' => true, 'fit' => 'cover', 'web' => 'https://example.org']),
+            'duration' => 0, 'sortorder' => 3, 'visible' => 1, 'targetall' => 0, 'everyweeks' => 0, 'createdby' => $author,
+            'usermodified' => $author, 'timecreated' => 1, 'timemodified' => 1]);
+        items::set_targets($id, [$group], []);
+        get_file_storage()->create_file_from_string(['contextid' => \context_system::instance()->id,
+            'component' => 'local_oksigeniahechauka', 'filearea' => 'media', 'itemid' => $id, 'filepath' => '/',
+            'filename' => 'huerto.jpg'], 'imagen');
+        $item = $DB->get_record('local_oksigeniahechauka_item', ['id' => $id]);
+        $this->assertTrue(items::copyable($item));
+        $copy = $DB->get_record('local_oksigeniahechauka_item', ['id' => items::duplicate($item, $other, $now)]);
+        $this->assertNotEquals($id, (int) $copy->id);
+        $this->assertSame('El huerto', $copy->title);
+        $this->assertSame($item->data, $copy->data);
+        $this->assertSame(0, (int) $copy->visible);
+        $this->assertSame($other, (int) $copy->createdby);
+        $this->assertSame([$group], items::targets($copy)['groups']);
+        $file = get_file_storage()->get_area_files(
+            \context_system::instance()->id,
+            'local_oksigeniahechauka',
+            'media',
+            (int) $copy->id,
+            'id',
+            false
+        );
+        $this->assertSame('imagen', reset($file)->get_content());
+        // The original is as it was.
+        $this->assertSame(1, (int) $DB->get_field('local_oksigeniahechauka_item', 'visible', ['id' => $id]));
+        $this->assertFalse(items::copyable((object) ['type' => 'agenda']));
+        $this->assertFalse(items::copyable((object) ['type' => 'urgent']));
+    }
 }

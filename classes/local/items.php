@@ -249,6 +249,47 @@ class items {
     }
 
     /**
+     * Whether an item can be copied: not an agenda (its events come from outside) nor an urgent notice (it is for now).
+     *
+     * @param \stdClass $item
+     * @return bool
+     */
+    public static function copyable(\stdClass $item): bool {
+        return in_array($item->type, ['media', 'notice', 'event', 'ticker'], true);
+    }
+
+    /**
+     * A copy of an item to change and publish: the same content, the same destinations and its files, still unpublished,
+     * of whoever copies it.
+     *
+     * @param \stdClass $item
+     * @param int $userid
+     * @param int $now
+     * @return int the new item's id
+     */
+    public static function duplicate(\stdClass $item, int $userid, int $now): int {
+        global $DB;
+        $copy = clone $item;
+        unset($copy->id);
+        $copy->visible = 0;
+        $copy->createdby = $userid;
+        $copy->usermodified = $userid;
+        $copy->timecreated = $now;
+        $copy->timemodified = $now;
+        $id = (int) $DB->insert_record('local_oksigeniahechauka_item', $copy);
+        $targets = self::targets($item);
+        self::set_targets($id, $targets['groups'], $targets['screens']);
+        $fs = get_file_storage();
+        $context = files::context();
+        foreach ([files::MEDIA, files::VIDEO, files::POSTER, files::BACKDROP] as $area) {
+            foreach ($fs->get_area_files($context->id, files::COMPONENT, $area, (int) $item->id, 'id', false) as $file) {
+                $fs->create_file_from_storedfile(['itemid' => $id], $file);
+            }
+        }
+        return $id;
+    }
+
+    /**
      * Deletes an item, its targets and its files.
      *
      * @param int $itemid

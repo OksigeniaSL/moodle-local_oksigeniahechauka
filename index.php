@@ -53,13 +53,25 @@ if ($action !== '' && confirm_sesskey()) {
     } else if (in_array($action, ['up', 'down'])) {
         access::require_cap('publishall');
     }
-    if (in_array($action, ['show', 'hide', 'delete', 'up', 'down'])) {
+    if (in_array($action, ['show', 'hide', 'delete', 'up', 'down', 'duplicate'])) {
         $item = $DB->get_record('local_oksigeniahechauka_item', ['id' => $id], '*', MUST_EXIST);
         if (!access::may_edit($item)) {
             throw new required_capability_exception($context, 'local/oksigeniahechauka:publishall', 'nopermissions', '');
         }
     }
     switch ($action) {
+        case 'duplicate':
+            // A copy to change and publish, open at once.
+            if (items::copyable($item)) {
+                $copy = items::duplicate($item, (int) $USER->id, $now);
+                redirect(
+                    new moodle_url('/local/oksigeniahechauka/edit.php', ['id' => $copy]),
+                    get_string('duplicate_done', $c),
+                    null,
+                    \core\output\notification::NOTIFY_SUCCESS
+                );
+            }
+            break;
         case 'show':
         case 'hide':
             $DB->set_field('local_oksigeniahechauka_item', 'visible', $action === 'show' ? 1 : 0, ['id' => $id]);

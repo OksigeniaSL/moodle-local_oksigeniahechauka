@@ -25,6 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['act_down'] = 'Bajar';
+$string['act_duplicate'] = 'Duplicar';
 $string['act_hide'] = 'Quitar de las pantallas';
 $string['act_show'] = 'Poner otra vez';
 $string['act_up'] = 'Subir';
@@ -323,6 +324,7 @@ $string['distance_5'] = 'A media distancia';
 $string['distance_5_help'] = 'Unos 5 m: un vestíbulo, un comedor. Letra más grande y algo menos a la vez.';
 $string['distance_8'] = 'De lejos';
 $string['distance_8_help'] = '8 m o más: un patio, una entrada. Una cosa cada vez, muy grande, sin cinta.';
+$string['duplicate_done'] = 'Copia hecha. Cambia lo que quieras y publícala: todavía no sale en ninguna pantalla.';
 $string['duration'] = 'Segundos en pantalla';
 $string['duration_help'] = 'Vacío, lo normal: diez segundos una foto y el vídeo entero un vídeo.';
 $string['empty_mine_text'] = 'Lo que añadas sale en las pantallas de {$a}, junto a lo que llega solo.';
@@ -512,6 +514,8 @@ $string['reload_done'] = 'La pantalla se recarga en menos de un minuto.';
 $string['reload_of'] = 'Recargar {$a}';
 $string['reloadall'] = 'Recargar todas';
 $string['reloadall_done'] = 'Todas las pantallas se recargan en menos de un minuto.';
+$string['reloaded'] = 'Recargada';
+$string['reloading'] = 'Recargando…';
 $string['remove'] = 'Quitar';
 $string['role_missing'] = 'El rol «Publica en las pantallas» no está en el sitio; reinstala la extensión o pídeselo a la administración.';
 $string['role_oksigeniahechauka_manager'] = 'Lleva las pantallas';

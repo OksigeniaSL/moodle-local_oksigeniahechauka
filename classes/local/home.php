@@ -128,6 +128,10 @@ class home {
                     ['action' => 'reloadall', 'sesskey' => sesskey()]
                 ))->out(false) : '',
                 'reloadicon' => icons::svg('reload'),
+                'reloading' => $managescreens ? (new \moodle_url(
+                    '/local/oksigeniahechauka/reloading.php',
+                    ['sesskey' => sesskey()]
+                ))->out(false) : '',
                 'add' => $managescreens ? (new \moodle_url('/local/oksigeniahechauka/screens.php'))->out(false) . '#add' : '',
                 'addicon' => icons::svg('qr'),
             ],
@@ -321,6 +325,8 @@ class home {
                 ['action' => 'reload', 'id' => $s->id, 'sesskey' => sesskey()]
             ))->out(false) : '',
             'reloadicon' => icons::svg('reload'),
+            'reloading' => $managescreens && (string) ($s->command ?? '') === 'reload' &&
+                !in_array($state['key'], ['off', 'down', 'new']),
             'previewlabel' => get_string('preview_of', $c, $name),
             'reloadlabel' => get_string('reload_of', $c, $name),
             'lastseen' => (int) $s->lastseen,
@@ -646,6 +652,9 @@ class home {
             if ($publishall && $item->type === 'media') {
                 $am->add_secondary_action(new \action_link($act('up'), get_string('act_up', $c)));
                 $am->add_secondary_action(new \action_link($act('down'), get_string('act_down', $c)));
+            }
+            if (items::copyable($item)) {
+                $am->add_secondary_action(new \action_link($act('duplicate'), get_string('act_duplicate', $c)));
             }
             $am->add_secondary_action(new \action_link($act('delete'), get_string('delete')));
             $menu = $OUTPUT->render($am);
