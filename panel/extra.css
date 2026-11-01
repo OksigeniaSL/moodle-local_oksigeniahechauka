@@ -190,3 +190,10 @@ dialog.hkp-dialog > footer {
     background: #000;
     color: #6c737b;
 }
+
+/* The new screen from the phone: the choices are fieldsets without the browser's own frame. */
+.hkp fieldset.hkp-plain {
+    margin: 0;
+    padding: 0;
+    border: 0;
+}

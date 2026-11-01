@@ -1,0 +1,110 @@
+{{!
+    This file is part of Moodle - https://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_oksigeniahechauka/claim
+
+    A new screen from the phone: «Pantalla encontrada», new or replacing another, its name and groups, and «Empezar»;
+    then «… ya está en marcha». A code that is not waiting says so, with a field to try again.
+
+    Example context (json):
+    {
+        "style": "", "isform": true, "title": "Una pantalla nueva", "action": "#", "sesskey": "abc", "code": "KM7 Q4X",
+        "about": "Código KM7 Q4X · 1920 × 1080, horizontal", "vertical": false, "replace": false, "name": "",
+        "groups": [{"id": 1, "name": "Infantil", "checked": false}], "screens": [], "hasscreens": false,
+        "errors": {}, "icons": {"plus": ""}, "strings": "{}"
+    }
+}}
+<div class="hkp" id="hkp-claim-page"{{#style}} style="{{style}}"{{/style}}>
+    <header class="hkp-head"><div class="hkp-head-title"><h1>{{title}}</h1></div></header>
+    {{#isform}}
+    <form class="hkp-claim" method="post" action="{{action}}" data-strings="{{strings}}">
+        <input type="hidden" name="sesskey" value="{{sesskey}}">
+        <p class="hkp-claim-step">{{#str}}claim_step2, local_oksigeniahechauka{{/str}}</p>
+        <div class="hkp-found"><span class="hkp-bezel{{#vertical}} is-v{{/vertical}}" data-state="new"><span class="hkp-bezel-off">{{code}}</span><span class="hkp-led" aria-hidden="true"></span></span><b>{{#str}}claim_found, local_oksigeniahechauka{{/str}}</b><span>{{about}}</span></div>
+        <fieldset class="hkp-pick hkp-plain">
+            <legend class="hkp-label">{{#str}}claim_kind, local_oksigeniahechauka{{/str}}</legend>
+            <label><input type="radio" name="kind" value="new"{{^replace}} checked{{/replace}}><b>{{#str}}claim_new, local_oksigeniahechauka{{/str}}</b><span>{{#str}}claim_new_help, local_oksigeniahechauka{{/str}}</span></label>
+            {{#hasscreens}}<label><input type="radio" name="kind" value="replace"{{#replace}} checked{{/replace}}><b>{{#str}}claim_replace, local_oksigeniahechauka{{/str}}</b><span>{{#str}}claim_replace_help, local_oksigeniahechauka{{/str}}</span></label>{{/hasscreens}}
+        </fieldset>
+        <div id="hkp-claim-new" class="hkp-claim-part">
+            <div class="hkp-field"><label class="form-label" for="hkp-cn">{{#str}}name, local_oksigeniahechauka{{/str}}</label><input class="form-control is-big{{#errors.name}} is-invalid{{/errors.name}}" id="hkp-cn" name="name" value="{{name}}" maxlength="100" autocomplete="off"><p class="hkp-hint">{{#errors.name}}<b class="text-danger">{{errors.name}}</b> {{/errors.name}}{{#str}}claim_name_help, local_oksigeniahechauka{{/str}}</p></div>
+            <div><span class="hkp-label">{{#str}}groups, local_oksigeniahechauka{{/str}}</span>
+                <div class="hkp-chips">{{#groups}}<label class="hkp-chip"><input type="checkbox" name="groups[]" value="{{id}}"{{#checked}} checked{{/checked}}>{{name}}</label>{{/groups}}<button type="button" class="hkp-chip" id="hkp-newgroup-open" aria-expanded="false" aria-controls="hkp-newgroup">{{{icons.plus}}}{{#str}}groups_new, local_oksigeniahechauka{{/str}}</button></div>
+                <div class="hkp-field" id="hkp-newgroup" hidden><label class="form-label" for="hkp-ng">{{#str}}claim_newgroup, local_oksigeniahechauka{{/str}}</label><input class="form-control" id="hkp-ng" name="newgroup" placeholder="{{#str}}groups_new_example, local_oksigeniahechauka{{/str}}" autocomplete="off"></div>
+                <p class="hkp-hint">{{#str}}claim_groups_help, local_oksigeniahechauka{{/str}}</p>
+            </div>
+        </div>
+        {{#hasscreens}}
+        <fieldset class="hkp-pick hkp-plain hkp-claim-part" id="hkp-claim-replace">
+            <legend class="hkp-label">{{#str}}claim_which, local_oksigeniahechauka{{/str}}</legend>
+            {{#screens}}<label><input type="radio" name="screenid" value="{{id}}"{{#checked}} checked{{/checked}}><b>{{name}}</b><span class="hkp-state" data-state="{{state}}"><span class="hkp-state-word"><span class="hkp-dot" aria-hidden="true"></span>{{label}}</span>{{#meta}} <span class="hkp-meta">· {{meta}}</span>{{/meta}}</span>{{#down}}<span>{{#str}}claim_isthis, local_oksigeniahechauka{{/str}}</span>{{/down}}</label>{{/screens}}
+        </fieldset>
+        {{/hasscreens}}
+        <button type="submit" class="btn btn-primary btn-lg" id="hkp-claim-go">{{#replace}}{{#str}}claim_change, local_oksigeniahechauka{{/str}}{{/replace}}{{^replace}}{{#str}}claim_start, local_oksigeniahechauka{{/str}}{{/replace}}</button>
+    </form>
+    {{/isform}}
+    {{#isdone}}
+    <div class="hkp-claim">
+        <p class="hkp-claim-step">{{#str}}claim_step3, local_oksigeniahechauka{{/str}}</p>
+        <div class="hkp-done-screen">
+            <div class="hkp-slot"><span class="hkp-bezel" data-state="on" role="img" aria-label="{{alt}}"><iframe src="{{frame}}" title="{{alt}}" tabindex="-1" aria-hidden="true"></iframe><span class="hkp-led" aria-hidden="true"></span></span></div>
+            <h2>{{running}}</h2>
+            <p>{{shows}}</p>
+            <div class="hkp-foot"><a class="btn btn-primary btn-lg" href="{{home}}">{{#str}}claim_ready, local_oksigeniahechauka{{/str}}</a><a class="btn btn-outline-secondary btn-lg" href="{{sheet}}">{{#str}}claim_hours, local_oksigeniahechauka{{/str}}</a></div>
+        </div>
+    </div>
+    {{/isdone}}
+    {{#isnotfound}}
+    <form class="hkp-claim" method="get" action="{{action}}">
+        <div class="alert alert-warning" role="alert">{{#str}}claim_bad, local_oksigeniahechauka{{/str}}</div>
+        <div class="hkp-field"><label class="form-label" for="hkp-code">{{#str}}addscreen_code, local_oksigeniahechauka{{/str}}</label><input class="form-control is-big hkp-code" id="hkp-code" name="code" value="{{code}}" placeholder="KM7 Q4X" spellcheck="false" autocomplete="off"></div>
+        <button type="submit" class="btn btn-primary btn-lg">{{#str}}addscreen_go, local_oksigeniahechauka{{/str}}</button>
+        <a class="btn btn-link" href="{{home}}">{{#str}}panel_title, local_oksigeniahechauka{{/str}}</a>
+    </form>
+    {{/isnotfound}}
+</div>
+{{#js}}
+(function() {
+    var form = document.querySelector('#hkp-claim-page form[data-strings]');
+    if (!form) {
+        return;
+    }
+    var words = JSON.parse(form.getAttribute('data-strings') || '{}');
+    var parts = function() {
+        var kind = form.querySelector('input[name="kind"]:checked');
+        var replace = kind && kind.value === 'replace';
+        var add = form.querySelector('#hkp-claim-new');
+        var swap = form.querySelector('#hkp-claim-replace');
+        add.hidden = replace;
+        if (swap) {
+            swap.hidden = !replace;
+        }
+        form.querySelector('#hkp-claim-go').textContent = replace ? words.replace : words['new'];
+    };
+    form.querySelectorAll('input[name="kind"]').forEach(function(r) {
+        r.addEventListener('change', parts);
+    });
+    var open = form.querySelector('#hkp-newgroup-open');
+    open.addEventListener('click', function() {
+        var box = form.querySelector('#hkp-newgroup');
+        box.hidden = false;
+        open.setAttribute('aria-expanded', 'true');
+        box.querySelector('input').focus();
+    });
+    parts();
+})();
+{{/js}}

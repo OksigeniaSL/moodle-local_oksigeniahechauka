@@ -16,9 +16,13 @@
 
 namespace local_oksigeniahechauka;
 
-use local_oksigeniahechauka\form\claim_form;
-use local_oksigeniahechauka\form\item_form;
-use local_oksigeniahechauka\form\screen_form;
+use local_oksigeniahechauka\local\centre;
+use local_oksigeniahechauka\local\claimpage;
+use local_oksigeniahechauka\local\compose;
+use local_oksigeniahechauka\local\groupspage;
+use local_oksigeniahechauka\local\home;
+use local_oksigeniahechauka\local\screens;
+use local_oksigeniahechauka\local\sheet;
 
 /**
  * Every form of the panel builds, for every kind of content: a form that fails only shows on the page that opens it.
@@ -27,29 +31,74 @@ use local_oksigeniahechauka\form\screen_form;
  * @category   test
  * @copyright  2026 Oksigenia SL <dev@oksigenia.cc>
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @covers     \local_oksigeniahechauka\form\item_form
- * @covers     \local_oksigeniahechauka\form\screen_form
- * @covers     \local_oksigeniahechauka\form\claim_form
+ * @covers     \local_oksigeniahechauka\local\home
+ * @covers     \local_oksigeniahechauka\local\compose
+ * @covers     \local_oksigeniahechauka\local\sheet
+ * @covers     \local_oksigeniahechauka\local\groupspage
+ * @covers     \local_oksigeniahechauka\local\centre
+ * @covers     \local_oksigeniahechauka\local\claimpage
  */
-#[\PHPUnit\Framework\Attributes\CoversClass(item_form::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(screen_form::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(claim_form::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(home::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(compose::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(sheet::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(groupspage::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(centre::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(claimpage::class)]
 final class forms_test extends \advanced_testcase {
     /**
-     * The forms build and render, with only what each one loads itself.
+     * Every page of the panel renders with real data, as each person sees it: a value missing in a context (Mustache
+     * then looks it up in the page's own) or a string that is not there fails here, not on a school's site.
      */
-    public function test_forms_build(): void {
-        global $PAGE;
+    public function test_pages_render(): void {
+        global $DB, $OUTPUT, $PAGE;
         $this->resetAfterTest();
         $this->setAdminUser();
-        $PAGE->set_url(new \moodle_url('/local/oksigeniahechauka/edit.php'));
+        $PAGE->set_url(new \moodle_url('/local/oksigeniahechauka/index.php'));
         $PAGE->set_context(\context_system::instance());
-        foreach (['media', 'notice', 'event', 'ticker'] as $type) {
-            $form = new item_form(null, ['type' => $type]);
-            $this->assertStringContainsString('id_dates', $form->render(), $type);
+        $now = time();
+        $group = (int) $DB->insert_record('local_oksigeniahechauka_group', (object) ['name' => 'Infantil', 'sortorder' => 0,
+            'timecreated' => $now, 'timemodified' => $now]);
+        $id = (int) $DB->insert_record('local_oksigeniahechauka_screen', (object) ['name' => 'Hall', 'template' => 'zones',
+            'theme' => 'site', 'keyhash' => 'x', 'lastseen' => $now - 60, 'sortorder' => 0, 'timecreated' => $now,
+            'timemodified' => $now, 'power' => json_encode([['days' => [1, 2, 3, 4, 5], 'on' => '07:30', 'off' => '18:30']]),
+            'lastinfo' => json_encode(['display' => ['width' => 1080, 'height' => 1920], 'time' => $now - 500])]);
+        screens::set_groups($id, [$group]);
+        $item = $DB->get_record('local_oksigeniahechauka_item', ['id' => $DB->insert_record(
+            'local_oksigeniahechauka_item',
+            (object) ['type' => 'notice', 'title' => 'Fotos de grupo', 'body' => '', 'data' => '{}', 'visible' => 1,
+            'targetall' => 1,
+            'everyweeks' => 0,
+            'createdby' => 2,
+            'timecreated' => $now,
+            'timemodified' => $now]
+        )]);
+        $DB->insert_record('local_oksigeniahechauka_item', (object) ['type' => 'urgent', 'title' => 'Simulacro', 'body' => '',
+            'data' => '{}', 'visible' => 1, 'targetall' => 1, 'everyweeks' => 0, 'createdby' => 2, 'timecreated' => $now,
+            'timemodified' => $now]);
+        $screen = $DB->get_record('local_oksigeniahechauka_screen', ['id' => $id]);
+        $render = function (string $template, array $context): string {
+            global $OUTPUT;
+            return $OUTPUT->render_from_template('local_oksigeniahechauka/' . $template, $context);
+        };
+
+        $html = $render('home', home::context($now));
+        $this->assertStringContainsString('hkp-wall', $html);
+        $this->assertStringContainsString('hkp-urgent-on', $html);
+        $this->assertStringContainsString('hkp-urgent-dialog', $html);
+        foreach (['notice', 'media', 'event', 'ticker', 'agenda'] as $type) {
+            $this->assertStringContainsString('hkp-compose', $render('compose', compose::context(null, $type, $now)), $type);
         }
-        $this->assertStringContainsString('id_powermode', (new screen_form())->render());
-        $this->assertStringContainsString('id_name', (new claim_form())->render());
+        $this->assertStringContainsString('Fotos de grupo', $render('compose', compose::context($item, 'notice', $now)));
+        $html = $render('sheet', sheet::context($screen, $now));
+        $this->assertStringContainsString('hkp-sheet', $html);
+        $this->assertStringContainsString('1080 × 1920', $html);
+        $this->assertStringContainsString('hkp-group-' . $group, $render('groups', groupspage::context($now)));
+        $this->assertStringContainsString('hkp-colours', $render('centre', centre::context('', $now)));
+        $code = screens::start_pairing(['width' => 1920, 'height' => 1080], $now)['code'];
+        $pair = screens::pairing($code, $now);
+        $this->assertStringContainsString('hkp-found', $render('claim', claimpage::form($pair, $code, $now, [])));
+        $this->assertStringContainsString('hkp-done-screen', $render('claim', claimpage::done($screen)));
+        $this->assertStringContainsString('alert-warning', $render('claim', claimpage::notfound('ABC123')));
     }
 
     /**

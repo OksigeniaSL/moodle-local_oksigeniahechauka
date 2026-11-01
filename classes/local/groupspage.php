@@ -51,11 +51,11 @@ class groupspage {
             $vertical[(int) $s->id] = $card['vertical'];
             $rows[] = $card + ['shapeicon' => icons::svg($card['vertical'] ? 'tvv' : 'tv'),
                 'groupnames' => array_map(function ($g) use ($groups) {
-                return ['name' => format_string($groups[$g] ?? '')];
-            }, screens::groups_of((int) $s->id)), 'sheet' => (new \moodle_url(
-                '/local/oksigeniahechauka/screen.php',
-                ['id' => $s->id]
-            ))->out(false)];
+                    return ['name' => format_string($groups[$g] ?? '')];
+                }, screens::groups_of((int) $s->id)), 'sheet' => (new \moodle_url(
+                    '/local/oksigeniahechauka/screen.php',
+                    ['id' => $s->id]
+                ))->out(false)];
         }
         $cards = [];
         foreach ($groups as $id => $name) {
