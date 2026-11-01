@@ -104,16 +104,28 @@ class centre {
 
         // The centre's categories: what it calls its parts, each with its colour and the words that mark it.
         $coursecats = $DB->get_records_menu('course_categories', null, '', 'id, name');
+        $counts = categories::week_counts($now);
         $cats = [];
         foreach (categories::all() as $i => $cat) {
-            $cats[] = ['n' => $i + 1, 'id' => $cat['id'], 'name' => $cat['name'], 'colour' => $cat['colour'],
-                'words' => implode(', ', $cat['words']), 'coursecat' => $cat['coursecat'],
-                'linked' => $cat['coursecat'] && isset($coursecats[$cat['coursecat']]) ? get_string(
-                    'centre_category_linked',
-                    $c,
-                    format_string($coursecats[$cat['coursecat']])
-                ) : '',
-                'remove' => get_string('centre_category_remove', $c, $cat['name'])];
+            $count = $counts[$i + 1] ?? 0;
+            $linkedto = $cat['coursecat'] && isset($coursecats[$cat['coursecat']]) ?
+                format_string($coursecats[$cat['coursecat']]) : '';
+            $cats[] = [
+                'n' => $i + 1,
+                'id' => $cat['id'],
+                'name' => $cat['name'],
+                'colour' => $cat['colour'],
+                'words' => implode(', ', $cat['words']),
+                'wordlist' => array_map(function ($w) use ($c) {
+                    return ['word' => $w, 'remove' => get_string('centre_word_remove', $c, $w)];
+                }, $cat['words']),
+                'coursecat' => $cat['coursecat'],
+                'linked' => $linkedto !== '' ? get_string('centre_category_linked', $c, $linkedto) : '',
+                'count' => $count === 1 ? get_string('centre_category_count_one', $c) :
+                    get_string('centre_category_count', $c, $count),
+                'remove' => get_string('centre_category_remove', $c, $cat['name']),
+                'unlink' => get_string('centre_category_unlink', $c, $cat['name']),
+            ];
         }
         $linked = array_column(categories::all(), 'coursecat');
         $importable = count(array_filter(categories::from_moodle(), function ($cat) use ($linked) {
@@ -169,7 +181,8 @@ class centre {
             'admin' => has_capability('moodle/site:config', \context_system::instance()) ?
                 (new \moodle_url('/admin/settings.php', ['section' => 'local_oksigeniahechauka_settings']))->out(false) : '',
             'icons' => ['search' => icons::svg('search'), 'pin' => icons::svg('pin'), 'out' => icons::svg('out'),
-                'check' => icons::svg('check')],
+                'check' => icons::svg('check'), 'link' => icons::svg('link'), 'x' => icons::svg('x'),
+                'plus' => icons::svg('plus')],
             'strings' => json_encode(['white' => get_string('centre_text_white', $c),
                 'dark' => get_string('centre_text_dark', $c), 'today' => schedule::day($now),
                 'samples' => self::samples()], JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP),
@@ -187,9 +200,9 @@ class centre {
         $c = self::C;
         $out = ['notice' => ['title' => get_string('centre_sample_notice', $c), 'body' => get_string('centre_sample_body', $c)],
             'ticker' => get_string('centre_sample_ticker', $c), 'events' => []];
-        // An event in each of the first categories of the centre (or one without colour, if it has none).
-        $cats = array_slice(categories::all(), 0, 3);
-        $hours = ['09:30', '11:00', '12:30'];
+        // An event in each category of the centre (or one without colour, if it has none).
+        $cats = categories::all();
+        $hours = ['09:00', '10:00', '11:00', '12:00', '13:00', '16:00'];
         foreach ($cats ?: [null] as $i => $cat) {
             $out['events'][] = ['title' => get_string('centre_sample_event', $c), 'detail' => $cat ? $cat['name'] : '',
                 'hour' => $hours[$i], 'color' => $cat ? $i + 1 : 0];

@@ -15,8 +15,9 @@ function plain(text) {
 }
 
 /**
- * The centre's category of an event by its words: the first category with a word that starts a word of the text
- * («Inf» marks «Infantil»; «Ingeniería» marks «Ingeniería Civil»), or a phrase of several words found whole. 0 if none.
+ * The centre's category of an event by its words: a word that starts a word of the text («Inf» marks «Infantil»), or a
+ * phrase of several words found whole. The closest wins: a whole word over a beginning, a longer beginning over a
+ * shorter one («Inglés» goes to the category with «inglés», not to the one with «ing»); then the first. 0 if none.
  *
  * @param {string} text the group of its title, or its «who or where»
  * @param {Array<{n: number, words: string[]}>} categories from the manifest
@@ -29,22 +30,32 @@ export function categoryOf(text, categories) {
     }
     const joined = ' ' + tokens.join(' ') + ' ';
     const list = categories || [];
+    let best = 0;
+    let found = 0;
     for (let i = 0; i < list.length; i++) {
         const words = list[i].words || [];
         for (let k = 0; k < words.length; k++) {
             const w = plain(words[k]).split(/[^a-z0-9ñ]+/).filter(Boolean).join(' ');
+            let score = 0;
             if (!w) {
                 continue;
             }
-            const found = w.indexOf(' ') >= 0 ? joined.indexOf(' ' + w + ' ') >= 0 : tokens.some(function (t) {
+            if (w.indexOf(' ') >= 0) {
+                score = joined.indexOf(' ' + w + ' ') >= 0 ? 1000 + w.length : 0;
+            } else if (tokens.indexOf(w) >= 0) {
+                score = 1000 + w.length;
+            } else if (tokens.some(function (t) {
                 return t.indexOf(w) === 0;
-            });
-            if (found) {
-                return list[i].n;
+            })) {
+                score = w.length;
+            }
+            if (score > best) {
+                best = score;
+                found = list[i].n;
             }
         }
     }
-    return 0;
+    return found;
 }
 
 /**

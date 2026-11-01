@@ -131,5 +131,14 @@ final class centre_test extends \advanced_testcase {
         $cats::save(array_merge($all, $found));
         $this->assertSame(4, $cats::of_coursecat((int) $below->id));
         $this->assertSame(0, $cats::of_coursecat(999999));
+        // The words, as the screens read them: the beginning of a word, accents aside, a phrase whole.
+        $this->assertSame(1, $cats::of_text('Ingenieria Civil'));
+        $this->assertSame(1, $cats::of_text('ETSI Caminos'));
+        $this->assertSame(3, $cats::of_text('Grado en Ciencias de la Salud'));
+        $this->assertSame(0, $cats::of_text('Ciencias Exactas'));
+        $academy = [['words' => ['ing', 'ingeniería']], ['words' => ['inglés', 'idiomas']]];
+        $this->assertSame(2, $cats::of_text('Inglés', $academy));
+        $this->assertSame(1, $cats::of_text('Ingeniería Civil', $academy));
+        $this->assertSame([1 => 0, 2 => 0, 3 => 0, 4 => 0], $cats::week_counts(time()));
     }
 }

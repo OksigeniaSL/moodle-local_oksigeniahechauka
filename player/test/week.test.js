@@ -33,6 +33,11 @@ test('the category of an event, by the words each centre gives its categories', 
     assert.equal(categoryOf('Facultad de Ciencias de la Salud', university), 2);
     assert.equal(categoryOf('Ciencias Exactas', university), 0);
     assert.equal(categoryOf('3º ESO', university), 0);
+    // The closest word wins: «Inglés» is not Engineering for having «ing».
+    const academy = [{n: 1, words: ['ing', 'ingeniería']}, {n: 2, words: ['inglés', 'idiomas']}];
+    assert.equal(categoryOf('Inglés', academy), 2);
+    assert.equal(categoryOf('Ingeniería Civil', academy), 1);
+    assert.equal(categoryOf('Ing. Industrial', academy), 1);
     // No categories: no colour.
     assert.equal(categoryOf('3º ESO', []), 0);
     // A category chosen for the event wins over its words.

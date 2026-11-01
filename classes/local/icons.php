@@ -27,6 +27,8 @@ namespace local_oksigeniahechauka\local;
 class icons {
     /** @var array Name => the inside of the SVG. */
     const PATHS = [
+        'link' => '<path d="M10.2 13.8a4.2 4.2 0 0 0 6 0l2.9-2.9a4.2 4.2 0 0 0-6-6L11.6 6.4"/>' .
+            '<path d="M13.8 10.2a4.2 4.2 0 0 0-6 0l-2.9 2.9a4.2 4.2 0 0 0 6 6l1.5-1.5"/>',
         'tv' => '<rect x="3" y="4.5" width="18" height="12" rx="2"/><path d="M8.5 20h7M12 16.5V20"/>',
         'tvv' => '<rect x="7" y="2.5" width="10" height="16" rx="2"/><path d="M9.5 21.5h5M12 18.5v3"/>',
         'screens' => '<rect x="2.5" y="7" width="13" height="9" rx="1.6"/><path d="M8 3.5h11.5a2 2 0 0 1 2 2V13"/>' .

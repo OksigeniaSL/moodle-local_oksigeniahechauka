@@ -190,6 +190,130 @@ class categories {
     }
 
     /**
+     * Lower case, without accents, split in words: how the screens compare words (categoryOf in player/src/agenda.js).
+     *
+     * @param string $text
+     * @return string[]
+     */
+    protected static function tokens(string $text): array {
+        $plain = \core_text::strtolower(\core_text::specialtoascii($text));
+        return array_values(array_filter(preg_split('/[^a-z0-9ñ]+/u', $plain), 'strlen'));
+    }
+
+    /**
+     * The category the words of a text mark, as the screens decide it: a word that starts a word of the text, or a phrase
+     * of several words found whole; the closest wins (a whole word over a beginning, a longer beginning over a shorter
+     * one), then the first; 0 if none.
+     *
+     * @param string $text
+     * @param array|null $all the categories, or null for the centre's
+     * @return int
+     */
+    public static function of_text(string $text, ?array $all = null): int {
+        $tokens = self::tokens($text);
+        if (!$tokens) {
+            return 0;
+        }
+        $joined = ' ' . implode(' ', $tokens) . ' ';
+        $best = 0;
+        $found = 0;
+        foreach (($all ?? self::all()) as $i => $cat) {
+            foreach ($cat['words'] as $word) {
+                $w = implode(' ', self::tokens($word));
+                if ($w === '') {
+                    continue;
+                }
+                $score = 0;
+                if (strpos($w, ' ') !== false) {
+                    $score = strpos($joined, ' ' . $w . ' ') !== false ? 1000 + strlen($w) : 0;
+                } else if (in_array($w, $tokens, true)) {
+                    $score = 1000 + strlen($w);
+                } else if (
+                    array_filter($tokens, function ($t) use ($w) {
+                        return strpos($t, $w) === 0;
+                    })
+                ) {
+                    $score = strlen($w);
+                }
+                if ($score > $best) {
+                    $best = $score;
+                    $found = $i + 1;
+                }
+            }
+        }
+        return $found;
+    }
+
+    /**
+     * How many events each category has from today to six days on, as the screens will colour them: those of the
+     * agendas, of the site and course categories of the calendar, and those made in the panel.
+     *
+     * @param int $now
+     * @return array position => count
+     */
+    public static function week_counts(int $now): array {
+        global $DB;
+        $from = usergetmidnight($now, \core_date::get_server_timezone());
+        $until = $from + 7 * DAYSECS;
+        $all = self::all();
+        $counts = array_fill(1, max(1, count($all)), 0);
+        $group = function (string $title, string $detail): string {
+            $parts = explode(' - ', $title, 2);
+            return count($parts) === 2 ? $parts[0] : $detail;
+        };
+        $add = function (int $n) use (&$counts) {
+            if ($n) {
+                $counts[$n] = ($counts[$n] ?? 0) + 1;
+            }
+        };
+        $agendas = [];
+        foreach ($DB->get_records('local_oksigeniahechauka_item', ['type' => 'agenda', 'visible' => 1]) as $agenda) {
+            $data = items::data($agenda);
+            $agendas[$agenda->id] = self::resolve($data['category'] ?? ($data['color'] ?? 0));
+        }
+        $sql = 'timestart < :until AND timeend >= :from';
+        foreach (
+            $DB->get_records_select(
+                'local_oksigeniahechauka_calevent',
+                $sql,
+                ['from' => $from, 'until' => $until],
+                '',
+                'id, itemid, title, detail'
+            ) as $ev
+        ) {
+            if (!array_key_exists($ev->itemid, $agendas)) {
+                continue;
+            }
+            $add($agendas[$ev->itemid] ?: self::of_text($group($ev->title, (string) $ev->detail), $all));
+        }
+        foreach (
+            $DB->get_records_select(
+                'event',
+                "(eventtype = 'site' OR eventtype = 'category') AND visible = 1
+                AND timestart < :until AND timestart + timeduration >= :from",
+                ['from' => $from, 'until' => $until],
+                '',
+                'id, name, location, eventtype, categoryid'
+            ) as $ev
+        ) {
+            $add($ev->eventtype === 'category' ? self::of_coursecat((int) $ev->categoryid) :
+                self::of_text($group((string) $ev->name, (string) $ev->location), $all));
+        }
+        foreach ($DB->get_records('local_oksigeniahechauka_item', ['type' => 'event', 'visible' => 1]) as $item) {
+            $data = items::data($item);
+            $start = (int) ($data['start'] ?? 0);
+            if ($start < $from || $start >= $until) {
+                continue;
+            }
+            $add(self::resolve($data['category'] ?? ($data['color'] ?? 0)) ?: self::of_text($group(
+                $item->title,
+                (string) $item->body
+            ), $all));
+        }
+        return $counts;
+    }
+
+    /**
      * The position a stored item colour means: an id of a category, or a number of the old four colours.
      *
      * @param mixed $value

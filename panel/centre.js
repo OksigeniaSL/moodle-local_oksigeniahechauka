@@ -126,18 +126,100 @@
     const list = page.querySelector('#hkp-cats');
     const palette = JSON.parse((list && list.getAttribute('data-palette')) || '[]');
     const max = Number((list && list.getAttribute('data-max')) || 6);
+    const removable = (row, button) => {
+        button.addEventListener('click', () => {
+            row.remove();
+            send();
+            if (add) {
+                add.hidden = list.children.length >= max;
+            }
+        });
+    };
     const wire = (row) => {
         const input = row.querySelector('[data-category]');
         const place = () => '--hk-marca-' + (Array.prototype.indexOf.call(list.children, row) + 1);
         input.addEventListener('input', send);
         row.addEventListener('mouseenter', () => blink(place()));
         input.addEventListener('focus', () => blink(place()));
-        row.querySelector('[data-remove-cat]').addEventListener('click', () => {
-            row.remove();
-            send();
-            if (add) {
-                add.hidden = list.children.length >= max;
-            }
+        const remove = row.querySelector('[data-remove-cat]');
+        if (remove) {
+            removable(row, remove);
+        }
+        // Brought from Moodle: not removed here, only unlinked (then it is like any other).
+        const unlink = row.querySelector('[data-unlink-cat]');
+        if (unlink) {
+            unlink.addEventListener('click', () => {
+                row.querySelector('[data-coursecat]').value = '0';
+                row.removeAttribute('data-linked');
+                const icon = row.querySelector('.hkp-cat-link');
+                if (icon) {
+                    icon.remove();
+                }
+                const x = page.querySelector('#hkp-cat-new').content.querySelector('[data-remove-cat]').cloneNode(true);
+                unlink.replaceWith(x);
+                removable(row, x);
+            });
+        }
+        // The words: pills, one taken out with its «×», one added with «+ palabra» (Enter or a comma).
+        const box = row.querySelector('.hkp-cat-words');
+        const hidden = row.querySelector('[data-words]');
+        const sync = () => {
+            hidden.value = Array.prototype.map.call(box.querySelectorAll('.hkp-word'), (w) => w.firstChild.textContent)
+                .join(', ');
+        };
+        const pill = (word) => {
+            const span = document.createElement('span');
+            span.className = 'hkp-word';
+            span.appendChild(document.createTextNode(word));
+            const x = document.createElement('button');
+            x.type = 'button';
+            x.setAttribute('aria-label', '× ' + word);
+            x.textContent = '×';
+            x.addEventListener('click', () => {
+                span.remove();
+                sync();
+            });
+            span.appendChild(x);
+            return span;
+        };
+        box.querySelectorAll('[data-word-remove]').forEach((x) => {
+            x.addEventListener('click', () => {
+                x.parentNode.remove();
+                sync();
+            });
+        });
+        const plus = box.querySelector('[data-word-add]');
+        plus.addEventListener('click', () => {
+            const field = document.createElement('input');
+            field.className = 'hkp-word-input';
+            field.setAttribute('aria-label', plus.textContent.trim());
+            plus.hidden = true;
+            box.insertBefore(field, plus);
+            field.focus();
+            const done = (keep) => {
+                const word = field.value.trim().toLowerCase();
+                if (keep && word) {
+                    box.insertBefore(pill(word), field);
+                    sync();
+                }
+                field.remove();
+                plus.hidden = false;
+            };
+            field.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ',') {
+                    e.preventDefault();
+                    done(true);
+                    plus.click();
+                } else if (e.key === 'Escape') {
+                    done(false);
+                    plus.focus();
+                }
+            });
+            field.addEventListener('blur', () => {
+                if (field.isConnected) {
+                    done(true);
+                }
+            });
         });
     };
     const add = page.querySelector('#hkp-cat-add');

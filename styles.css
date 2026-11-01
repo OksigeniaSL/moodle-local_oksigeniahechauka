@@ -2669,10 +2669,12 @@ dialog.hkp-dialog > footer {
     --hkp-ev: var(--hkp-stage-6, var(--hkp-stage-0));
 }
 
-/* «Tu centro»: each category in a row, its colour, its name, the words that mark it, and taking it out. */
+/* «Tu centro»: each category in a row (the art direction's review): a round swatch that opens the picker, the name
+   edited in place, the words that mark it as small pills with «+ palabra», «×» on the right (or «Desenlazar» for one
+   brought from Moodle), and under it how many events it has this week. */
 .hkp-cats {
     display: grid;
-    gap: .6rem;
+    gap: .5rem;
     margin: 0 0 .75rem;
     padding: 0;
     list-style: none;
@@ -2680,42 +2682,146 @@ dialog.hkp-dialog > footer {
 
 .hkp-cat {
     display: grid;
-    grid-template-columns: auto minmax(0, 1fr) minmax(0, 1.4fr) auto;
-    gap: .4rem .75rem;
-    align-items: end;
-    padding: .6rem .7rem;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: .25rem .75rem;
+    align-items: start;
+    padding: .55rem .7rem;
     border: 1px solid var(--hkp-line);
     border-radius: var(--hkp-radius-sm);
     background: var(--hkp-card);
 }
 
-.hkp-cat input[type="color"] {
-    width: 2.6rem;
-    height: 2.6rem;
-    padding: 0;
+.hkp-cat-swatch {
+    position: relative;
+    width: 28px;
+    height: 28px;
+    margin: .25rem 0 0;
+    overflow: hidden;
     border: 1px solid var(--hkp-edge);
-    border-radius: .45rem;
-    background: none;
+    border-radius: 50%;
     cursor: pointer;
 }
 
-.hkp-cat .hkp-field {
-    margin: 0;
+.hkp-cat-swatch:has(input:focus-visible) {
+    outline: 3px solid var(--bs-focus-ring-color, rgba(15, 108, 191, .75));
+    outline-offset: 2px;
 }
 
-.hkp-cat small {
-    grid-column: 2 / -1;
+.hkp-cat-swatch input[type="color"] {
+    position: absolute;
+    top: -8px;
+    left: -8px;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 0;
+    cursor: pointer;
+}
+
+.hkp-cat-line {
+    display: flex;
+    align-items: center;
+    gap: .35rem;
+}
+
+.hkp .hkp-cat-name {
+    width: 100%;
+    min-width: 0;
+    padding: .15rem .35rem;
+    border: 1px solid transparent;
+    border-radius: .35rem;
+    background: transparent;
+    color: var(--hkp-ink);
+    font-weight: 700;
+}
+
+.hkp .hkp-cat-name:hover,
+.hkp .hkp-cat-name:focus {
+    border-color: var(--hkp-edge);
+    background: var(--hkp-card);
+}
+
+.hkp-cat-link {
+    display: inline-grid;
+    flex: none;
     color: var(--hkp-muted);
+}
+
+.hkp-cat-link .hkp-i {
+    width: 1rem;
+    height: 1rem;
+}
+
+.hkp-cat-words {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .3rem;
+    margin: .3rem 0 0 .35rem;
+}
+
+.hkp-word,
+.hkp .hkp-word-add,
+.hkp .hkp-word-input {
+    display: inline-flex;
+    align-items: center;
+    gap: .15rem;
+    min-height: 1.6rem;
+    padding: 0 .55rem;
+    border-radius: 999px;
     font-size: .8125rem;
 }
 
-/* stylelint-disable-next-line csstree/validator */
-@container hkp (max-width: 36rem) {
-    .hkp-cat {
-        grid-template-columns: auto minmax(0, 1fr) auto;
-    }
+.hkp-word {
+    padding-right: .2rem;
+    background: var(--hkp-chip);
+    color: var(--hkp-muted);
+}
 
-    .hkp-cat .hkp-cat-words {
-        grid-column: 2 / -1;
-    }
+.hkp-word button {
+    display: inline-grid;
+    place-items: center;
+    width: 1.3rem;
+    height: 1.3rem;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: none;
+    color: inherit;
+}
+
+.hkp-word button:hover,
+.hkp-word button:focus-visible {
+    background: var(--hkp-bad-tint);
+    color: var(--hkp-bad-ink);
+}
+
+.hkp-word button .hkp-i,
+.hkp-word-add .hkp-i {
+    width: .8rem;
+    height: .8rem;
+}
+
+.hkp .hkp-word-add {
+    border: 1px dashed var(--hkp-edge);
+    background: none;
+    color: var(--hkp-muted);
+}
+
+.hkp .hkp-word-add:hover {
+    border-color: var(--hkp-accent-edge);
+    color: var(--hkp-accent-ink);
+}
+
+.hkp .hkp-word-input {
+    width: 9rem;
+    border: 1px solid var(--hkp-accent-edge);
+    background: var(--hkp-card);
+    color: var(--hkp-ink);
+}
+
+.hkp-cat-count {
+    display: block;
+    margin: .25rem 0 0 .35rem;
+    color: var(--hkp-muted);
+    font-size: .8125rem;
 }

@@ -126,6 +126,15 @@ function xmldb_local_oksigeniahechauka_upgrade($oldversion) {
         if ($list && !get_config($c, 'categories')) {
             set_config('categories', json_encode($list), $c);
         }
+        // The old form gave every event the first of the four colours by default: not a choice anyone made. Events and
+        // agendas go by their words until someone chooses a category for them.
+        foreach ($DB->get_records_select('local_oksigeniahechauka_item', "type IN ('event', 'agenda')") as $item) {
+            $data = json_decode((string) $item->data, true) ?: [];
+            if (array_key_exists('color', $data)) {
+                unset($data['color']);
+                $DB->set_field('local_oksigeniahechauka_item', 'data', json_encode($data), ['id' => $item->id]);
+            }
+        }
         upgrade_plugin_savepoint(true, 2026110200, 'local', 'oksigeniahechauka');
     }
 
