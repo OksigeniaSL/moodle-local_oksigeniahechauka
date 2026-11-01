@@ -144,10 +144,11 @@ class sources {
         $until = $from + ($days + 1) * DAYSECS;
         $records = $DB->get_records_select(
             'event',
-            "eventtype = 'site' AND visible = 1 AND timestart < :until AND timestart + timeduration >= :from",
+            "(eventtype = 'site' OR eventtype = 'category') AND visible = 1 AND timestart < :until
+             AND timestart + timeduration >= :from",
             ['from' => $from, 'until' => $until],
             'timestart',
-            'id, name, location, timestart, timeduration',
+            'id, name, location, timestart, timeduration, eventtype, categoryid',
             0,
             200
         );
@@ -171,6 +172,14 @@ class sources {
             ];
             if ($allday) {
                 $item['allday'] = true;
+            }
+            if ($ev->eventtype === 'category') {
+                // An event of a course category: only when the centre has linked that category, in its colour.
+                $n = categories::of_coursecat((int) $ev->categoryid);
+                if (!$n) {
+                    continue;
+                }
+                $item['color'] = $n;
             }
             if ($ev->timeduration > 0) {
                 $item['end'] = schedule::stamp($last);

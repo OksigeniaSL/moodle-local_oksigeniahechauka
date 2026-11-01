@@ -290,7 +290,7 @@
                 eventDay: value('#hkp-eday'),
                 eventFrom: value('#hkp-ef'),
                 eventTo: value('#hkp-et'),
-                colour: colour ? colour.value : 0,
+                colour: colour ? colour.getAttribute('data-n') : 0,
                 media,
             }, s);
         };

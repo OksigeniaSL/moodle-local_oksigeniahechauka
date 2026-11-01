@@ -29,7 +29,7 @@
         "hastypes": true, "types": [{"type": "notice", "label": "Aviso", "icon": "", "checked": true, "url": "#"}],
         "values": {"title": "Salida temprana el viernes", "body": "", "important": false, "caption": true, "url": "",
             "eventday": "2026-11-02", "eventfrom": "10:00", "eventto": ""},
-        "stages": [], "file": null, "maxbytes": "100 MB",
+        "stages": [], "hascategories": false, "centre": "", "file": null, "maxbytes": "100 MB",
         "shortcuts": [{"value": "friday", "label": "Hasta el viernes", "checked": true}],
         "datesopen": false, "from": "", "to": "",
         "days": [{"n": 1, "letter": "L", "name": "lunes", "on": true}],
@@ -85,7 +85,8 @@
                 <div class="hkp-field hkp-field-time"><label class="form-label" for="hkp-et">{{#str}}compose_ends, local_oksigeniahechauka{{/str}}</label><input class="form-control" type="time" id="hkp-et" name="eventto" value="{{values.eventto}}"></div>
             </div>
             <div class="hkp-field"><label class="form-label" for="hkp-body">{{#str}}compose_forwho, local_oksigeniahechauka{{/str}}</label><input class="form-control" id="hkp-body" name="body" value="{{values.body}}" maxlength="120" autocomplete="off"></div>
-            <div class="hkp-field"><span class="hkp-label" id="hkp-st-l">{{#str}}compose_stage, local_oksigeniahechauka{{/str}}</span><div class="hkp-stages" role="radiogroup" aria-labelledby="hkp-st-l">{{#stages}}<label class="hkp-chip is-small" data-stage="{{n}}"><input type="radio" name="colour" value="{{n}}"{{#checked}} checked{{/checked}}><i aria-hidden="true"></i>{{label}}</label>{{/stages}}</div></div>
+            {{#hascategories}}<div class="hkp-field"><span class="hkp-label" id="hkp-st-l">{{#str}}compose_category, local_oksigeniahechauka{{/str}}</span><div class="hkp-stages" role="radiogroup" aria-labelledby="hkp-st-l">{{#stages}}<label class="hkp-chip is-small" data-stage="{{n}}"><input type="radio" name="colour" value="{{id}}" data-n="{{n}}"{{#checked}} checked{{/checked}}><i aria-hidden="true"></i>{{label}}</label>{{/stages}}</div><p class="hkp-hint">{{#str}}compose_category_help, local_oksigeniahechauka{{/str}}</p></div>{{/hascategories}}
+            {{^hascategories}}{{#centre}}<p class="hkp-hint">{{#str}}compose_category_nocats, local_oksigeniahechauka{{/str}} <a href="{{centre}}">{{#str}}tab_centre, local_oksigeniahechauka{{/str}}</a></p>{{/centre}}{{/hascategories}}
             {{/isevent}}
             {{#isticker}}
             <legend>{{#str}}compose_ticker, local_oksigeniahechauka{{/str}}</legend>
@@ -97,8 +98,8 @@
             <div class="hkp-field"><label class="form-label" for="hkp-title">{{#str}}compose_name, local_oksigeniahechauka{{/str}}</label><input class="form-control{{#errors.title}} is-invalid{{/errors.title}}" id="hkp-title" name="title" value="{{values.title}}" maxlength="80" autocomplete="off" required><p class="hkp-hint">{{#errors.title}}{{errors.title}}{{/errors.title}}</p></div>
             <div class="hkp-field"><label class="form-label" for="hkp-url">{{#str}}agenda_url, local_oksigeniahechauka{{/str}}</label><input class="form-control{{#errors.url}} is-invalid{{/errors.url}}" type="url" id="hkp-url" name="url" value="{{values.url}}" spellcheck="false" autocomplete="off">
                 <p class="hkp-hint">{{#errors.url}}<b class="text-danger">{{errors.url}}</b> {{/errors.url}}{{#str}}compose_agenda_help, local_oksigeniahechauka{{/str}}</p></div>
-            <div class="hkp-field"><span class="hkp-label" id="hkp-col-l">{{#str}}compose_colour, local_oksigeniahechauka{{/str}}</span><div class="hkp-stages" role="radiogroup" aria-labelledby="hkp-col-l">{{#stages}}<label class="hkp-chip is-small" data-stage="{{n}}"><input type="radio" name="colour" value="{{n}}"{{#checked}} checked{{/checked}}><i aria-hidden="true"></i>{{label}}</label>{{/stages}}</div>
-                <p class="hkp-hint">{{#str}}compose_colour_help, local_oksigeniahechauka{{/str}}</p></div>
+            {{#hascategories}}<div class="hkp-field"><span class="hkp-label" id="hkp-col-l">{{#str}}compose_category, local_oksigeniahechauka{{/str}}</span><div class="hkp-stages" role="radiogroup" aria-labelledby="hkp-col-l">{{#stages}}<label class="hkp-chip is-small" data-stage="{{n}}"><input type="radio" name="colour" value="{{id}}" data-n="{{n}}"{{#checked}} checked{{/checked}}><i aria-hidden="true"></i>{{label}}</label>{{/stages}}</div>
+                <p class="hkp-hint">{{#str}}compose_colour_help, local_oksigeniahechauka{{/str}}</p></div>{{/hascategories}}
             {{/isagenda}}
         </fieldset>
 

@@ -9,25 +9,55 @@ function keepEmoji(t) {
     return m ? m[1] + '\u00a0' + t.slice(m[0].length) : t;
 }
 
+// Lower case and without accents, for comparing words: «Educación» and «educacion» are the same word.
+function plain(text) {
+    return String(text || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+}
+
 /**
- * The stage of an event from its group, as school calendars write it: «Inf» Infantil, «Pri» Primaria, «ESO»,
- * «Bac(h)» Bachillerato, in the four colours of the centre in that order; 0 for something of the whole school.
+ * The centre's category of an event by its words: the first category with a word that starts a word of the text
+ * («Inf» marks «Infantil»; «Ingeniería» marks «Ingeniería Civil»), or a phrase of several words found whole. 0 if none.
+ *
+ * @param {string} text the group of its title, or its «who or where»
+ * @param {Array<{n: number, words: string[]}>} categories from the manifest
+ * @returns {number} the category's position, 1 to 6
  */
-export function stageOf(group) {
-    const g = String(group || '');
-    if (/(^|[^a-z])inf/i.test(g)) {
-        return 1;
+export function categoryOf(text, categories) {
+    const tokens = plain(text).split(/[^a-z0-9ñ]+/).filter(Boolean);
+    if (!tokens.length) {
+        return 0;
     }
-    if (/(^|[^a-z])pri/i.test(g)) {
-        return 2;
-    }
-    if (/(^|[^a-z])eso($|[^a-z])/i.test(g)) {
-        return 3;
-    }
-    if (/(^|[^a-z])bac/i.test(g)) {
-        return 4;
+    const joined = ' ' + tokens.join(' ') + ' ';
+    const list = categories || [];
+    for (let i = 0; i < list.length; i++) {
+        const words = list[i].words || [];
+        for (let k = 0; k < words.length; k++) {
+            const w = plain(words[k]).split(/[^a-z0-9ñ]+/).filter(Boolean).join(' ');
+            if (!w) {
+                continue;
+            }
+            const found = w.indexOf(' ') >= 0 ? joined.indexOf(' ' + w + ' ') >= 0 : tokens.some(function (t) {
+                return t.indexOf(w) === 0;
+            });
+            if (found) {
+                return list[i].n;
+            }
+        }
     }
     return 0;
+}
+
+/**
+ * The colour of an event: the category chosen for it, or the one its words mark, or 0 (a neutral grey).
+ *
+ * @param {object} ev
+ * @param {string} text
+ * @param {Array} categories
+ * @returns {number}
+ */
+export function colourOf(ev, text, categories) {
+    const n = Number(ev && ev.color) || 0;
+    return n >= 1 && n <= 6 ? n : categoryOf(text, categories);
 }
 
 /** «3º ESO - Acampada» reads as «Acampada» with «3º ESO» under it; a title without « - » stays whole. */
@@ -96,7 +126,7 @@ export function upcoming(events, today, days, s) {
             day: dayLabel(date, today, s),
             title: parts.title,
             group: parts.group || ev.detail || '',
-            color: stageOf(parts.group || ev.detail) || (ev.color >= 1 && ev.color <= 4 ? ev.color : 0),
+            color: colourOf(ev, parts.group || ev.detail, s.categories),
             sameDay: date === before,
         };
         before = date;
@@ -110,7 +140,7 @@ export function upcoming(events, today, days, s) {
  *
  * @returns {{id: string, days: number, title: string, group: string, date: string, color: number}|null}
  */
-export function countdown(events, today, max) {
+export function countdown(events, today, max, categories) {
     const t = dayNumber(today);
     let best = null;
     events.forEach(function (ev) {
@@ -123,7 +153,7 @@ export function countdown(events, today, max) {
         if (long && days >= 2 && days <= (max || 14) && (!best || days < best.days)) {
             const parts = splitTitle(ev.title);
             best = {id: ev.id, days, title: parts.title, group: parts.group || ev.detail || '', date: dateOf(ev.start),
-                color: stageOf(parts.group) || (ev.color >= 1 && ev.color <= 4 ? ev.color : 0)};
+                color: colourOf(ev, parts.group || ev.detail, categories)};
         }
     });
     return best;

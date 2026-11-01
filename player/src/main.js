@@ -8,7 +8,7 @@ import {makeApi} from './api.js';
 import {realClock, simulatedClock} from './clock.js';
 import {MediaStore, mediaOf} from './media.js';
 import {pair} from './pairing.js';
-import {countdown, dayLabel, splitTitle, stageOf, upcoming} from './agenda.js';
+import {colourOf, countdown, dayLabel, splitTitle, upcoming} from './agenda.js';
 import {Composer, draftChoice} from './compose.js';
 import {dayNumber, isDark, isLive, isPowerOn, liveItems, urgentOf, weekdayOf} from './rules.js';
 import {Screen} from './render.js';
@@ -16,7 +16,7 @@ import {store} from './store.js';
 import {countToday} from './today.js';
 import {weekOf} from './week.js';
 
-const VERSION = '0.6.0';
+const VERSION = '0.6.1';
 const COMING_DAYS = 7;
 const HEARTBEAT_MS = 60000;
 const REFRESH_MS = 15 * 60000;
@@ -255,12 +255,13 @@ class Player {
         }).map(function (n) {
             return {title: n.title || '', body: n.body || '', tone: n.tone || 'normal'};
         });
+        const cats = this.manifest.categories || [];
         const events = side.filter(function (it) {
             return it.type === 'event';
         }).sort(byStart).map(function (ev) {
             const parts = splitTitle(ev.title);
             return {time: ev.allday || !ev.start ? '·' : ev.start.slice(11, 16), title: parts.title,
-                group: parts.group || ev.detail || '', color: stageOf(parts.group || ev.detail) || ev.color || 0};
+                group: parts.group || ev.detail || '', color: colourOf(ev, parts.group || ev.detail, cats)};
         });
         const menu = this.menuOf(side.filter(function (it) {
             return it.type === 'menu';
@@ -270,8 +271,8 @@ class Player {
         });
         const labels = this.manifest.labels || {};
         const names = {tomorrow: labels.tomorrow || this.strings.tomorrow, days_short: this.strings.days_short,
-            months_short: this.strings.months_short};
-        const big = countdown(all, wall.date, 14);
+            months_short: this.strings.months_short, categories: cats};
+        const big = countdown(all, wall.date, 14, cats);
         if (big) {
             big.day = dayLabel(big.date, wall.date, names);
         }
@@ -302,6 +303,7 @@ class Player {
             holiday: s.week_holiday || '',
             from: s.week_from || '',
             until: s.week_until || '',
+            categories: this.manifest.categories || [],
         });
     }
 

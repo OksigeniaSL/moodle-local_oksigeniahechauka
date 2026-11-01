@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.6.1 (2026-11-01)
+
+- **Each centre names its own categories** to colour its events (the stages of a school, the faculties of a
+  university, the areas of an academy), up to six, none by default: in «Tu centro», each with its colour and the words
+  that mark it in a title or in «for whom», or brought from Moodle's top course categories, linked, so their calendar
+  events reach the screens in their colour. The four fixed stages (Infantil, Primaria, ESO, Bachillerato) go; colours a
+  site had chosen for them become its first categories. Adding an event chooses among the centre's categories.
+- «Tu centro» says when its colours are still Hechauka's own.
+- The urgent notice's sentences already made fit any centre (severe weather, early closing).
+- Mustache scripts pass Moodle 4.5's ESLint; on a phone the panel keeps 16 px from the edge.
+
 ## 0.6.0 (2026-11-01)
 
 The panel, as the art direction drew it (DESIGN.md), and run without being an administrator.

@@ -159,7 +159,10 @@ class compose {
             'eventfrom' => (string) $v('eventfrom', $start ? phrases::hour($start) : '10:00'),
             'eventto' => (string) $v('eventto', $end ? phrases::hour($end) : ''),
         ];
-        $colour = (int) $v('colour', $data['color'] ?? 0);
+        // The category chosen, by its id (an old number of the four colours means the category in that place).
+        $resolved = categories::resolve($data['category'] ?? ($data['color'] ?? 0));
+        $current = $resolved ? (categories::all()[$resolved - 1]['id'] ?? '') : '';
+        $colour = (string) $v('colour', $current);
 
         // When.
         $from = schedule::is_date($item->datefrom ?? '') ? $item->datefrom : '';
@@ -271,10 +274,11 @@ class compose {
                 'checked' => $t === $type,
                 'url' => (new \moodle_url('/local/oksigeniahechauka/edit.php', ['type' => $t]))->out(false)];
         }
-        $stages = [];
-        foreach ([0, 1, 2, 3, 4] as $n) {
-            $stages[] = ['n' => $n, 'label' => get_string($type === 'agenda' && !$n ? 'compose_colour_bystage' : 'stage_' . $n, $c),
-                'checked' => $colour === $n];
+        // The centre's categories to choose from: none (grey, or each event by its words in an agenda), then each one.
+        $stages = [['n' => 0, 'id' => '', 'label' => get_string($type === 'agenda' ? 'compose_category_bywords' :
+            'compose_category_none', $c), 'checked' => $colour === '']];
+        foreach (categories::all() as $i => $cat) {
+            $stages[] = ['n' => $i + 1, 'id' => $cat['id'], 'label' => $cat['name'], 'checked' => $colour === $cat['id']];
         }
         $first = $screensmap[0] ?? null;
 
@@ -293,6 +297,8 @@ class compose {
             'hastypes' => !$item,
             'values' => $values,
             'stages' => $stages,
+            'hascategories' => count($stages) > 1,
+            'centre' => access::can('managescreens') ? (new \moodle_url('/local/oksigeniahechauka/centre.php'))->out(false) : '',
             'file' => $file,
             'maxbytes' => display_size(get_max_upload_file_size()),
             'shortcuts' => $shortcuts,
@@ -422,7 +428,7 @@ class compose {
             'important' => optional_param('important', 0, PARAM_BOOL),
             'caption' => optional_param('caption', 0, PARAM_BOOL),
             'url' => trim(optional_param('url', '', PARAM_RAW_TRIMMED)),
-            'colour' => optional_param('colour', 0, PARAM_INT),
+            'colour' => optional_param('colour', '', PARAM_ALPHANUM),
             'eventday' => optional_param('eventday', '', PARAM_RAW_TRIMMED),
             'eventfrom' => optional_param('eventfrom', '', PARAM_RAW_TRIMMED),
             'eventto' => optional_param('eventto', '', PARAM_RAW_TRIMMED),
@@ -565,10 +571,12 @@ class compose {
         } else if ($type === 'event') {
             $extra['start'] = $eventstart;
             $extra['end'] = $eventend;
-            $extra['color'] = max(0, min(4, $in['colour']));
+            $extra['category'] = categories::position($in['colour']) ? $in['colour'] : '';
+            unset($extra['color']);
         } else if ($type === 'agenda') {
             $extra['url'] = $in['url'];
-            $extra['color'] = max(0, min(4, $in['colour']));
+            $extra['category'] = categories::position($in['colour']) ? $in['colour'] : '';
+            unset($extra['color']);
         }
         $record->data = json_encode($extra);
         $record->usermodified = $USER->id;

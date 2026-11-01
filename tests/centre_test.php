@@ -49,8 +49,7 @@ final class centre_test extends \advanced_testcase {
             // Large and bold on the screens: 3:1 at least, whatever the colour.
             $this->assertGreaterThanOrEqual(3, colours::contrast(colours::on($hex), $hex));
         }
-        $vars = colours::vars(['colourprimary' => '#F2C200', 'colouraccent' => '#e8a33a', 'colour2' => '#2f8a55',
-            'colour3' => 'no']);
+        $vars = colours::vars(['colourprimary' => '#F2C200', 'colouraccent' => '#e8a33a'], [2 => '#2f8a55', 3 => 'no']);
         $this->assertSame('#f2c200', $vars['--hk-primario']);
         $this->assertSame(colours::DARK, $vars['--hk-sobre-primario']);
         $this->assertArrayHasKey('--hk-acento-texto', $vars);
@@ -100,5 +99,37 @@ final class centre_test extends \advanced_testcase {
         $this->assertLessThan(360, max(array_map('floatval', $m[1])));
         $this->assertStringContainsString('V200', $map['grid']);
         $this->assertSame('', place::map(0.0, -30.0)['land']);
+    }
+
+    /**
+     * Each centre names its own categories: none by default, any name and words, the top course categories of Moodle
+     * brought in and linked, an id that stays, and the old numbers of the four colours read as positions.
+     */
+    public function test_categories_of_each_centre(): void {
+        global $DB;
+        $this->resetAfterTest();
+        $this->assertSame([], \local_oksigeniahechauka\local\categories::all());
+        $cats = \local_oksigeniahechauka\local\categories::class;
+        $cats::save([['name' => 'Ingeniería', 'words' => 'Ing, ETSI'], ['name' => 'Derecho', 'colour' => '#123456'],
+            ['name' => ''], ['name' => 'Ciencias de la Salud']]);
+        $all = $cats::all();
+        $this->assertSame(['Ingeniería', 'Derecho', 'Ciencias de la Salud'], array_column($all, 'name'));
+        $this->assertSame(['ing', 'etsi'], $all[0]['words']);
+        $this->assertSame(['derecho'], $all[1]['words']);
+        $this->assertSame('#123456', $all[1]['colour']);
+        $this->assertSame(2, $cats::position($all[1]['id']));
+        $this->assertSame(3, $cats::resolve(3));
+        $this->assertSame(0, $cats::resolve(4));
+        $this->assertSame([['n' => 1, 'name' => 'Ingeniería', 'words' => ['ing', 'etsi']]], array_slice($cats::contract(), 0, 1));
+        // Moodle's top course categories, linked; a course category below one of them takes its colour.
+        $faculty = $this->getDataGenerator()->create_category(['name' => 'Facultad de Bellas Artes']);
+        $below = $this->getDataGenerator()->create_category(['name' => 'Grado en Diseño', 'parent' => $faculty->id]);
+        $found = array_values(array_filter($cats::from_moodle(), function ($c) use ($faculty) {
+            return $c['coursecat'] === (int) $faculty->id;
+        }));
+        $this->assertSame('Facultad de Bellas Artes', $found[0]['name']);
+        $cats::save(array_merge($all, $found));
+        $this->assertSame(4, $cats::of_coursecat((int) $below->id));
+        $this->assertSame(0, $cats::of_coursecat(999999));
     }
 }

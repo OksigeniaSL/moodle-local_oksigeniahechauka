@@ -27,6 +27,7 @@
         "action": "https://example.com/local/oksigeniahechauka/centre.php", "sesskey": "abc",
         "query": "", "searched": false, "results": [], "hasresults": false, "resultsjson": "[]", "place": null,
         "tiles": [{"setting": "colourprimary", "value": "#1f5f8b", "name": "Principal", "use": "la cinta", "hex": "#1F5F8B", "on": "letra blanca"}],
+        "defaults": true, "categories": [], "hascategories": false, "canadd": true, "canimport": false, "palette": "[]", "max": 6,
         "logos": [{"area": "logo", "dark": false, "label": "Para fondo claro", "url": "", "alt": "Logotipo"}],
         "frame": "https://example.com/local/oksigeniahechauka/preview.php?frame=1", "placename": "", "admin": "",
         "icons": {"search": "", "pin": "", "out": "", "check": ""}, "strings": "{}"
@@ -73,8 +74,25 @@
                 <input type="hidden" name="sesskey" value="{{sesskey}}">
                 <section class="hkp-fs" aria-labelledby="hkp-col-h">
                     <h2 id="hkp-col-h" class="hkp-label hkp-section-label">{{#str}}centre_colours, local_oksigeniahechauka{{/str}}</h2>
-                    <p class="hkp-hint hkp-section-hint">{{#str}}centre_colours_help, local_oksigeniahechauka{{/str}}</p>
+                    <p class="hkp-hint hkp-section-hint">{{#str}}centre_colours_help, local_oksigeniahechauka{{/str}}{{#defaults}} <b>{{#str}}centre_colours_defaults, local_oksigeniahechauka{{/str}}</b>{{/defaults}}</p>
                     <div class="hkp-colours">{{#tiles}}<label class="hkp-colour"><input type="color" name="{{setting}}" value="{{value}}" data-colour="{{setting}}" aria-describedby="hkp-c-{{setting}}"><b>{{name}}</b><span id="hkp-c-{{setting}}">{{use}} · <span data-hex="{{setting}}">{{hex}}</span>, <span data-on="{{setting}}">{{on}}</span></span></label>{{/tiles}}</div>
+                </section>
+                <section class="hkp-fs" aria-labelledby="hkp-cat-h">
+                    <h2 id="hkp-cat-h" class="hkp-label hkp-section-label">{{#str}}centre_categories, local_oksigeniahechauka{{/str}}</h2>
+                    <p class="hkp-hint hkp-section-hint">{{#str}}centre_categories_help, local_oksigeniahechauka{{/str}}</p>
+                    <ol class="hkp-cats" id="hkp-cats" data-palette="{{palette}}" data-max="{{max}}">
+                        {{#categories}}<li class="hkp-cat"><input type="hidden" name="cat_id[]" value="{{id}}"><input type="hidden" name="cat_coursecat[]" value="{{coursecat}}">
+                            <input type="color" name="cat_colour[]" value="{{colour}}" data-category aria-label="{{#str}}centre_category_colour, local_oksigeniahechauka, {{name}}{{/str}}">
+                            <div class="hkp-field"><label class="form-label" for="hkp-cat-n{{n}}">{{#str}}name, local_oksigeniahechauka{{/str}}</label><input class="form-control" id="hkp-cat-n{{n}}" name="cat_name[]" value="{{name}}" maxlength="60" autocomplete="off"></div>
+                            <div class="hkp-field hkp-cat-words"><label class="form-label" for="hkp-cat-w{{n}}">{{#str}}centre_category_words, local_oksigeniahechauka{{/str}}</label><input class="form-control" id="hkp-cat-w{{n}}" name="cat_words[]" value="{{words}}" autocomplete="off"></div>
+                            <button type="button" class="btn btn-sm btn-outline-secondary btn-icon" data-remove-cat aria-label="{{remove}}" title="{{remove}}">×</button>
+                            {{#linked}}<small>{{linked}}</small>{{/linked}}
+                        </li>{{/categories}}
+                    </ol>
+                    {{^hascategories}}<p class="hkp-hint" id="hkp-cats-none">{{#str}}centre_categories_none, local_oksigeniahechauka{{/str}}</p>{{/hascategories}}
+                    <template id="hkp-cat-new"><li class="hkp-cat"><input type="hidden" name="cat_id[]" value=""><input type="hidden" name="cat_coursecat[]" value="0"><input type="color" name="cat_colour[]" value="#1f5f8b" data-category aria-label="{{#str}}centre_category_colour_new, local_oksigeniahechauka{{/str}}"><div class="hkp-field"><label class="form-label">{{#str}}name, local_oksigeniahechauka{{/str}}<input class="form-control" name="cat_name[]" maxlength="60" autocomplete="off"></label></div><div class="hkp-field hkp-cat-words"><label class="form-label">{{#str}}centre_category_words, local_oksigeniahechauka{{/str}}<input class="form-control" name="cat_words[]" autocomplete="off"></label></div><button type="button" class="btn btn-sm btn-outline-secondary btn-icon" data-remove-cat aria-label="{{#str}}centre_category_remove_new, local_oksigeniahechauka{{/str}}">×</button></li></template>
+                    <div class="hkp-chips">{{#canadd}}<button type="button" class="btn btn-outline-secondary" id="hkp-cat-add">+ {{#str}}centre_category_add, local_oksigeniahechauka{{/str}}</button>{{/canadd}}{{#canimport}}<button type="submit" class="btn btn-outline-secondary" name="import" value="1">{{#str}}centre_category_import, local_oksigeniahechauka{{/str}}</button>{{/canimport}}</div>
+                    <p class="hkp-hint">{{#str}}centre_category_words_help, local_oksigeniahechauka{{/str}}</p>
                 </section>
                 <section class="hkp-fs" aria-labelledby="hkp-logo-h">
                     <h2 id="hkp-logo-h" class="hkp-label hkp-section-label">{{#str}}centre_logo, local_oksigeniahechauka{{/str}}</h2>

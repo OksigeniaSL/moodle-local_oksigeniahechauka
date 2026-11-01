@@ -161,7 +161,7 @@ length unless it has a duration.
 | `image` | `main` | `media`, `fit` (`cover`, `contain` or `blur`), `focus` (`[x, y]` from 0 to 1, for `cover`), `caption` |
 | `video` | `main` | `media`, `poster` and `backdrop` (still images), `fit`, `caption` |
 | `notice` | `side` | `title`, `body` (one short line), `tone` (`normal` or `important`) |
-| `event` | `side` | `title`, `detail` (who or where, one line), `start` and `end` (`"2026-11-02T10:00"`), `allday`, `color` (1 to 4, optional), `holiday` (optional). A title «3º ESO - Acampada» reads as «Acampada» with «3º ESO» under it |
+| `event` | `side` | `title`, `detail` (who or where, one line), `start` and `end` (`"2026-11-02T10:00"`), `allday`, `color` (1 to 6, optional: the centre's category), `holiday` (optional). A title «3º ESO - Acampada» reads as «Acampada» with «3º ESO» under it |
 | `menu` | `side` | `date`, `label`, `menus`, `closed`, `title`, `note` |
 | `ticker` | `ticker` | `text` |
 | `urgent` | `urgent` | `title`, `body`, `ends` (optional, `"2026-11-02T11:46"`). The urgent notice: while one is live and its `ends` has not come, it covers the whole screen (red with white, striped edges, the clock) and nothing moves under it; the newest one wins. A screen off by its power hours shows it when it comes on, if it is still there |
@@ -172,11 +172,12 @@ length unless it has a duration.
   at which nothing overflows; when nothing fits, notices and events turn pages.
 - «La semana» shows the events of the next five school days, holidays and events of more than a day. A holiday is an
   event with `holiday: true`, or whose title starts with «Festivo», «No lectivo» or «Vacaciones» before « - ».
-- The colour of an event is its stage: the player takes it from the group of its title or its `detail` («Inf», «Pri»,
-  «ESO», «Bach»: `--hk-marca-1` to `-4`); without one, the event's `color`; without either, a neutral grey (the
-  whole school).
+- The colour of an event is its category, one of the centre's own (the manifest's `categories`: `[{n, name, words}]`,
+  up to six, `--hk-marca-1` to `-6` in the theme): the event's `color` if it has one; else the first category with a
+  word that starts a word of the group of its title or of its `detail` («Ing» marks «Ingeniería Civil»; a word of
+  several words, whole); without either, a neutral grey. Each centre names its categories: nothing is fixed.
 - An `event` disappears by itself once its end has passed (an hour after its start if it has no end; the end of its
-  last day if it is all day). `color` picks one of the four colours of the client (`--hk-marca-1` to `-4`), for example by stage.
+  last day if it is all day). `color` picks one of the centre's categories (`--hk-marca-1` to `-6`).
 - A `menu` is the menu of one day: `menus` is `[{"name": "Menu A", "courses": [{"label": "First course", "dishes":
   ["…"]}]}]`, and every menu is a page of the block. `label` replaces the title of the block (the server can show
   tomorrow's menu in the afternoon, with its own `when` and «Tomorrow's menu»). With `closed`, `title` says why.

@@ -110,5 +110,24 @@ function xmldb_local_oksigeniahechauka_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026110100, 'local', 'oksigeniahechauka');
     }
 
+    if ($oldversion < 2026110200) {
+        // The four fixed stage colours become the centre's own categories (each centre names its parts); the colours a
+        // site had chosen are kept as its first categories, to be named in «Tu centro».
+        $c = 'local_oksigeniahechauka';
+        $list = [];
+        for ($i = 1; $i <= 4; $i++) {
+            $colour = (string) get_config($c, 'colour' . $i);
+            if (preg_match('/^#[0-9a-fA-F]{6}$/', $colour)) {
+                $list[] = ['id' => 'c' . $i, 'name' => get_string('category_n', $c, $i), 'colour' => $colour, 'words' => [],
+                    'coursecat' => 0];
+            }
+            unset_config('colour' . $i, $c);
+        }
+        if ($list && !get_config($c, 'categories')) {
+            set_config('categories', json_encode($list), $c);
+        }
+        upgrade_plugin_savepoint(true, 2026110200, 'local', 'oksigeniahechauka');
+    }
+
     return true;
 }

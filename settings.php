@@ -96,14 +96,7 @@ if ($hassiteconfig) {
             get_string('colouraccent_desc', $p),
             ''
         ));
-        for ($i = 1; $i <= 4; $i++) {
-            $settings->add(new admin_setting_configcolourpicker(
-                "$p/colour$i",
-                get_string('colour_n', $p, $i),
-                $i === 1 ? get_string('colours_desc', $p) : '',
-                ''
-            ));
-        }
+        // The categories of the centre (their names, colours and words) are set in the panel, «Tu centro».
 
         // What reaches the screens by itself.
         $settings->add(new admin_setting_heading("$p/sources", get_string('sources', $p), ''));

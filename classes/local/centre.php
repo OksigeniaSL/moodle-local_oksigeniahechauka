@@ -27,14 +27,10 @@ class centre {
     /** @var string */
     const C = 'local_oksigeniahechauka';
 
-    /** @var array The colours the screens use when the school has not chosen its own. */
+    /** @var array The colours the screens use when the centre has not chosen its own. */
     const DEFAULTS = [
         'colourprimary' => '#1f5f8b',
         'colouraccent' => '#e8a33a',
-        'colour1' => '#1f5f8b',
-        'colour2' => '#2f8a55',
-        'colour3' => '#c9842a',
-        'colour4' => '#b23a48',
     ];
 
     /**
@@ -87,22 +83,42 @@ class centre {
             ];
         }
 
-        // The colours, each with the text that will go on it.
+        // The two colours, each with the text that will go on it; «de serie» while the centre has not chosen its own.
         $tiles = [];
         $uses = ['colourprimary' => ['centre_primary', 'centre_primary_use'], 'colouraccent' => ['centre_accent',
             'centre_accent_use']];
+        $chosen = false;
         foreach (self::DEFAULTS as $setting => $default) {
-            $value = colours::valid($config->$setting ?? '') ? strtolower($config->$setting) : $default;
-            $n = (int) substr($setting, -1);
+            $mine = colours::valid($config->$setting ?? '');
+            $chosen = $chosen || $mine;
+            $value = $mine ? strtolower($config->$setting) : $default;
             $tiles[] = [
                 'setting' => $setting,
                 'value' => $value,
-                'name' => isset($uses[$setting]) ? get_string($uses[$setting][0], $c) : get_string('stage_' . $n, $c),
-                'use' => isset($uses[$setting]) ? get_string($uses[$setting][1], $c) : get_string('centre_stage_use', $c, $n),
+                'name' => get_string($uses[$setting][0], $c),
+                'use' => get_string($uses[$setting][1], $c),
                 'hex' => strtoupper($value),
                 'on' => get_string(colours::on($value) === '#ffffff' ? 'centre_text_white' : 'centre_text_dark', $c),
             ];
         }
+
+        // The centre's categories: what it calls its parts, each with its colour and the words that mark it.
+        $coursecats = $DB->get_records_menu('course_categories', null, '', 'id, name');
+        $cats = [];
+        foreach (categories::all() as $i => $cat) {
+            $cats[] = ['n' => $i + 1, 'id' => $cat['id'], 'name' => $cat['name'], 'colour' => $cat['colour'],
+                'words' => implode(', ', $cat['words']), 'coursecat' => $cat['coursecat'],
+                'linked' => $cat['coursecat'] && isset($coursecats[$cat['coursecat']]) ? get_string(
+                    'centre_category_linked',
+                    $c,
+                    format_string($coursecats[$cat['coursecat']])
+                ) : '',
+                'remove' => get_string('centre_category_remove', $c, $cat['name'])];
+        }
+        $linked = array_column(categories::all(), 'coursecat');
+        $importable = count(array_filter(categories::from_moodle(), function ($cat) use ($linked) {
+            return !in_array($cat['coursecat'], $linked);
+        }));
 
         // The logos.
         $logos = [];
@@ -140,6 +156,13 @@ class centre {
             'resultsjson' => json_encode($results),
             'place' => $place,
             'tiles' => $tiles,
+            'defaults' => !$chosen,
+            'categories' => $cats,
+            'hascategories' => (bool) $cats,
+            'canadd' => count($cats) < categories::MAX,
+            'canimport' => $importable > 0 && count($cats) < categories::MAX,
+            'palette' => json_encode(categories::PALETTE),
+            'max' => categories::MAX,
             'logos' => $logos,
             'frame' => (new \moodle_url('/local/oksigeniahechauka/preview.php', ['frame' => 1, 'screen' => $first]))->out(false),
             'placename' => $place['name'] ?? '',
@@ -164,11 +187,12 @@ class centre {
         $c = self::C;
         $out = ['notice' => ['title' => get_string('centre_sample_notice', $c), 'body' => get_string('centre_sample_body', $c)],
             'ticker' => get_string('centre_sample_ticker', $c), 'events' => []];
-        $events = [1 => ['09:30', 'centre_sample_event1'], 2 => ['10:30', 'centre_sample_event2'],
-            3 => ['12:00', 'centre_sample_event3']];
-        foreach ($events as $stage => [$hour, $title]) {
-            $out['events'][] = ['title' => get_string($title, $c), 'detail' => get_string('stage_' . $stage, $c),
-                'hour' => $hour, 'color' => $stage];
+        // An event in each of the first categories of the centre (or one without colour, if it has none).
+        $cats = array_slice(categories::all(), 0, 3);
+        $hours = ['09:30', '11:00', '12:30'];
+        foreach ($cats ?: [null] as $i => $cat) {
+            $out['events'][] = ['title' => get_string('centre_sample_event', $c), 'detail' => $cat ? $cat['name'] : '',
+                'hour' => $hours[$i], 'color' => $cat ? $i + 1 : 0];
         }
         return $out;
     }
@@ -187,6 +211,28 @@ class centre {
                 set_config($setting, strtolower($value), $c);
             }
         }
+        // The categories as they came, in their order (one without a name is taken out); then, if asked, the top
+        // course categories of the site not linked yet.
+        $ids = optional_param_array('cat_id', [], PARAM_ALPHANUM);
+        $names = optional_param_array('cat_name', [], PARAM_TEXT);
+        $colours = optional_param_array('cat_colour', [], PARAM_RAW_TRIMMED);
+        $words = optional_param_array('cat_words', [], PARAM_TEXT);
+        $links = optional_param_array('cat_coursecat', [], PARAM_INT);
+        $list = [];
+        foreach ($names as $i => $name) {
+            $list[] = ['id' => $ids[$i] ?? '', 'name' => $name, 'colour' => $colours[$i] ?? '', 'words' => $words[$i] ?? '',
+                'coursecat' => $links[$i] ?? 0];
+        }
+        if (optional_param('import', 0, PARAM_BOOL)) {
+            $linked = array_column($list, 'coursecat');
+            foreach (categories::from_moodle() as $cat) {
+                if (!in_array($cat['coursecat'], $linked)) {
+                    $cat['colour'] = categories::PALETTE[count($list) % categories::MAX];
+                    $list[] = $cat;
+                }
+            }
+        }
+        categories::save($list);
         $fs = get_file_storage();
         $context = \context_system::instance();
         foreach ([files::LOGO => 'logo', files::LOGODARK => 'logodark'] as $area => $setting) {

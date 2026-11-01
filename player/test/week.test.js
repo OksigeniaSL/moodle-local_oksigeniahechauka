@@ -2,7 +2,7 @@
 
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {stageOf} from '../src/agenda.js';
+import {categoryOf, colourOf} from '../src/agenda.js';
 import {weekOf} from '../src/week.js';
 
 const L = {
@@ -12,15 +12,32 @@ const L = {
         'noviembre', 'diciembre'],
     months_short: ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'],
     holiday: 'Festivo', from: 'desde el', until: 'hasta el',
+    // The categories of an example school, as its centre would set them in «Tu centro».
+    categories: [{n: 1, words: ['inf', 'infantil']}, {n: 2, words: ['pri', 'primaria']}, {n: 3, words: ['eso']},
+        {n: 4, words: ['bach', 'bachillerato']}],
 };
 
-test('the stage from the group of a title', () => {
-    assert.equal(stageOf('Infantil'), 1);
-    assert.equal(stageOf('4º Pri C'), 2);
-    assert.equal(stageOf('3º ESO'), 3);
-    assert.equal(stageOf('1º Bac Biología'), 4);
-    assert.equal(stageOf(''), 0);
-    assert.equal(stageOf('Mesorregión'), 0);
+test('the category of an event, by the words each centre gives its categories', () => {
+    const school = L.categories;
+    assert.equal(categoryOf('Infantil', school), 1);
+    assert.equal(categoryOf('4º Pri C', school), 2);
+    assert.equal(categoryOf('3º ESO', school), 3);
+    assert.equal(categoryOf('1º Bach Biología', school), 4);
+    assert.equal(categoryOf('', school), 0);
+    assert.equal(categoryOf('Mesorregión', school), 0);
+    // A university: its faculties, a phrase of two words, accents or not.
+    const university = [{n: 1, words: ['ingeniería', 'etsi']}, {n: 2, words: ['ciencias de la salud']},
+        {n: 3, words: ['derecho']}];
+    assert.equal(categoryOf('ETSI Caminos', university), 1);
+    assert.equal(categoryOf('Ingenieria Civil', university), 1);
+    assert.equal(categoryOf('Facultad de Ciencias de la Salud', university), 2);
+    assert.equal(categoryOf('Ciencias Exactas', university), 0);
+    assert.equal(categoryOf('3º ESO', university), 0);
+    // No categories: no colour.
+    assert.equal(categoryOf('3º ESO', []), 0);
+    // A category chosen for the event wins over its words.
+    assert.equal(colourOf({color: 2}, '3º ESO', school), 2);
+    assert.equal(colourOf({}, '3º ESO', school), 3);
 });
 
 test('five school days from today; from a Thursday it goes on after the weekend', () => {

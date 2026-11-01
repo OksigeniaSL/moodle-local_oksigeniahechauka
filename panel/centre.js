@@ -39,11 +39,18 @@
         }
         return to[0] ? '#ffffff' : '#000000';
     };
-    const names = {colourprimary: '--hk-primario', colouraccent: '--hk-acento', colour1: '--hk-marca-1',
-        colour2: '--hk-marca-2', colour3: '--hk-marca-3', colour4: '--hk-marca-4'};
+    const names = {colourprimary: '--hk-primario', colouraccent: '--hk-acento'};
 
     const vars = () => {
         const out = {};
+        // The centre's categories, by their place in the list.
+        page.querySelectorAll('[data-category]').forEach((input, i) => {
+            const hex = input.value.toLowerCase();
+            const name = '--hk-marca-' + (i + 1);
+            out[name] = hex;
+            out['--hk-sobre-marca-' + (i + 1)] = on(hex);
+            out[name + '-oscuro'] = readable(hex, '#19212c');
+        });
         page.querySelectorAll('[data-colour]').forEach((input) => {
             const setting = input.getAttribute('data-colour');
             const hex = input.value.toLowerCase();
@@ -52,8 +59,6 @@
             out[name.replace('--hk-', '--hk-sobre-')] = on(hex);
             if (setting === 'colouraccent') {
                 out['--hk-acento-texto'] = readable(hex, '#ffffff');
-            } else if (setting !== 'colourprimary') {
-                out[name + '-oscuro'] = readable(hex, '#19212c');
             }
         });
         return out;
@@ -77,9 +82,8 @@
     };
     // Passing over a sample, its colour blinks on the screen: where it goes, at a glance.
     let blinking = null;
-    const blink = (setting) => {
+    const blink = (name) => {
         clearTimeout(blinking);
-        const name = names[setting];
         let n = 0;
         const step = () => {
             send(n % 2 === 0 ? {[name]: '#ff2d95'} : null);
@@ -115,9 +119,46 @@
     });
     page.querySelectorAll('.hkp-colour').forEach((tile) => {
         const input = tile.querySelector('[data-colour]');
-        tile.addEventListener('mouseenter', () => blink(input.getAttribute('data-colour')));
-        input.addEventListener('focus', () => blink(input.getAttribute('data-colour')));
+        tile.addEventListener('mouseenter', () => blink(names[input.getAttribute('data-colour')]));
+        input.addEventListener('focus', () => blink(names[input.getAttribute('data-colour')]));
     });
+    // The categories: add one (in the next colour of the palette), take one out, see a colour as it changes.
+    const list = page.querySelector('#hkp-cats');
+    const palette = JSON.parse((list && list.getAttribute('data-palette')) || '[]');
+    const max = Number((list && list.getAttribute('data-max')) || 6);
+    const wire = (row) => {
+        const input = row.querySelector('[data-category]');
+        const place = () => '--hk-marca-' + (Array.prototype.indexOf.call(list.children, row) + 1);
+        input.addEventListener('input', send);
+        row.addEventListener('mouseenter', () => blink(place()));
+        input.addEventListener('focus', () => blink(place()));
+        row.querySelector('[data-remove-cat]').addEventListener('click', () => {
+            row.remove();
+            send();
+            if (add) {
+                add.hidden = list.children.length >= max;
+            }
+        });
+    };
+    const add = page.querySelector('#hkp-cat-add');
+    if (list) {
+        Array.prototype.forEach.call(list.children, wire);
+    }
+    if (add && list) {
+        add.addEventListener('click', () => {
+            const row = page.querySelector('#hkp-cat-new').content.firstElementChild.cloneNode(true);
+            row.querySelector('[data-category]').value = palette[list.children.length % palette.length] || '#1f5f8b';
+            list.appendChild(row);
+            wire(row);
+            const none = page.querySelector('#hkp-cats-none');
+            if (none) {
+                none.hidden = true;
+            }
+            add.hidden = list.children.length >= max;
+            row.querySelector('input[name="cat_name[]"]').focus();
+            send();
+        });
+    }
     // A new logo, seen before it is saved.
     page.querySelectorAll('[data-logo]').forEach((input) => {
         input.addEventListener('change', () => {

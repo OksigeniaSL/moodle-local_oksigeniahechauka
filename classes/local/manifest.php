@@ -89,6 +89,7 @@ class manifest {
                 $m['weather'] = $weather;
             }
         }
+        $m['categories'] = categories::contract();
         $m['items'] = self::unique(array_merge(self::own_items($screen, $now), self::source_items($config, $now)));
         $m['etag'] = self::etag($m);
         return $m;
@@ -147,7 +148,7 @@ class manifest {
         foreach (array_keys(colours::SETTINGS) as $setting) {
             $set[$setting] = $config->$setting ?? '';
         }
-        $theme['vars'] = colours::vars($set);
+        $theme['vars'] = colours::vars($set, categories::colours());
         if (!$theme['vars']) {
             unset($theme['vars']);
         }

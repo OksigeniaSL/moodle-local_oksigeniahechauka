@@ -189,6 +189,12 @@ final class manifest_test extends \advanced_testcase {
         $this->assertCount(2, $events);
         $this->assertSame('Teatro', $events[0]['title']);
         $this->assertSame('2026-11-03T11:00', $events[0]['end']);
+        // Without categories of the centre, no colour; with them, the agenda's own (its third).
+        $this->assertArrayNotHasKey('color', $events[0]);
+        \local_oksigeniahechauka\local\categories::save([['name' => 'Uno'], ['name' => 'Dos'], ['name' => 'Tres']]);
+        $events = array_values(array_filter(manifest::build($infant, $now)['items'], function ($it) {
+            return $it['type'] === 'event';
+        }));
         $this->assertSame(3, $events[0]['color']);
         $this->assertArrayNotHasKey('color', agendas::contract(
             (object) ['id' => $id, 'data' => json_encode(['color' => 0])],

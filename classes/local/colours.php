@@ -30,10 +30,6 @@ class colours {
     const SETTINGS = [
         'colourprimary' => '--hk-primario',
         'colouraccent' => '--hk-acento',
-        'colour1' => '--hk-marca-1',
-        'colour2' => '--hk-marca-2',
-        'colour3' => '--hk-marca-3',
-        'colour4' => '--hk-marca-4',
     ];
 
     /** @var string The dark text the screens use. */
@@ -117,14 +113,24 @@ class colours {
     }
 
     /**
-     * The screens' variables for the school's colours: each colour, its text, and its readable forms.
+     * The screens' variables for the centre's colours: each colour, its text, and its readable forms.
      *
      * @param array $colours setting => «#rrggbb» (the ones not set are left to the screens' own)
+     * @param array $categories position => «#rrggbb», the colours of the centre's categories
      * @return array variable => value
      */
-    public static function vars(array $colours): array {
+    public static function vars(array $colours, array $categories = []): array {
+        foreach ($categories as $n => $hex) {
+            $colours['category' . (int) $n] = $hex;
+        }
         $vars = [];
-        foreach (self::SETTINGS as $setting => $var) {
+        $names = self::SETTINGS;
+        foreach (array_keys($colours) as $key) {
+            if (preg_match('/^category([1-6])$/', $key, $m)) {
+                $names[$key] = '--hk-marca-' . $m[1];
+            }
+        }
+        foreach ($names as $setting => $var) {
             $hex = $colours[$setting] ?? '';
             if (!self::valid($hex)) {
                 continue;

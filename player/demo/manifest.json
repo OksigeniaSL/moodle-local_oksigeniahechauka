@@ -1,6 +1,6 @@
 {
   "contract": 1,
-  "etag": "demo-3",
+  "etag": "demo-4",
   "generated": 1793577600,
   "horizon": "2026-11-15",
   "sample": true,
@@ -404,5 +404,38 @@
       "text": "Lluvia débil"
     },
     "credit": "Datos de MET Norway"
-  }
+  },
+  "categories": [
+    {
+      "n": 1,
+      "name": "Infantil",
+      "words": [
+        "inf",
+        "infantil"
+      ]
+    },
+    {
+      "n": 2,
+      "name": "Primaria",
+      "words": [
+        "pri",
+        "primaria"
+      ]
+    },
+    {
+      "n": 3,
+      "name": "ESO",
+      "words": [
+        "eso"
+      ]
+    },
+    {
+      "n": 4,
+      "name": "Bachillerato",
+      "words": [
+        "bach",
+        "bachillerato"
+      ]
+    }
+  ]
 }

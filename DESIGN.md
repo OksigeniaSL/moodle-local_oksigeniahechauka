@@ -35,7 +35,7 @@ the pieces the screens use (the notice with its amber stripe, the event with its
 list already looks like what will appear. Time is said in words and shown on a two-week strip.
 
 It should feel like a calm control room: quiet surfaces, the screens as the only images, colour only where it means
-something (a state, a stage, the urgent red).
+something (a state, a category of the centre, the urgent red).
 
 ## 3. Who sees what
 
@@ -117,7 +117,7 @@ Colours that are not the theme's, on purpose:
 | `--hkp-bezel` | `#121417` (dark `#0b0c0e`) | A screen is a black object in both modes |
 | `--hkp-led-on` / `-off` / `-down` / `-warn` | `#3ddc6f` / `#6c737b` / `#ff5a47` / `#ffb21f` | Lights on a black bezel |
 | `--hkp-urgent` | `#9f1d16`, white text (7.8:1) | The urgent notice is the screens' red, the same on the screen and in the panel |
-| `--hkp-stage-1…4` | The site's four stage colours (defaults `#1f5f8b`, `#2f8a55`, `#c9842a`, `#b23a48`; dark `#6aa6d6`, `#6cc79a`, `#f0b452`, `#f08a96`) | Set in «Tu centro»; output by PHP as inline variables on `.hkp`. They mark (a stripe, a dot, a tint), never carry text: any colour can be chosen |
+| `--hkp-stage-1…6` | The colours of the centre's own categories, up to six, set in «Tu centro» (none by default; the palette for new ones `#1f5f8b`, `#2f8a55`, `#c9842a`, `#b23a48`, `#6b4fa0`, `#1b8a8f`; dark `#6aa6d6`, `#6cc79a`, `#f0b452`, `#f08a96`) | Set in «Tu centro»; output by PHP as inline variables on `.hkp`. They mark (a stripe, a dot, a tint), never carry text: any colour can be chosen |
 
 Never Bootstrap's fixed utilities (`bg-warning text-dark`, `bg-light`): they do not follow the mode.
 
@@ -183,7 +183,7 @@ Shape and word say the state; colour only adds to it. The LED on the bezel repea
 
 - Thumb (`.hkp-thumb`, 16:9, 6rem): the photo; a video with its length; a vertical photo whole on dark; a notice as
   a small notice block (amber stripe, two bars, the first bar amber when important); an event as its day with the
-  stage colour on top; a ticker line as the band; a calendar feed as a month of stage-coloured days. Drawn, never
+  category's colour on top; a ticker line as the band; a calendar feed as a month of coloured days. Drawn, never
   written small.
 - Title (bold), then meta: type with icon, «Importante», detail, author as «De Marta Gil» (only when it can be someone
   else's).
@@ -290,8 +290,13 @@ Biblioteca, Secretaría y Comedor.» A teacher sees only their groups, already c
   lowest), and «Si ves tu pueblo y su tiempo, está bien.»
 - The locator is drawn by the plugin: a public-domain land outline (Natural Earth, 1:50m) cropped about 640 km
   around the point, a grid of degrees, the point with a ring and a 100 km bar. No map service is loaded.
-- **The colours**: one tile per colour (principal, segundo, the four stages) with a colour input, its use, its value
+- **The colours**: one tile per colour (principal, segundo) with a colour input, its use, its value
   and the text that will go on it, chosen alone («letra blanca» or «letra oscura», whichever reaches 4.5:1).
+- **The categories**: what each centre calls its parts (the stages of a school, the faculties of a university, the
+  areas of an academy), up to six, none by default: a row each with its colour, its name and the words that mark it in
+  a title or in «for whom», «×» to take it out, «+ Añadir una categoría», and «Traer las categorías de cursos de
+  Moodle» (each linked to its course category, whose calendar events then show in its colour). Nothing in the product
+  is one school's: Hechauka is installed by universities, academies and schools alike.
 - **The logo**: one for light screens and one for dark ones, each on its own background, with «Cambiar».
 - Beside, the screen live with these colours, this logo and this weather, in «Claro» or «Oscuro».
 - Under «Guardar»: «Lo técnico, como la preparación de los vídeos, sigue en la administración del sitio.»
@@ -334,7 +339,7 @@ stops; chips and toggles change colour in .15 s; folded parts turn their arrow. 
 
 - AA everywhere, checked in light and dark: text 4.5:1 (3:1 large), the borders of chips and toggles and the state
   dots 3:1 against what is behind them. Text on a tint uses the darker (light mode) or lighter (dark mode) ink.
-- Nothing by colour alone: states have a shape and a word; chosen chips have a tick; stages have a name.
+- Nothing by colour alone: states have a shape and a word; chosen chips have a tick; categories have a name.
 - Keyboard: everything reachable in order; chips and toggles are real buttons or radios; the add-screen card is a
   button (`Enter` and `Space`); the people and place searches are comboboxes (`aria-expanded`, `aria-controls`,
   arrows, `Enter`, `Escape`); dialogs trap focus and close with `Escape`; dragging has its menu alternative.
@@ -392,7 +397,7 @@ Words of the panel:
   every option open («Fechas: Entre dos fechas / Desde / Hasta / Días: Solo estos días / Horas…»).
 - Cards that show a version or an address instead of a picture («0.1.0», `http://localhost…/player/`).
 - Ask for a «Diseño» when adding a screen: the composition is the player's job.
-- Fixed Bootstrap colour utilities; text on the stage colours; colour as the only signal.
+- Fixed Bootstrap colour utilities; text on the category colours; colour as the only signal.
 - Product or school branding in the panel; a `max-width` in `ch` or `px` on running text.
 - Load a third-party map or font in the panel.
 
@@ -413,7 +418,7 @@ Words of the panel:
 - Templates: one Mustache template per piece (screen card, state, content row, chips, the when editor, the preview
   pane), and the views as compositions of them; small AMD modules for the when editor (sentence and strip), the
   preview (`postMessage` to the frame), the chips and the searches.
-- The stage colours go out as inline variables on `.hkp` from the settings.
+- The category colours go out as inline variables on `.hkp` from the settings.
 - The when sentence is built with Moodle's strings, one string per pattern (not by concatenating words), so other
   languages can order it their way.
 - Por verificar before building:

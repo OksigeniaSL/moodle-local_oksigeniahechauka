@@ -138,7 +138,8 @@ class agendas {
     public static function contract(\stdClass $item, int $now): array {
         global $DB;
         $data = items::data($item);
-        $color = (int) ($data['color'] ?? 1);
+        // One category for all its events, or (0) each by its own words.
+        $color = categories::resolve($data['category'] ?? ($data['color'] ?? 0));
         $from = usergetmidnight($now, \core_date::get_server_timezone());
         $to = $from + (manifest::HORIZON + 1) * DAYSECS;
         $rows = $DB->get_records_select(
@@ -160,7 +161,7 @@ class agendas {
             $event = ['id' => 'c' . $r->id, 'type' => 'event', 'zone' => 'side', 'title' => $r->title,
                 'start' => schedule::stamp($start),
                 'when' => ['from' => schedule::day($start), 'until' => schedule::day($last)]];
-            if ($color >= 1 && $color <= 4) {
+            if ($color) {
                 // Without a colour of its own, the screen takes each event's stage from its title.
                 $event['color'] = $color;
             }

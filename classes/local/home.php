@@ -209,17 +209,14 @@ class home {
     }
 
     /**
-     * The colours of the four stages of the centre, as the panel's variables (they mark, never carry text).
+     * The colours of the centre's categories, as the panel's variables (they mark, never carry text).
      *
      * @return string an inline style, maybe empty
      */
     public static function stages(): string {
         $out = [];
-        for ($i = 1; $i <= 4; $i++) {
-            $colour = (string) get_config(self::C, 'colour' . $i);
-            if (preg_match('/^#[0-9a-fA-F]{3}([0-9a-fA-F]{3})?$/', $colour)) {
-                $out[] = '--hkp-stage-' . $i . ': ' . $colour;
-            }
+        foreach (categories::colours() as $n => $colour) {
+            $out[] = '--hkp-stage-' . $n . ': ' . $colour;
         }
         return implode('; ', $out);
     }
@@ -719,8 +716,7 @@ class home {
             $words = explode(' ', phrases::weekday($day));
             $out['day'] = \core_text::substr($words[0], 0, 3);
             $out['num'] = $words[1] ?? '';
-            $color = (int) ($data['color'] ?? 0);
-            $out['stage'] = $color >= 1 && $color <= 4 ? $color : 0;
+            $out['stage'] = categories::resolve($data['category'] ?? ($data['color'] ?? 0));
         } else if ($item->type === 'agenda') {
             foreach ([0, 0, 2, 0, 3, 0, 0, 0, 1, 0, 0, 4, 0, 0, 0, 2, 2, 0, 0, 0, 0] as $stage) {
                 $out['agenda'][] = ['stage' => $stage ? 's' . $stage : ''];

@@ -143,8 +143,11 @@ test('one countdown, for the nearest event of more than a day, from two to fourt
         {id: 'c', title: 'Teatro', start: '2026-11-02T10:00', end: '2026-11-02T12:00'},
         {id: 'd', title: 'Mañana mismo', start: '2026-11-01T08:00', end: '2026-11-03T16:00'},
     ];
-    assert.deepEqual(countdown(events, '2026-10-31', 14), {id: 'b', days: 3, title: 'Acampada', group: '3º ESO',
+    // The colour comes from the centre's categories (here, a school's), or is 0 without them.
+    const cats = [{n: 3, words: ['eso']}];
+    assert.deepEqual(countdown(events, '2026-10-31', 14, cats), {id: 'b', days: 3, title: 'Acampada', group: '3º ESO',
         date: '2026-11-03', color: 3});
+    assert.equal(countdown(events, '2026-10-31', 14).color, 0);
     assert.equal(countdown(events, '2026-11-09', 14), null);
 });
 

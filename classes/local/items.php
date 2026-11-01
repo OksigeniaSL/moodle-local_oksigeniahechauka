@@ -84,7 +84,12 @@ class items {
                     return null;
                 }
                 $event = $item + ['type' => 'event', 'zone' => 'side', 'title' => $title,
-                    'start' => schedule::stamp((int) $data['start']), 'color' => (int) ($data['color'] ?? 1)];
+                    'start' => schedule::stamp((int) $data['start'])];
+                // The centre's category chosen for it (its position on the screens); without one, by its words.
+                $category = categories::resolve($data['category'] ?? ($data['color'] ?? 0));
+                if ($category) {
+                    $event['color'] = $category;
+                }
                 if (!empty($data['end']) && $data['end'] > $data['start']) {
                     $event['end'] = schedule::stamp((int) $data['end']);
                 }

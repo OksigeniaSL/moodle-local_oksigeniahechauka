@@ -28,12 +28,12 @@ const DROP = '<svg viewBox="0 0 16 21" aria-hidden="true"><path d="M8 0C9.5 3.6 
     '6.5 3.6 8 0z"/></svg>';
 
 export function stage(node, color) {
-    if (color >= 1 && color <= 4) {
+    if (color >= 1 && color <= 6) {
         node.style.setProperty('--hk-ev', 'var(--hk-marca-' + color + ')');
         node.style.setProperty('--hk-sobre-ev', 'var(--hk-sobre-marca-' + color + ')');
         node.style.setProperty('--hk-ev-oscuro', 'var(--hk-marca-' + color + '-oscuro)');
     } else {
-        // The whole school: a neutral grey (the primary colour of a centre may be one of its stages).
+        // For everyone, or of no category: a neutral grey (the primary colour of a centre may be one of its categories).
         node.style.setProperty('--hk-ev', 'var(--hk-texto-suave)');
         node.style.setProperty('--hk-sobre-ev', 'var(--hk-superficie)');
     }

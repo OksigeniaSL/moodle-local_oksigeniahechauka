@@ -3,7 +3,7 @@
 // «semanaDe» in its demo). Nothing here touches the page, so it is tested on its own.
 
 import {dayNumber, weekdayOf} from './rules.js';
-import {splitTitle, stageOf} from './agenda.js';
+import {colourOf, splitTitle} from './agenda.js';
 
 const DAYS = 5;
 
@@ -170,7 +170,7 @@ export function weekOf(events, today, vertical, labels) {
         const parts = splitTitle(ev.title);
         // Who it is for: the group in its title or, for one made in the panel, its «who or where».
         const group = parts.group || ev.detail || '';
-        const color = stageOf(group) || (ev.color >= 1 && ev.color <= 4 ? ev.color : 0);
+        const color = colourOf(ev, group, labels.categories);
         const holiday = holidayOf(ev, parts, labels);
         if (holiday) {
             days.forEach(function (d) {

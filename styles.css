@@ -2659,3 +2659,63 @@ dialog.hkp-dialog > footer {
         padding-left: .5rem;
     }
 }
+
+/* A centre can have up to six categories: the fifth and the sixth mark as the first four do. */
+.hkp [data-stage="5"] {
+    --hkp-ev: var(--hkp-stage-5, var(--hkp-stage-0));
+}
+
+.hkp [data-stage="6"] {
+    --hkp-ev: var(--hkp-stage-6, var(--hkp-stage-0));
+}
+
+/* «Tu centro»: each category in a row, its colour, its name, the words that mark it, and taking it out. */
+.hkp-cats {
+    display: grid;
+    gap: .6rem;
+    margin: 0 0 .75rem;
+    padding: 0;
+    list-style: none;
+}
+
+.hkp-cat {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) minmax(0, 1.4fr) auto;
+    gap: .4rem .75rem;
+    align-items: end;
+    padding: .6rem .7rem;
+    border: 1px solid var(--hkp-line);
+    border-radius: var(--hkp-radius-sm);
+    background: var(--hkp-card);
+}
+
+.hkp-cat input[type="color"] {
+    width: 2.6rem;
+    height: 2.6rem;
+    padding: 0;
+    border: 1px solid var(--hkp-edge);
+    border-radius: .45rem;
+    background: none;
+    cursor: pointer;
+}
+
+.hkp-cat .hkp-field {
+    margin: 0;
+}
+
+.hkp-cat small {
+    grid-column: 2 / -1;
+    color: var(--hkp-muted);
+    font-size: .8125rem;
+}
+
+/* stylelint-disable-next-line csstree/validator */
+@container hkp (max-width: 36rem) {
+    .hkp-cat {
+        grid-template-columns: auto minmax(0, 1fr) auto;
+    }
+
+    .hkp-cat .hkp-cat-words {
+        grid-column: 2 / -1;
+    }
+}
