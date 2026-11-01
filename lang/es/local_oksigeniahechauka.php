@@ -372,6 +372,7 @@ $string['groups_nobody_else'] = 'Solo el administrador del sitio.';
 $string['groups_nobody_yet'] = 'Aquí solo publica quien publica en todas.';
 $string['groups_none'] = 'Todavía no hay grupos. Un grupo sirve para publicar en varias pantallas a la vez: «Entrada», «Pasillos», «Exterior».';
 $string['groups_people'] = 'Quién publica aquí';
+$string['groups_permissions'] = 'Permisos';
 $string['groups_runs'] = 'Lleva las pantallas';
 $string['groups_screens'] = 'Sus pantallas';
 $string['groups_search'] = 'Añadir a alguien del centro';

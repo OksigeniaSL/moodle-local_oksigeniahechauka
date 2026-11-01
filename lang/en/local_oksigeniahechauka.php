@@ -372,6 +372,7 @@ $string['groups_nobody_else'] = 'Only the administrator of the site.';
 $string['groups_nobody_yet'] = 'Only who publishes everywhere publishes here.';
 $string['groups_none'] = 'No groups yet. A group is for publishing on several screens at once: «Entrance», «Corridors», «Outside».';
 $string['groups_people'] = 'Who publishes here';
+$string['groups_permissions'] = 'Permissions';
 $string['groups_runs'] = 'Runs the screens';
 $string['groups_screens'] = 'Its screens';
 $string['groups_search'] = 'Add someone of the school';

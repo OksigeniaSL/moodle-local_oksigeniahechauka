@@ -372,3 +372,18 @@ dialog.hkp-dialog > footer {
     color: var(--hkp-muted);
     font-size: .8125rem;
 }
+
+/* «Pantallas y grupos»: the permissions (who publishes everywhere, who runs the screens) are a block apart from the
+   groups, under a small label. Solid border: in the panel a dashed one means «a place to add something». */
+.hkp-perms {
+    margin: 1.5rem 0 0;
+}
+
+.hkp-perms > .hkp-k {
+    margin: 0 0 .5rem;
+}
+
+.hkp .hkp-group.is-perm {
+    background: color-mix(in srgb, var(--hkp-accent) 4%, var(--hkp-card));
+    box-shadow: none;
+}

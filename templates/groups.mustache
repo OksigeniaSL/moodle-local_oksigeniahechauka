@@ -61,30 +61,35 @@
                 <div class="hkp-search" data-list="group" data-group="{{id}}">{{{icons.search}}}<input class="form-control" role="combobox" aria-expanded="false" aria-controls="hkp-lb-{{id}}" aria-autocomplete="list" placeholder="{{#str}}groups_search, local_oksigeniahechauka{{/str}}" aria-label="{{#str}}groups_search_label, local_oksigeniahechauka, {{name}}{{/str}}" autocomplete="off" spellcheck="false"><ul class="hkp-listbox" id="hkp-lb-{{id}}" role="listbox" aria-label="{{#str}}groups_found, local_oksigeniahechauka{{/str}}" hidden></ul></div>
             </article>
             {{/groups}}
-            <article class="hkp-group is-all" id="hkp-all" data-list="everywhere" data-group="0"><header><h3>{{#str}}where_all, local_oksigeniahechauka{{/str}}</h3></header>
-                <div><span class="hkp-k">{{#str}}groups_everywhere, local_oksigeniahechauka{{/str}}</span>
-                    <ul class="hkp-people">
-                        {{#everywhere}}<li class="hkp-person"><span class="hkp-av" aria-hidden="true">{{initials}}</span><span>{{name}}{{#detail}}<small>{{detail}}</small>{{/detail}}</span>{{#own}}<a class="btn btn-sm btn-outline-secondary btn-icon" href="#" data-remove-user="{{userid}}" aria-label="{{label}}">{{{icons.x}}}</a>{{/own}}{{^own}}<span></span>{{/own}}</li>{{/everywhere}}
-                        {{^haseverywhere}}<li class="hkp-hint">{{#str}}groups_nobody_else, local_oksigeniahechauka{{/str}}</li>{{/haseverywhere}}
-                    </ul>
-                </div>
-                <div class="hkp-search" data-list="everywhere" data-group="0">{{{icons.search}}}<input class="form-control" role="combobox" aria-expanded="false" aria-controls="hkp-lb-everywhere" aria-autocomplete="list" placeholder="{{#str}}groups_search, local_oksigeniahechauka{{/str}}" aria-label="{{#str}}groups_everywhere_search_label, local_oksigeniahechauka{{/str}}" autocomplete="off" spellcheck="false"><ul class="hkp-listbox" id="hkp-lb-everywhere" role="listbox" aria-label="{{#str}}groups_found, local_oksigeniahechauka{{/str}}" hidden></ul></div>
-                <p class="hkp-hint">{{#str}}groups_everywhere_help, local_oksigeniahechauka{{/str}}</p>
-            </article>
-            <article class="hkp-group is-all" id="hkp-managers" data-list="managers" data-group="0"><header><h3>{{#str}}groups_managers, local_oksigeniahechauka{{/str}}</h3></header>
-                <div>
-                    <ul class="hkp-people">
-                        {{#managers}}<li class="hkp-person"><span class="hkp-av" aria-hidden="true">{{initials}}</span><span>{{name}}{{#detail}}<small>{{detail}}</small>{{/detail}}</span>{{#own}}<a class="btn btn-sm btn-outline-secondary btn-icon" href="#" data-remove-user="{{userid}}" aria-label="{{label}}">{{{icons.x}}}</a>{{/own}}{{^own}}<span></span>{{/own}}</li>{{/managers}}
-                        {{^hasmanagers}}<li class="hkp-hint">{{#str}}groups_nobody_else, local_oksigeniahechauka{{/str}}</li>{{/hasmanagers}}
-                    </ul>
-                </div>
-                {{#choosemanagers}}<div class="hkp-search" data-list="managers" data-group="0">{{{icons.search}}}<input class="form-control" role="combobox" aria-expanded="false" aria-controls="hkp-lb-managers" aria-autocomplete="list" placeholder="{{#str}}groups_search, local_oksigeniahechauka{{/str}}" aria-label="{{#str}}groups_managers_search_label, local_oksigeniahechauka{{/str}}" autocomplete="off" spellcheck="false"><ul class="hkp-listbox" id="hkp-lb-managers" role="listbox" aria-label="{{#str}}groups_found, local_oksigeniahechauka{{/str}}" hidden></ul></div>{{/choosemanagers}}
-                <p class="hkp-hint">{{#choosemanagers}}{{#str}}groups_managers_help, local_oksigeniahechauka{{/str}}{{/choosemanagers}}{{^choosemanagers}}{{#str}}groups_managers_admin, local_oksigeniahechauka{{/str}}{{/choosemanagers}}</p>
-            </article>
             <form class="hkp-group" method="post" action="{{action}}"><input type="hidden" name="sesskey" value="{{sesskey}}"><input type="hidden" name="action" value="addgroup">
                 <header><h3>{{#str}}groups_new, local_oksigeniahechauka{{/str}}</h3></header>
                 <div class="hkp-field"><label class="form-label" for="hkp-ng">{{#str}}name, local_oksigeniahechauka{{/str}}</label><div class="hkp-find"><input class="form-control" id="hkp-ng" name="name" placeholder="{{#str}}groups_new_example, local_oksigeniahechauka{{/str}}" autocomplete="off" required><button type="submit" class="btn btn-outline-secondary">{{#str}}groups_create, local_oksigeniahechauka{{/str}}</button></div></div>
             </form>
+        </div>
+        <div class="hkp-perms" role="group" aria-labelledby="hkp-h-perms">
+            <p class="hkp-k" id="hkp-h-perms">{{#str}}groups_permissions, local_oksigeniahechauka{{/str}}</p>
+            <div class="hkp-groups">
+                <article class="hkp-group is-perm" id="hkp-all" data-list="everywhere" data-group="0"><header><h3>{{#str}}where_all, local_oksigeniahechauka{{/str}}</h3></header>
+                    <div><span class="hkp-k">{{#str}}groups_everywhere, local_oksigeniahechauka{{/str}}</span>
+                        <ul class="hkp-people">
+                            {{#everywhere}}<li class="hkp-person"><span class="hkp-av" aria-hidden="true">{{initials}}</span><span>{{name}}{{#detail}}<small>{{detail}}</small>{{/detail}}</span>{{#own}}<a class="btn btn-sm btn-outline-secondary btn-icon" href="#" data-remove-user="{{userid}}" aria-label="{{label}}">{{{icons.x}}}</a>{{/own}}{{^own}}<span></span>{{/own}}</li>{{/everywhere}}
+                            {{^haseverywhere}}<li class="hkp-hint">{{#str}}groups_nobody_else, local_oksigeniahechauka{{/str}}</li>{{/haseverywhere}}
+                        </ul>
+                    </div>
+                    <div class="hkp-search" data-list="everywhere" data-group="0">{{{icons.search}}}<input class="form-control" role="combobox" aria-expanded="false" aria-controls="hkp-lb-everywhere" aria-autocomplete="list" placeholder="{{#str}}groups_search, local_oksigeniahechauka{{/str}}" aria-label="{{#str}}groups_everywhere_search_label, local_oksigeniahechauka{{/str}}" autocomplete="off" spellcheck="false"><ul class="hkp-listbox" id="hkp-lb-everywhere" role="listbox" aria-label="{{#str}}groups_found, local_oksigeniahechauka{{/str}}" hidden></ul></div>
+                    <p class="hkp-hint">{{#str}}groups_everywhere_help, local_oksigeniahechauka{{/str}}</p>
+                </article>
+                <article class="hkp-group is-perm" id="hkp-managers" data-list="managers" data-group="0"><header><h3>{{#str}}groups_managers, local_oksigeniahechauka{{/str}}</h3></header>
+                    <div>
+                        <ul class="hkp-people">
+                            {{#managers}}<li class="hkp-person"><span class="hkp-av" aria-hidden="true">{{initials}}</span><span>{{name}}{{#detail}}<small>{{detail}}</small>{{/detail}}</span>{{#own}}<a class="btn btn-sm btn-outline-secondary btn-icon" href="#" data-remove-user="{{userid}}" aria-label="{{label}}">{{{icons.x}}}</a>{{/own}}{{^own}}<span></span>{{/own}}</li>{{/managers}}
+                            {{^hasmanagers}}<li class="hkp-hint">{{#str}}groups_nobody_else, local_oksigeniahechauka{{/str}}</li>{{/hasmanagers}}
+                        </ul>
+                    </div>
+                    {{#choosemanagers}}<div class="hkp-search" data-list="managers" data-group="0">{{{icons.search}}}<input class="form-control" role="combobox" aria-expanded="false" aria-controls="hkp-lb-managers" aria-autocomplete="list" placeholder="{{#str}}groups_search, local_oksigeniahechauka{{/str}}" aria-label="{{#str}}groups_managers_search_label, local_oksigeniahechauka{{/str}}" autocomplete="off" spellcheck="false"><ul class="hkp-listbox" id="hkp-lb-managers" role="listbox" aria-label="{{#str}}groups_found, local_oksigeniahechauka{{/str}}" hidden></ul></div>{{/choosemanagers}}
+                    <p class="hkp-hint">{{#choosemanagers}}{{#str}}groups_managers_help, local_oksigeniahechauka{{/str}}{{/choosemanagers}}{{^choosemanagers}}{{#str}}groups_managers_admin, local_oksigeniahechauka{{/str}}{{/choosemanagers}}</p>
+                </article>
+            </div>
         </div>
     </section>
     <form method="post" action="{{action}}" id="hkp-people-form" hidden><input type="hidden" name="sesskey" value="{{sesskey}}"><input type="hidden" name="action" value="addeditor"><input type="hidden" name="group" value=""><input type="hidden" name="user" value=""></form>
