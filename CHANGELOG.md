@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.7.4 (2026-11-01)
+
+- «Show one now» given right after turning the surprises on was lost: the order reached the screen before the manifest
+  that says who comes out. It now waits for it.
+
 ## 0.7.3 (2026-11-01)
 
 - In «Tu centro», the surprises go under the screen, with a button of their own to save: at the end of the long column

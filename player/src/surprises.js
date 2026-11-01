@@ -9,6 +9,8 @@
 // what is planted stays planted only if both change together.
 
 const LEAST_MINUTES = 15;
+// An order waits this long for the manifest that says who comes out: it may have been given right after turning them on.
+const ORDER_WAITS_MS = 5 * 60000;
 const STEP_BASE = 1080;
 // Bigger from afar, and softer: the sheets are drawn for 1080.
 const BY_DISTANCE = {3: 1, 5: 1.25, 8: 1.5};
@@ -276,10 +278,10 @@ export class Surprises {
     /**
      * One now, without waiting for its turn.
      *
-     * @param {{id: string, atlas: string}} [character] this one; else one of those chosen
+     * @param {{id: string, atlas: string}} [character] this one; else one of those chosen, when it comes out
      */
     askNow(character) {
-        this.asked = character || this.pick();
+        this.asked = {who: character || null, at: Date.now()};
     }
 
     pick() {
@@ -303,10 +305,17 @@ export class Surprises {
             return;
         }
         if (this.asked) {
-            const asked = this.asked;
-            this.asked = null;
-            this.go(asked);
-        } else if (!onlyAsked && this.every && now >= this.due) {
+            const who = this.asked.who || this.pick();
+            if (who) {
+                this.asked = null;
+                this.go(who);
+                return;
+            }
+            if (now - this.asked.at > ORDER_WAITS_MS) {
+                this.asked = null;
+            }
+        }
+        if (!onlyAsked && this.every && now >= this.due) {
             this.due = dueAfter(now, this.every, Math.random);
             this.go(this.pick());
         }
