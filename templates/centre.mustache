@@ -1,0 +1,93 @@
+{{!
+    This file is part of Moodle - https://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_oksigeniahechauka/centre
+
+    «Tu centro»: where the school is (a search, the places found, and a card with a small map drawn by the plugin,
+    the coordinates and the weather there now), its colours (each with the text that goes on it) and its two logos,
+    with the screen beside them, live (panel/centre.js).
+
+    Example context (json):
+    {
+        "style": "", "title": "Pantallas", "hastabs": false, "tabs": [],
+        "action": "https://example.com/local/oksigeniahechauka/centre.php", "sesskey": "abc",
+        "query": "", "searched": false, "results": [], "hasresults": false, "resultsjson": "[]", "place": null,
+        "tiles": [{"setting": "colourprimary", "value": "#1f5f8b", "name": "Principal", "use": "la cinta", "hex": "#1F5F8B", "on": "letra blanca"}],
+        "logos": [{"area": "logo", "dark": false, "label": "Para fondo claro", "url": "", "alt": "Logotipo"}],
+        "frame": "https://example.com/local/oksigeniahechauka/preview.php?frame=1", "placename": "", "admin": "",
+        "icons": {"search": "", "pin": "", "out": "", "check": ""}, "strings": "{}"
+    }
+}}
+<div class="hkp" id="hkp-centre-page"{{#style}} style="{{style}}"{{/style}} data-strings="{{strings}}">
+    <header class="hkp-head"><div class="hkp-head-title"><h1>{{title}}</h1></div></header>
+    {{#hastabs}}<nav class="hkp-tabs" aria-label="{{#str}}tabs_label, local_oksigeniahechauka{{/str}}">{{#tabs}}<a href="{{url}}"{{#current}} aria-current="page"{{/current}}>{{{icon}}}{{label}}</a>{{/tabs}}</nav>{{/hastabs}}
+    <div class="hkp-centre">
+        <div class="hkp-centre-form">
+            <section class="hkp-fs" aria-labelledby="hkp-loc-h">
+                <h2 id="hkp-loc-h" class="hkp-label hkp-section-label">{{#str}}centre_where, local_oksigeniahechauka{{/str}}</h2>
+                <p class="hkp-hint hkp-section-hint">{{#str}}centre_where_help, local_oksigeniahechauka{{/str}}</p>
+                {{#searched}}<form method="post" action="{{action}}" id="hkp-pick-form"><input type="hidden" name="sesskey" value="{{sesskey}}"><input type="hidden" name="results" value="{{resultsjson}}"></form>{{/searched}}
+                <form method="get" action="{{action}}" class="hkp-find" role="search">
+                    <div class="hkp-search">{{{icons.search}}}<input class="form-control is-big" id="hkp-q" name="q" value="{{query}}" aria-label="{{#str}}centre_search_label, local_oksigeniahechauka{{/str}}" autocomplete="off" spellcheck="false"{{#hasresults}} aria-controls="hkp-places" aria-expanded="true"{{/hasresults}}>
+                        {{#searched}}
+                        <ul class="hkp-listbox" id="hkp-places" aria-label="{{#str}}centre_found, local_oksigeniahechauka{{/str}}">
+                            {{#results}}<li><button type="submit" form="hkp-pick-form" name="pick" value="{{i}}" class="hkp-pick">{{{icons.pin}}}<span>{{before}}<mark>{{mark}}</mark>{{after}}<small>{{detail}}</small></span></button></li>{{/results}}
+                            <li aria-disabled="true" class="hkp-nofind"><small>{{^hasresults}}{{#str}}centre_none, local_oksigeniahechauka{{/str}} {{/hasresults}}{{#str}}centre_tip, local_oksigeniahechauka{{/str}}</small></li>
+                        </ul>
+                        {{/searched}}
+                    </div>
+                    <button type="submit" class="btn btn-outline-secondary">{{#str}}search{{/str}}</button>
+                </form>
+                {{#place}}
+                <div class="hkp-place" aria-live="polite">
+                    <span class="hkp-map"><svg viewBox="0 0 320 200" role="img" aria-label="{{#str}}centre_map, local_oksigeniahechauka, {{name}}{{/str}}"><rect class="sea" width="320" height="200"/><path class="grid" d="{{map.grid}}"/><path class="land" d="{{map.land}}"/><path class="grid-over" d="{{map.grid}}"/><circle class="ring" cx="160" cy="100" r="13"/><circle class="pin" cx="160" cy="100" r="5.5"/><path class="scale" d="M10 188h{{map.km100}}M10 185v6"/></svg><span class="hkp-map-scale">100 km</span></span>
+                    <div>
+                        <h3>{{name}}</h3>
+                        <p class="hkp-place-where">{{where}}</p>
+                        <p class="hkp-place-coords">{{coords}}</p>
+                        <div class="hkp-foot"><a class="btn btn-sm btn-outline-secondary" href="{{osm}}" target="_blank" rel="noopener">{{{icons.out}}}{{#str}}centre_onmap, local_oksigeniahechauka{{/str}}<span class="visually-hidden sr-only"> {{#str}}centre_newtab, local_oksigeniahechauka{{/str}}</span></a><a class="btn btn-sm btn-outline-secondary" href="#hkp-q" data-hkp-focus="hkp-q">{{#str}}compose_change, local_oksigeniahechauka{{/str}}</a></div>
+                    </div>
+                    <div class="hkp-place-check">
+                        {{#weather}}<div class="hkp-weather"><span class="hkp-weather-icon" aria-hidden="true" data-hk-sky="{{symbol}}"></span><span class="hkp-weather-deg">{{temp}}°</span><span class="hkp-weather-ext">{{max}}°<span>{{min}}°</span></span><span class="hkp-weather-sky">{{text}}<small>{{#str}}centre_now, local_oksigeniahechauka{{/str}}</small></span></div>{{/weather}}
+                        {{^weather}}<p class="hkp-hint">{{#str}}centre_noweather, local_oksigeniahechauka{{/str}}</p>{{/weather}}
+                        <p class="hkp-place-ok">{{{icons.check}}}{{#str}}centre_ok, local_oksigeniahechauka{{/str}}</p>
+                    </div>
+                </div>
+                {{/place}}
+            </section>
+            <form method="post" action="{{action}}" enctype="multipart/form-data" id="hkp-centre-form" class="hkp-centre-form">
+                <input type="hidden" name="sesskey" value="{{sesskey}}">
+                <section class="hkp-fs" aria-labelledby="hkp-col-h">
+                    <h2 id="hkp-col-h" class="hkp-label hkp-section-label">{{#str}}centre_colours, local_oksigeniahechauka{{/str}}</h2>
+                    <p class="hkp-hint hkp-section-hint">{{#str}}centre_colours_help, local_oksigeniahechauka{{/str}}</p>
+                    <div class="hkp-colours">{{#tiles}}<label class="hkp-colour"><input type="color" name="{{setting}}" value="{{value}}" data-colour="{{setting}}" aria-describedby="hkp-c-{{setting}}"><b>{{name}}</b><span id="hkp-c-{{setting}}">{{use}} · <span data-hex="{{setting}}">{{hex}}</span>, <span data-on="{{setting}}">{{on}}</span></span></label>{{/tiles}}</div>
+                </section>
+                <section class="hkp-fs" aria-labelledby="hkp-logo-h">
+                    <h2 id="hkp-logo-h" class="hkp-label hkp-section-label">{{#str}}centre_logo, local_oksigeniahechauka{{/str}}</h2>
+                    <p class="hkp-hint hkp-section-hint">{{#str}}centre_logo_help, local_oksigeniahechauka{{/str}}</p>
+                    <div class="hkp-logos">{{#logos}}<div class="hkp-logo"><span class="hkp-logo-art{{#dark}} is-dark{{/dark}}">{{#url}}<img src="{{url}}" alt="{{alt}}">{{/url}}</span><b>{{label}}</b><label class="btn btn-sm btn-outline-secondary">{{#str}}compose_change, local_oksigeniahechauka{{/str}}<input class="visually-hidden sr-only" type="file" name="{{area}}" accept=".svg,.png,.jpg,.jpeg,.webp" data-logo="{{area}}"></label></div>{{/logos}}</div>
+                </section>
+                <div class="hkp-foot"><button type="submit" class="btn btn-primary btn-lg">{{#str}}centre_save, local_oksigeniahechauka{{/str}}</button><p class="hkp-hint">{{#str}}centre_technical, local_oksigeniahechauka{{/str}}{{#admin}} <a href="{{admin}}">{{#str}}centre_admin, local_oksigeniahechauka{{/str}}</a>{{/admin}}</p></div>
+            </form>
+        </div>
+        <aside class="hkp-preview" aria-labelledby="hkp-cpv-h">
+            <div class="hkp-preview-head"><h2 id="hkp-cpv-h">{{#str}}centre_preview, local_oksigeniahechauka{{/str}}</h2><div class="hkp-seg" role="group" aria-label="{{#str}}centre_theme, local_oksigeniahechauka{{/str}}"><button type="button" aria-pressed="true" data-ct="light">{{#str}}thememode_light, local_oksigeniahechauka{{/str}}</button><button type="button" aria-pressed="false" data-ct="dark">{{#str}}thememode_dark, local_oksigeniahechauka{{/str}}</button></div></div>
+            <div class="hkp-stage"><span class="hkp-bezel" data-state="on"><iframe id="hkp-cpv" src="{{frame}}" title="{{#str}}centre_preview_title, local_oksigeniahechauka{{/str}}"></iframe><span class="hkp-led" aria-hidden="true"></span></span></div>
+            {{#placename}}<p class="hkp-preview-note">{{#str}}centre_preview_note, local_oksigeniahechauka, {{placename}}{{/str}}</p>{{/placename}}
+        </aside>
+    </div>
+</div>

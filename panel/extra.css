@@ -43,9 +43,9 @@ body.hkp-page #page.drawers .main-inner {
 
 /* Moodle's dark mode underlines every link of the page's content; the links the panel draws as pieces (the names of
    the screens, the tabs, the card to add a screen) keep the design's look, underlined only on hover or focus. */
-[data-bs-theme] #region-main .hkp .hkp-screen-body h3 a:not(.btn):not(:hover):not(:focus-visible),
-[data-bs-theme] #region-main .hkp .hkp-tabs a:not(.btn):not(:hover):not(:focus-visible),
-[data-bs-theme] #region-main .hkp .hkp-screen.is-add a:not(.btn):not(:hover):not(:focus-visible) {
+[data-bs-theme] body.hkp-page #region-main .hkp .hkp-screen-body h3 a:not(.btn):not(:hover):not(:focus-visible),
+[data-bs-theme] body.hkp-page #region-main .hkp .hkp-tabs a:not(.btn):not(:hover):not(:focus-visible),
+[data-bs-theme] body.hkp-page #region-main .hkp .hkp-screen.is-add a:not(.btn):not(:hover):not(:focus-visible) {
     text-decoration: none;
 }
 
@@ -81,4 +81,34 @@ dialog.hkp-dialog > footer {
     position: sticky;
     bottom: 0;
     z-index: 2;
+}
+
+/* «Tu centro»: each place found is a button filling its row; the headings of the sections, as the design draws them. */
+.hkp-listbox li > .hkp-pick {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: .6rem;
+    width: 100%;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.hkp-listbox li.hkp-nofind {
+    grid-template-columns: 1fr;
+    cursor: default;
+}
+
+.hkp .hkp-section-label {
+    margin-bottom: .35rem;
+    font-size: 1.1rem;
+}
+
+.hkp .hkp-section-hint {
+    margin: 0 0 .75rem;
 }

@@ -142,20 +142,12 @@ class manifest {
             $theme['dark_from'] = schedule::is_hour($config->darkfrom ?? '') ? $config->darkfrom : '19:00';
             $theme['dark_until'] = schedule::is_hour($config->darkuntil ?? '') ? $config->darkuntil : '07:30';
         }
-        $colours = [
-            'colourprimary' => '--hk-primario',
-            'colouraccent' => '--hk-acento',
-            'colour1' => '--hk-marca-1',
-            'colour2' => '--hk-marca-2',
-            'colour3' => '--hk-marca-3',
-            'colour4' => '--hk-marca-4',
-        ];
-        foreach ($colours as $setting => $var) {
-            $value = $config->$setting ?? '';
-            if (preg_match('/^#[0-9a-fA-F]{6}$/', $value)) {
-                $theme['vars'][$var] = $value;
-            }
+        // The school's colours, each with the text that reads on it (colours::vars).
+        $set = [];
+        foreach (array_keys(colours::SETTINGS) as $setting) {
+            $set[$setting] = $config->$setting ?? '';
         }
+        $theme['vars'] = colours::vars($set);
         if (!$theme['vars']) {
             unset($theme['vars']);
         }

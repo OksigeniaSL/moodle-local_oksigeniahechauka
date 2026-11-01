@@ -103,8 +103,19 @@ class Player {
         }
         if (this.mode === 'preview') {
             window.addEventListener('message', function (ev) {
-                if (ev.origin === location.origin && ev.data && ev.data.hkDraft !== undefined) {
+                if (ev.origin !== location.origin || !ev.data) {
+                    return;
+                }
+                if (ev.data.hkDraft !== undefined) {
                     self.setDraft(ev.data.hkDraft);
+                }
+                if (ev.data.hkTheme) {
+                    // «Tu centro»: the colours being chosen, and light or dark, before they are saved.
+                    self.screen.applyTheme({vars: ev.data.hkTheme.vars || {}});
+                    if (ev.data.hkTheme.mode) {
+                        self.forcedTheme = ev.data.hkTheme.mode === 'dark';
+                    }
+                    self.tick();
                 }
             });
         }
