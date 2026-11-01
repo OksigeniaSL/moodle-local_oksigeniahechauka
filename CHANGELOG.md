@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- The full preview is a page of the panel, with its tabs to go back: it was left in the site's administration, with no way
+  back to the panel.
 - In «Tu centro», «Verlo en la vista previa» instead of «Verlo en la pantalla»: it plays in the preview, not on the real
   screens, and the old words said otherwise.
 

@@ -24,6 +24,9 @@
 
 require(__DIR__ . '/../../config.php');
 
+use local_oksigeniahechauka\local\access;
+use local_oksigeniahechauka\local\home;
+use local_oksigeniahechauka\local\icons;
 use local_oksigeniahechauka\local\player_page;
 
 require_login(null, false);
@@ -43,10 +46,11 @@ $c = 'local_oksigeniahechauka';
 $url = new moodle_url('/local/oksigeniahechauka/preview.php', ['screen' => $screenid]);
 $PAGE->set_context($context);
 $PAGE->set_url($url);
-$PAGE->set_pagelayout('admin');
+$PAGE->set_pagelayout('standard');
+$PAGE->add_body_class('hkp-page');
 $PAGE->set_title(get_string('preview', $c));
-$PAGE->set_heading(get_string('manage', $c));
-navigation_node::override_active_url(new moodle_url('/local/oksigeniahechauka/index.php'));
+$PAGE->set_heading('');
+$PAGE->set_primary_active_tab('local_oksigeniahechauka');
 
 $screens = $DB->get_records('local_oksigeniahechauka_screen', null, 'sortorder, name', 'id, name, lastinfo');
 $width = 1920;
@@ -66,7 +70,18 @@ if (!preg_match('/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/', $at)) {
 }
 
 echo $OUTPUT->header();
-echo $OUTPUT->heading(get_string('preview', $c));
+// Inside the panel: its tabs lead back; whoever does not have them, the way home.
+$manage = access::can('managescreens');
+echo $OUTPUT->render_from_template('local_oksigeniahechauka/panel_head', [
+    'style' => home::stages(),
+    'title' => get_string('preview', $c),
+    'sub' => '',
+    'hastabs' => $manage,
+    'tabs' => home::tabs('', $manage),
+    'hasactions' => !$manage,
+    'actions' => [['primary' => false, 'url' => (new moodle_url('/local/oksigeniahechauka/index.php'))->out(false),
+        'icon' => icons::svg('back'), 'label' => get_string('tab_home', $c)]],
+]);
 
 // The controls: which screen, which day and hour, which shape.
 $options = [0 => get_string('preview_general', $c)];
