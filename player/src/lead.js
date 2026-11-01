@@ -98,13 +98,19 @@ export function menuParts(menu) {
 
 /**
  * What a menu is called on the screen: with its own name when a day has several, so the dishes of one are not taken for
- * those of another («Menú de hoy · Infantil»).
+ * those of another («Menú de hoy · Infantil»), and without saying the same word twice («Menú de hoy · D», of «Menú D»).
  *
  * @param {object} menu {label, name}
  * @returns {string}
  */
 export function menuLabel(menu) {
-    return [menu.label, menu.name].filter(Boolean).join(' · ');
+    const label = menu.label || '';
+    let name = menu.name || '';
+    const first = label.split(' ')[0].toLowerCase();
+    if (first && name.toLowerCase().indexOf(first + ' ') === 0) {
+        name = name.slice(first.length + 1);
+    }
+    return [label, name].filter(Boolean).join(' · ');
 }
 
 /**

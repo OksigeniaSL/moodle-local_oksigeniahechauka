@@ -166,6 +166,7 @@ test('what leads, in order; the main dish of a menu; what the week strip says', 
     assert.equal(menuParts({courses: [{label: 'Único', dishes: ['Paella']}]}).main, 'Paella');
     assert.equal(menuLabel({label: 'Menú de hoy', name: 'Infantil'}), 'Menú de hoy · Infantil');
     assert.equal(menuLabel({label: 'Menú de hoy', name: ''}), 'Menú de hoy');
+    assert.equal(menuLabel({label: 'Menú de hoy', name: 'Menú C (vegetariano)'}), 'Menú de hoy · C (vegetariano)');
     // The strip: the nearest event, or a big one of the next days.
     assert.equal(weekHeadline(today, S.days), 'jueves 5: Día del deporte');
     const soon = Object.assign({}, today, {countdown: {days: 3, title: 'Acampada', date: '2026-11-06'}});
