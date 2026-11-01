@@ -2,8 +2,8 @@
 
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {dayNumber, eventOver, inRange, isDark, isLive, isPowerOn, liveItems, matchesWhen, wallOf, weekdayOf}
-    from '../src/rules.js';
+import {dayNumber, eventOver, inRange, isDark, isLive, isPowerOn, liveItems, matchesWhen, urgentOf, wallOf,
+    weekdayOf} from '../src/rules.js';
 
 function wall(stamp) {
     const [date, hm] = stamp.split('T');
@@ -136,4 +136,17 @@ test('live items of a zone, in their order', () => {
         {id: 'd', zone: 'main', order: 3, when: {until: '2026-11-01'}},
     ];
     assert.deepEqual(liveItems(items, 'main', wall('2026-11-02T10:00')).map((i) => i.id), ['a', 'b']);
+});
+
+test('the urgent notice on now: the newest live one, until it ends', () => {
+    const wall = wallOf(new Date(2026, 10, 2, 10, 46));
+    const items = [
+        {id: 'i1', type: 'urgent', zone: 'urgent', title: 'Old', ends: '2026-11-02T10:00'},
+        {id: 'i2', type: 'urgent', zone: 'urgent', title: 'Simulacro'},
+        {id: 'i3', type: 'notice', zone: 'side', title: 'Not this'},
+    ];
+    assert.equal(urgentOf(items, wall).id, 'i2');
+    assert.equal(urgentOf([items[0]], wall), null);
+    assert.equal(urgentOf([{...items[1], ends: '2026-11-02T11:46'}], wall).id, 'i2');
+    assert.equal(urgentOf([], wall), null);
 });

@@ -10,7 +10,7 @@ import {MediaStore, mediaOf} from './media.js';
 import {pair} from './pairing.js';
 import {countdown, dayLabel, splitTitle, stageOf, upcoming} from './agenda.js';
 import {Composer, draftChoice} from './compose.js';
-import {dayNumber, isDark, isLive, isPowerOn, liveItems, weekdayOf} from './rules.js';
+import {dayNumber, isDark, isLive, isPowerOn, liveItems, urgentOf, weekdayOf} from './rules.js';
 import {Screen} from './render.js';
 import {store} from './store.js';
 import {countToday} from './today.js';
@@ -346,6 +346,10 @@ class Player {
             this.showDraft();
             return;
         }
+        if (this.urgentOn) {
+            // Nothing moves under an urgent notice.
+            return;
+        }
         if (this.reloadAt) {
             location.reload();
             return;
@@ -390,6 +394,14 @@ class Player {
         }
         this.screen.setDark(this.forcedTheme !== undefined ? this.forcedTheme : isDark(m.theme, wall));
         this.screen.setClock(this.clock.date());
+        // An urgent notice covers everything until it is taken off; then the turns go on.
+        const urgent = urgentOf(m.items, wall);
+        const was = this.urgentOn;
+        this.urgentOn = !!urgent;
+        this.screen.showUrgent(urgent);
+        if (was && !urgent) {
+            this.next();
+        }
         if (!this.screen.comp) {
             this.next();
         }

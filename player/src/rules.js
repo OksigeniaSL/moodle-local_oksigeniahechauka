@@ -163,3 +163,21 @@ export function liveItems(items, zone, wall) {
     });
     return out;
 }
+
+/**
+ * The urgent notice on now, if any: the newest one whose «when» is live and whose «ends» has not come. It covers the
+ * whole screen until it is taken off (the panel's «Aviso urgente»).
+ *
+ * @param {object[]} items
+ * @param {{date: string, dow: number, min: number, stamp: string}} wall
+ * @returns {object|null}
+ */
+export function urgentOf(items, wall) {
+    let found = null;
+    (items || []).forEach(function (it) {
+        if (it.type === 'urgent' && isLive(it, wall) && !(it.ends && it.ends <= wall.stamp)) {
+            found = it;
+        }
+    });
+    return found;
+}

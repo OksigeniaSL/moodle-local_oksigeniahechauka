@@ -55,6 +55,7 @@ class player_page {
             'days_word' => get_string('label_days', $c),
             'days_mid' => explode(',', get_string('days_abbr_mid', $c)),
             'week_none' => get_string('week_none', $c),
+            'urgent' => get_string('urgent_label', $c),
             'week_holiday' => get_string('week_holiday', $c),
             'week_more' => get_string('week_more', $c),
             'week_from' => get_string('week_from', $c),
@@ -140,7 +141,7 @@ class player_page {
         // The templates, the compositions, the weather and the coming days, in this order; the weather icons before
         // the player, which takes them from the page.
         $sheets = '';
-        foreach (['hechauka.css', 'composiciones.css', 'tiempo.css', 'semana.css', 'proximos-dias.css'] as $file) {
+        foreach (['hechauka.css', 'composiciones.css', 'tiempo.css', 'semana.css', 'proximos-dias.css', 'urgente.css'] as $file) {
             $sheets .= '<link rel="stylesheet" href="' . $url($file) . '">';
         }
         $json = json_encode($boot, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP);

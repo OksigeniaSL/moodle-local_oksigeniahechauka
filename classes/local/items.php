@@ -29,7 +29,7 @@ namespace local_oksigeniahechauka\local;
  */
 class items {
     /** The types the panel makes. */
-    const TYPES = ['media', 'notice', 'event', 'ticker', 'agenda'];
+    const TYPES = ['media', 'notice', 'event', 'ticker', 'agenda', 'urgent'];
 
     /**
      * A text for the screens: through the filters (multilang), as plain text. The player writes it with textContent,
@@ -98,6 +98,12 @@ class items {
                 return $event;
             case 'ticker':
                 return $item + ['type' => 'ticker', 'zone' => 'ticker', 'text' => $title];
+            case 'urgent':
+                $urgent = $item + ['type' => 'urgent', 'zone' => 'urgent', 'title' => $title, 'body' => $body];
+                if (!empty($data['ends'])) {
+                    $urgent['ends'] = schedule::stamp((int) $data['ends']);
+                }
+                return $urgent;
             case 'agenda':
                 // Its events, one by one: agendas::contract().
                 return null;
@@ -219,6 +225,18 @@ class items {
         foreach (array_unique(array_map('intval', $screens)) as $s) {
             $DB->insert_record('local_oksigeniahechauka_target', (object) ['itemid' => $itemid, 'screenid' => $s]);
         }
+    }
+
+    /**
+     * Whether an urgent notice is on: published, and its end (if it has one) has not come.
+     *
+     * @param \stdClass $item
+     * @param int $now
+     * @return bool
+     */
+    public static function urgent_on(\stdClass $item, int $now): bool {
+        $ends = (int) (self::data($item)['ends'] ?? 0);
+        return $item->type === 'urgent' && !empty($item->visible) && (!$ends || $ends > $now);
     }
 
     /**

@@ -32,6 +32,8 @@
         "tabs": [],
         "health": {"ok": true, "title": "Las 2 pantallas, bien", "detail": "última señal hace 1 min"},
         "minefirst": false,
+        "urgent": null,
+        "dialog": null,
         "wall": {"title": "Ahora en cada pantalla", "count": 0, "screens": [], "reloadall": "", "reloadicon": "",
             "add": "", "addicon": ""},
         "content": {
@@ -47,7 +49,7 @@
         </div>
         {{#hasactions}}
         <div class="hkp-head-actions">
-            {{#actions}}<a class="btn {{#primary}}btn-primary{{/primary}}{{^primary}}btn-outline-danger{{/primary}}" href="{{url}}">{{{icon}}}{{label}}</a>{{/actions}}
+            {{#actions}}{{#dialog}}<button type="button" class="btn btn-outline-danger" data-hkp-open="{{dialog}}">{{{icon}}}{{label}}</button>{{/dialog}}{{^dialog}}<a class="btn {{#primary}}btn-primary{{/primary}}{{^primary}}btn-outline-secondary{{/primary}}" href="{{url}}">{{{icon}}}{{label}}</a>{{/dialog}}{{/actions}}
         </div>
         {{/hasactions}}
     </header>
@@ -56,12 +58,16 @@
         {{#tabs}}<a href="{{url}}"{{#current}} aria-current="page"{{/current}}>{{{icon}}}{{label}}</a>{{/tabs}}
     </nav>
     {{/hastabs}}
+    {{#urgent}}
+    <section class="hkp-urgent-on" role="alert">{{{icon}}}<div><p class="k">{{line}}</p><p class="t">{{title}}</p></div>{{#remove}}<a class="btn" href="{{remove}}">{{#str}}urgent_take_off, local_oksigeniahechauka{{/str}}</a>{{/remove}}</section>
+    {{/urgent}}
     {{#health}}
         {{#ok}}<p class="hkp-health" data-state="ok" role="status"><span class="hkp-state" data-state="on"><span class="hkp-dot" aria-hidden="true"></span>{{title}}</span>{{#detail}}<span>{{detail}}</span>{{/detail}}</p>{{/ok}}
         {{^ok}}<section class="hkp-health" data-state="down" role="status"><span class="hkp-health-icon">{{{icon}}}</span><p><b>{{bold}}</b> {{detail}}</p>{{#see}}<a class="btn btn-sm btn-outline-secondary" href="{{see}}">{{#str}}health_see, local_oksigeniahechauka{{/str}}</a>{{/see}}</section>{{/ok}}
     {{/health}}
     {{#minefirst}}{{> local_oksigeniahechauka/home_content}}{{> local_oksigeniahechauka/home_wall}}{{/minefirst}}
     {{^minefirst}}{{> local_oksigeniahechauka/home_wall}}{{> local_oksigeniahechauka/home_content}}{{/minefirst}}
+    {{#dialog}}{{> local_oksigeniahechauka/urgent_dialog}}{{/dialog}}
 </div>
 {{#js}}
 (function() {
@@ -87,6 +93,85 @@
             apply();
         });
     });
+    // The urgent notice: its dialog, the sentences already made, where it goes, and the urgent screen beside it.
+    var dialog = document.getElementById('hkp-urgent-dialog');
+    if (dialog) {
+        var words = JSON.parse(dialog.getAttribute('data-strings') || '{}');
+        var frame = dialog.querySelector('iframe[data-src]');
+        var title = dialog.querySelector('#hkp-ut');
+        var body = dialog.querySelector('#hkp-ud');
+        var go = dialog.querySelector('#hkp-urgent-go-label');
+        var send = function() {
+            if (frame && frame.contentWindow && frame.getAttribute('src')) {
+                frame.contentWindow.postMessage({hkDraft: {item: {id: 'draft', type: 'urgent', zone: 'urgent',
+                    title: title.value || words.label, body: body.value}}}, location.origin);
+            }
+        };
+        var count = function() {
+            var all = dialog.querySelector('input[data-where="all"]');
+            var ids = {};
+            var n = 0;
+            if (all.checked) {
+                n = Number(all.getAttribute('data-count'));
+            } else {
+                dialog.querySelectorAll('input[data-where="group"]:checked').forEach(function(g) {
+                    (g.getAttribute('data-screens') || '').split(',').filter(Boolean).forEach(function(id) {
+                        if (!ids[id]) {
+                            ids[id] = true;
+                            n++;
+                        }
+                    });
+                });
+            }
+            go.textContent = n === 1 ? words.one : words.n.replace('{$a}', n);
+            dialog.querySelector('#hkp-urgent-go').disabled = !n;
+        };
+        root.querySelectorAll('[data-hkp-open]').forEach(function(button) {
+            button.addEventListener('click', function() {
+                if (frame && !frame.getAttribute('src')) {
+                    frame.setAttribute('src', frame.getAttribute('data-src'));
+                }
+                dialog.showModal();
+                send();
+            });
+        });
+        dialog.querySelectorAll('[data-hkp-close]').forEach(function(button) {
+            button.addEventListener('click', function() {
+                dialog.close();
+            });
+        });
+        dialog.querySelectorAll('input[name="kind"]').forEach(function(kind) {
+            kind.addEventListener('change', function() {
+                title.value = kind.getAttribute('data-title');
+                body.value = kind.getAttribute('data-body');
+                if (!title.value) {
+                    title.focus();
+                }
+                send();
+            });
+        });
+        dialog.querySelectorAll('input[data-where]').forEach(function(where) {
+            where.addEventListener('change', function() {
+                if (where.checked && where.getAttribute('data-where') === 'all') {
+                    dialog.querySelectorAll('input[data-where="group"]').forEach(function(g) {
+                        g.checked = false;
+                    });
+                } else if (where.checked) {
+                    dialog.querySelector('input[data-where="all"]').checked = false;
+                }
+                count();
+            });
+        });
+        title.addEventListener('input', send);
+        body.addEventListener('input', send);
+        window.addEventListener('message', function(ev) {
+            if (ev.origin === location.origin && ev.data && ev.data.hkPreviewReady && frame &&
+                    ev.source === frame.contentWindow) {
+                send();
+            }
+        });
+        count();
+    }
     root.querySelectorAll('[data-scope]').forEach(function(button) {
         button.addEventListener('click', function() {
             scope = button.getAttribute('data-scope');

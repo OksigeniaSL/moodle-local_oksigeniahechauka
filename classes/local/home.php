@@ -66,10 +66,29 @@ class home {
             $titles['i' . $item->id] = format_string($item->title);
         }
 
+        // The urgent notices on now, newest last, and the screens each one reaches.
+        $urgents = array_values(array_filter($DB->get_records(
+            'local_oksigeniahechauka_item',
+            ['type' => 'urgent'],
+            'sortorder, id'
+        ), function ($u) use ($now) {
+                return items::urgent_on($u, $now);
+        }));
         $cards = [];
         $states = [];
+        $reached = 0;
         foreach ($screens as $s) {
+            $urgent = null;
+            foreach ($urgents as $u) {
+                if (items::reaches((int) $u->id, (int) $s->id)) {
+                    $urgent = $u;
+                }
+            }
             $card = self::screen($s, $now, $titles, $managescreens);
+            if ($urgent && $card['state'] !== 'off') {
+                $card['now'] = get_string('urgent_label', $c);
+                $reached++;
+            }
             $states[] = $card;
             $cards[] = $card;
         }
@@ -77,9 +96,14 @@ class home {
         $actions = [];
         $destinations = access::destinations();
         $canadd = access::publishes() && ($destinations['all'] || $destinations['groups']);
+        if ($publishall) {
+            $actions[] = ['dialog' => 'hkp-urgent-dialog', 'label' => get_string('urgent_button', $c),
+                'icon' => icons::svg('urgent'), 'primary' => false, 'url' => ''];
+        }
         if ($canadd) {
+            // Every action says whether it opens a dialog: Mustache would otherwise find the page's own «dialog».
             $actions[] = ['url' => (new \moodle_url('/local/oksigeniahechauka/edit.php', ['type' => 'notice']))->out(false),
-                'label' => get_string('add', $c), 'icon' => icons::svg('plus'), 'primary' => true];
+                'label' => get_string('add', $c), 'icon' => icons::svg('plus'), 'primary' => true, 'dialog' => ''];
         }
 
         $groupnames = array_map('format_string', array_intersect_key($groups, array_flip($mygroups)));
@@ -92,7 +116,9 @@ class home {
             'tabs' => self::tabs('home', $managescreens),
             'hastabs' => $managescreens,
             'style' => self::stages(),
-            'health' => self::health($states, $now, $managescreens),
+            'health' => $urgents ? [] : self::health($states, $now, $managescreens),
+            'urgent' => $urgents ? self::urgent_banner(end($urgents), $reached, $publishall) : null,
+            'dialog' => $publishall ? self::urgent_dialog($now) : null,
             'wall' => [
                 'title' => get_string($limited ? 'wall_mine' : 'wall_title', $c),
                 'count' => count($cards),
@@ -110,6 +136,76 @@ class home {
         // A screen of one's groups first, for who only publishes: their content comes before the wall.
         $context['minefirst'] = $limited;
         return $context;
+    }
+
+    /**
+     * The red banner over the home while an urgent notice is on, with the one click to take it off.
+     *
+     * @param \stdClass $urgent
+     * @param int $screens the screens it is on now
+     * @param bool $publishall
+     * @return array
+     */
+    protected static function urgent_banner(\stdClass $urgent, int $screens, bool $publishall): array {
+        $c = self::C;
+        return [
+            'icon' => icons::svg('urgent'),
+            'line' => get_string($screens === 1 ? 'urgent_on_one' : 'urgent_on', $c, (object) ['n' => $screens,
+                'since' => phrases::hour((int) $urgent->timecreated)]),
+            'title' => format_string($urgent->title),
+            'remove' => $publishall ? (new \moodle_url('/local/oksigeniahechauka/urgent.php', ['off' => $urgent->id,
+                'sesskey' => sesskey()]))->out(false) : '',
+        ];
+    }
+
+    /**
+     * The dialog of the urgent notice: what happens (with sentences already made), where, until when, and the urgent
+     * screen beside it.
+     *
+     * @param int $now
+     * @return array
+     */
+    protected static function urgent_dialog(int $now): array {
+        global $DB;
+        $c = self::C;
+        $members = [];
+        foreach ($DB->get_records('local_oksigeniahechauka_member') as $m) {
+            $members[(int) $m->groupid][] = (int) $m->screenid;
+        }
+        $screens = $DB->get_records('local_oksigeniahechauka_screen', null, 'sortorder, name', 'id, name, lastinfo');
+        $groups = [];
+        foreach ($DB->get_records_menu('local_oksigeniahechauka_group', null, 'sortorder, name', 'id, name') as $id => $name) {
+            $groups[] = ['id' => $id, 'name' => format_string($name), 'count' => count($members[$id] ?? []),
+                'screens' => implode(',', $members[$id] ?? [])];
+        }
+        $kinds = [];
+        foreach (['drill', 'rain', 'early', 'other'] as $i => $kind) {
+            $kinds[] = ['kind' => $kind, 'label' => get_string('urgent_kind_' . $kind, $c), 'checked' => $i === 0,
+                'title' => $kind === 'other' ? '' : get_string('urgent_' . $kind . '_title', $c),
+                'body' => $kind === 'other' ? '' : get_string('urgent_' . $kind . '_body', $c)];
+        }
+        $until = [];
+        foreach (['off', 'hour', 'day'] as $i => $u) {
+            $until[] = ['value' => $u, 'label' => get_string('urgent_until_' . $u, $c), 'checked' => $i === 0];
+        }
+        $first = reset($screens);
+        $info = $first ? (json_decode((string) $first->lastinfo, true) ?: []) : [];
+        return [
+            'action' => (new \moodle_url('/local/oksigeniahechauka/urgent.php'))->out(false),
+            'sesskey' => sesskey(),
+            'kinds' => $kinds,
+            'title' => $kinds[0]['title'],
+            'body' => $kinds[0]['body'],
+            'groups' => $groups,
+            'all' => count($screens),
+            'until' => $until,
+            'frame' => (new \moodle_url('/local/oksigeniahechauka/preview.php', ['frame' => 1,
+                'screen' => $first ? $first->id : 0]))->out(false),
+            'vertical' => ($info['display']['height'] ?? 0) > ($info['display']['width'] ?? 1),
+            'icons' => ['urgent' => icons::svg('urgent'), 'x' => icons::svg('x'), 'screens' => icons::svg('screens')],
+            'strings' => json_encode(['n' => get_string('urgent_go_n', $c), 'one' => get_string('urgent_go_one', $c),
+                'label' => get_string('urgent_label', $c)], JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP),
+        ];
     }
 
     /**
@@ -398,7 +494,9 @@ class home {
         $counts = ['all' => 0, 'notice' => 0, 'media' => 0, 'event' => 0, 'ticker' => 0, 'agenda' => 0];
         $mine = 0;
         foreach ($items as $item) {
-            $moment = phrases::moment($item, $today);
+            // An urgent notice is on until it is taken off or its hour comes.
+            $moment = $item->type === 'urgent' ? (items::urgent_on($item, time()) ? 'now' : 'done') :
+                phrases::moment($item, $today);
             $row = self::row(
                 $item,
                 $moment,
@@ -414,7 +512,8 @@ class home {
             $out[$moment][] = $row;
             if ($moment !== 'done') {
                 $counts['all']++;
-                $counts[$item->type] = ($counts[$item->type] ?? 0) + 1;
+                // An urgent notice counts among the notices.
+                $counts[$item->type === 'urgent' ? 'notice' : $item->type]++;
                 $mine += $row['mine'] ? 1 : 0;
             }
         }
@@ -496,8 +595,20 @@ class home {
             $meta[] = ['text' => get_string('by', $c, fullname($author))];
         }
 
-        $when = $item->type === 'agenda' ? ['when' => get_string('when_always', $c),
-            'small' => get_string('when_agenda', $c), 'soon' => false] : phrases::when($item, $today);
+        if ($item->type === 'urgent') {
+            $ends = (int) ($data['ends'] ?? 0);
+            $item = clone $item;
+            if ($ends && $ends <= time()) {
+                $item->visible = 0;
+            }
+        }
+        $when = $item->type === 'urgent' ? ['when' => !empty($data['ends']) ? get_string(
+            'urgent_until_at',
+            $c,
+            phrases::hour((int) $data['ends'])
+        ) : get_string('urgent_until_off', $c), 'small' => '', 'soon' => false] :
+            ($item->type === 'agenda' ? ['when' => get_string('when_always', $c),
+            'small' => get_string('when_agenda', $c), 'soon' => false] : phrases::when($item, $today));
         if (!$item->visible) {
             $when = ['when' => get_string('when_hidden', $c), 'small' => '', 'soon' => false];
         }
@@ -517,7 +628,7 @@ class home {
             } else if ($moment === 'done') {
                 $actions[] = ['url' => $edit->out(false), 'label' => get_string('act_show', $c),
                     'icon' => icons::svg('reload')];
-            } else {
+            } else if ($item->type !== 'urgent') {
                 $actions[] = ['url' => $edit->out(false), 'label' => get_string('edit'), 'icon' => ''];
             }
             $am = new \action_menu();
@@ -526,7 +637,9 @@ class home {
                 'visually-hidden sr-only'
             ), 'btn btn-sm btn-outline-secondary btn-icon no-caret');
             // Also in the menu: on a phone the menu is the only button of the row.
-            $am->add_secondary_action(new \action_link($edit, get_string('edit')));
+            if ($item->type !== 'urgent') {
+                $am->add_secondary_action(new \action_link($edit, get_string('edit')));
+            }
             if ($moment !== 'done') {
                 $am->add_secondary_action(new \action_link($act('hide'), get_string('act_hide', $c)));
             }
@@ -540,13 +653,13 @@ class home {
 
         return [
             'id' => (int) $item->id,
-            'type' => $item->type,
+            'type' => $item->type === 'urgent' ? 'notice' : $item->type,
             'mine' => (int) ($item->createdby ?? 0) === $userid,
             'title' => $title,
             'thumb' => $thumb,
             'kind' => get_string('kind_' . $kind, $c) . ($thumb['video'] ? ' · ' . $thumb['video'] : ''),
             'kindicon' => icons::svg(['photo' => 'photo', 'video' => 'video', 'notice' => 'notice', 'event' => 'event',
-                'ticker' => 'ticker', 'agenda' => 'agenda'][$kind]),
+                'ticker' => 'ticker', 'agenda' => 'agenda', 'urgent' => 'urgent'][$kind]),
             'meta' => $meta,
             'when' => $when['when'],
             'whensmall' => $when['small'],
@@ -595,8 +708,9 @@ class home {
                     $out['vertical'] = $data['videoheight'] > $data['videowidth'];
                 }
             }
-        } else if ($item->type === 'notice') {
-            $out['important'] = !empty($data['important']);
+        } else if ($item->type === 'notice' || $item->type === 'urgent') {
+            $out['important'] = $item->type === 'urgent' || !empty($data['important']);
+            $out['isnotice'] = true;
         } else if ($item->type === 'event' && !empty($data['start'])) {
             $day = schedule::day((int) $data['start']);
             $words = explode(' ', phrases::weekday($day));
@@ -609,7 +723,7 @@ class home {
                 $out['agenda'][] = ['stage' => $stage ? 's' . $stage : ''];
             }
         }
-        $out['is' . $item->type] = true;
+        $out['is' . ($item->type === 'urgent' ? 'notice' : $item->type)] = true;
         return $out;
     }
 

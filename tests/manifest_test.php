@@ -229,4 +229,29 @@ final class manifest_test extends \advanced_testcase {
         $this->assertCount(1, $events);
         $this->assertStringStartsWith('c', $events[0]['id']);
     }
+
+    /**
+     * An urgent notice reaches the screens until it is taken off or its hour comes.
+     */
+    public function test_urgent_notice(): void {
+        global $DB;
+        $this->resetAfterTest();
+        $screen = $this->screen('Hall');
+        $now = time();
+        $urgent = function (array $data, int $visible = 1) use ($DB, $now) {
+            return (int) $DB->insert_record('local_oksigeniahechauka_item', (object) ['type' => 'urgent',
+                'title' => 'Simulacro', 'body' => 'Sal con calma', 'data' => json_encode($data), 'visible' => $visible,
+                'targetall' => 1, 'everyweeks' => 0, 'timecreated' => $now, 'timemodified' => $now]);
+        };
+        $on = $urgent(['ends' => $now + HOURSECS]);
+        $urgent(['ends' => $now - 60]);
+        $urgent([], 0);
+        $found = array_values(array_filter(manifest::build($screen, $now)['items'], function ($it) {
+            return $it['type'] === 'urgent';
+        }));
+        $this->assertCount(1, $found);
+        $this->assertSame(['i' . $on, 'urgent', 'Simulacro', 'Sal con calma'], [$found[0]['id'], $found[0]['zone'],
+            $found[0]['title'], $found[0]['body']]);
+        $this->assertArrayHasKey('ends', $found[0]);
+    }
 }

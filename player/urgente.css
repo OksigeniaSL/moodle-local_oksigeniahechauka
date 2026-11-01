@@ -1,0 +1,75 @@
+/* Hechauka: the urgent notice on the screen. A proposal for the player, drawn for the panel
+ * mock-up's preview: it covers the whole screen, with the clock, until someone takes it off. For Chromium 56 like the
+ * rest (flexbox, rem, no grid, no clamp). Red with white, 7.8:1, the same in both themes: it is an alarm, not the
+ * school's colour. Striped edges say «urgent» without the colour. Nothing moves. */
+.hk-urgente {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 40;
+    display: -webkit-box;
+    display: flex;
+    -webkit-box-orient: vertical;
+    flex-direction: column;
+    -webkit-box-pack: center;
+    justify-content: center;
+    padding: 9rem 12rem;
+    background: #9f1d16;
+    color: #fff;
+    font-family: var(--hk-letra-titulos);
+}
+.hk-urgente::before,
+.hk-urgente::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 2.4rem;
+    background: repeating-linear-gradient(-45deg, #fff 0, #fff 2.4rem, #9f1d16 2.4rem, #9f1d16 4.8rem);
+    opacity: .9;
+}
+.hk-urgente::before {
+    top: 0;
+}
+.hk-urgente::after {
+    bottom: 0;
+}
+.hk-urgente-etiqueta {
+    margin: 0;
+    font-size: 3.6rem;
+    font-weight: 800;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+}
+.hk-urgente h1 {
+    margin: 2.8rem 0 0;
+    font-size: 12rem;
+    font-weight: 800;
+    line-height: 1.02;
+}
+.hk-urgente-texto {
+    margin: 3.6rem 0 0;
+    font-family: var(--hk-letra-texto);
+    font-size: 5.4rem;
+    font-weight: 600;
+    line-height: 1.2;
+}
+.hk-urgente-hora {
+    position: absolute;
+    top: 6rem;
+    right: 9rem;
+    margin: 0;
+    font-size: 7rem;
+    font-weight: 800;
+}
+.hk-vertical .hk-urgente {
+    padding: 12rem 7rem;
+}
+.hk-vertical .hk-urgente h1 {
+    font-size: 11rem;
+}
+.hk-vertical .hk-urgente-hora {
+    right: 7rem;
+}

@@ -45,6 +45,10 @@ if ($item && !access::may_edit($item)) {
 if ($item) {
     $type = $item->type;
 }
+if ($type === 'urgent') {
+    // An urgent notice is put on and taken off from the home of the panel, not changed.
+    redirect(new moodle_url('/local/oksigeniahechauka/index.php'));
+}
 if (!in_array($type, items::TYPES)) {
     throw new moodle_exception('invalidparameter', 'debug');
 }

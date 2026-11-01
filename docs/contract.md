@@ -164,6 +164,7 @@ length unless it has a duration.
 | `event` | `side` | `title`, `detail` (who or where, one line), `start` and `end` (`"2026-11-02T10:00"`), `allday`, `color` (1 to 4, optional), `holiday` (optional). A title «3º ESO - Acampada» reads as «Acampada» with «3º ESO» under it |
 | `menu` | `side` | `date`, `label`, `menus`, `closed`, `title`, `note` |
 | `ticker` | `ticker` | `text` |
+| `urgent` | `urgent` | `title`, `body`, `ends` (optional, `"2026-11-02T11:46"`). The urgent notice: while one is live and its `ends` has not come, it covers the whole screen (red with white, striped edges, the clock) and nothing moves under it; the newest one wins. A screen off by its power hours shows it when it comes on, if it is still there |
 
 - `caption`: `{"title": "…", "text": "…"}`, over the picture on a dark fade.
 - «Today» has the menu, the notices, the events of the day and the coming days (the events of the next week, from

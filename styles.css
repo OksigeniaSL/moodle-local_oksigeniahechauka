@@ -2511,3 +2511,21 @@ body.hkp-page #page.drawers .main-inner {
 .hkp-strip .hkp-strip-gap {
     background: none;
 }
+
+/* The dialogs are native ones (they keep the focus and close with Escape): no frame of the browser's own. */
+dialog.hkp-dialog {
+    max-height: calc(100vh - 2rem);
+    padding: 0;
+    overflow: auto;
+    border: 0;
+}
+
+dialog.hkp-dialog::backdrop {
+    background: rgba(0, 0, 0, .55);
+}
+
+/* In a dialog, a field or a label after a row of chips keeps its distance. */
+.hkp-dialog .hkp-chips + .hkp-field,
+.hkp-dialog .hkp-chips + .hkp-label {
+    margin-top: 1rem;
+}

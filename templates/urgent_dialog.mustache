@@ -1,0 +1,64 @@
+{{!
+    This file is part of Moodle - https://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_oksigeniahechauka/urgent_dialog
+
+    The urgent notice, in two steps: the dialog (what happens, with sentences already made; where; until when; the
+    urgent screen beside it) and «Ponerlo ya». A native dialog: it keeps the focus inside and closes with Escape.
+
+    Example context (json):
+    {
+        "action": "https://example.com/local/oksigeniahechauka/urgent.php", "sesskey": "abc",
+        "kinds": [{"kind": "drill", "label": "Simulacro", "checked": true, "title": "Simulacro de evacuación", "body": "Sal con calma"}],
+        "title": "Simulacro de evacuación", "body": "Sal con calma",
+        "groups": [{"id": 1, "name": "Infantil", "count": 2, "screens": "4,5"}], "all": 6,
+        "until": [{"value": "off", "label": "Hasta que lo quite", "checked": true}],
+        "frame": "https://example.com/local/oksigeniahechauka/preview.php?frame=1", "vertical": false,
+        "icons": {"urgent": "", "x": "", "screens": ""}, "strings": "{}"
+    }
+}}
+<dialog class="hkp-dialog is-urgent" id="hkp-urgent-dialog" aria-labelledby="hkp-urg-h" data-strings="{{strings}}">
+    <form method="post" action="{{action}}" id="hkp-urgent-form"><input type="hidden" name="sesskey" value="{{sesskey}}"></form>
+    <header>{{{icons.urgent}}}<h2 id="hkp-urg-h">{{#str}}urgent_label, local_oksigeniahechauka{{/str}}</h2><button type="button" class="btn btn-icon" data-hkp-close aria-label="{{#str}}closebuttontitle{{/str}}">{{{icons.x}}}</button></header>
+    <div class="hkp-dialog-body">
+        <p class="hkp-lead">{{#str}}urgent_lead, local_oksigeniahechauka{{/str}}</p>
+        <div class="hkp-two">
+            <div>
+                <span class="hkp-label" id="hkp-uk">{{#str}}urgent_what, local_oksigeniahechauka{{/str}}</span>
+                <div class="hkp-chips" role="radiogroup" aria-labelledby="hkp-uk">{{#kinds}}<label class="hkp-chip"><input form="hkp-urgent-form" type="radio" name="kind" value="{{kind}}" data-title="{{title}}" data-body="{{body}}"{{#checked}} checked{{/checked}}>{{label}}</label>{{/kinds}}</div>
+                <div class="hkp-field"><label class="form-label" for="hkp-ut">{{#str}}compose_says, local_oksigeniahechauka{{/str}}</label><input form="hkp-urgent-form" class="form-control is-big" id="hkp-ut" name="title" value="{{title}}" maxlength="120" autocomplete="off" required></div>
+                <div class="hkp-field"><label class="form-label" for="hkp-ud">{{#str}}urgent_oneline, local_oksigeniahechauka{{/str}}</label><input form="hkp-urgent-form" class="form-control" id="hkp-ud" name="body" value="{{body}}" maxlength="160" autocomplete="off"></div>
+                <span class="hkp-label">{{#str}}where, local_oksigeniahechauka{{/str}}</span>
+                <div class="hkp-chips">
+                    <label class="hkp-chip is-small"><input form="hkp-urgent-form" type="checkbox" name="whereall" value="1" data-where="all" data-count="{{all}}" checked>{{{icons.screens}}}{{#str}}where_all, local_oksigeniahechauka{{/str}} <small>{{all}}</small></label>
+                    {{#groups}}<label class="hkp-chip is-small"><input form="hkp-urgent-form" type="checkbox" name="groups[]" value="{{id}}" data-where="group" data-screens="{{screens}}">{{name}} <small>{{count}}</small></label>{{/groups}}
+                </div>
+                <span class="hkp-label" id="hkp-uu">{{#str}}urgent_until, local_oksigeniahechauka{{/str}}</span>
+                <div class="hkp-chips" role="radiogroup" aria-labelledby="hkp-uu">{{#until}}<label class="hkp-chip is-small"><input form="hkp-urgent-form" type="radio" name="until" value="{{value}}"{{#checked}} checked{{/checked}}>{{label}}</label>{{/until}}</div>
+            </div>
+            <div>
+                <div class="hkp-stage"><span class="hkp-bezel{{#vertical}} is-v{{/vertical}}" data-state="on"><iframe id="hkp-upv" data-src="{{frame}}" title="{{#str}}urgent_preview, local_oksigeniahechauka{{/str}}"></iframe><span class="hkp-led" aria-hidden="true"></span></span></div>
+                <p class="hkp-hint">{{#str}}urgent_off_screens, local_oksigeniahechauka{{/str}}</p>
+            </div>
+        </div>
+    </div>
+    <footer>
+        <button type="submit" form="hkp-urgent-form" class="btn btn-danger btn-lg" id="hkp-urgent-go">{{{icons.urgent}}}<span id="hkp-urgent-go-label">{{#str}}urgent_go_n, local_oksigeniahechauka, {{all}}{{/str}}</span></button>
+        <button type="button" class="btn btn-secondary btn-lg" data-hkp-close>{{#str}}cancel{{/str}}</button>
+        <p class="hkp-hint">{{#str}}urgent_how_off, local_oksigeniahechauka{{/str}}</p>
+    </footer>
+</dialog>

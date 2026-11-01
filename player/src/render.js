@@ -278,6 +278,9 @@ export class Screen {
         this.minute = key;
         this.lastDate = d;
         this.headers.forEach((p) => this.paintClock(p, d));
+        if (this.urgentClock) {
+            this.urgentClock.textContent = two(d.getHours()) + ':' + two(d.getMinutes());
+        }
     }
 
     paintClock(p, d) {
@@ -610,6 +613,45 @@ export class Screen {
     }
 
     // --- The ticker -------------------------------------------------------------------------------------------------
+
+    /**
+     * The urgent notice over the whole screen, or null to take it off. Red with white, the same in both themes, its
+     * edges striped, the clock in a corner; nothing moves, and what was under it stops (the art direction's
+     * urgente.css).
+     *
+     * @param {object|null} item
+     */
+    showUrgent(item) {
+        const key = item ? item.id + '\u0000' + (item.title || '') + '\u0000' + (item.body || '') : '';
+        if (key === this.urgentKey) {
+            return;
+        }
+        this.urgentKey = key;
+        if (this.urgent && this.urgent.parentNode) {
+            this.urgent.parentNode.removeChild(this.urgent);
+        }
+        this.urgent = null;
+        this.frame.classList.toggle('hk-con-urgente', !!item);
+        if (!item) {
+            return;
+        }
+        const layer = el('div', 'hk-urgente');
+        layer.setAttribute('role', 'alert');
+        layer.appendChild(el('p', 'hk-urgente-etiqueta', this.s.urgent || ''));
+        layer.appendChild(el('h1', '', item.title || ''));
+        if (item.body) {
+            layer.appendChild(el('p', 'hk-urgente-texto', item.body));
+        }
+        this.urgentClock = el('p', 'hk-urgente-hora', this.lastDate ? two(this.lastDate.getHours()) + ':' +
+            two(this.lastDate.getMinutes()) : '');
+        layer.appendChild(this.urgentClock);
+        this.frame.appendChild(layer);
+        this.urgent = layer;
+        const videos = this.stage ? this.stage.querySelectorAll('video') : [];
+        for (let i = 0; i < videos.length; i++) {
+            videos[i].pause();
+        }
+    }
 
     showTicker(texts) {
         const text = texts.join('\u0000');
