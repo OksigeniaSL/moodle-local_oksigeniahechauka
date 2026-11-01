@@ -25,7 +25,7 @@
         "style": "", "id": 3, "name": "Biblioteca", "rawname": "Biblioteca", "back": "#", "backlabel": "Pantallas y grupos",
         "backicon": "", "action": "#", "sesskey": "abc",
         "card": {"state": "on", "label": "En marcha", "meta": "señal hace 1 min"},
-        "reload": "", "reloadicon": "", "clockicon": "", "moment": "Ahora · lunes 2, 10:45", "frame": "#",
+        "reload": "", "reloadicon": "", "clockhint": "", "clockicon": "", "moment": "Ahora · lunes 2, 10:45", "frame": "#",
         "vertical": false, "shot": "", "shotwhen": "",
         "facts": [{"term": "Señal", "value": "Hace 1 min"}],
         "groups": [{"id": 1, "name": "Zonas comunes", "checked": true}], "hasgroups": true,
@@ -39,7 +39,7 @@
 <div class="hkp" id="hkp-sheet-page"{{#style}} style="{{style}}"{{/style}} data-strings="{{strings}}">
     <a class="hkp-back" href="{{back}}">{{{backicon}}}{{backlabel}}</a>
     <header class="hkp-head">
-        <div class="hkp-head-title"><h1>{{name}}</h1>{{#card}}<p class="hkp-head-sub"><span class="hkp-state" data-state="{{state}}"><span class="hkp-state-word"><span class="hkp-dot" aria-hidden="true"></span>{{label}}</span>{{#meta}} <span class="hkp-meta">· {{meta}}</span>{{/meta}}</span></p>{{/card}}</div>
+        <div class="hkp-head-title"><h1>{{name}}</h1>{{#card}}<p class="hkp-head-sub"><span class="hkp-state" data-state="{{state}}"><span class="hkp-state-word"><span class="hkp-dot" aria-hidden="true"></span>{{label}}</span>{{#meta}} <span class="hkp-meta">· {{meta}}</span>{{/meta}}</span></p>{{/card}}{{#clockhint}}<p class="hkp-head-sub hkp-hint">{{clockhint}}</p>{{/clockhint}}</div>
         {{#reload}}<div class="hkp-head-actions"><a class="btn btn-outline-secondary" href="{{reload}}">{{{reloadicon}}}{{#str}}reload, local_oksigeniahechauka{{/str}}</a></div>{{/reload}}
     </header>
     {{#haserrors}}<div class="alert alert-danger" role="alert">{{#str}}compose_errors, local_oksigeniahechauka{{/str}}</div>{{/haserrors}}

@@ -204,7 +204,39 @@ function anyOverflows(cols) {
     return false;
 }
 
-// Bigger letters are worth it only while a dish or a notice keeps to two lines.
+// How many lines the title of an event takes: its own text, without the small line of its group under it.
+function titleLines(span) {
+    const text = span.firstChild;
+    if (!text || text.nodeType !== 3 || !document.createRange) {
+        return 1;
+    }
+    const range = document.createRange();
+    range.selectNodeContents(text);
+    const rects = range.getClientRects();
+    const tops = {};
+    let n = 0;
+    for (let i = 0; i < rects.length; i++) {
+        const top = Math.round(rects[i].top);
+        if (rects[i].width > 0 && !tops[top]) {
+            tops[top] = true;
+            n++;
+        }
+    }
+    return n;
+}
+
+// A title of an event (of today or of the coming days) in three lines or more.
+function longTitles(col, selector) {
+    const spans = col.querySelectorAll(selector);
+    for (let i = 0; i < spans.length; i++) {
+        if (titleLines(spans[i]) > 2) {
+            return true;
+        }
+    }
+    return false;
+}
+
+// Bigger letters are worth it only while a dish, a notice or the title of an event keeps to two lines.
 function threeLines(cols) {
     for (let i = 0; i < cols.length; i++) {
         const lines = cols[i].querySelectorAll('.hk-plato span, .hk-aviso h3');
@@ -213,6 +245,9 @@ function threeLines(cols) {
             if (lines[j].offsetHeight > height * 2.5) {
                 return true;
             }
+        }
+        if (longTitles(cols[i], '.hk-evento:not(.hk-proximo) > span')) {
+            return true;
         }
     }
     return false;
@@ -395,7 +430,8 @@ export function fitToday(aside) {
         let scale = parseInt(comingCol.getAttribute('data-escala'), 10) || 0;
         for (;;) {
             const got = addComing(comingCol, group, data, aside.hkLabels);
-            if (got.rows >= want || scale === 0) {
+            // Enough of them, and none of their titles in three lines; else a step down.
+            if ((got.rows >= want && !longTitles(comingCol, '.hk-proximo > span')) || scale === 0) {
                 if (!got.rows) {
                     dropComing(comingCol, got.block);
                 }

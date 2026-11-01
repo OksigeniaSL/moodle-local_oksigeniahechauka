@@ -164,9 +164,11 @@ class centre {
         $c = self::C;
         $out = ['notice' => ['title' => get_string('centre_sample_notice', $c), 'body' => get_string('centre_sample_body', $c)],
             'ticker' => get_string('centre_sample_ticker', $c), 'events' => []];
-        foreach ([1 => '09:30', 2 => '10:30', 3 => '12:00'] as $stage => $hour) {
-            $out['events'][] = ['title' => get_string('centre_sample_event' . $stage, $c), 'detail' => get_string('stage_' . $stage,
-                $c), 'hour' => $hour, 'color' => $stage];
+        $events = [1 => ['09:30', 'centre_sample_event1'], 2 => ['10:30', 'centre_sample_event2'],
+            3 => ['12:00', 'centre_sample_event3']];
+        foreach ($events as $stage => [$hour, $title]) {
+            $out['events'][] = ['title' => get_string($title, $c), 'detail' => get_string('stage_' . $stage, $c),
+                'hour' => $hour, 'color' => $stage];
         }
         return $out;
     }

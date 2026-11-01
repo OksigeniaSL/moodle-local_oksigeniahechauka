@@ -105,6 +105,8 @@ class sheet {
             'sesskey' => sesskey(),
             'card' => $card,
             'reload' => $card['reload'],
+            // A clock that is off says what to do about it.
+            'clockhint' => $card['state'] === 'warn' ? get_string('sheet_clock_hint', $c) : '',
             'reloadicon' => icons::svg('reload'),
             'clockicon' => icons::svg('clock'),
             'moment' => get_string('preview_moment', $c, phrases::weekday(schedule::day($now)) . ', ' . phrases::hour($now)),

@@ -2566,3 +2566,61 @@ dialog.hkp-dialog > footer {
 .hkp .hkp-section-hint {
     margin: 0 0 .75rem;
 }
+
+/* «Pantallas y grupos»: chips that only say (a screen in a group, a group of a screen), their «×», and adding a screen. */
+.hkp-chip.hkp-static {
+    cursor: default;
+}
+
+.hkp-chip.hkp-static:hover {
+    border-color: var(--hkp-edge);
+    background: var(--hkp-chip);
+}
+
+.hkp-chip-x {
+    display: inline-grid;
+    place-items: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    margin-right: -.35rem;
+    border-radius: 50%;
+    color: var(--hkp-muted);
+}
+
+.hkp-chip-x:hover,
+.hkp-chip-x:focus-visible {
+    background: var(--hkp-bad-tint);
+    color: var(--hkp-bad-ink);
+}
+
+.hkp-chip-x .hkp-i {
+    width: .9rem;
+    height: .9rem;
+}
+
+.hkp-add > summary {
+    list-style: none;
+    cursor: pointer;
+}
+
+.hkp-add > summary::-webkit-details-marker {
+    display: none;
+}
+
+.hkp-add[open] > form {
+    margin-top: .5rem;
+}
+
+.hkp .hkp-sec-hint {
+    flex-basis: 100%;
+    margin: 0;
+}
+
+.hkp .hkp-mono {
+    font-family: ui-monospace, monospace;
+}
+
+.hkp .hkp-code {
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}

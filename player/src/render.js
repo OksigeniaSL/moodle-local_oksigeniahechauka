@@ -559,6 +559,21 @@ export class Screen {
             fitWeek(layer.hkWeek, this.horizontal);
         }
         layer.hkPaging = turnPages(fitToday(layer.hkToday));
+        // Measured while the screens' letters were still arriving: once they are here (wider, as a rule), «Today» and
+        // the week are measured again, so no title ends up in three lines.
+        if (document.fonts && document.fonts.status === 'loading') {
+            const self = this;
+            document.fonts.ready.then(function () {
+                if (self.layer === layer) {
+                    self.todayKey = '';
+                    self.refreshToday(comp, today);
+                    self.todayKey = JSON.stringify(today);
+                    if (layer.hkWeek) {
+                        fitWeek(layer.hkWeek, self.horizontal);
+                    }
+                }
+            });
+        }
         void layer.offsetWidth;
         requestAnimationFrame(function () {
             layer.classList.add('hk-dentro');
