@@ -51,24 +51,28 @@
 }
 .hk-urgente-texto {
     margin: 3.6rem 0 0;
-    font-family: var(--hk-letra-texto);
-    font-size: 5.4rem;
-    font-weight: 600;
-    line-height: 1.2;
+    font-family: var(--hk-letra-titulos);
+    font-size: 7.2rem;                      /* 60 % of the title: read from 10 m in the middle of a drill */
+    font-weight: 700;
+    line-height: 1.15;
 }
 .hk-urgente-hora {
     position: absolute;
     top: 6rem;
     right: 9rem;
     margin: 0;
-    font-size: 7rem;
-    font-weight: 800;
+    font-size: 5rem;                        /* there, but quieter than what the notice says */
+    font-weight: 700;
+    opacity: .72;
 }
 .hk-vertical .hk-urgente {
     padding: 12rem 7rem;
 }
 .hk-vertical .hk-urgente h1 {
     font-size: 11rem;
+}
+.hk-vertical .hk-urgente-texto {
+    font-size: 6.6rem;
 }
 .hk-vertical .hk-urgente-hora {
     right: 7rem;

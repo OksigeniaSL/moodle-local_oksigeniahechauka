@@ -2529,3 +2529,10 @@ dialog.hkp-dialog::backdrop {
 .hkp-dialog .hkp-chips + .hkp-label {
     margin-top: 1rem;
 }
+
+/* The main button of a dialog stays in sight while one chooses, also on a phone (as in «Añadir»). */
+dialog.hkp-dialog > footer {
+    position: sticky;
+    bottom: 0;
+    z-index: 2;
+}
