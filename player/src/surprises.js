@@ -21,6 +21,11 @@ const BY_DISTANCE = {3: 1, 5: 1.25, 8: 1.5};
 const EDGE = 6;
 // Without news from the server for this long, it no longer knows what the sky is doing.
 const SKY_LASTS_MS = 3 * 3600000;
+// The thread of what hangs: one element, stretched from above the screen to where it holds on. Nothing to paint, whatever its length.
+const THREAD_WIDE = 7;
+const THREAD_ABOVE = 4;
+const THREAD_TEXELS = 'linear-gradient(to right, rgba(34,30,48,0) 7.14%, rgba(34,30,48,.3) 21.43%, rgba(140,138,150,.8) 35.71%, ' +
+    'rgba(255,255,255,.92) 50%, rgba(140,138,150,.8) 64.29%, rgba(34,30,48,.3) 78.57%, rgba(34,30,48,0) 92.86%)';
 
 function css(node, styles) {
     Object.keys(styles).forEach(function (k) {
@@ -77,8 +82,30 @@ export function walkOf(meta, width, scale, random) {
 }
 
 /**
+ * What hangs comes down instead of crossing: whole turns of its loop, as many as it takes to start out of sight, so that it
+ * brakes just at the height it stops at. It leaves upwards.
+ *
+ * @param {object} meta the atlas's
+ * @param {number} width of the screen
+ * @param {number} stop the height it stops at
+ * @param {number} scale
+ * @param {function(): number} random from 0 to 1
+ * @returns {{dir: number, turns: number, from: number, top: number, exit: number}}
+ */
+export function hangOf(meta, width, stop, scale, random) {
+    const sum = (state) => meta.estados[state].avance.reduce((total, step) => total + step[1], 0) * scale;
+    const turn = sum('cruza');
+    const brake = sum('para');
+    const below = (meta.cell.h - meta.anchor.y) * scale;
+    const turns = Math.max(1, Math.ceil((stop - brake + below) / turn));
+    const side = meta.anchor.x * scale;
+    return {dir: random() < 0.5 ? 1 : -1, turns, from: side + random() * (width - 2 * side), top: stop - brake - turns * turn,
+        exit: -below};
+}
+
+/**
  * The height its anchor goes at. What walks, on the ticker if it is in sight and if not on the bottom edge; what flies has no
- * floor: anywhere within the heights its atlas says (`altura`, at base 1080), on any shape of screen.
+ * floor: anywhere within the heights its atlas says (`altura`, at base 1080), on any shape of screen. What hangs stops there.
  *
  * @param {object} meta the atlas's
  * @param {number} height of the screen
@@ -204,6 +231,15 @@ class Walk {
             this.root.appendChild(this.shadow);
         }
         this.root.appendChild(box);
+        // What hangs has its thread behind it, at scale 1 from the start: only `transform` changes.
+        this.thread = null;
+        if (m.estados.cruza.hilo) {
+            this.thread = document.createElement('div');
+            css(this.thread, {position: 'absolute', left: '0', top: '0', width: THREAD_WIDE + 'px', height: '1px',
+                background: THREAD_TEXELS, willChange: 'transform', visibility: 'hidden',
+                transformOrigin: (THREAD_WIDE / 2) + 'px 0', transform: 'translate3d(0,0,0) scale(1,1)'});
+            layer.appendChild(this.thread);
+        }
         layer.appendChild(this.root);
     }
 
@@ -222,6 +258,10 @@ class Walk {
         })).then(() => new Promise((resolve) => {
             this.root.style.visibility = 'visible';
             this.root.style.opacity = '0.001';
+            if (this.thread) {
+                this.thread.style.opacity = '0.001';
+                this.thread.style.visibility = 'visible';
+            }
             images.forEach(function (img) {
                 img.style.visibility = 'visible';
             });
@@ -232,6 +272,10 @@ class Walk {
                     });
                     this.root.style.opacity = '1';
                     this.root.style.visibility = 'hidden';
+                    if (this.thread) {
+                        this.thread.style.opacity = '1';
+                        this.thread.style.visibility = 'hidden';
+                    }
                     resolve();
                 });
             });
@@ -256,13 +300,26 @@ class Walk {
             this.shadow.style.transform = 'translate3d(' + (s[0] - s[1] * 0.56) + 'px,0,0) scaleX(' + (s[1] * 1.12 / 100) + ')';
             this.shadow.style.opacity = s[2];
         }
+        const hilo = m.estados[state].hilo;
+        if (hilo) {
+            const px = x + (hilo[i][0] - m.anchor.x) * (mirrored ? -scale : scale);
+            const py = y + (hilo[i][1] - m.anchor.y) * scale;
+            const dx = px - this.threadX;
+            const dy = py + THREAD_ABOVE;
+            this.thread.style.transform = 'translate3d(' + (this.threadX - THREAD_WIDE / 2) + 'px,' + (-THREAD_ABOVE) + 'px,0) rotate(' +
+                Math.atan2(-dx, dy) + 'rad) scale(' + scale + ',' + Math.sqrt(dx * dx + dy * dy) + ')';
+            if ((py > 0) !== this.threadSeen) {
+                this.threadSeen = py > 0;
+                this.thread.style.visibility = this.threadSeen ? 'visible' : 'hidden';
+            }
+        }
         this.root.style.transform = 'translate3d(' + (x - m.anchor.x) + 'px,' + (y - m.anchor.y) + 'px,0) scale(' +
             (mirrored ? -scale : scale) + ',' + scale + ')';
     }
 
     /**
-     * @param {{dir: number, from: number, turns: number, exit: number}} plan
-     * @param {number} height the height its anchor starts at
+     * @param {{dir: number, from: number, turns: number, exit: number, top: (number|undefined)}} plan with `top`, it hangs
+     * @param {number} height the height its anchor starts at, if it does not hang
      * @param {number} scale
      * @param {string} gesture
      * @param {function(): void} done
@@ -272,7 +329,10 @@ class Walk {
         const steps = [{state: 'cruza', times: plan.turns}, {state: 'para', times: 1}, {state: gesture, times: 1},
             {state: 'huye', times: 0}];
         let x = plan.from;
-        let y = height;
+        let y = plan.top === undefined ? height : plan.top;
+        // On a whole pixel, for it to be as sharp as it can when still.
+        this.threadX = Math.round(plan.from) + 0.5;
+        this.threadSeen = false;
         let step = 0;
         let time = 0;
         let i = 0;
@@ -298,7 +358,7 @@ class Walk {
                     time = 0;
                 }
             }
-            if (now.state === 'huye' && (plan.dir > 0 ? x > plan.exit : x < plan.exit)) {
+            if (now.state === 'huye' && (plan.top !== undefined ? y < plan.exit : (plan.dir > 0 ? x > plan.exit : x < plan.exit))) {
                 done();
                 return;
             }
@@ -312,6 +372,9 @@ class Walk {
         clearTimeout(this.timer);
         if (this.root.parentNode) {
             this.root.parentNode.removeChild(this.root);
+        }
+        if (this.thread && this.thread.parentNode) {
+            this.thread.parentNode.removeChild(this.thread);
         }
         Object.keys(this.images).forEach((p) => {
             this.images[p].onload = null;
@@ -547,8 +610,10 @@ export class Surprises {
                 const gestures = atlas.meta.gestos;
                 const gesture = gestures[Math.floor(Math.random() * gestures.length)];
                 walk = new Walk(this.layer, atlas, base, ['cruza', 'para', gesture, 'huye']);
-                start = () => walk.run(walkOf(atlas.meta, width, scale, Math.random),
-                    heightOf(atlas.meta, height, scale, this.hooks.floor(), Math.random), scale, gesture, done);
+                const stop = heightOf(atlas.meta, height, scale, this.hooks.floor(), Math.random);
+                const plan = atlas.meta.estados.cruza.hilo ? hangOf(atlas.meta, width, stop, scale, Math.random) :
+                    walkOf(atlas.meta, width, scale, Math.random);
+                start = () => walk.run(plan, stop, scale, gesture, done);
             }
             return walk.prepare().then(() => {
                 if (holding.cut) {

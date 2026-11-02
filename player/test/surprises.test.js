@@ -1,12 +1,12 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {dueAfter, filesOf, heightOf, inSeason, isRaining, pagesOf, scaleOf, Surprises, tileOf, walkOf} from '../src/surprises.js';
+import {dueAfter, filesOf, hangOf, heightOf, inSeason, isRaining, pagesOf, scaleOf, Surprises, tileOf, walkOf} from '../src/surprises.js';
 
 const atlasOf = (id) => JSON.parse(readFileSync(new URL('../sorpresas/' + id + '/spr.' + id + '.atlas.json', import.meta.url), 'utf8'));
 const atlas = atlasOf('gusanito');
 const m = atlas.meta;
-const ALL = ['gusanito', 'abeja', 'mosca'];
+const ALL = ['gusanito', 'abeja', 'mosca', 'arana'];
 const at = (v) => () => v;
 
 test('it comes now and then, never closer than a quarter of an hour', () => {
@@ -74,8 +74,11 @@ test('every frame of every state of everyone is in its atlas, and the states it 
                 assert.ok(one.frames[name], id + ' ' + name);
             }
         }
-        assert.ok(one.meta.estados.cruza.speed > 0, id);
-        assert.ok(one.meta.estados.huye.speed > 0, id);
+        // What hangs goes by its `avance`: it has no way forward.
+        if (!one.meta.estados.cruza.hilo) {
+            assert.ok(one.meta.estados.cruza.speed > 0, id);
+            assert.ok(one.meta.estados.huye.speed > 0, id);
+        }
     }
 });
 
@@ -114,6 +117,39 @@ test('a flyer also starts out of sight and stops on the screen', () => {
             }
         }
     }
+});
+
+test('what hangs starts out of sight, brakes just where it stops, on the screen, and has its thread in every frame', () => {
+    const one = atlasOf('arana').meta;
+    const cell = one.cell;
+    for (const state of ['cruza', 'para', 'huye'].concat(one.gestos)) {
+        const e = one.estados[state];
+        assert.equal(e.hilo.length, e.frames, state);
+        assert.equal(e.avance.length, e.frames, state);
+        for (const p of e.hilo) {
+            assert.ok(p[0] > 0 && p[0] < cell.w && p[1] > 0 && p[1] < cell.h, state);
+        }
+    }
+    const down = (name) => one.estados[name].avance.reduce((total, step) => total + step[1], 0);
+    assert.ok(down('cruza') > 0);
+    assert.ok(down('huye') < 0);
+    for (const [width, height, distance] of [[1920, 1080, 3], [1080, 1920, 3], [1920, 1080, 8], [3840, 2160, 3]]) {
+        const scale = scaleOf(width, height, distance);
+        for (const r of [0, 0.25, 0.5, 0.999]) {
+            const stop = heightOf(one, height, scale, null, at(r));
+            assert.ok(stop > 0 && stop < height);
+            const h = hangOf(one, width, stop, scale, at(r));
+            assert.ok(h.turns >= 1 && Number.isInteger(h.turns));
+            assert.ok(h.top + (cell.h - one.anchor.y) * scale <= 0.001, 'starts out of sight');
+            assert.ok(Math.abs(h.top + h.turns * down('cruza') * scale + down('para') * scale - stop) < 0.001, 'brakes where it stops');
+            assert.ok(h.from - one.anchor.x * scale >= -0.001 && h.from + one.anchor.x * scale <= width + 0.001, 'on the screen');
+            assert.equal(h.exit, -(cell.h - one.anchor.y) * scale);
+            assert.equal(h.dir, r < 0.5 ? 1 : -1);
+        }
+    }
+    // Those who do not hang have no `top`, and the walk goes as it did.
+    assert.equal(walkOf(atlasOf('abeja').meta, 1920, 1, at(0.5)).top, undefined);
+    assert.equal(atlasOf('abeja').meta.estados.cruza.hilo, undefined);
 });
 
 test('what falls closes its loop: a tile down is a whole number of tiles across, in whole pixels at any size', () => {

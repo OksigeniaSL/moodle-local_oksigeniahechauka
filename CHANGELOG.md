@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.7.9 (2026-11-02)
+
+- **The spider**, a new character of the surprises: it comes down its thread in eight striped socks, brakes as if on elastic
+  and, when it sees you, starts knitting or does a ta-da that goes wrong. The player draws the thread.
+- **The plugin has its icon**: two screens and the ribbon that goes from one to the other, an H.
+
 ## 0.7.8 (2026-11-02)
 
 - **Rain**: 45 seconds of fine streaks over the whole screen. It is off by default and, if the centre chooses it, it takes
