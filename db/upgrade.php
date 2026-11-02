@@ -245,5 +245,15 @@ function xmldb_local_oksigeniahechauka_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026110304, 'local', 'oksigeniahechauka');
     }
 
+    if ($oldversion < 2026110305) {
+        // Someone on the birthdays list can have the ID number of Moodle, often the one of enrolment.
+        $table = new xmldb_table('local_oksigeniahechauka_birthday');
+        $field = new xmldb_field('idnumber', XMLDB_TYPE_CHAR, '100', null, null, null, null, 'groupname');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        upgrade_plugin_savepoint(true, 2026110305, 'local', 'oksigeniahechauka');
+    }
+
     return true;
 }

@@ -50,6 +50,7 @@ class birthdayspage {
                 'id' => (int) $row->id,
                 'name' => $row->name,
                 'group' => (string) $row->groupname,
+                'idnumber' => (string) $row->idnumber,
                 'date' => (int) $row->day . ' ' . ($months[(int) $row->month] ?? ''),
                 'photo' => $picture ? \moodle_url::make_pluginfile_url(
                     $picture->get_contextid(),
@@ -70,6 +71,9 @@ class birthdayspage {
             'hastabs' => true,
             'centre' => (new \moodle_url('/local/oksigeniahechauka/centre.php'))->out(false),
             'action' => (new \moodle_url('/local/oksigeniahechauka/birthdays.php'))->out(false),
+            'modelurl' => (new \moodle_url('/local/oksigeniahechauka/model.php', ['kind' => 'birthdays']))->out(false),
+            'moodlepictures' => has_capability('tool/uploaduser:uploaduserpictures', \context_system::instance()) ?
+                (new \moodle_url('/admin/tool/uploaduser/picture.php'))->out(false) : '',
             'sesskey' => sesskey(),
             'on' => !empty($config->sourcebirthdays),
             'fields' => $fields,

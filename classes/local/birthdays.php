@@ -143,12 +143,24 @@ class birthdays {
     public static function on(\stdClass $config, string $date): array {
         global $DB;
         $people = [];
-        foreach (self::days_of($date) as [$month, $day]) {
-            foreach ($DB->get_records(self::TABLE, ['month' => $month, 'day' => $day]) as $row) {
-                $people[] = self::person($row->name, (string) $row->groupname, self::list_picture((int) $row->id));
-            }
-        }
         $ids = self::users_on((string) ($config->birthdayfield ?? ''), $date);
+        $rows = [];
+        foreach (self::days_of($date) as [$month, $day]) {
+            $rows = array_merge($rows, array_values($DB->get_records(self::TABLE, ['month' => $month, 'day' => $day])));
+        }
+        $users = self::users_by_idnumber(array_map(function ($row) {
+            return (string) $row->idnumber;
+        }, $rows));
+        foreach ($rows as $row) {
+            $user = $users[(string) $row->idnumber] ?? null;
+            if ($user && in_array((int) $user->id, $ids)) {
+                // Already there, from the profile.
+                continue;
+            }
+            // Its own picture, or the one of the Moodle user with its ID number.
+            $photo = self::list_picture((int) $row->id) ?: ($user && $user->picture ? self::user_picture((int) $user->id) : null);
+            $people[] = self::person($row->name, (string) $row->groupname, $photo);
+        }
         if ($ids) {
             foreach ($DB->get_records_list('user', 'id', $ids, '', 'id, firstname, lastname, department, picture') as $user) {
                 // The first name and the first surname: enough to know who it is, and no more.
@@ -268,12 +280,14 @@ class birthdays {
      * @param string $group
      * @param int $day
      * @param int $month
+     * @param string $idnumber the ID number in Moodle, often the one of enrolment: it matches a picture, or the Moodle user
      * @return int|null the id, or null if the date is no date or there is no name
      */
-    public static function add(string $name, string $group, int $day, int $month): ?int {
+    public static function add(string $name, string $group, int $day, int $month, string $idnumber = ''): ?int {
         global $DB, $USER;
         $name = \core_text::substr(trim($name), 0, 120);
         $group = \core_text::substr(trim($group), 0, 60);
+        $idnumber = \core_text::substr(trim($idnumber), 0, 100);
         // Any leap year: 29 February is a date.
         if ($name === '' || !checkdate($month, $day, 2024)) {
             return null;
@@ -281,37 +295,101 @@ class birthdays {
         $now = time();
         $same = $DB->get_record(self::TABLE, ['name' => $name, 'month' => $month, 'day' => $day]);
         if ($same) {
-            $DB->update_record(self::TABLE, (object) ['id' => $same->id, 'groupname' => $group, 'usermodified' => $USER->id,
-                'timemodified' => $now]);
+            $update = ['id' => $same->id, 'groupname' => $group, 'usermodified' => $USER->id, 'timemodified' => $now];
+            if ($idnumber !== '') {
+                $update['idnumber'] = $idnumber;
+            }
+            $DB->update_record(self::TABLE, (object) $update);
             return (int) $same->id;
         }
         return (int) $DB->insert_record(self::TABLE, (object) ['name' => $name, 'groupname' => $group, 'month' => $month,
-            'day' => $day, 'usermodified' => $USER->id, 'timecreated' => $now, 'timemodified' => $now]);
+            'day' => $day, 'idnumber' => $idnumber !== '' ? $idnumber : null, 'usermodified' => $USER->id, 'timecreated' => $now,
+            'timemodified' => $now]);
     }
 
     /**
-     * A list pasted in: a person per line, with name, group and date («Lucía Pérez; 3.º A; 15/03»), separated by a semicolon, a
-     * tab or a comma. The group may be left out. Of the date, the day and the month: a year there is ignored and not kept.
+     * The rows of the model a centre downloads: titles first, then two of example data.
+     *
+     * @return array of arrays
+     */
+    public static function model(): array {
+        return array_map(function ($line) {
+            return explode(';', $line);
+        }, explode("\n", get_string('model_birthdays', 'local_oksigeniahechauka')));
+    }
+
+    /**
+     * What a line says: name, group, day, month and ID number. Two shapes: the model's columns (name, group, day, month and the
+     * ID number, if any) or a date at the end («Lucía Pérez; 3.º A; 15/03», the group may be left out). Of a date, the day and
+     * the month: a year there is ignored.
+     *
+     * @param array $parts the fields of the line
+     * @return array|null [name, group, day, month, idnumber], or null if it is not understood
+     */
+    protected static function read_line(array $parts): ?array {
+        $parts = array_map('trim', $parts);
+        while ($parts && end($parts) === '') {
+            array_pop($parts);
+        }
+        if (count($parts) >= 4 && ctype_digit($parts[2]) && ctype_digit($parts[3])) {
+            return [$parts[0], $parts[1], (int) $parts[2], (int) $parts[3], $parts[4] ?? ''];
+        }
+        if (count($parts) < 2) {
+            return null;
+        }
+        $date = array_pop($parts);
+        if (!preg_match('~^(\d{1,2})[/.-](\d{1,2})(?:[/.-]\d{2,4})?$~', $date, $m)) {
+            return null;
+        }
+        $name = (string) array_shift($parts);
+        return [$name, implode(' ', $parts), (int) $m[1], (int) $m[2], ''];
+    }
+
+    /**
+     * A list pasted in or a spreadsheet saved as CSV: a person per line. Pasted, the fields go apart at a semicolon, a tab or a
+     * comma; from a file, at the one its first line uses, with quotes as a spreadsheet writes them. A first line that is no
+     * person is the titles of the columns, and the example rows of the model are not added.
      *
      * @param string $text
+     * @param bool $file it comes from a file
      * @return array {added: how many, wrong: the lines not understood}
      */
-    public static function import(string $text): array {
+    public static function import(string $text, bool $file = false): array {
+        $text = preg_replace('/^\xEF\xBB\xBF/', '', $text);
+        if (!mb_check_encoding($text, 'UTF-8')) {
+            // What a spreadsheet in Spanish or English saves as «CSV» by default.
+            $text = \core_text::convert($text, 'windows-1252', 'utf-8');
+        }
+        $lines = array_values(array_filter(preg_split('/\R/u', $text), function ($line) {
+            return trim($line) !== '';
+        }));
+        $separator = null;
+        if ($file && $lines) {
+            $count = [';' => substr_count($lines[0], ';'), "\t" => substr_count($lines[0], "\t"),
+                ',' => substr_count($lines[0], ',')];
+            arsort($count);
+            $separator = (string) array_key_first($count);
+        }
+        $examples = [];
+        foreach (array_slice(self::model(), 1) as $row) {
+            $examples[] = self::plain_name($row[0]) . '|' . (int) ($row[2] ?? 0) . '|' . (int) ($row[3] ?? 0);
+        }
         $added = 0;
         $wrong = [];
-        foreach (preg_split('/\R/u', $text) as $line) {
-            if (trim($line) === '') {
+        foreach ($lines as $n => $line) {
+            $parts = $separator !== null ? str_getcsv($line, $separator, '"', '') : preg_split('/[;\t,]/', $line);
+            $person = self::read_line($parts);
+            if (!$person) {
+                if ($n > 0 || preg_match('/\d/', $line)) {
+                    $wrong[] = $line;
+                }
                 continue;
             }
-            $parts = array_map('trim', preg_split('/[;\t,]/', $line));
-            $date = array_pop($parts);
-            $name = (string) array_shift($parts);
-            $group = implode(' ', $parts);
-            $id = null;
-            if (preg_match('~^(\d{1,2})[/.-](\d{1,2})(?:[/.-]\d{2,4})?$~', $date, $m)) {
-                $id = self::add($name, $group, (int) $m[1], (int) $m[2]);
+            [$name, $group, $day, $month, $idnumber] = $person;
+            if (in_array(self::plain_name($name) . '|' . $day . '|' . $month, $examples, true)) {
+                continue;
             }
-            if ($id) {
+            if (self::add($name, $group, $day, $month, $idnumber)) {
                 $added++;
             } else {
                 $wrong[] = $line;
@@ -363,20 +441,55 @@ class birthdays {
     }
 
     /**
-     * Who a file is for, by its name: a folder of pictures named after each person is what a centre usually has.
+     * Who a file is for, by its name: a folder of pictures named after each person, or after their ID number, is what a centre
+     * usually has.
      *
      * @param string $filename
      * @return int|null the id of the person on the list, when only one fits
      */
     public static function who_is(string $filename): ?int {
-        $wanted = self::plain_name(pathinfo($filename, PATHINFO_FILENAME));
-        $found = [];
+        $stem = trim(pathinfo($filename, PATHINFO_FILENAME));
+        $wanted = self::plain_name($stem);
+        $byid = [];
+        $byname = [];
         foreach (self::all() as $row) {
+            if ((string) $row->idnumber !== '' && \core_text::strtolower(trim($row->idnumber)) === \core_text::strtolower($stem)) {
+                $byid[] = (int) $row->id;
+            }
             if (self::plain_name($row->name) === $wanted) {
-                $found[] = (int) $row->id;
+                $byname[] = (int) $row->id;
             }
         }
-        return count($found) === 1 ? $found[0] : null;
+        if ($byid) {
+            return count($byid) === 1 ? $byid[0] : null;
+        }
+        return count($byname) === 1 ? $byname[0] : null;
+    }
+
+    /**
+     * The Moodle users with these ID numbers, when each one is only one.
+     *
+     * @param array $idnumbers
+     * @return array idnumber => user record (id, picture)
+     */
+    protected static function users_by_idnumber(array $idnumbers): array {
+        global $DB;
+        $idnumbers = array_values(array_unique(array_filter(array_map('strval', $idnumbers), 'strlen')));
+        if (!$idnumbers) {
+            return [];
+        }
+        [$in, $params] = $DB->get_in_or_equal($idnumbers);
+        $found = [];
+        foreach ($DB->get_records_select('user', "idnumber $in AND deleted = 0", $params, '', 'id, idnumber, picture') as $user) {
+            $found[$user->idnumber][] = $user;
+        }
+        $out = [];
+        foreach ($found as $idnumber => $users) {
+            if (count($users) === 1) {
+                $out[$idnumber] = $users[0];
+            }
+        }
+        return $out;
     }
 
     /**

@@ -107,13 +107,15 @@ $string['birthdays_field_help'] = 'The picture, that of their profile. They show
 $string['birthdays_field_none'] = 'None: only the list';
 $string['birthdays_group'] = 'Group';
 $string['birthdays_help'] = 'The screens congratulate whoever has a birthday, with their name, their group and their picture. Never the age, and never on a showcase screen.';
-$string['birthdays_import'] = 'Paste a list';
+$string['birthdays_idnumber'] = 'ID number, if any';
+$string['birthdays_import'] = 'Or paste a list';
 $string['birthdays_import_button'] = 'Add to the list';
 $string['birthdays_import_help'] = 'One person per line: name; group; day/month. For example, «Lucy Peters; 3A; 15/03». A year in the date is not kept.';
 $string['birthdays_import_wrong'] = 'These lines were not understood: {$a}';
 $string['birthdays_imported'] = 'Added to the list: {$a}.';
 $string['birthdays_list'] = 'The list ({$a})';
 $string['birthdays_list_empty'] = 'Nobody on the list yet.';
+$string['birthdays_model'] = 'Download the model';
 $string['birthdays_month'] = 'Month';
 $string['birthdays_name'] = 'Name';
 $string['birthdays_on'] = 'Show birthdays on the screens';
@@ -121,10 +123,16 @@ $string['birthdays_photo'] = 'Picture';
 $string['birthdays_photo_wrong'] = 'Added, but that picture could not be read.';
 $string['birthdays_photos'] = 'Upload several pictures';
 $string['birthdays_photos_button'] = 'Upload the pictures';
-$string['birthdays_photos_done'] = 'Pictures set: {$a->ok}. Not set, because nobody has that name or the file cannot be read: {$a->nobody}.';
-$string['birthdays_photos_help'] = 'Each file with the name of the person, as on the list: «Lucy Peters.jpg».';
+$string['birthdays_photos_done'] = 'Pictures set: {$a->ok}. Not set, because nobody has that name or ID number, or the file cannot be read: {$a->nobody}.';
+$string['birthdays_photos_help'] = 'Each file with the name of the person, as it is on the list («Lucía Pérez.jpg»), or with their ID number («1024.jpg»).';
+$string['birthdays_photos_moodle'] = 'Whoever is in Moodle comes with their profile picture, also when they are on the list with their ID number.';
+$string['birthdays_photos_moodle_admin'] = 'Those pictures are uploaded in Moodle by its administrator, and Moodle matches them by the ID number too.';
+$string['birthdays_photos_moodle_here'] = 'Those pictures are uploaded in Moodle, in';
+$string['birthdays_row_idnumber'] = 'ID number {$a}';
 $string['birthdays_saved'] = 'Saved.';
 $string['birthdays_screens'] = 'On the screens';
+$string['birthdays_sheet'] = 'Upload a spreadsheet (CSV)';
+$string['birthdays_sheet_help'] = 'With the columns of the model: name, group, day, month and, if any, the ID number in Moodle, which in many centres is the enrolment number. The two example rows of the model are not added.';
 $string['birthdays_title'] = 'Birthdays';
 $string['birthdays_today'] = 'Today: {$a}.';
 $string['birthdays_today_none'] = 'Nobody has a birthday today.';
@@ -401,6 +409,7 @@ $string['compose_secondline'] = 'Second line';
 $string['compose_starts'] = 'Starts';
 $string['compose_table'] = 'The table';
 $string['compose_table_help'] = 'A spreadsheet published as CSV (Google Sheets, OneDrive, Nextcloud) or a list in JSON. The first row, the titles of the columns. It is read again every few minutes.';
+$string['compose_table_model'] = 'Download a model to start from.';
 $string['compose_table_order'] = 'Put what matters first: from far away not all the columns may fit, and the first ones stay. And a long table takes a while to go round, as one page comes out each time.';
 $string['compose_table_when'] = 'A table has no dates: it shows while it is on, with the last that could be read.';
 $string['compose_ticker'] = 'The ticker line';
@@ -612,6 +621,17 @@ $string['meta_frozen'] = 'it answers, but the picture does not change';
 $string['meta_late'] = '{$a} min late';
 $string['meta_new'] = 'waiting for its first signal';
 $string['meta_seen'] = 'signal {$a} ago';
+$string['model_birthdays'] = 'Name;Group;Day;Month;ID number
+Lucía Pérez;3A;15;3;
+Marcos Díaz;1B;2;11;1024';
+$string['model_birthdays_file'] = 'birthdays.csv';
+$string['model_table'] = 'Time;Monday;Tuesday;Wednesday;Thursday;Friday
+8:00;Literature;French;Physics;Literature;Art
+9:00;Maths;Maths;French;History;Maths
+10:00;Physics;History;Maths;Physics;Literature
+11:30;French;Literature;Art;Maths;Tutorial
+12:30;History;Art;Literature;French;Physics';
+$string['model_table_file'] = 'table.csv';
 $string['months'] = 'January,February,March,April,May,June,July,August,September,October,November,December';
 $string['months_abbr'] = 'Jan,Feb,Mar,Apr,May,Jun,Jul,Aug,Sep,Oct,Nov,Dec';
 $string['more_actions'] = 'More actions for «{$a}»';

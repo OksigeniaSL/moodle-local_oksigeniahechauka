@@ -133,6 +133,54 @@ final class birthdays_test extends \advanced_testcase {
     }
 
     /**
+     * A spreadsheet saved as CSV: its titles, its quotes, the encoding it saves by default; the model's examples left out.
+     */
+    public function test_the_sheet(): void {
+        global $DB;
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        $model = implode("\n", array_map(function ($row) {
+            return implode(';', $row);
+        }, birthdays::model()));
+        $sheet = "\xEF\xBB\xBF" . $model . "\n\"Pérez, Ana\";4.º A;7;5;A-77\nSin fecha;1.º B;;\n";
+        $done = birthdays::import($sheet, true);
+        $this->assertSame(1, $done['added']);
+        $this->assertSame(['Sin fecha;1.º B;;'], $done['wrong']);
+        $this->assertSame('A-77', $DB->get_field(birthdays::TABLE, 'idnumber', ['name' => 'Pérez, Ana']));
+        // What a spreadsheet in Spanish saves as CSV: commas and Windows letters.
+        $done = birthdays::import(\core_text::convert("Nombre,Grupo,Día,Mes\nMaría Núñez,2.º C,1,12", 'utf-8', 'windows-1252'), true);
+        $this->assertSame(1, $done['added']);
+        $this->assertTrue($DB->record_exists(birthdays::TABLE, ['name' => 'María Núñez', 'groupname' => '2.º C', 'day' => 1,
+            'month' => 12]));
+        $this->assertCount(2, birthdays::all());
+    }
+
+    /**
+     * The ID number: a picture named after it finds its person, and the Moodle user with it is not twice.
+     */
+    public function test_the_idnumber(): void {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        $this->getDataGenerator()->create_custom_profile_field(['datatype' => 'datetime', 'shortname' => 'nacimiento',
+            'name' => 'Nacimiento', 'param1' => 1950, 'param2' => 2030]);
+        $now = time();
+        $today = schedule::day($now);
+        [$year, $month, $day] = array_map('intval', explode('-', $today));
+        $inprofile = $this->born('Lucía', 'Pérez', make_timestamp($year - 11, $month, $day, 12));
+        $this->getDataGenerator()->create_user(['idnumber' => 'M-2']);
+        global $DB;
+        $DB->set_field('user', 'idnumber', 'M-1', ['id' => $inprofile->id]);
+        birthdays::add('Lucía Pérez', '3A', $day, $month, 'M-1');
+        $other = birthdays::add('Pablo Ruiz', '3A', $day, $month, 'M-2');
+        birthdays::add('Pablo Ruiz', '4A', 3, 3);
+        $this->assertSame($other, birthdays::who_is('m-2.JPG'));
+        // Two with the same name: by name it is nobody, by ID number it is one.
+        $this->assertNull(birthdays::who_is('Pablo Ruiz.jpg'));
+        $config = (object) ['birthdayfield' => 'nacimiento'];
+        $this->assertSame(['Lucía Pérez', 'Pablo Ruiz'], array_column(birthdays::on($config, $today), 'name'));
+    }
+
+    /**
      * A manifest carries them, in a zone of their own.
      */
     public function test_in_the_manifest(): void {

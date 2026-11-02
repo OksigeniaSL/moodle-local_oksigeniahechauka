@@ -22,10 +22,10 @@
     Example context (json):
     {
         "tabs": [{"url": "#", "label": "Tu centro", "icon": "", "current": true}], "hastabs": true, "centre": "#", "action": "#",
-        "sesskey": "abc", "on": true, "fields": [{"value": "", "label": "Ninguno", "selected": true}], "hasfields": false,
+        "sesskey": "abc", "modelurl": "#", "moodlepictures": "#", "on": true, "fields": [{"value": "", "label": "Ninguno", "selected": true}], "hasfields": false,
         "days": [1, 2], "months": [{"value": 1, "label": "enero"}], "count": 1, "haspeople": true, "hastoday": true,
         "today": "Lucía Pérez",
-        "people": [{"id": 1, "name": "Lucía Pérez", "group": "3.º A", "date": "15 marzo", "photo": "", "initial": "L"}]
+        "people": [{"id": 1, "name": "Lucía Pérez", "group": "3.º A", "idnumber": "1024", "date": "15 marzo", "photo": "", "initial": "L"}]
     }
 }}
 <div class="hkp" id="hkp-birthdays-page">
@@ -56,25 +56,29 @@
                 <div class="hkp-row">
                     <div class="hkp-field"><label class="form-label" for="hkp-bd-day">{{#str}}birthdays_day, local_oksigeniahechauka{{/str}}</label><select class="form-select" id="hkp-bd-day" name="day">{{#days}}<option value="{{.}}">{{.}}</option>{{/days}}</select></div>
                     <div class="hkp-field"><label class="form-label" for="hkp-bd-month">{{#str}}birthdays_month, local_oksigeniahechauka{{/str}}</label><select class="form-select" id="hkp-bd-month" name="month">{{#months}}<option value="{{value}}">{{label}}</option>{{/months}}</select></div>
+                    <div class="hkp-field"><label class="form-label" for="hkp-bd-idnumber">{{#str}}birthdays_idnumber, local_oksigeniahechauka{{/str}}</label><input class="form-control" id="hkp-bd-idnumber" name="idnumber" maxlength="100"></div>
                     <div class="hkp-field"><label class="form-label" for="hkp-bd-photo">{{#str}}birthdays_photo, local_oksigeniahechauka{{/str}}</label><input class="form-control" type="file" id="hkp-bd-photo" name="photo" accept="image/jpeg,image/png"></div>
                 </div>
                 <div class="hkp-foot"><button type="submit" class="btn btn-outline-secondary">{{#str}}birthdays_add_button, local_oksigeniahechauka{{/str}}</button></div>
             </form>
-            <form method="post" action="{{action}}">
+            <form method="post" action="{{action}}" enctype="multipart/form-data">
                 <input type="hidden" name="sesskey" value="{{sesskey}}"><input type="hidden" name="action" value="import">
+                <div class="hkp-field"><label class="form-label" for="hkp-bd-sheet">{{#str}}birthdays_sheet, local_oksigeniahechauka{{/str}}</label><input class="form-control" type="file" id="hkp-bd-sheet" name="sheet" accept=".csv,text/csv,text/plain">
+                    <p class="hkp-hint">{{#str}}birthdays_sheet_help, local_oksigeniahechauka{{/str}} <a href="{{modelurl}}" download>{{#str}}birthdays_model, local_oksigeniahechauka{{/str}}</a></p></div>
                 <div class="hkp-field"><label class="form-label" for="hkp-bd-list">{{#str}}birthdays_import, local_oksigeniahechauka{{/str}}</label><textarea class="form-control" id="hkp-bd-list" name="list" rows="4"></textarea><p class="hkp-hint">{{#str}}birthdays_import_help, local_oksigeniahechauka{{/str}}</p></div>
                 <div class="hkp-foot"><button type="submit" class="btn btn-outline-secondary">{{#str}}birthdays_import_button, local_oksigeniahechauka{{/str}}</button></div>
             </form>
             <form method="post" action="{{action}}" enctype="multipart/form-data">
                 <input type="hidden" name="sesskey" value="{{sesskey}}"><input type="hidden" name="action" value="photos">
-                <div class="hkp-field"><label class="form-label" for="hkp-bd-photos">{{#str}}birthdays_photos, local_oksigeniahechauka{{/str}}</label><input class="form-control" type="file" id="hkp-bd-photos" name="photos[]" accept="image/jpeg,image/png" multiple><p class="hkp-hint">{{#str}}birthdays_photos_help, local_oksigeniahechauka{{/str}}</p></div>
+                <div class="hkp-field"><label class="form-label" for="hkp-bd-photos">{{#str}}birthdays_photos, local_oksigeniahechauka{{/str}}</label><input class="form-control" type="file" id="hkp-bd-photos" name="photos[]" accept="image/jpeg,image/png" multiple><p class="hkp-hint">{{#str}}birthdays_photos_help, local_oksigeniahechauka{{/str}}</p>
+                    <p class="hkp-hint">{{#str}}birthdays_photos_moodle, local_oksigeniahechauka{{/str}} {{#moodlepictures}}{{#str}}birthdays_photos_moodle_here, local_oksigeniahechauka{{/str}} <a href="{{moodlepictures}}">{{#str}}uploadpictures, tool_uploaduser{{/str}}</a>.{{/moodlepictures}}{{^moodlepictures}}{{#str}}birthdays_photos_moodle_admin, local_oksigeniahechauka{{/str}}{{/moodlepictures}}</p></div>
                 <div class="hkp-foot"><button type="submit" class="btn btn-outline-secondary">{{#str}}birthdays_photos_button, local_oksigeniahechauka{{/str}}</button></div>
             </form>
         </section>
         <section class="hkp-fs" aria-labelledby="hkp-bd-people">
             <h2 id="hkp-bd-people" class="hkp-label hkp-section-label">{{#str}}birthdays_list, local_oksigeniahechauka, {{count}}{{/str}}</h2>
             {{^haspeople}}<p class="hkp-hint">{{#str}}birthdays_list_empty, local_oksigeniahechauka{{/str}}</p>{{/haspeople}}
-            {{#haspeople}}<ul class="hkp-bd-list">{{#people}}<li class="hkp-bd-row"><span class="hkp-bd-face" aria-hidden="true">{{#photo}}<img src="{{photo}}" alt="">{{/photo}}{{^photo}}{{initial}}{{/photo}}</span><span class="hkp-bd-who"><b>{{name}}</b>{{#group}} <small>{{group}}</small>{{/group}}</span><span class="hkp-bd-date">{{date}}</span><form method="post" action="{{action}}"><input type="hidden" name="sesskey" value="{{sesskey}}"><input type="hidden" name="action" value="delete"><input type="hidden" name="id" value="{{id}}"><button type="submit" class="btn btn-sm btn-outline-secondary" aria-label="{{#str}}birthdays_delete, local_oksigeniahechauka, {{name}}{{/str}}">×</button></form></li>{{/people}}</ul>{{/haspeople}}
+            {{#haspeople}}<ul class="hkp-bd-list">{{#people}}<li class="hkp-bd-row"><span class="hkp-bd-face" aria-hidden="true">{{#photo}}<img src="{{photo}}" alt="">{{/photo}}{{^photo}}{{initial}}{{/photo}}</span><span class="hkp-bd-who"><b>{{name}}</b>{{#group}} <small>{{group}}</small>{{/group}}{{#idnumber}} <small>· {{#str}}birthdays_row_idnumber, local_oksigeniahechauka, {{idnumber}}{{/str}}</small>{{/idnumber}}</span><span class="hkp-bd-date">{{date}}</span><form method="post" action="{{action}}"><input type="hidden" name="sesskey" value="{{sesskey}}"><input type="hidden" name="action" value="delete"><input type="hidden" name="id" value="{{id}}"><button type="submit" class="btn btn-sm btn-outline-secondary" aria-label="{{#str}}birthdays_delete, local_oksigeniahechauka, {{name}}{{/str}}">×</button></form></li>{{/people}}</ul>{{/haspeople}}
         </section>
     </div>
 </div>

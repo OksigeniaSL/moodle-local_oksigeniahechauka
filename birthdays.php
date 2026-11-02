@@ -65,7 +65,8 @@ if ($action !== '' && confirm_sesskey()) {
             optional_param('name', '', PARAM_TEXT),
             optional_param('group', '', PARAM_TEXT),
             optional_param('day', 0, PARAM_INT),
-            optional_param('month', 0, PARAM_INT)
+            optional_param('month', 0, PARAM_INT),
+            optional_param('idnumber', '', PARAM_TEXT)
         );
         if (!$id) {
             $message = get_string('birthdays_add_wrong', $c);
@@ -79,6 +80,12 @@ if ($action !== '' && confirm_sesskey()) {
         }
     } else if ($action === 'import') {
         $done = birthdays::import(optional_param('list', '', PARAM_TEXT));
+        $sheet = $_FILES['sheet'] ?? null;
+        if (local_oksigeniahechauka_arrived($sheet)) {
+            $text = filesize($sheet['tmp_name']) <= 1024 * 1024 ? (string) file_get_contents($sheet['tmp_name']) : '';
+            $fromfile = birthdays::import($text, true);
+            $done = ['added' => $done['added'] + $fromfile['added'], 'wrong' => array_merge($done['wrong'], $fromfile['wrong'])];
+        }
         $message = get_string('birthdays_imported', $c, $done['added']);
         if ($done['wrong']) {
             $message .= ' ' . get_string('birthdays_import_wrong', $c, s(implode(' · ', array_slice($done['wrong'], 0, 5))));

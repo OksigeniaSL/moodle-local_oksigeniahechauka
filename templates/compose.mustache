@@ -23,6 +23,7 @@
 
     Example context (json):
     {
+        "tablemodel": "#",
         "style": "", "id": 0, "type": "notice", "isnotice": true, "editing": false, "title": "Añadir a las pantallas",
         "back": "https://example.com/local/oksigeniahechauka/index.php", "backicon": "",
         "action": "https://example.com/local/oksigeniahechauka/edit.php", "sesskey": "abc",
@@ -124,7 +125,7 @@
             <legend>{{#str}}compose_table, local_oksigeniahechauka{{/str}}</legend>
             <div class="hkp-field"><label class="form-label" for="hkp-title">{{#str}}compose_name, local_oksigeniahechauka{{/str}}</label><input class="form-control{{#errors.title}} is-invalid{{/errors.title}}" id="hkp-title" name="title" value="{{values.title}}" maxlength="120" required></div>
             <div class="hkp-field"><label class="form-label" for="hkp-url">{{#str}}table_url, local_oksigeniahechauka{{/str}}</label><input class="form-control{{#errors.url}} is-invalid{{/errors.url}}" id="hkp-url" name="url" type="url" value="{{values.url}}" required>
-                <p class="hkp-hint">{{#errors.url}}<b class="text-danger">{{errors.url}}</b> {{/errors.url}}{{#str}}compose_table_help, local_oksigeniahechauka{{/str}} {{#str}}compose_table_order, local_oksigeniahechauka{{/str}}</p></div>
+                <p class="hkp-hint">{{#errors.url}}<b class="text-danger">{{errors.url}}</b> {{/errors.url}}{{#str}}compose_table_help, local_oksigeniahechauka{{/str}} {{#str}}compose_table_order, local_oksigeniahechauka{{/str}} <a href="{{tablemodel}}" download>{{#str}}compose_table_model, local_oksigeniahechauka{{/str}}</a></p></div>
             {{/istable}}
         </fieldset>
 

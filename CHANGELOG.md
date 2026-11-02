@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.8.4
+
+- **A model to fill in:** the birthdays list and the tables offer a model as CSV, with the separator of the user's language and its letters right in a spreadsheet.
+- **The birthdays list from a spreadsheet:** a CSV is uploaded as well as pasted, with its titles, quotes and the encoding a spreadsheet saves by default; the example rows of the model are not added.
+- **The ID number of Moodle** on the birthdays list, often the one of enrolment: pictures named after it find their person, and someone on the list with the ID number of a Moodle user takes that user's picture, and is not shown twice when the profile already brings them.
+
 ## 0.8.3
 
 - **The monthly report**: how much of its hours each screen was working, day by day, its longest cuts, and what came out and how many times, with the hours the television was on and off in the CSV; a new tab in the panel, a CSV and a page to print, and a message on the first of each month to whoever runs the screens. The player adds up what it shows and sends it every ten heartbeats.
