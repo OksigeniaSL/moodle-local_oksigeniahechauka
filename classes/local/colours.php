@@ -161,6 +161,22 @@ class colours {
     }
 
     /**
+     * A colour part of the way to another.
+     *
+     * @param string $from «#rrggbb»
+     * @param string $to «#rrggbb»
+     * @param float $part 0 is the first, 1 the second
+     * @return string
+     */
+    public static function mix(string $from, string $to, float $part): string {
+        $a = array_map('hexdec', str_split(substr($from, 1), 2));
+        $b = array_map('hexdec', str_split(substr($to, 1), 2));
+        return '#' . implode('', array_map(function ($i) use ($a, $b, $part) {
+            return sprintf('%02x', (int) round($a[$i] + ($b[$i] - $a[$i]) * $part));
+        }, [0, 1, 2]));
+    }
+
+    /**
      * The screens' variables for the centre's colours: each colour, its text, and its readable forms.
      *
      * @param array $colours setting => «#rrggbb» (the ones not set are left to the screens' own)

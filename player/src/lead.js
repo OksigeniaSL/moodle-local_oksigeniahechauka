@@ -393,7 +393,7 @@ export function buildRest(today, lead, l, turn) {
     (today.events || []).forEach(function (e) {
         if (!(lead && lead.type === 'event' && lead.event === e)) {
             items.push({group: today.eventsLabel || l.events, colour: ['marca-3', 'marca-3-oscuro'], make: function (short) {
-                return line(e.time && e.time !== '·' ? e.time : '·', e.title, short ? null : e.group, e.color);
+                return line(e.time && e.time !== '·' ? e.time : null, e.title, short ? null : e.group, e.color);
             }});
         }
     });
@@ -604,9 +604,21 @@ export function fitHeadline(box, headline, maxLines, overflows) {
         }
         return false;
     };
-    if (tryAll() || !box.hkShort) {
+    headline.style.fontSize = '';
+    if (tryAll()) {
         return;
     }
-    box.classList.add(box.hkShort);
-    tryAll();
+    if (box.hkShort) {
+        box.classList.add(box.hkShort);
+        if (tryAll()) {
+            return;
+        }
+    }
+    // Last resort, a very long title from afar: smaller than the minimum rather than cut at the edge of its box.
+    if (overflows) {
+        const size = parseFloat(getComputedStyle(headline).fontSize);
+        for (let k = 1; k <= 14 && overflows(); k++) {
+            headline.style.fontSize = Math.round(size * (1 - k * 0.05)) + 'px';
+        }
+    }
 }

@@ -1,0 +1,81 @@
+/* Oksigenia Hechauka: the closed list of backgrounds of the skin editor. Made by fondos.py, not by hand. Goes after pieles.css. */
+[data-fondo="papel"] {
+    --hk-fondo: #f4f1ea;
+    --hk-superficie: #ffffff;
+    --hk-linea: #e4dfd3;
+}
+[data-fondo="papel"][data-tema="oscuro"] {
+    --hk-fondo: #10151a;
+    --hk-superficie: #1a2127;
+    --hk-linea: #2c353d;
+}
+[data-fondo="blanco"] {
+    --hk-fondo: #ffffff;
+    --hk-superficie: #f3f3f1;
+    --hk-linea: #e2e2de;
+}
+[data-fondo="blanco"][data-tema="oscuro"] {
+    --hk-fondo: #0b0c0e;
+    --hk-superficie: #17191c;
+    --hk-linea: #2a2d31;
+}
+[data-fondo="nube"] {
+    --hk-fondo: #f1f4f7;
+    --hk-superficie: #ffffff;
+    --hk-linea: #dde3e9;
+}
+[data-fondo="nube"][data-tema="oscuro"] {
+    --hk-fondo: #0f151c;
+    --hk-superficie: #1a222c;
+    --hk-linea: #2b3541;
+}
+[data-fondo="arena"] {
+    --hk-fondo: #ede6d8;
+    --hk-superficie: #fbf8f1;
+    --hk-linea: #dbd2bf;
+}
+[data-fondo="arena"][data-tema="oscuro"] {
+    --hk-fondo: #17130d;
+    --hk-superficie: #231e16;
+    --hk-linea: #3a3225;
+}
+[data-fondo="salvia"] {
+    --hk-fondo: #e8eee5;
+    --hk-superficie: #fbfdfa;
+    --hk-linea: #d3ddce;
+}
+[data-fondo="salvia"][data-tema="oscuro"] {
+    --hk-fondo: #0f1610;
+    --hk-superficie: #1a231b;
+    --hk-linea: #2d3a2e;
+}
+[data-fondo="niebla"] {
+    --hk-fondo: #e4ecf2;
+    --hk-superficie: #fafcfe;
+    --hk-linea: #cfdbe4;
+}
+[data-fondo="niebla"][data-tema="oscuro"] {
+    --hk-fondo: #0d1520;
+    --hk-superficie: #18222f;
+    --hk-linea: #2a3745;
+}
+[data-fondo="lavanda"] {
+    --hk-fondo: #ecebf4;
+    --hk-superficie: #fcfbfe;
+    --hk-linea: #dad8e6;
+}
+[data-fondo="lavanda"][data-tema="oscuro"] {
+    --hk-fondo: #13111c;
+    --hk-superficie: #1f1c2a;
+    --hk-linea: #332f42;
+}
+[data-fondo="melocoton"] {
+    --hk-fondo: #f8ebdf;
+    --hk-superficie: #fffcf8;
+    --hk-linea: #ecd9c7;
+}
+[data-fondo="melocoton"][data-tema="oscuro"] {
+    --hk-fondo: #1a120c;
+    --hk-superficie: #271d15;
+    --hk-linea: #3f3126;
+}

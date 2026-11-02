@@ -68,7 +68,7 @@
 /* --- A notice: a speech bubble ------------------------------------------------------------------------------------ */
 .hk-lider[data-tipo="aviso"] {
     overflow: visible;
-    border-radius: 4.4rem;
+    border-radius: calc(4.4rem * var(--hk-esquina));
     background: var(--hk-primario);
     color: var(--hk-sobre-primario);
 }
@@ -91,7 +91,7 @@
 /* --- The important one: a sign, not a bubble ------------------------------------------------------------------- */
 .hk .hk-lider.hk-lider-importante {
     margin-bottom: 0;
-    border-radius: 2.8rem;
+    border-radius: calc(2.8rem * var(--hk-esquina));
     background: var(--hk-acento);
     color: var(--hk-sobre-acento);
 }
@@ -213,7 +213,7 @@
     align-items: center;
     justify-content: center;
     width: calc(var(--hk-t-titular) * 2.75);
-    border-radius: 2.4rem;
+    border-radius: calc(2.4rem * var(--hk-esquina));
     background-color: var(--hk-paleta-oscuro);
     background-image: linear-gradient(to bottom, var(--hk-paleta-claro) 50%, var(--hk-paleta-oscuro) 50%);
     color: #fff;
@@ -293,7 +293,7 @@
     align-items: center;
     margin: 5rem 0 3rem 5rem;
     padding-bottom: 2.8rem;
-    border-radius: 1.6rem;
+    border-radius: calc(1.6rem * var(--hk-esquina));
     background: #fffdf8;
     box-shadow: 0 .6rem 2rem rgba(0, 0, 0, .22);
     -webkit-transform: rotate(-2.5deg);
@@ -311,7 +311,7 @@
     width: 2.6rem;
     height: 7.4rem;
     margin-top: -3.4rem;
-    border-radius: 1.3rem;
+    border-radius: calc(1.3rem * var(--hk-esquina));
     background: #1b2027;
 }
 [data-tema="oscuro"] .hk-hoja-anillas i {
@@ -320,7 +320,7 @@
 .hk .hk-hoja-mes {
     width: 100%;
     padding: 4.4rem 1.2rem 1.8rem;
-    border-radius: 1.6rem 1.6rem 0 0;
+    border-radius: calc(1.6rem * var(--hk-esquina)) calc(1.6rem * var(--hk-esquina)) 0 0;
     background: var(--hk-festivo, #c0352b);
     color: #fff;
     font-size: var(--hk-t-min);
@@ -347,7 +347,7 @@
 }
 .hk-lider[data-tipo="festivo"] .hk-lider-cuerpo {
     margin: 4rem 4rem 4rem 3.2rem;
-    border-radius: 2.4rem;
+    border-radius: calc(2.4rem * var(--hk-esquina));
     background: var(--hk-superficie);
     align-self: center;
 }
@@ -562,7 +562,7 @@
     flex: 1 1 0px;
     min-height: 0;
     padding: 4.4rem 5.6rem;
-    border-radius: 2.8rem;
+    border-radius: calc(2.8rem * var(--hk-esquina));
 }
 .hk .hk-cuerpo[data-composicion="semana"][data-poca] .hk-semana-titular small {
     display: block;

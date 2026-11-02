@@ -1,0 +1,404 @@
+{
+ "default": "gabarito",
+ "categories": {
+  "round": {
+   "es": "Redondas",
+   "en": "Rounded"
+  },
+  "neutral": {
+   "es": "Neutras",
+   "en": "Neutral"
+  },
+  "serif": {
+   "es": "Con serifa",
+   "en": "Serif"
+  },
+  "narrow": {
+   "es": "Estrechas",
+   "en": "Narrow"
+  },
+  "character": {
+   "es": "Con carácter",
+   "en": "With character"
+  }
+ },
+ "letters": [
+  {
+   "id": "nunito",
+   "name": "Nunito",
+   "family": "Nunito",
+   "category": "round",
+   "stack": "\"Nunito\", system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+   "files": [
+    {
+     "weight": 600,
+     "file": "fuentes/Nunito-600.woff2",
+     "kb": 16.8
+    },
+    {
+     "weight": 700,
+     "file": "fuentes/Nunito-700.woff2",
+     "kb": 16.7
+    },
+    {
+     "weight": 800,
+     "file": "fuentes/Nunito-800.woff2",
+     "kb": 16.9
+    }
+   ],
+   "license": "OFL-1.1",
+   "copyright": "Copyright 2014 The Nunito Project Authors (https://github.com/googlefonts/nunito)",
+   "repository": "https://github.com/googlefonts/nunito",
+   "tnum": "default",
+   "notes": "Rounded ends, open shapes. The roundest that still reads as an adult letter. Figures tabular by default."
+  },
+  {
+   "id": "baloo2",
+   "name": "Baloo 2",
+   "family": "Baloo2",
+   "category": "round",
+   "stack": "\"Baloo2\", system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+   "files": [
+    {
+     "weight": 600,
+     "file": "fuentes/Baloo2-600.woff2",
+     "kb": 21.9
+    },
+    {
+     "weight": 700,
+     "file": "fuentes/Baloo2-700.woff2",
+     "kb": 22.0
+    },
+    {
+     "weight": 800,
+     "file": "fuentes/Baloo2-800.woff2",
+     "kb": 20.8
+    }
+   ],
+   "license": "OFL-1.1",
+   "copyright": "Copyright 2019 The Baloo 2 Project Authors (https://github.com/EkType/Baloo2)",
+   "repository": "https://github.com/EkType/Baloo2",
+   "tnum": "tnum",
+   "notes": "Thick and friendly, about as wide as the default. Weak points: small capitals (0.62 of the size), and the combining tilde lands off centre on g and touches G: not for Guarani text."
+  },
+  {
+   "id": "gabarito",
+   "name": "Gabarito",
+   "family": "Gabarito",
+   "category": "neutral",
+   "stack": "\"Gabarito\", system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+   "files": [
+    {
+     "weight": 600,
+     "file": "fuentes/Gabarito-600.woff2",
+     "kb": 21.2
+    },
+    {
+     "weight": 700,
+     "file": "fuentes/Gabarito-700.woff2",
+     "kb": 21.1
+    },
+    {
+     "weight": 800,
+     "file": "fuentes/Gabarito-800.woff2",
+     "kb": 21.3
+    }
+   ],
+   "license": "OFL-1.1",
+   "copyright": "Copyright 2023 The Gabarito Project Authors (https://github.com/naipefoundry/gabarito)",
+   "repository": "https://github.com/naipefoundry/gabarito",
+   "tnum": "tnum",
+   "notes": "The default, and the letter of the first skin. Warm geometric, and the narrowest of the normal widths."
+  },
+  {
+   "id": "schibsted",
+   "name": "Schibsted Grotesk",
+   "family": "Schibsted",
+   "category": "neutral",
+   "stack": "\"Schibsted\", system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+   "files": [
+    {
+     "weight": 600,
+     "file": "fuentes/Schibsted-600.woff2",
+     "kb": 25.1
+    },
+    {
+     "weight": 700,
+     "file": "fuentes/Schibsted-700.woff2",
+     "kb": 24.7
+    },
+    {
+     "weight": 800,
+     "file": "fuentes/Schibsted-800.woff2",
+     "kb": 24.8
+    }
+   ],
+   "license": "OFL-1.1",
+   "copyright": "Copyright 2023 The Schibsted-Grotesk Project Authors (https://github.com/schibsted/schibsted-grotesk)",
+   "repository": "https://github.com/schibsted/schibsted-grotesk",
+   "tnum": "tnum",
+   "notes": "A newspaper's grotesque, the letter of the second skin. Wide: at distance 8 a long headline overflows its box until the player has a last step."
+  },
+  {
+   "id": "fira-sans",
+   "name": "Fira Sans",
+   "family": "FiraSans",
+   "category": "neutral",
+   "stack": "\"FiraSans\", system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+   "files": [
+    {
+     "weight": 600,
+     "file": "fuentes/FiraSans-600.woff2",
+     "kb": 17.9
+    },
+    {
+     "weight": 700,
+     "file": "fuentes/FiraSans-700.woff2",
+     "kb": 18.0
+    },
+    {
+     "weight": 800,
+     "file": "fuentes/FiraSans-800.woff2",
+     "kb": 17.9
+    }
+   ],
+   "license": "OFL-1.1",
+   "copyright": "Copyright (c) 2012-2015, The Mozilla Foundation and Telefonica S.A.",
+   "repository": "https://github.com/googlefonts/FiraGFVersion",
+   "tnum": "tnum",
+   "notes": "Humanist, the most open shapes of the list, as narrow as the default. The one for long notices in a normal width."
+  },
+  {
+   "id": "open-sans",
+   "name": "Open Sans",
+   "family": "OpenSans",
+   "category": "neutral",
+   "stack": "\"OpenSans\", system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+   "files": [
+    {
+     "weight": 600,
+     "file": "fuentes/OpenSans-600.woff2",
+     "kb": 14.5
+    },
+    {
+     "weight": 700,
+     "file": "fuentes/OpenSans-700.woff2",
+     "kb": 14.2
+    },
+    {
+     "weight": 800,
+     "file": "fuentes/OpenSans-800.woff2",
+     "kb": 14.4
+    }
+   ],
+   "license": "OFL-1.1",
+   "copyright": "Copyright 2020 The Open Sans Project Authors (https://github.com/googlefonts/opensans)",
+   "repository": "https://github.com/googlefonts/opensans",
+   "tnum": "default",
+   "notes": "The width axis at 87.5, so it fits like the default (at 100 it is 17 % wider and overflows). The largest lowercase of the list and the weights that differ most."
+  },
+  {
+   "id": "public-sans",
+   "name": "Public Sans",
+   "family": "PublicSans",
+   "category": "neutral",
+   "stack": "\"PublicSans\", system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+   "files": [
+    {
+     "weight": 600,
+     "file": "fuentes/PublicSans-600.woff2",
+     "kb": 15.1
+    },
+    {
+     "weight": 700,
+     "file": "fuentes/PublicSans-700.woff2",
+     "kb": 15.1
+    },
+    {
+     "weight": 800,
+     "file": "fuentes/PublicSans-800.woff2",
+     "kb": 15.3
+    }
+   ],
+   "license": "OFL-1.1",
+   "copyright": "Copyright 2015 The Public Sans Project Authors (https://github.com/uswds/public-sans)",
+   "repository": "https://github.com/uswds/public-sans",
+   "tnum": "tnum",
+   "notes": "An American gothic, sober and institutional: public bodies, companies. Tall capitals, rather closed shapes."
+  },
+  {
+   "id": "bitter",
+   "name": "Bitter",
+   "family": "Bitter",
+   "category": "serif",
+   "stack": "\"Bitter\", Georgia, \"Times New Roman\", Times, serif",
+   "files": [
+    {
+     "weight": 600,
+     "file": "fuentes/Bitter-600.woff2",
+     "kb": 20.4
+    },
+    {
+     "weight": 700,
+     "file": "fuentes/Bitter-700.woff2",
+     "kb": 20.3
+    },
+    {
+     "weight": 800,
+     "file": "fuentes/Bitter-800.woff2",
+     "kb": 20.3
+    }
+   ],
+   "license": "OFL-1.1",
+   "copyright": "Copyright 2011 The Bitter Project Authors (https://github.com/solmatas/BitterPro)",
+   "repository": "https://github.com/solmatas/BitterPro",
+   "tnum": "tnum",
+   "notes": "A sturdy slab with a large lowercase: the serif that loses least from far away."
+  },
+  {
+   "id": "noto-serif",
+   "name": "Noto Serif",
+   "family": "NotoSerif",
+   "category": "serif",
+   "stack": "\"NotoSerif\", Georgia, \"Times New Roman\", Times, serif",
+   "files": [
+    {
+     "weight": 600,
+     "file": "fuentes/NotoSerif-600.woff2",
+     "kb": 17.2
+    },
+    {
+     "weight": 700,
+     "file": "fuentes/NotoSerif-700.woff2",
+     "kb": 17.1
+    },
+    {
+     "weight": 800,
+     "file": "fuentes/NotoSerif-800.woff2",
+     "kb": 17.1
+    }
+   ],
+   "license": "OFL-1.1",
+   "copyright": "Copyright 2022 The Noto Project Authors (https://github.com/notofonts/latin-greek-cyrillic)",
+   "repository": "https://github.com/notofonts/latin-greek-cyrillic",
+   "tnum": "default",
+   "notes": "The classic text serif, the width axis at 80 so that it fits. For a university, a town hall. Its thin strokes are the weakest part at 8 m."
+  },
+  {
+   "id": "barlow-semi",
+   "name": "Barlow Semi Condensed",
+   "family": "BarlowSemiCondensed",
+   "category": "narrow",
+   "stack": "\"BarlowSemiCondensed\", system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+   "files": [
+    {
+     "weight": 600,
+     "file": "fuentes/BarlowSemiCondensed-600.woff2",
+     "kb": 16.7
+    },
+    {
+     "weight": 700,
+     "file": "fuentes/BarlowSemiCondensed-700.woff2",
+     "kb": 16.7
+    },
+    {
+     "weight": 800,
+     "file": "fuentes/BarlowSemiCondensed-800.woff2",
+     "kb": 16.7
+    }
+   ],
+   "license": "OFL-1.1",
+   "copyright": "Copyright 2017 The Barlow Project Authors (https://github.com/jpt/barlow)",
+   "repository": "https://github.com/jpt/barlow",
+   "tnum": "tnum",
+   "notes": "Narrow, from road signs and number plates. Long headlines hold a step larger. At 8 m 6 and 8 are the closest of the list."
+  },
+  {
+   "id": "archivo-condensed",
+   "name": "Archivo Condensed",
+   "family": "ArchivoCondensed",
+   "category": "narrow",
+   "stack": "\"ArchivoCondensed\", system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+   "files": [
+    {
+     "weight": 600,
+     "file": "fuentes/ArchivoCondensed-600.woff2",
+     "kb": 15.3
+    },
+    {
+     "weight": 700,
+     "file": "fuentes/ArchivoCondensed-700.woff2",
+     "kb": 15.5
+    },
+    {
+     "weight": 800,
+     "file": "fuentes/ArchivoCondensed-800.woff2",
+     "kb": 15.5
+    }
+   ],
+   "license": "OFL-1.1",
+   "copyright": "Copyright 2020 The Archivo Project Authors (https://github.com/Omnibus-Type/Archivo)",
+   "repository": "https://github.com/Omnibus-Type/Archivo",
+   "tnum": "tnum",
+   "notes": "The narrowest of the list, 13 % under the default, with its letters still apart. For long texts. Its shapes close a lot."
+  },
+  {
+   "id": "bricolage",
+   "name": "Bricolage Grotesque",
+   "family": "Bricolage",
+   "category": "character",
+   "stack": "\"Bricolage\", system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+   "files": [
+    {
+     "weight": 600,
+     "file": "fuentes/Bricolage-600.woff2",
+     "kb": 23.4
+    },
+    {
+     "weight": 700,
+     "file": "fuentes/Bricolage-700.woff2",
+     "kb": 23.2
+    },
+    {
+     "weight": 800,
+     "file": "fuentes/Bricolage-800.woff2",
+     "kb": 23.0
+    }
+   ],
+   "license": "OFL-1.1",
+   "copyright": "Copyright 2022 The Bricolage Grotesque Project Authors (https://github.com/ateliertriay/bricolage)",
+   "repository": "https://github.com/ateliertriay/bricolage",
+   "tnum": "tnum",
+   "notes": "A quirky grotesque with ink traps, the letter of the third skin. Cultural centres, young organisations."
+  },
+  {
+   "id": "grandstander",
+   "name": "Grandstander",
+   "family": "Grandstander",
+   "category": "character",
+   "stack": "\"Grandstander\", system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+   "files": [
+    {
+     "weight": 600,
+     "file": "fuentes/Grandstander-600.woff2",
+     "kb": 24.1
+    },
+    {
+     "weight": 700,
+     "file": "fuentes/Grandstander-700.woff2",
+     "kb": 24.1
+    },
+    {
+     "weight": 800,
+     "file": "fuentes/Grandstander-800.woff2",
+     "kb": 24.1
+    }
+   ],
+   "license": "OFL-1.1",
+   "copyright": "Copyright 2020 The Grandstander Project Authors (https://github.com/Etcetera-Type-Co/Grandstander)",
+   "repository": "https://github.com/Etcetera-Type-Co/Grandstander",
+   "tnum": "tnum",
+   "notes": "Informal, of a comic's lettering, upright and with a two-storey a. For the youngest. The 1 of the clock stands apart: it is tabular."
+  }
+ ]
+}

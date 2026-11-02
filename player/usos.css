@@ -152,7 +152,7 @@
     width: 9rem;
     height: 1.2rem;
     margin-bottom: 3.2rem;
-    border-radius: .6rem;
+    border-radius: calc(.6rem * var(--hk-esquina));
     background: var(--hk-acento);
 }
 .hk .hk-completa .hk-pie-escaparate p {
@@ -176,7 +176,7 @@
     z-index: 3;
     width: 39.2rem;
     padding: 3.6rem 3.6rem 2.6rem;        /* the white around the code is its quiet zone (the path has none) */
-    border-radius: 2.6rem;
+    border-radius: calc(2.6rem * var(--hk-esquina));
     background: #fff;
     box-shadow: 0 1rem 4rem rgba(0, 0, 0, .35);
     color: #16191d;
@@ -279,7 +279,7 @@
     min-height: 0;
     overflow: hidden;
     padding: 6rem 10rem 6.4rem;
-    border-radius: 2.8rem;
+    border-radius: calc(2.8rem * var(--hk-esquina));
     background-color: var(--hk-primario);
     background-image: radial-gradient(circle at 88% 12%, rgba(255, 255, 255, .16), rgba(255, 255, 255, 0) 52%);
     color: var(--hk-sobre-primario);
@@ -302,7 +302,7 @@
     width: 7rem;
     height: 1.2rem;
     margin-right: 2.4rem;
-    border-radius: .6rem;
+    border-radius: calc(.6rem * var(--hk-esquina));
     background: var(--hk-acento);
 }
 .hk .hk-tipografica-texto {

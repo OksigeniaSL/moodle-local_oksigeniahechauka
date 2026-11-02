@@ -1,0 +1,141 @@
+{
+ "default": null,
+ "backgrounds": [
+  {
+   "id": "papel",
+   "name": {
+    "es": "Papel",
+    "en": "Paper"
+   },
+   "claro": {
+    "fondo": "#f4f1ea",
+    "superficie": "#ffffff",
+    "linea": "#e4dfd3"
+   },
+   "oscuro": {
+    "fondo": "#10151a",
+    "superficie": "#1a2127",
+    "linea": "#2c353d"
+   }
+  },
+  {
+   "id": "blanco",
+   "name": {
+    "es": "Blanco",
+    "en": "White"
+   },
+   "claro": {
+    "fondo": "#ffffff",
+    "superficie": "#f3f3f1",
+    "linea": "#e2e2de"
+   },
+   "oscuro": {
+    "fondo": "#0b0c0e",
+    "superficie": "#17191c",
+    "linea": "#2a2d31"
+   }
+  },
+  {
+   "id": "nube",
+   "name": {
+    "es": "Nube",
+    "en": "Cloud"
+   },
+   "claro": {
+    "fondo": "#f1f4f7",
+    "superficie": "#ffffff",
+    "linea": "#dde3e9"
+   },
+   "oscuro": {
+    "fondo": "#0f151c",
+    "superficie": "#1a222c",
+    "linea": "#2b3541"
+   }
+  },
+  {
+   "id": "arena",
+   "name": {
+    "es": "Arena",
+    "en": "Sand"
+   },
+   "claro": {
+    "fondo": "#ede6d8",
+    "superficie": "#fbf8f1",
+    "linea": "#dbd2bf"
+   },
+   "oscuro": {
+    "fondo": "#17130d",
+    "superficie": "#231e16",
+    "linea": "#3a3225"
+   }
+  },
+  {
+   "id": "salvia",
+   "name": {
+    "es": "Salvia",
+    "en": "Sage"
+   },
+   "claro": {
+    "fondo": "#e8eee5",
+    "superficie": "#fbfdfa",
+    "linea": "#d3ddce"
+   },
+   "oscuro": {
+    "fondo": "#0f1610",
+    "superficie": "#1a231b",
+    "linea": "#2d3a2e"
+   }
+  },
+  {
+   "id": "niebla",
+   "name": {
+    "es": "Niebla",
+    "en": "Mist"
+   },
+   "claro": {
+    "fondo": "#e4ecf2",
+    "superficie": "#fafcfe",
+    "linea": "#cfdbe4"
+   },
+   "oscuro": {
+    "fondo": "#0d1520",
+    "superficie": "#18222f",
+    "linea": "#2a3745"
+   }
+  },
+  {
+   "id": "lavanda",
+   "name": {
+    "es": "Lavanda",
+    "en": "Lavender"
+   },
+   "claro": {
+    "fondo": "#ecebf4",
+    "superficie": "#fcfbfe",
+    "linea": "#dad8e6"
+   },
+   "oscuro": {
+    "fondo": "#13111c",
+    "superficie": "#1f1c2a",
+    "linea": "#332f42"
+   }
+  },
+  {
+   "id": "melocoton",
+   "name": {
+    "es": "Melocotón",
+    "en": "Peach"
+   },
+   "claro": {
+    "fondo": "#f8ebdf",
+    "superficie": "#fffcf8",
+    "linea": "#ecd9c7"
+   },
+   "oscuro": {
+    "fondo": "#1a120c",
+    "superficie": "#271d15",
+    "linea": "#3f3126"
+   }
+  }
+ ]
+}

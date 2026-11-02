@@ -180,6 +180,12 @@ changed, or the manifest with its `ETag` header:
 - `sample`: true when the manifest carries example data; the screen says so in a corner.
 - `theme.skin`: the skin of the screen (`player/pieles.css`, `pieles.json`), which sets its colours and its letter; `theme.vars` goes
   over it. Without it, the first one.
+- `theme.ground`: a background of the closed list (`player/fondos.css`, `fondos.json`), set as `data-fondo` on the page, with its own tones
+  for the light and the dark theme. Absent: the skin's.
+- `theme.modes`: `{"light": {variable: value}, "dark": {variable: value}}`, what is worked out and differs by theme (a background made from the
+  main colour, the second colour written as text). It goes in a sheet after the skins': a variable on the page would hold on both themes.
+- `theme.vars` may also carry `--hk-letra-titulos` and `--hk-letra-texto` (a letter of the closed list, `player/letras.css`, `letras.json`) and
+  `--hk-esquina` (how round the corners go, a multiple of each piece's own: `0`, `.5` or `1`).
 - `centre`: `{"name": "…"}`, what stands in for the logo while there is none. `screen.name` is for the panel, and the screen
   does not show it.
 - `power`: when the screen should be on. Outside these hours the player shows black and a device agent may turn the

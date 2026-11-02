@@ -33,7 +33,7 @@
     padding: .15em 0;
     border: .07em solid var(--hk-linea);
     border-left: .32em solid var(--hk-ev, var(--hk-primario));
-    border-radius: .35em;
+    border-radius: calc(.35em * var(--hk-esquina));
     background: transparent;
     color: var(--hk-texto);
     font-size: 2.8em;

@@ -116,7 +116,7 @@
     align-items: center;
     margin-top: 1.1rem;
     padding: 1.3rem 2.8rem 1.5rem;
-    border-radius: 1.6rem;
+    border-radius: calc(1.6rem * var(--hk-esquina));
     background: var(--hk-ev);
     color: var(--hk-sobre-ev);
     font-size: var(--hk-t-lista);
@@ -166,12 +166,12 @@
 .hk .hk-agenda-rayas {
     margin-top: 1.1rem;
     padding: 1.2rem 1.6rem;
-    border-radius: 1.6rem;
+    border-radius: calc(1.6rem * var(--hk-esquina));
 }
 .hk .hk-agenda-rayas p {
     display: inline-block;
     padding: .6rem 2rem .8rem;
-    border-radius: 1.1rem;
+    border-radius: calc(1.1rem * var(--hk-esquina));
 }
 .hk .hk-agenda-rayas b {
     font-size: var(--hk-t-lista);

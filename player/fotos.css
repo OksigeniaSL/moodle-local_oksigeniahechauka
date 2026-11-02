@@ -121,7 +121,7 @@
     min-width: 0;
     min-height: 0;
     overflow: hidden;
-    border-radius: 2.4rem;
+    border-radius: calc(2.4rem * var(--hk-esquina));
     background: var(--hk-superficie);
     box-shadow: 0 .2rem .8rem rgba(0, 0, 0, .06);
 }
@@ -145,7 +145,7 @@
     bottom: 2rem;
     left: 0;
     width: 1rem;
-    border-radius: 0 1rem 1rem 0;
+    border-radius: 0 calc(1rem * var(--hk-esquina)) calc(1rem * var(--hk-esquina)) 0;
     background: var(--hk-acento);
 }
 .hk .hk-carrusel-pie h3 {
@@ -211,7 +211,7 @@
     min-width: 0;
     min-height: 0;
     overflow: hidden;
-    border-radius: 2.4rem;
+    border-radius: calc(2.4rem * var(--hk-esquina));
     background: var(--hk-superficie);
 }
 .hk-horizontal .hk-muro {
@@ -265,7 +265,7 @@
     justify-content: space-between;
     margin-top: var(--hk-hueco);
     padding: 1.6rem 4rem 2rem 4.8rem;
-    border-radius: 2.4rem;
+    border-radius: calc(2.4rem * var(--hk-esquina));
     background: var(--hk-superficie);
     box-shadow: 0 .2rem .8rem rgba(0, 0, 0, .06);
 }
@@ -276,7 +276,7 @@
     bottom: 2rem;
     left: 0;
     width: 1rem;
-    border-radius: 0 1rem 1rem 0;
+    border-radius: 0 calc(1rem * var(--hk-esquina)) calc(1rem * var(--hk-esquina)) 0;
     background: var(--hk-acento);
 }
 .hk .hk-muro-banda h2 {
@@ -336,7 +336,7 @@
     left: 0;
     z-index: 1;
     padding: 2.4rem 3.6rem 2.4rem 3.2rem;
-    border-radius: 0 0 2.4rem 0;
+    border-radius: 0 0 calc(2.4rem * var(--hk-esquina)) 0;
     background: var(--hk-superficie);
     font-size: 0;
 }
@@ -392,7 +392,7 @@
     width: 9rem;
     height: 1.2rem;
     margin-bottom: 2.4rem;
-    border-radius: .6rem;
+    border-radius: calc(.6rem * var(--hk-esquina));
     background: var(--hk-acento);
 }
 .hk .hk-muro-cartel-texto p {
@@ -421,7 +421,7 @@
     width: auto;
     margin-left: 3.2rem;
     padding: 2.4rem;
-    border-radius: 2.6rem;
+    border-radius: calc(2.6rem * var(--hk-esquina));
     box-shadow: none;
     text-align: left;
 }

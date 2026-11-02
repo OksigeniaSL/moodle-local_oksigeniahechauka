@@ -69,7 +69,7 @@
     flex-direction: column;
     min-width: 0;
     min-height: 0;
-    border-radius: 2rem;
+    border-radius: calc(2rem * var(--hk-esquina));
     background: var(--hk-superficie);
     box-shadow: 0 .2rem .8rem rgba(0, 0, 0, .06);
 }
@@ -91,7 +91,7 @@
     height: 12rem;
     padding: 0 2.4rem;
     border-bottom: .2rem solid var(--hk-linea);
-    border-radius: 2rem 2rem 0 0;
+    border-radius: calc(2rem * var(--hk-esquina)) calc(2rem * var(--hk-esquina)) 0 0;
 }
 .hk-vertical .hk-dia-cabeza {
     flex-direction: column;
@@ -101,7 +101,7 @@
     height: auto;
     border-bottom: 0;
     border-right: .2rem solid var(--hk-linea);
-    border-radius: 2rem 0 0 2rem;
+    border-radius: calc(2rem * var(--hk-esquina)) 0 0 calc(2rem * var(--hk-esquina));
 }
 .hk-dia-num {
     flex: none;
@@ -145,7 +145,7 @@
 .hk-dia-hoy .hk-dia-marca {
     display: inline-block;
     padding: .2rem 1.2rem .3rem;
-    border-radius: 1rem;
+    border-radius: calc(1rem * var(--hk-esquina));
     background: var(--hk-acento);
     color: var(--hk-sobre-acento);
     font-weight: 800;
@@ -199,14 +199,14 @@
     margin: 1.6rem;
     padding: 1.6rem;
     overflow: hidden;
-    border-radius: 1.4rem;
+    border-radius: calc(1.4rem * var(--hk-esquina));
     background: repeating-linear-gradient(135deg, transparent 0, transparent 1.6rem,
         var(--hk-linea) 1.6rem, var(--hk-linea) 2.4rem);
 }
 .hk-dia .hk-festivo p {
     min-width: 0;
     padding: 2rem 2.4rem 2.2rem;
-    border-radius: 1.4rem;
+    border-radius: calc(1.4rem * var(--hk-esquina));
     background: var(--hk-superficie);
     box-shadow: 0 .2rem .8rem rgba(0, 0, 0, .08);
     text-align: center;
@@ -286,7 +286,7 @@
     flex: none;
     margin-top: .8em;
     padding: .45em .8em .55em 1.35em;
-    border-radius: .7em;
+    border-radius: calc(.7em * var(--hk-esquina));
 }
 .hk-dia-ev:first-child {
     margin-top: 0;
@@ -313,12 +313,12 @@
 }
 .hk-dia-ev::before {
     right: 0;
-    border-radius: .7em;
+    border-radius: calc(.7em * var(--hk-esquina));
     opacity: .13;
 }
 .hk-dia-ev::after {
     width: .55em;
-    border-radius: .7em 0 0 .7em;
+    border-radius: calc(.7em * var(--hk-esquina)) 0 0 calc(.7em * var(--hk-esquina));
 }
 [data-tema="oscuro"] .hk-dia-ev::before,
 [data-tema="oscuro"] .hk-dia-ev::after {
@@ -377,7 +377,7 @@
 }
 .hk-tramo {
     position: absolute;
-    border-radius: 1.4rem;
+    border-radius: calc(1.4rem * var(--hk-esquina));
     background: var(--hk-ev, var(--hk-texto-suave));
     color: var(--hk-sobre-ev, var(--hk-superficie));
     box-shadow: 0 .2rem .8rem rgba(0, 0, 0, .14);
@@ -492,7 +492,7 @@
     top: 0;
     right: 0;
     width: 72rem;                         /* from the start of the list (26.4rem) to the bar of lane 0 (98.4rem) */
-    border-radius: 1.4rem;
+    border-radius: calc(1.4rem * var(--hk-esquina));
     background: var(--hk-ev, var(--hk-texto-suave));
     box-shadow: 0 .2rem .8rem rgba(0, 0, 0, .14);
 }

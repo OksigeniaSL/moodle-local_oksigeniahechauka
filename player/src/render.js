@@ -209,6 +209,12 @@ export class Screen {
         } else {
             document.documentElement.removeAttribute('data-piel');
         }
+        // The background of the list it chose (fondos.css), with its pair for the dark theme.
+        if (/^[a-z0-9-]+$/.test(theme.ground || '')) {
+            document.documentElement.setAttribute('data-fondo', theme.ground);
+        } else {
+            document.documentElement.removeAttribute('data-fondo');
+        }
         const vars = theme.vars || {};
         // What was set before and no longer is goes back to the skin.
         (this.themeVars || []).forEach(function (name) {
@@ -222,6 +228,7 @@ export class Screen {
         this.themeVars.forEach(function (name) {
             style.setProperty(name, vars[name]);
         });
+        this.applyModes(theme.modes);
         this.identity = this.identity || {name: ''};
         this.identity.light = this.media.url(theme.logo);
         this.identity.dark = this.media.url(theme.logo_dark) || this.identity.light;
@@ -229,6 +236,25 @@ export class Screen {
         this.headers.forEach((p) => this.paintHeader(p));
         this.fonts(theme.fonts || []);
         this.loadLetters();
+    }
+
+    // What is worked out and not the same on the light theme as on the dark (a background from the main colour, the second colour
+    // as text): in a sheet after the skins', since a variable on the page would hold on both.
+    applyModes(modes) {
+        if (!this.modesSheet) {
+            this.modesSheet = document.createElement('style');
+            document.head.appendChild(this.modesSheet);
+        }
+        const rule = function (selector, vars) {
+            const lines = Object.keys(vars || {}).filter(function (name) {
+                return /^--hk-[a-z0-9-]+$/.test(name) && safeValue(vars[name]);
+            }).map(function (name) {
+                return name + ':' + vars[name];
+            });
+            return lines.length ? selector + '{' + lines.join(';') + '}' : '';
+        };
+        const m = modes || {};
+        this.modesSheet.textContent = rule(':root[data-tema="claro"]', m.light) + rule(':root[data-tema="oscuro"]', m.dark);
     }
 
     // The letters of the skin, asked for at once: until they arrive everything is measured in the fallback letter, and a sentence

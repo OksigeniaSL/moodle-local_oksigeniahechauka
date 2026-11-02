@@ -17,6 +17,7 @@
 
 /* --- The client's identity: defaults, overridden by each client's sheet ------------------------------------------ */
 :root {
+    --hk-esquina: 1; /* how round the corners go, a multiple of each one's own: «Tu centro» */
     --hk-letra-titulos: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     --hk-letra-texto: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     /* light */
@@ -173,7 +174,7 @@ body {
     flex: 1 1 auto;
     min-width: 0;
     overflow: hidden;
-    border-radius: 2.4rem;
+    border-radius: calc(2.4rem * var(--hk-esquina));
     background: #000;
 }
 .hk-medio img,
@@ -220,7 +221,7 @@ body {
     position: relative;
     margin-bottom: 2rem;
     padding: 2.2rem 3rem 2.4rem 3.6rem;
-    border-radius: 2rem;
+    border-radius: calc(2rem * var(--hk-esquina));
     background: var(--hk-superficie);
     box-shadow: 0 .2rem .8rem rgba(0, 0, 0, .06);
 }
@@ -234,7 +235,7 @@ body {
     bottom: 2.2rem;
     left: 0;
     width: .8rem;
-    border-radius: 0 .8rem .8rem 0;
+    border-radius: 0 calc(.8rem * var(--hk-esquina)) calc(.8rem * var(--hk-esquina)) 0;
     background: var(--hk-color, var(--hk-primario));
 }
 .hk-bloque-crece {
@@ -322,7 +323,7 @@ body {
     width: 13rem;
     margin-right: 2rem;
     padding: .6rem 0;
-    border-radius: 1.2rem;
+    border-radius: calc(1.2rem * var(--hk-esquina));
     background: var(--hk-ev, var(--hk-primario));
     color: var(--hk-sobre-ev, #fff);
     font-size: 3.2rem;
@@ -431,7 +432,7 @@ body {
     top: 2.4rem;
     left: 2.4rem;
     padding: .8rem 1.6rem;
-    border-radius: 1rem;
+    border-radius: calc(1rem * var(--hk-esquina));
     background: rgba(0, 0, 0, .55);
     color: #fff;
     font-size: 2.4rem;
@@ -563,7 +564,7 @@ body {
     height: 52rem;
     margin-left: 8rem;
     padding: 3rem;
-    border-radius: 3rem;
+    border-radius: calc(3rem * var(--hk-esquina));
     background: #fff;
     box-sizing: border-box;
 }

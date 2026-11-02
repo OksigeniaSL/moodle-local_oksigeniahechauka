@@ -173,6 +173,7 @@ class centre {
             'defaults' => !$chosen,
             'skins' => skins::gallery($config),
             'skinletters' => skins::gallery_letters(),
+            'custom' => skins::editor($config),
             'sitelogo' => !files::first(files::LOGO, 0) && files::site_logo(),
             'categories' => $cats,
             'hascategories' => (bool) $cats,
@@ -231,6 +232,19 @@ class centre {
         $skin = optional_param('skin', null, PARAM_ALPHANUMEXT);
         if ($skin !== null) {
             set_config('skin', skins::get($skin) ? $skin : '', $c);
+        }
+        // What the editor changes over the skin: each from its closed list, or nothing.
+        $letter = optional_param('skinletter', null, PARAM_ALPHANUMEXT);
+        if ($letter !== null) {
+            set_config('skinletter', skins::letter($letter) ? $letter : '', $c);
+        }
+        $ground = optional_param('skinground', null, PARAM_ALPHANUMEXT);
+        if ($ground !== null) {
+            set_config('skinground', skins::ground($ground, '#000000') ? $ground : '', $c);
+        }
+        $corners = optional_param('skincorners', null, PARAM_ALPHANUMEXT);
+        if ($corners !== null) {
+            set_config('skincorners', isset(skins::CORNERS[$corners]) && $corners !== skins::ROUND ? $corners : '', $c);
         }
         $auto = skins::colours(get_config($c));
         foreach (array_keys(self::DEFAULTS) as $setting) {

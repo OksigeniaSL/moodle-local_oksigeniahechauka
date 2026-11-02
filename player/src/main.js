@@ -20,7 +20,7 @@ import {filesOf, isRaining, Surprises} from './surprises.js';
 import {countToday} from './today.js';
 import {weekOf} from './week.js';
 
-const VERSION = '0.7.16';
+const VERSION = '0.7.17';
 const COMING_DAYS = 7;
 const HEARTBEAT_MS = 60000;
 const REFRESH_MS = 15 * 60000;
@@ -154,7 +154,8 @@ class Player {
                 if (ev.data.hkTheme) {
                     // «Tu centro»: the colours being chosen, and light or dark, before they are saved.
                     self.screen.applyTheme(Object.assign({}, (self.manifest && self.manifest.theme) || {},
-                        {vars: ev.data.hkTheme.vars || {}}, ev.data.hkTheme.skin ? {skin: ev.data.hkTheme.skin} : {}));
+                        {vars: ev.data.hkTheme.vars || {}, modes: ev.data.hkTheme.modes || null, ground: ev.data.hkTheme.ground || ''},
+                        ev.data.hkTheme.skin ? {skin: ev.data.hkTheme.skin} : {}));
                     if (ev.data.hkTheme.mode) {
                         self.forcedTheme = ev.data.hkTheme.mode === 'dark';
                     }

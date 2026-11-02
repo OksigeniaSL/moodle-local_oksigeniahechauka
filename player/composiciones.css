@@ -178,7 +178,7 @@
     width: 4.0625em;
     margin-right: .625em;
     padding: .1875em 0;
-    border-radius: .375em;
+    border-radius: calc(.375em * var(--hk-esquina));
     font-size: 3.2em;
 }
 .hk-hoy-col .hk-evento span {
@@ -524,7 +524,7 @@
     left: 4rem;
     z-index: 6;
     padding: .3rem 1.2rem;
-    border-radius: .8rem;
+    border-radius: calc(.8rem * var(--hk-esquina));
     font-size: 2rem;
     line-height: 2rem;
 }

@@ -173,7 +173,17 @@ class manifest {
         // chosen, the first skin with the main colour of its Moodle: never the same on every site.
         $theme['skin'] = skins::chosen($config) ?: skins::first();
         $set = skins::theme_colours($config);
-        $theme['vars'] = colours::vars($set, categories::colours());
+        $theme['vars'] = colours::vars($set, categories::colours()) + skins::own_vars($config);
+        $ground = skins::listed_ground($config);
+        if ($ground) {
+            $theme['ground'] = $ground;
+        }
+        // What is not the same on the light theme as on the dark goes apart; a variable on the page would hold on both.
+        $modes = skins::modes($config, $set);
+        if ($modes) {
+            $theme['modes'] = $modes;
+            unset($theme['vars']['--hk-acento-texto']);
+        }
         if (!$theme['vars']) {
             unset($theme['vars']);
         }

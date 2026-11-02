@@ -348,4 +348,75 @@ final class manifest_test extends \advanced_testcase {
         $this->assertSame('', $cards[0]['id']);
         $this->assertTrue($cards[0]['checked']);
     }
+
+    /**
+     * What the editor changes over a skin: letter and corners on the page, a background of the list as an attribute, and what is
+     * not the same on light as on dark apart, reading on what it goes on. What is not on its list is nothing.
+     */
+    public function test_skin_editor(): void {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        $screen = $this->screen('Hall');
+        $skins = '\\local_oksigeniahechauka\\local\\skins';
+        set_config('brandcolor', '', 'theme_boost');
+        set_config('brandcolor', '', 'theme_' . $GLOBALS['CFG']->theme);
+
+        $_POST = ['skin' => 'botella', 'colourprimary' => '#123f33', 'colouraccent' => '#ffb48a', 'skinletter' => '',
+            'skinground' => '', 'skincorners' => 'round'];
+        \local_oksigeniahechauka\local\centre::save();
+        $theme = manifest::build($screen, time())['theme'];
+        $this->assertArrayNotHasKey('ground', $theme);
+        $this->assertArrayNotHasKey('modes', $theme);
+        $this->assertArrayNotHasKey('--hk-esquina', $theme['vars'] ?? []);
+
+        $_POST = ['skin' => 'botella', 'colourprimary' => '#123f33', 'colouraccent' => '#ffb48a', 'skinletter' => 'gabarito',
+            'skinground' => 'arena', 'skincorners' => 'square'];
+        \local_oksigeniahechauka\local\centre::save();
+        $theme = manifest::build($screen, time())['theme'];
+        $this->assertStringStartsWith('"Gabarito"', $theme['vars']['--hk-letra-titulos']);
+        $this->assertSame($theme['vars']['--hk-letra-titulos'], $theme['vars']['--hk-letra-texto']);
+        $this->assertSame('0', $theme['vars']['--hk-esquina']);
+        $this->assertSame('arena', $theme['ground']);
+        $this->assertArrayNotHasKey('modes', $theme);
+
+        // A second colour of its own: as text, what reads on that background on each theme.
+        $_POST = ['skin' => 'botella', 'colourprimary' => '#123f33', 'colouraccent' => '#ffcc00'];
+        \local_oksigeniahechauka\local\centre::save();
+        $theme = manifest::build($screen, time())['theme'];
+        $this->assertArrayNotHasKey('--hk-acento-texto', $theme['vars']);
+        $tones = $skins::ground('arena', '#000000');
+        foreach (['light', 'dark'] as $mode) {
+            foreach (['fondo', 'superficie'] as $tone) {
+                $this->assertGreaterThanOrEqual(4.5, \local_oksigeniahechauka\local\colours::contrast(
+                    $theme['modes'][$mode]['--hk-acento-texto'],
+                    $tones[$mode][$tone]
+                ));
+            }
+        }
+
+        // From the main colour: worked out, on each theme, whatever the colour, and every text of every skin reads on it.
+        foreach (['#0f6cbf', '#b3261e', '#f5c400', '#2e7d32', '#6a1b9a', '#222222', '#9ad0ec', '#808080'] as $primary) {
+            $_POST = ['skin' => 'botella', 'colourprimary' => $primary, 'colouraccent' => '#ffb48a', 'skinground' => 'tint'];
+            \local_oksigeniahechauka\local\centre::save();
+            $theme = manifest::build($screen, time())['theme'];
+            $this->assertArrayNotHasKey('ground', $theme);
+            foreach ($skins::texts() as $mode => $texts) {
+                foreach ($texts as $text) {
+                    $this->assertGreaterThanOrEqual(4.5, \local_oksigeniahechauka\local\colours::contrast(
+                        $text,
+                        $theme['modes'][$mode]['--hk-fondo']
+                    ), $primary . ' ' . $mode . ' ' . $text);
+                }
+            }
+        }
+
+        // What is not on its list is nothing.
+        $_POST = ['skinletter' => 'comic', 'skinground' => 'neon', 'skincorners' => 'wavy'];
+        \local_oksigeniahechauka\local\centre::save();
+        $config = get_config('local_oksigeniahechauka');
+        $this->assertSame('', (string) $config->skinletter);
+        $this->assertSame('', (string) $config->skinground);
+        $this->assertSame('', (string) $config->skincorners);
+        $this->assertSame([], $skins::own_vars($config));
+    }
 }

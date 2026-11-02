@@ -52,7 +52,7 @@
     top: .6rem;
     left: 4rem;
     padding: .3rem 1.2rem;
-    border-radius: .8rem;
+    border-radius: calc(.8rem * var(--hk-esquina));
     font-size: 2rem;
 }
 
@@ -73,7 +73,7 @@
 .hk .hk-aviso-fijo {
     margin-bottom: 3.2rem;
     padding: 2.4rem 3rem 2.8rem;
-    border-radius: 2rem;
+    border-radius: calc(2rem * var(--hk-esquina));
     background: var(--hk-acento);
     color: var(--hk-sobre-acento);
 }

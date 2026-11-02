@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.7.17 (2026-11-02)
+
+- **«Personalizar», under the gallery of skins in «Tu centro»**: starting from a skin, each centre changes its colours, its background, its
+  letter and its corners, and sees them at once on the screen beside it. Backgrounds and letters come from closed lists, tried with the text
+  of every skin and each with its partner for the dark theme; a background can also be made from the main colour. Sizes and compositions stay
+  as they are, and the colour of the text is still chosen by the system.
+- Thirteen letters to choose from, in five families, each tried on the real player.
+- In «Tu centro», the screen stays in sight all the way down the page.
+- A very long title from afar comes smaller than the minimum rather than cut at the edge of its box.
+- A new surprise: the pufferfish.
+- A second colour of the centre's own now reads as text on the dark theme too.
+- An event without a time no longer shows an empty chip in the third.
+
 ## 0.7.16 (2026-11-02)
 
 - A whole photo or video beside «Today» no longer squeezes its caption into a sliver at the edge: the words go on a block beside the

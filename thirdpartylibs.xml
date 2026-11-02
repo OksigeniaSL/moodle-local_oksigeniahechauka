@@ -23,16 +23,471 @@
         </copyrights>
     </library>
     <library>
-        <location>player/fuentes</location>
-        <name>Gabarito, Schibsted Grotesk, Bricolage Grotesque</name>
-        <description>The letters of the screens' skins, cut to Latin and made readable by Chrome 56.</description>
-        <version>2.0</version>
-        <license>SIL Open Font License 1.1</license>
-        <repository>https://github.com/google/fonts</repository>
+        <location>player/fuentes/Nunito-600.woff2</location>
+        <name>Nunito 600</name>
+        <description>A letter centres can choose for their screens: a static instance cut to the Latin alphabets, so that the screens' old browser can read it.</description>
+        <version>3.602</version>
+        <license>OFL</license>
+        <licenseversion>1.1</licenseversion>
+        <repository>https://github.com/googlefonts/nunito</repository>
         <copyrights>
-            <copyright>2023 The Gabarito Project Authors (https://github.com/naipefoundry/gabarito)</copyright>
-            <copyright>2023 The Schibsted-Grotesk Project Authors (https://github.com/schibsted/schibsted-grotesk)</copyright>
-            <copyright>2022 The Bricolage Grotesque Project Authors (https://github.com/ateliertriay/bricolage)</copyright>
+            <copyright>Copyright 2014 The Nunito Project Authors (https://github.com/googlefonts/nunito)</copyright>
+        </copyrights>
+    </library>
+    <library>
+        <location>player/fuentes/Nunito-700.woff2</location>
+        <name>Nunito 700</name>
+        <description>A letter centres can choose for their screens: a static instance cut to the Latin alphabets, so that the screens' old browser can read it.</description>
+        <version>3.602</version>
+        <license>OFL</license>
+        <licenseversion>1.1</licenseversion>
+        <repository>https://github.com/googlefonts/nunito</repository>
+        <copyrights>
+            <copyright>Copyright 2014 The Nunito Project Authors (https://github.com/googlefonts/nunito)</copyright>
+        </copyrights>
+    </library>
+    <library>
+        <location>player/fuentes/Nunito-800.woff2</location>
+        <name>Nunito 800</name>
+        <description>A letter centres can choose for their screens: a static instance cut to the Latin alphabets, so that the screens' old browser can read it.</description>
+        <version>3.602</version>
+        <license>OFL</license>
+        <licenseversion>1.1</licenseversion>
+        <repository>https://github.com/googlefonts/nunito</repository>
+        <copyrights>
+            <copyright>Copyright 2014 The Nunito Project Authors (https://github.com/googlefonts/nunito)</copyright>
+        </copyrights>
+    </library>
+    <library>
+        <location>player/fuentes/Baloo2-600.woff2</location>
+        <name>Baloo 2 600</name>
+        <description>A letter centres can choose for their screens: a static instance cut to the Latin alphabets, so that the screens' old browser can read it.</description>
+        <version>1.700</version>
+        <license>OFL</license>
+        <licenseversion>1.1</licenseversion>
+        <repository>https://github.com/EkType/Baloo2</repository>
+        <copyrights>
+            <copyright>Copyright 2019 The Baloo 2 Project Authors (https://github.com/EkType/Baloo2)</copyright>
+        </copyrights>
+    </library>
+    <library>
+        <location>player/fuentes/Baloo2-700.woff2</location>
+        <name>Baloo 2 700</name>
+        <description>A letter centres can choose for their screens: a static instance cut to the Latin alphabets, so that the screens' old browser can read it.</description>
+        <version>1.700</version>
+        <license>OFL</license>
+        <licenseversion>1.1</licenseversion>
+        <repository>https://github.com/EkType/Baloo2</repository>
+        <copyrights>
+            <copyright>Copyright 2019 The Baloo 2 Project Authors (https://github.com/EkType/Baloo2)</copyright>
+        </copyrights>
+    </library>
+    <library>
+        <location>player/fuentes/Baloo2-800.woff2</location>
+        <name>Baloo 2 800</name>
+        <description>A letter centres can choose for their screens: a static instance cut to the Latin alphabets, so that the screens' old browser can read it.</description>
+        <version>1.700</version>
+        <license>OFL</license>
+        <licenseversion>1.1</licenseversion>
+        <repository>https://github.com/EkType/Baloo2</repository>
+        <copyrights>
+            <copyright>Copyright 2019 The Baloo 2 Project Authors (https://github.com/EkType/Baloo2)</copyright>
+        </copyrights>
+    </library>
+    <library>
+        <location>player/fuentes/Gabarito-600.woff2</location>
+        <name>Gabarito 600</name>
+        <description>A letter centres can choose for their screens: a static instance cut to the Latin alphabets, so that the screens' old browser can read it.</description>
+        <version>1.000</version>
+        <license>OFL</license>
+        <licenseversion>1.1</licenseversion>
+        <repository>https://github.com/naipefoundry/gabarito</repository>
+        <copyrights>
+            <copyright>Copyright 2023 The Gabarito Project Authors (https://github.com/naipefoundry/gabarito)</copyright>
+        </copyrights>
+    </library>
+    <library>
+        <location>player/fuentes/Gabarito-700.woff2</location>
+        <name>Gabarito 700</name>
+        <description>A letter centres can choose for their screens: a static instance cut to the Latin alphabets, so that the screens' old browser can read it.</description>
+        <version>1.000</version>
+        <license>OFL</license>
+        <licenseversion>1.1</licenseversion>
+        <repository>https://github.com/naipefoundry/gabarito</repository>
+        <copyrights>
+            <copyright>Copyright 2023 The Gabarito Project Authors (https://github.com/naipefoundry/gabarito)</copyright>
+        </copyrights>
+    </library>
+    <library>
+        <location>player/fuentes/Gabarito-800.woff2</location>
+        <name>Gabarito 800</name>
+        <description>A letter centres can choose for their screens: a static instance cut to the Latin alphabets, so that the screens' old browser can read it.</description>
+        <version>1.000</version>
+        <license>OFL</license>
+        <licenseversion>1.1</licenseversion>
+        <repository>https://github.com/naipefoundry/gabarito</repository>
+        <copyrights>
+            <copyright>Copyright 2023 The Gabarito Project Authors (https://github.com/naipefoundry/gabarito)</copyright>
+        </copyrights>
+    </library>
+    <library>
+        <location>player/fuentes/Schibsted-600.woff2</location>
+        <name>Schibsted Grotesk 600</name>
+        <description>A letter centres can choose for their screens: a static instance cut to the Latin alphabets, so that the screens' old browser can read it.</description>
+        <version>1.100</version>
+        <license>OFL</license>
+        <licenseversion>1.1</licenseversion>
+        <repository>https://github.com/schibsted/schibsted-grotesk</repository>
+        <copyrights>
+            <copyright>Copyright 2023 The Schibsted-Grotesk Project Authors (https://github.com/schibsted/schibsted-grotesk)</copyright>
+        </copyrights>
+    </library>
+    <library>
+        <location>player/fuentes/Schibsted-700.woff2</location>
+        <name>Schibsted Grotesk 700</name>
+        <description>A letter centres can choose for their screens: a static instance cut to the Latin alphabets, so that the screens' old browser can read it.</description>
+        <version>1.100</version>
+        <license>OFL</license>
+        <licenseversion>1.1</licenseversion>
+        <repository>https://github.com/schibsted/schibsted-grotesk</repository>
+        <copyrights>
+            <copyright>Copyright 2023 The Schibsted-Grotesk Project Authors (https://github.com/schibsted/schibsted-grotesk)</copyright>
+        </copyrights>
+    </library>
+    <library>
+        <location>player/fuentes/Schibsted-800.woff2</location>
+        <name>Schibsted Grotesk 800</name>
+        <description>A letter centres can choose for their screens: a static instance cut to the Latin alphabets, so that the screens' old browser can read it.</description>
+        <version>1.100</version>
+        <license>OFL</license>
+        <licenseversion>1.1</licenseversion>
+        <repository>https://github.com/schibsted/schibsted-grotesk</repository>
+        <copyrights>
+            <copyright>Copyright 2023 The Schibsted-Grotesk Project Authors (https://github.com/schibsted/schibsted-grotesk)</copyright>
+        </copyrights>
+    </library>
+    <library>
+        <location>player/fuentes/FiraSans-600.woff2</location>
+        <name>Fira Sans 600</name>
+        <description>A letter centres can choose for their screens: a static instance cut to the Latin alphabets, so that the screens' old browser can read it.</description>
+        <version>4.203</version>
+        <license>OFL</license>
+        <licenseversion>1.1</licenseversion>
+        <repository>https://github.com/googlefonts/FiraGFVersion</repository>
+        <copyrights>
+            <copyright>Copyright (c) 2012-2015, The Mozilla Foundation and Telefonica S.A.</copyright>
+        </copyrights>
+    </library>
+    <library>
+        <location>player/fuentes/FiraSans-700.woff2</location>
+        <name>Fira Sans 700</name>
+        <description>A letter centres can choose for their screens: a static instance cut to the Latin alphabets, so that the screens' old browser can read it.</description>
+        <version>4.203</version>
+        <license>OFL</license>
+        <licenseversion>1.1</licenseversion>
+        <repository>https://github.com/googlefonts/FiraGFVersion</repository>
+        <copyrights>
+            <copyright>Copyright (c) 2012-2015, The Mozilla Foundation and Telefonica S.A.</copyright>
+        </copyrights>
+    </library>
+    <library>
+        <location>player/fuentes/FiraSans-800.woff2</location>
+        <name>Fira Sans 800</name>
+        <description>A letter centres can choose for their screens: a static instance cut to the Latin alphabets, so that the screens' old browser can read it.</description>
+        <version>4.203</version>
+        <license>OFL</license>
+        <licenseversion>1.1</licenseversion>
+        <repository>https://github.com/googlefonts/FiraGFVersion</repository>
+        <copyrights>
+            <copyright>Copyright (c) 2012-2015, The Mozilla Foundation and Telefonica S.A.</copyright>
+        </copyrights>
+    </library>
+    <library>
+        <location>player/fuentes/OpenSans-600.woff2</location>
+        <name>Open Sans 600</name>
+        <description>A letter centres can choose for their screens: a static instance cut to the Latin alphabets, so that the screens' old browser can read it.</description>
+        <version>3.003</version>
+        <license>OFL</license>
+        <licenseversion>1.1</licenseversion>
+        <repository>https://github.com/googlefonts/opensans</repository>
+        <copyrights>
+            <copyright>Copyright 2020 The Open Sans Project Authors (https://github.com/googlefonts/opensans)</copyright>
+        </copyrights>
+    </library>
+    <library>
+        <location>player/fuentes/OpenSans-700.woff2</location>
+        <name>Open Sans 700</name>
+        <description>A letter centres can choose for their screens: a static instance cut to the Latin alphabets, so that the screens' old browser can read it.</description>
+        <version>3.003</version>
+        <license>OFL</license>
+        <licenseversion>1.1</licenseversion>
+        <repository>https://github.com/googlefonts/opensans</repository>
+        <copyrights>
+            <copyright>Copyright 2020 The Open Sans Project Authors (https://github.com/googlefonts/opensans)</copyright>
+        </copyrights>
+    </library>
+    <library>
+        <location>player/fuentes/OpenSans-800.woff2</location>
+        <name>Open Sans 800</name>
+        <description>A letter centres can choose for their screens: a static instance cut to the Latin alphabets, so that the screens' old browser can read it.</description>
+        <version>3.003</version>
+        <license>OFL</license>
+        <licenseversion>1.1</licenseversion>
+        <repository>https://github.com/googlefonts/opensans</repository>
+        <copyrights>
+            <copyright>Copyright 2020 The Open Sans Project Authors (https://github.com/googlefonts/opensans)</copyright>
+        </copyrights>
+    </library>
+    <library>
+        <location>player/fuentes/PublicSans-600.woff2</location>
+        <name>Public Sans 600</name>
+        <description>A letter centres can choose for their screens: a static instance cut to the Latin alphabets, so that the screens' old browser can read it.</description>
+        <version>2.001</version>
+        <license>OFL</license>
+        <licenseversion>1.1</licenseversion>
+        <repository>https://github.com/uswds/public-sans</repository>
+        <copyrights>
+            <copyright>Copyright 2015 The Public Sans Project Authors (https://github.com/uswds/public-sans)</copyright>
+        </copyrights>
+    </library>
+    <library>
+        <location>player/fuentes/PublicSans-700.woff2</location>
+        <name>Public Sans 700</name>
+        <description>A letter centres can choose for their screens: a static instance cut to the Latin alphabets, so that the screens' old browser can read it.</description>
+        <version>2.001</version>
+        <license>OFL</license>
+        <licenseversion>1.1</licenseversion>
+        <repository>https://github.com/uswds/public-sans</repository>
+        <copyrights>
+            <copyright>Copyright 2015 The Public Sans Project Authors (https://github.com/uswds/public-sans)</copyright>
+        </copyrights>
+    </library>
+    <library>
+        <location>player/fuentes/PublicSans-800.woff2</location>
+        <name>Public Sans 800</name>
+        <description>A letter centres can choose for their screens: a static instance cut to the Latin alphabets, so that the screens' old browser can read it.</description>
+        <version>2.001</version>
+        <license>OFL</license>
+        <licenseversion>1.1</licenseversion>
+        <repository>https://github.com/uswds/public-sans</repository>
+        <copyrights>
+            <copyright>Copyright 2015 The Public Sans Project Authors (https://github.com/uswds/public-sans)</copyright>
+        </copyrights>
+    </library>
+    <library>
+        <location>player/fuentes/Bitter-600.woff2</location>
+        <name>Bitter 600</name>
+        <description>A letter centres can choose for their screens: a static instance cut to the Latin alphabets, so that the screens' old browser can read it.</description>
+        <version>3.021</version>
+        <license>OFL</license>
+        <licenseversion>1.1</licenseversion>
+        <repository>https://github.com/solmatas/BitterPro</repository>
+        <copyrights>
+            <copyright>Copyright 2011 The Bitter Project Authors (https://github.com/solmatas/BitterPro)</copyright>
+        </copyrights>
+    </library>
+    <library>
+        <location>player/fuentes/Bitter-700.woff2</location>
+        <name>Bitter 700</name>
+        <description>A letter centres can choose for their screens: a static instance cut to the Latin alphabets, so that the screens' old browser can read it.</description>
+        <version>3.021</version>
+        <license>OFL</license>
+        <licenseversion>1.1</licenseversion>
+        <repository>https://github.com/solmatas/BitterPro</repository>
+        <copyrights>
+            <copyright>Copyright 2011 The Bitter Project Authors (https://github.com/solmatas/BitterPro)</copyright>
+        </copyrights>
+    </library>
+    <library>
+        <location>player/fuentes/Bitter-800.woff2</location>
+        <name>Bitter 800</name>
+        <description>A letter centres can choose for their screens: a static instance cut to the Latin alphabets, so that the screens' old browser can read it.</description>
+        <version>3.021</version>
+        <license>OFL</license>
+        <licenseversion>1.1</licenseversion>
+        <repository>https://github.com/solmatas/BitterPro</repository>
+        <copyrights>
+            <copyright>Copyright 2011 The Bitter Project Authors (https://github.com/solmatas/BitterPro)</copyright>
+        </copyrights>
+    </library>
+    <library>
+        <location>player/fuentes/NotoSerif-600.woff2</location>
+        <name>Noto Serif 600</name>
+        <description>A letter centres can choose for their screens: a static instance cut to the Latin alphabets, so that the screens' old browser can read it.</description>
+        <version>2.015</version>
+        <license>OFL</license>
+        <licenseversion>1.1</licenseversion>
+        <repository>https://github.com/notofonts/latin-greek-cyrillic</repository>
+        <copyrights>
+            <copyright>Copyright 2022 The Noto Project Authors (https://github.com/notofonts/latin-greek-cyrillic)</copyright>
+        </copyrights>
+    </library>
+    <library>
+        <location>player/fuentes/NotoSerif-700.woff2</location>
+        <name>Noto Serif 700</name>
+        <description>A letter centres can choose for their screens: a static instance cut to the Latin alphabets, so that the screens' old browser can read it.</description>
+        <version>2.015</version>
+        <license>OFL</license>
+        <licenseversion>1.1</licenseversion>
+        <repository>https://github.com/notofonts/latin-greek-cyrillic</repository>
+        <copyrights>
+            <copyright>Copyright 2022 The Noto Project Authors (https://github.com/notofonts/latin-greek-cyrillic)</copyright>
+        </copyrights>
+    </library>
+    <library>
+        <location>player/fuentes/NotoSerif-800.woff2</location>
+        <name>Noto Serif 800</name>
+        <description>A letter centres can choose for their screens: a static instance cut to the Latin alphabets, so that the screens' old browser can read it.</description>
+        <version>2.015</version>
+        <license>OFL</license>
+        <licenseversion>1.1</licenseversion>
+        <repository>https://github.com/notofonts/latin-greek-cyrillic</repository>
+        <copyrights>
+            <copyright>Copyright 2022 The Noto Project Authors (https://github.com/notofonts/latin-greek-cyrillic)</copyright>
+        </copyrights>
+    </library>
+    <library>
+        <location>player/fuentes/BarlowSemiCondensed-600.woff2</location>
+        <name>Barlow Semi Condensed 600</name>
+        <description>A letter centres can choose for their screens: a static instance cut to the Latin alphabets, so that the screens' old browser can read it.</description>
+        <version>1.408</version>
+        <license>OFL</license>
+        <licenseversion>1.1</licenseversion>
+        <repository>https://github.com/jpt/barlow</repository>
+        <copyrights>
+            <copyright>Copyright 2017 The Barlow Project Authors (https://github.com/jpt/barlow)</copyright>
+        </copyrights>
+    </library>
+    <library>
+        <location>player/fuentes/BarlowSemiCondensed-700.woff2</location>
+        <name>Barlow Semi Condensed 700</name>
+        <description>A letter centres can choose for their screens: a static instance cut to the Latin alphabets, so that the screens' old browser can read it.</description>
+        <version>1.408</version>
+        <license>OFL</license>
+        <licenseversion>1.1</licenseversion>
+        <repository>https://github.com/jpt/barlow</repository>
+        <copyrights>
+            <copyright>Copyright 2017 The Barlow Project Authors (https://github.com/jpt/barlow)</copyright>
+        </copyrights>
+    </library>
+    <library>
+        <location>player/fuentes/BarlowSemiCondensed-800.woff2</location>
+        <name>Barlow Semi Condensed 800</name>
+        <description>A letter centres can choose for their screens: a static instance cut to the Latin alphabets, so that the screens' old browser can read it.</description>
+        <version>1.408</version>
+        <license>OFL</license>
+        <licenseversion>1.1</licenseversion>
+        <repository>https://github.com/jpt/barlow</repository>
+        <copyrights>
+            <copyright>Copyright 2017 The Barlow Project Authors (https://github.com/jpt/barlow)</copyright>
+        </copyrights>
+    </library>
+    <library>
+        <location>player/fuentes/ArchivoCondensed-600.woff2</location>
+        <name>Archivo Condensed 600</name>
+        <description>A letter centres can choose for their screens: a static instance cut to the Latin alphabets, so that the screens' old browser can read it.</description>
+        <version>2.001</version>
+        <license>OFL</license>
+        <licenseversion>1.1</licenseversion>
+        <repository>https://github.com/Omnibus-Type/Archivo</repository>
+        <copyrights>
+            <copyright>Copyright 2020 The Archivo Project Authors (https://github.com/Omnibus-Type/Archivo)</copyright>
+        </copyrights>
+    </library>
+    <library>
+        <location>player/fuentes/ArchivoCondensed-700.woff2</location>
+        <name>Archivo Condensed 700</name>
+        <description>A letter centres can choose for their screens: a static instance cut to the Latin alphabets, so that the screens' old browser can read it.</description>
+        <version>2.001</version>
+        <license>OFL</license>
+        <licenseversion>1.1</licenseversion>
+        <repository>https://github.com/Omnibus-Type/Archivo</repository>
+        <copyrights>
+            <copyright>Copyright 2020 The Archivo Project Authors (https://github.com/Omnibus-Type/Archivo)</copyright>
+        </copyrights>
+    </library>
+    <library>
+        <location>player/fuentes/ArchivoCondensed-800.woff2</location>
+        <name>Archivo Condensed 800</name>
+        <description>A letter centres can choose for their screens: a static instance cut to the Latin alphabets, so that the screens' old browser can read it.</description>
+        <version>2.001</version>
+        <license>OFL</license>
+        <licenseversion>1.1</licenseversion>
+        <repository>https://github.com/Omnibus-Type/Archivo</repository>
+        <copyrights>
+            <copyright>Copyright 2020 The Archivo Project Authors (https://github.com/Omnibus-Type/Archivo)</copyright>
+        </copyrights>
+    </library>
+    <library>
+        <location>player/fuentes/Bricolage-600.woff2</location>
+        <name>Bricolage Grotesque 600</name>
+        <description>A letter centres can choose for their screens: a static instance cut to the Latin alphabets, so that the screens' old browser can read it.</description>
+        <version>1.001</version>
+        <license>OFL</license>
+        <licenseversion>1.1</licenseversion>
+        <repository>https://github.com/ateliertriay/bricolage</repository>
+        <copyrights>
+            <copyright>Copyright 2022 The Bricolage Grotesque Project Authors (https://github.com/ateliertriay/bricolage)</copyright>
+        </copyrights>
+    </library>
+    <library>
+        <location>player/fuentes/Bricolage-700.woff2</location>
+        <name>Bricolage Grotesque 700</name>
+        <description>A letter centres can choose for their screens: a static instance cut to the Latin alphabets, so that the screens' old browser can read it.</description>
+        <version>1.001</version>
+        <license>OFL</license>
+        <licenseversion>1.1</licenseversion>
+        <repository>https://github.com/ateliertriay/bricolage</repository>
+        <copyrights>
+            <copyright>Copyright 2022 The Bricolage Grotesque Project Authors (https://github.com/ateliertriay/bricolage)</copyright>
+        </copyrights>
+    </library>
+    <library>
+        <location>player/fuentes/Bricolage-800.woff2</location>
+        <name>Bricolage Grotesque 800</name>
+        <description>A letter centres can choose for their screens: a static instance cut to the Latin alphabets, so that the screens' old browser can read it.</description>
+        <version>1.001</version>
+        <license>OFL</license>
+        <licenseversion>1.1</licenseversion>
+        <repository>https://github.com/ateliertriay/bricolage</repository>
+        <copyrights>
+            <copyright>Copyright 2022 The Bricolage Grotesque Project Authors (https://github.com/ateliertriay/bricolage)</copyright>
+        </copyrights>
+    </library>
+    <library>
+        <location>player/fuentes/Grandstander-600.woff2</location>
+        <name>Grandstander 600</name>
+        <description>A letter centres can choose for their screens: a static instance cut to the Latin alphabets, so that the screens' old browser can read it.</description>
+        <version>1.200</version>
+        <license>OFL</license>
+        <licenseversion>1.1</licenseversion>
+        <repository>https://github.com/Etcetera-Type-Co/Grandstander</repository>
+        <copyrights>
+            <copyright>Copyright 2020 The Grandstander Project Authors (https://github.com/Etcetera-Type-Co/Grandstander)</copyright>
+        </copyrights>
+    </library>
+    <library>
+        <location>player/fuentes/Grandstander-700.woff2</location>
+        <name>Grandstander 700</name>
+        <description>A letter centres can choose for their screens: a static instance cut to the Latin alphabets, so that the screens' old browser can read it.</description>
+        <version>1.200</version>
+        <license>OFL</license>
+        <licenseversion>1.1</licenseversion>
+        <repository>https://github.com/Etcetera-Type-Co/Grandstander</repository>
+        <copyrights>
+            <copyright>Copyright 2020 The Grandstander Project Authors (https://github.com/Etcetera-Type-Co/Grandstander)</copyright>
+        </copyrights>
+    </library>
+    <library>
+        <location>player/fuentes/Grandstander-800.woff2</location>
+        <name>Grandstander 800</name>
+        <description>A letter centres can choose for their screens: a static instance cut to the Latin alphabets, so that the screens' old browser can read it.</description>
+        <version>1.200</version>
+        <license>OFL</license>
+        <licenseversion>1.1</licenseversion>
+        <repository>https://github.com/Etcetera-Type-Co/Grandstander</repository>
+        <copyrights>
+            <copyright>Copyright 2020 The Grandstander Project Authors (https://github.com/Etcetera-Type-Co/Grandstander)</copyright>
         </copyrights>
     </library>
 </libraries>

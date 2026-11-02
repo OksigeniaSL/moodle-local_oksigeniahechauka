@@ -10,14 +10,6 @@
     const frame = document.getElementById('hkp-cpv');
     let mode = 'light';
 
-    // Sticks under the bar of the site; if it does not fit in the window, higher up, with its end in sight.
-    const side = page.querySelector('.hkp-centre-side');
-    const fit = () => {
-        side.style.top = Math.min(77, window.innerHeight - side.offsetHeight - 16) + 'px';
-    };
-    window.addEventListener('resize', fit);
-    new ResizeObserver(fit).observe(side);
-
     // What was changed is not lost by searching for a place or by going away.
     const form = document.getElementById('hkp-centre-form');
     let dirty = false;
@@ -88,6 +80,58 @@
         return to[0] ? '#ffffff' : '#000000';
     };
     const names = {colourprimary: '--hk-primario', colouraccent: '--hk-acento'};
+    const mix = (from, to, part) => {
+        const a = rgb(from);
+        const b = rgb(to);
+        return '#' + a.map((v, i) => Math.round(v + (b[i] - v) * part).toString(16).padStart(2, '0')).join('');
+    };
+    const custom = page.querySelector('#hkp-custom');
+    const picked = (name) => page.querySelector('input[name="' + name + '"]:checked');
+    const colourOf = (setting) => page.querySelector('[data-colour="' + setting + '"]').value.toLowerCase();
+    // The background made from the main colour: the same rule as skins::tinted().
+    const tinted = (primary) => {
+        const tints = JSON.parse(custom.getAttribute('data-tints'));
+        const texts = JSON.parse(custom.getAttribute('data-texts'));
+        const out = {};
+        Object.keys(tints).forEach((mode) => {
+            const [base, start, surface, line] = tints[mode];
+            let part = 0;
+            let fondo = base;
+            for (const step of [1, 0.75, 0.5, 0.25, 0]) {
+                part = start * step;
+                fondo = mix(base, primary, part);
+                if (texts[mode].every((text) => contrast(text, fondo) >= 4.5)) {
+                    break;
+                }
+            }
+            out[mode] = {fondo, superficie: mix(surface, primary, part * 0.4), linea: mix(fondo, line, 0.12)};
+        });
+        return out;
+    };
+    // What changes with the theme: the same rule as skins::modes().
+    const modes = (accent) => {
+        const skin = picked('skin');
+        const ground = picked('skinground');
+        const tint = ground && ground.value === 'tint';
+        if (!skin || (!tint && !accent)) {
+            return null;
+        }
+        const tones = tint ? tinted(colourOf('colourprimary')) :
+            JSON.parse((ground && ground.value && ground.getAttribute('data-tones')) || skin.getAttribute('data-tones'));
+        const out = {};
+        ['light', 'dark'].forEach((mode) => {
+            out[mode] = {};
+            if (tint) {
+                out[mode]['--hk-fondo'] = tones[mode].fondo;
+                out[mode]['--hk-superficie'] = tones[mode].superficie;
+                out[mode]['--hk-linea'] = tones[mode].linea;
+            }
+            if (accent) {
+                out[mode]['--hk-acento-texto'] = readable(readable(accent, tones[mode].fondo), tones[mode].superficie);
+            }
+        });
+        return out;
+    };
 
     const vars = () => {
         const out = {};
@@ -110,10 +154,16 @@
             }
             out[name] = hex;
             out[name.replace('--hk-', '--hk-sobre-')] = on(hex);
-            if (setting === 'colouraccent') {
-                out['--hk-acento-texto'] = readable(hex, '#ffffff');
-            }
         });
+        const letter = picked('skinletter');
+        if (letter && letter.value) {
+            out['--hk-letra-titulos'] = letter.getAttribute('data-stack');
+            out['--hk-letra-texto'] = letter.getAttribute('data-stack');
+        }
+        const corners = picked('skincorners');
+        if (corners && corners.getAttribute('data-corner') !== '1') {
+            out['--hk-esquina'] = corners.getAttribute('data-corner');
+        }
         return out;
     };
     // The preview stands on «a picture with Today»: the ticker (main colour), the label (second colour) and events of
@@ -130,8 +180,11 @@
     };
     const send = (override) => {
         if (frame && frame.contentWindow) {
-            const skin = page.querySelector('input[name="skin"]:checked');
-            frame.contentWindow.postMessage({hkTheme: {vars: Object.assign(vars(), override || {}), mode,
+            const skin = picked('skin');
+            const own = vars();
+            const ground = picked('skinground');
+            frame.contentWindow.postMessage({hkTheme: {vars: Object.assign(own, override || {}), mode,
+                modes: modes(own['--hk-acento']), ground: ground && ground.value !== 'tint' ? ground.value : '',
                 skin: skin ? skin.getAttribute('data-skin') : ''}}, location.origin);
         }
     };
@@ -166,9 +219,46 @@
         letters.textContent = gallery.getAttribute('data-letters');
         document.head.appendChild(letters);
     }
-    // Choosing a skin brings its colours; touching them afterwards makes them the centre's own.
+    // The editor opens under the gallery; what it starts from is drawn from the skin, and a note says when it has changes.
+    const opener = page.querySelector('#hkp-custom-open');
+    const note = page.querySelector('#hkp-custom-note');
+    const paintCustom = () => {
+        const skin = picked('skin');
+        if (!skin) {
+            return;
+        }
+        page.querySelector('[data-letter-skin]').style.fontFamily = skin.getAttribute('data-stack');
+        page.querySelector('[data-ground-skin]').style.background = JSON.parse(skin.getAttribute('data-tones')).light.fondo;
+        page.querySelector('[data-ground-tint]').style.background = tinted(colourOf('colourprimary')).light.fondo;
+        note.hidden = !(picked('skinletter').value || picked('skinground').value || picked('skincorners').value !== 'round' ||
+            colourOf('colourprimary') !== skin.getAttribute('data-primary') ||
+            colourOf('colouraccent') !== skin.getAttribute('data-accent'));
+    };
+    opener.addEventListener('click', () => {
+        custom.hidden = !custom.hidden;
+        opener.setAttribute('aria-expanded', custom.hidden ? 'false' : 'true');
+    });
+    ['skinletter', 'skinground', 'skincorners'].forEach((name) => {
+        page.querySelectorAll('input[name="' + name + '"]').forEach((radio) => {
+            radio.addEventListener('change', () => {
+                paintCustom();
+                send();
+            });
+        });
+    });
+    const asItComes = () => {
+        page.querySelector('input[name="skinletter"][value=""]').checked = true;
+        page.querySelector('input[name="skinground"][value=""]').checked = true;
+        page.querySelector('input[name="skincorners"][value="round"]').checked = true;
+    };
+    page.querySelector('#hkp-custom-reset').addEventListener('click', () => {
+        dirty = true;
+        picked('skin').dispatchEvent(new Event('change'));
+    });
+    // Choosing a skin brings its colours and undoes what was changed over the other; touching them makes them the centre's own.
     page.querySelectorAll('input[name="skin"]').forEach((radio) => {
         radio.addEventListener('change', () => {
+            asItComes();
             page.querySelectorAll('[data-colour]').forEach((input) => {
                 const setting = input.getAttribute('data-colour');
                 input.value = radio.getAttribute(setting === 'colouraccent' ? 'data-accent' : 'data-primary');
@@ -176,9 +266,11 @@
                 page.querySelector('[data-on="' + setting + '"]').textContent = on(input.value) === '#ffffff' ? words.white :
                     words.dark;
             });
+            paintCustom();
             send();
         });
     });
+    paintCustom();
     page.querySelectorAll('[data-ct]').forEach((button) => {
         button.addEventListener('click', () => {
             mode = button.getAttribute('data-ct');
