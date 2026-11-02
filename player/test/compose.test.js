@@ -278,3 +278,16 @@ test('a showcase has neither birthdays nor the library', () => {
     }
     assert.ok(!seen.includes('cumple') && !seen.includes('biblioteca'));
 });
+
+test('what falls due has its slide, the next page each time, one in twelve', () => {
+    const c = new Composer();
+    const deadlines = {id: 'd', type: 'deadlines', days: [{date: '2026-11-05', items: [{course: 'A', activity: 'B', kind: 'due'}]}]};
+    const seen = [];
+    for (let i = 0; i < 40; i++) {
+        seen.push(c.next([], 4, true, {deadlines, distance: 3}));
+    }
+    const plazos = seen.filter((x) => x.comp === 'plazos');
+    assert.ok(plazos.length >= 3 && plazos.length <= 4, 'deadlines: ' + plazos.length);
+    assert.equal(plazos[0].extra.page, 0);
+    assert.equal(plazos[1].extra.page, 1);
+});

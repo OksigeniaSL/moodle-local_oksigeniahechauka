@@ -34,6 +34,9 @@ class sources {
     /** @var int The most books a screen gets. */
     const BOOKS_MOST = 12;
 
+    /** @var int The most deadlines a screen gets: a screen is not the place for all of a big site's. */
+    const DEADLINES_MOST = 60;
+
     /** After this hour the screens show tomorrow's menu, as the canteen's own board does. */
     /** @var string When the day ends for the screens if the centre has not said (then «Today» shows tomorrow). */
     const DAY_END = '16:00';
@@ -162,6 +165,67 @@ class sources {
             $item['allergennames'] = $names;
         }
         return $item;
+    }
+
+    /**
+     * What falls due in the courses in the coming days, grouped by day: only what is for everyone in a visible course, and, if the
+     * centre has linked course categories, only from those.
+     *
+     * @param int $now
+     * @param int $days how far ahead
+     * @return array items of the contract
+     */
+    public static function deadlines(int $now, int $days): array {
+        global $DB;
+        $c = 'local_oksigeniahechauka';
+        $from = $now;
+        $until = usergetmidnight($now, \core_date::get_server_timezone()) + ($days + 1) * DAYSECS;
+        // The moment that matters of each kind; an exception made for a group or a person has a priority, and is not for a screen.
+        $records = $DB->get_records_sql(
+            "SELECT e.id, e.modulename, e.instance, e.timestart, c.fullname, c.category
+               FROM {event} e
+               JOIN {course} c ON c.id = e.courseid
+              WHERE ((e.modulename = 'assign' AND e.eventtype = 'due')
+                     OR (e.modulename = 'quiz' AND e.eventtype = 'close')
+                     OR (e.modulename = 'workshop' AND e.eventtype = 'closesubmission'))
+                AND e.visible = 1 AND c.visible = 1 AND e.groupid = 0 AND e.priority IS NULL
+                AND e.timestart >= :from AND e.timestart < :until
+           ORDER BY e.timestart, e.id",
+            ['from' => $from, 'until' => $until],
+            0,
+            self::DEADLINES_MOST
+        );
+        $linked = array_filter(array_column(categories::all(), 'coursecat'));
+        $system = ['context' => \context_system::instance()];
+        $byday = [];
+        foreach ($records as $record) {
+            $colour = categories::of_coursecat((int) $record->category);
+            if ($linked && !$colour) {
+                continue;
+            }
+            $name = $DB->get_field($record->modulename, 'name', ['id' => $record->instance]);
+            if ($name === false) {
+                continue;
+            }
+            $one = ['course' => items::plain(format_string($record->fullname, true, $system)),
+                'activity' => items::plain(format_string($name, true, $system)),
+                'kind' => $record->modulename === 'quiz' ? 'quiz' : 'due',
+                'time' => userdate((int) $record->timestart, '%H:%M', \core_date::get_server_timezone())];
+            if ($colour) {
+                $one['color'] = $colour;
+            }
+            $byday[schedule::day((int) $record->timestart)][] = $one;
+        }
+        if (!$byday) {
+            return [];
+        }
+        $list = [];
+        foreach ($byday as $date => $entries) {
+            $list[] = ['date' => $date, 'items' => $entries];
+        }
+        return [['id' => 'deadlines-' . schedule::day($now), 'type' => 'deadlines', 'zone' => 'extra',
+            'label' => get_string('label_deadlines', $c), 'words' => ['due' => get_string('label_deadline_due', $c),
+                'quiz' => get_string('label_deadline_quiz', $c)], 'days' => $list]];
     }
 
     /**

@@ -570,6 +570,9 @@ class Player {
                 books: liveItems(m.items || [], 'extra', wall).filter(function (it) {
                     return it.type === 'books';
                 })[0] || null,
+                deadlines: liveItems(m.items || [], 'extra', wall).filter(function (it) {
+                    return it.type === 'deadlines';
+                })[0] || null,
                 albums: albums.map(function (a) {
                     return {id: a.id, count: a.photos.length};
                 }),

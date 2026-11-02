@@ -19,6 +19,7 @@
 // muro            three to five photos of an album, one changing at a time; on a showcase, with a poster and its QR
 // cumple          whose birthday it is today, with their pictures, by pages
 // biblioteca      what has come to the library: a book at a time with its QR, the next ones on the shelf
+// plazos          what falls due in the courses in the coming days, by days and by pages
 //
 // By the distance it is read from (the art direction's 0.7.0): at 3 m, all; at 5 m, all but «semana»; at 8 m, no
 // thirds (foto-hoy is foto-sola, a landscape video is foto-completa, «Today» comes one thing at a time) and the
@@ -29,6 +30,9 @@ const BIRTHDAY_EVERY = 7;
 
 /** How many slides go by between one of the library and the next. */
 const BOOKS_EVERY = 16;
+
+/** How many slides go by between one of the deadlines and the next. */
+const DEADLINES_EVERY = 12;
 
 /** Width over height of an item's picture or video; landscape when it does not say. */
 export function ratio(item) {
@@ -172,6 +176,12 @@ export class Composer {
             this.sinceBooks = 1;
             this.bookPage = (this.bookPage === undefined ? -1 : this.bookPage) + 1;
             return pick('biblioteca', [], 15, {item: o.books, page: this.bookPage});
+        }
+        this.sinceDeadlines = (this.sinceDeadlines === undefined ? DEADLINES_EVERY / 2 : this.sinceDeadlines) + 1;
+        if (o.deadlines && this.sinceDeadlines > DEADLINES_EVERY) {
+            this.sinceDeadlines = 1;
+            this.deadlinePage = (this.deadlinePage === undefined ? -1 : this.deadlinePage) + 1;
+            return pick('plazos', [], 15, {item: o.deadlines, page: this.deadlinePage});
         }
         // At 8 m the ticker's sentences and the countdown come as slides of their own, one every four.
         if (far && this.n % 4 === 3) {

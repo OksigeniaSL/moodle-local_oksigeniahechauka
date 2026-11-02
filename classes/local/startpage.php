@@ -29,7 +29,7 @@ class startpage {
         'company' => '18:00', 'other' => '18:00'];
 
     /** @var string[] The sources that can be turned on or off here. */
-    const SOURCES = ['sourcecalendar', 'sourcenews', 'sourcemenu', 'sourcebooks'];
+    const SOURCES = ['sourcecalendar', 'sourcenews', 'sourcemenu', 'sourcebooks', 'sourcedeadlines'];
 
     /**
      * Whether to send whoever runs the screens here instead of an empty panel: only the first time, with no screen yet.
@@ -111,6 +111,13 @@ class startpage {
         }
         $rows[] = ['setting' => 'sourcebooks', 'name' => get_string('start_source_books', $c), 'available' => $hasbooks,
             'now' => $hasbooks ? self::figure('books', $books) : get_string('start_source_books_missing', $c)];
+        $list = sources::deadlines($now, (int) ($config->deadlinesdays ?? 7) ?: 7);
+        $deadlines = 0;
+        foreach ($list ? $list[0]['days'] : [] as $day) {
+            $deadlines += count($day['items']);
+        }
+        $rows[] = ['setting' => 'sourcedeadlines', 'name' => get_string('start_source_deadlines', $c), 'available' => true,
+            'now' => self::figure('deadlines', $deadlines)];
         foreach ($rows as &$row) {
             $row['checked'] = $row['available'] && !empty($config->{$row['setting']});
             $row['id'] = 'hkp-st-' . $row['setting'];

@@ -16,6 +16,7 @@
 
 namespace local_oksigeniahechauka;
 
+use local_oksigeniahechauka\local\categories;
 use local_oksigeniahechauka\local\sources;
 
 /**
@@ -80,5 +81,44 @@ final class sources_test extends \advanced_testcase {
         $this->assertArrayNotHasKey('allday', $items['Acampada']);
         $this->assertSame('2026-11-06T16:00', $items['Acampada']['end']);
         $this->assertArrayNotHasKey('allday', $items['Reunión']);
+    }
+
+    /**
+     * What falls due: assignments and quizzes of visible courses, for everyone, by days; not what is past, far off or hidden, and
+     * only from the linked categories when there are any.
+     */
+    public function test_deadlines(): void {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        $now = time();
+        $gen = $this->getDataGenerator();
+        $first = $gen->create_category(['name' => 'Primero']);
+        $second = $gen->create_category(['name' => 'Segundo']);
+        $course = $gen->create_course(['fullname' => 'Matemáticas', 'category' => $first->id]);
+        $other = $gen->create_course(['fullname' => 'Historia', 'category' => $second->id]);
+        $hidden = $gen->create_course(['fullname' => 'Oculto', 'visible' => 0, 'category' => $first->id]);
+        $gen->create_module('assign', ['course' => $course->id, 'name' => 'Problemas', 'duedate' => $now + 2 * DAYSECS]);
+        $gen->create_module('assign', ['course' => $course->id, 'name' => 'Lejana', 'duedate' => $now + 40 * DAYSECS]);
+        $gen->create_module('assign', ['course' => $course->id, 'name' => 'Pasada', 'duedate' => $now - DAYSECS]);
+        $gen->create_module('assign', ['course' => $hidden->id, 'name' => 'Escondida', 'duedate' => $now + DAYSECS]);
+        $gen->create_module('quiz', ['course' => $other->id, 'name' => 'Control', 'timeclose' => $now + 3 * DAYSECS]);
+
+        $items = sources::deadlines($now, 7);
+        $this->assertCount(1, $items);
+        $this->assertSame('deadlines', $items[0]['type']);
+        $this->assertSame('extra', $items[0]['zone']);
+        $all = array_merge(...array_column($items[0]['days'], 'items'));
+        $this->assertSame(['Problemas', 'Control'], array_column($all, 'activity'));
+        $this->assertSame(['due', 'quiz'], array_column($all, 'kind'));
+        $this->assertSame(['Matemáticas', 'Historia'], array_column($all, 'course'));
+
+        // A linked category: only that one, in its colour.
+        categories::save([['name' => 'Primero', 'coursecat' => $first->id]]);
+        $all = array_merge(...array_column(sources::deadlines($now, 7)[0]['days'], 'items'));
+        $this->assertSame(['Problemas'], array_column($all, 'activity'));
+        $this->assertSame(1, $all[0]['color']);
+
+        // Nothing falling due: no item at all, so no empty slide.
+        $this->assertSame([], sources::deadlines($now - 10 * DAYSECS, 1));
     }
 }

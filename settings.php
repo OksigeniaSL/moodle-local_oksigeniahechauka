@@ -136,6 +136,20 @@ if ($hassiteconfig) {
             PARAM_INT,
             4
         ));
+        $settings->add(new admin_setting_configcheckbox(
+            "$p/sourcedeadlines",
+            get_string('sourcedeadlines', $p),
+            get_string('sourcedeadlines_desc', $p),
+            0
+        ));
+        $settings->add(new admin_setting_configtext(
+            "$p/deadlinesdays",
+            get_string('deadlinesdays', $p),
+            get_string('deadlinesdays_desc', $p),
+            7,
+            PARAM_INT,
+            4
+        ));
         $settings->add(new admin_setting_configcheckbox("$p/sourcecalendar", get_string('sourcecalendar', $p), '', 1));
         $settings->add(new admin_setting_configcheckbox("$p/sourcenews", get_string('sourcenews', $p), '', 1));
         $settings->add(new admin_setting_configtext("$p/newsdays", get_string('newsdays', $p), '', 7, PARAM_INT, 4));

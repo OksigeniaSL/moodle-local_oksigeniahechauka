@@ -267,6 +267,9 @@ class manifest {
         if (!empty($config->sourcebooks)) {
             $items = array_merge($items, sources::books($now, (int) ($config->booksdays ?? 14) ?: 14));
         }
+        if (!empty($config->sourcedeadlines)) {
+            $items = array_merge($items, sources::deadlines($now, (int) ($config->deadlinesdays ?? 7) ?: 7));
+        }
         return array_merge($items, birthdays::items($config, $now));
     }
 }
