@@ -5,7 +5,7 @@
 
 import {ratio, shapeOf} from './compose.js';
 import {buildWeatherThird} from './today.js';
-import {MARK, buildLead, buildRest, fitAlso, fitHeadline, fitWord, leadOfTurn, leadsOf, linesOf, paginateRest, showRestPage, turnFixed, weekHeadline} from './lead.js';
+import {MARK, buildLead, buildRest, fitAlso, fitHeadline, fitWord, leadOfTurn, leadsOf, linesOf, paginateRest, showRestPage, turnFixed, weekHeadline, wordsCramped} from './lead.js';
 import {buildBirthdays, fitBirthdays} from './cumple.js';
 import {buildBooks, fitBooks} from './biblioteca.js';
 import {qrPath, shortWeb} from './qr.js';
@@ -277,15 +277,7 @@ export class Screen {
             if (self.lettersFamily !== family) {
                 return;
             }
-            self.fitHeaders();
-            if (self.tickerTexts && self.tickerTexts.length) {
-                self.phrasesStale = true;
-                if (self.tickerTrack.offsetWidth) {
-                    clearTimeout(self.phraseTimer);
-                    self.phraseAt = 0;
-                    self.nextPhrase();
-                }
-            }
+            self.remeasureFixed();
             if (self.layer) {
                 self.fitStrip(self.layer);
                 self.adjustLayer(self.layer);
@@ -806,8 +798,10 @@ export class Screen {
         this.bandLine.appendChild(document.createTextNode(n.title));
         const line = this.bandLine;
         const band = this.ticker;
+        // It does not wrap, so only its width can overflow. Its height says nothing: a tight line leaves the letter's own
+        // box sticking out of it, on any notice, and the band would go to two lines with one to say.
         const over = function () {
-            return line.scrollWidth > line.clientWidth + 1 || line.scrollHeight > line.clientHeight + 1;
+            return line.scrollWidth > line.clientWidth + 1;
         };
         // Its second line, if it fits; then, the title in two lines. It stays still, so it never comes in pieces.
         line.classList.remove('hk-solo-titulo');
@@ -921,13 +915,32 @@ export class Screen {
             // Measured on what holds the words: a bubble's tail hangs out of the lead on purpose.
             const words = lead.querySelector('.hk-lider-cuerpo') || lead;
             fitAlso(lead);
-            fitHeadline(lead, t, comp === 'vertical-hoy' && vertical ? 2 : 3, function () {
-                return words.scrollHeight > words.clientHeight + 1 || t.scrollWidth > t.clientWidth + 1;
-            });
+            const fit = function () {
+                fitHeadline(lead, t, comp === 'vertical-hoy' && vertical ? 2 : 3, function () {
+                    return words.scrollHeight > words.clientHeight + 1 || t.scrollWidth > t.clientWidth + 1;
+                });
+            };
+            fit();
+            // The icon gives way before the words: what it says, the title says better.
+            const stamp = lead.querySelector('.hk-lider-sello');
+            if (stamp && stamp.offsetWidth && wordsCramped(lead, t)) {
+                lead.classList.remove('hk-lider-corto');
+                lead.classList.add('hk-lider-sin-sello');
+                fit();
+            }
             even(t);
             const second = lead.querySelector('.hk-lider-entrada');
             if (second) {
                 even(second);
+            }
+            // The board's height depends on the screen and on what shares the body: the figure never taller than its flap.
+            const flaps = lead.querySelectorAll('.hk-paleta');
+            for (let i = 0; i < flaps.length; i++) {
+                flaps[i].style.fontSize = '';
+                const most = flaps[i].clientHeight * 1.02;
+                if (most > 0 && parseFloat(getComputedStyle(flaps[i]).fontSize) > most) {
+                    flaps[i].style.fontSize = Math.floor(most) + 'px';
+                }
             }
         }
         this.fitCaptions(c, comp);
@@ -1320,6 +1333,7 @@ export class Screen {
         // Where neither the third nor the lead shows the important notice, the ticker does.
         const lead = layer.querySelector('.hk-lider-importante');
         this.importantBand(layer.querySelector('.hk-resto') || lead ? null : this.pendingBand);
+        this.refreshPhrases();
         this.fitStrip(layer);
         if (layer.hkWeek) {
             fitWeek(layer.hkWeek, this.horizontal);
@@ -1335,6 +1349,7 @@ export class Screen {
         if (document.fonts && document.fonts.status === 'loading') {
             const self = this;
             document.fonts.ready.then(function () {
+                self.remeasureFixed();
                 if (self.layer === layer) {
                     self.fitStrip(layer);
                     if (layer.hkWeek) {
@@ -1510,6 +1525,36 @@ export class Screen {
         });
         clear(this.tickerCount);
         return out;
+    }
+
+    /** The letters have arrived, wider as a rule: what stays on the screen is measured again with them. */
+    remeasureFixed() {
+        this.fitHeaders();
+        if (this.ticker.classList.contains('hk-cinta-importante')) {
+            this.bandKey = null;
+            this.importantBand(this.pendingBand);
+        }
+        if (this.tickerTexts && this.tickerTexts.length) {
+            this.phrasesStale = true;
+            this.refreshPhrases();
+        }
+    }
+
+    /**
+     * The ticker has its size back (under the important notice or a full-screen slide it has none): the sentences measured
+     * without it are measured again, and the one on show goes at once, or it would stay cut until the next one comes.
+     */
+    refreshPhrases() {
+        if (!this.phrasesStale || !this.tickerTrack.offsetWidth || !this.tickerTexts || !this.tickerTexts.length) {
+            return;
+        }
+        clearTimeout(this.phraseTimer);
+        if (this.phraseNode && this.phraseNode.parentNode) {
+            this.phraseNode.parentNode.removeChild(this.phraseNode);
+        }
+        this.phraseNode = null;
+        this.phraseAt = 0;
+        this.nextPhrase();
     }
 
     nextPhrase() {

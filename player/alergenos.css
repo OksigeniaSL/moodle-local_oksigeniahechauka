@@ -29,15 +29,15 @@
     font-weight: 800;
     line-height: 1;
 }
+/* They go together: if they do not fit after the dish, all of them under it, never one on its own */
 .hk .hk-plato-alergenos {
     --hk-alergeno: var(--hk-t-min);
-    display: inline;
+    display: inline-flex;
     margin-left: .3em;
+    vertical-align: -.12em;
 }
 .hk .hk-plato-alergenos .hk-alergeno {
-    display: inline-block;
-    margin: 0 .1em -.12em 0;
-    vertical-align: baseline;
+    margin: 0 .1em 0 0;
 }
 .hk .hk-lider-plato .hk-plato-texto {
     flex: 1 1 0px;
@@ -94,6 +94,7 @@
     margin-right: 4.4rem;
 }
 .hk-vertical .hk-lider-sello,
-.hk[data-distancia="8"] .hk-lider-sello {
+.hk[data-distancia="8"] .hk-lider-sello,
+.hk .hk-lider.hk-lider-sin-sello .hk-lider-sello {
     display: none;
 }

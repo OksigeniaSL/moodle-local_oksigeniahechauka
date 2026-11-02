@@ -4,7 +4,7 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {birthdaysPages, birthdaysPerPage, initialsOf} from '../src/cumple.js';
 import {booksPages} from '../src/biblioteca.js';
-import {allergensOf, menuParts} from '../src/lead.js';
+import {allergensOf, menuParts, wordsCramped} from '../src/lead.js';
 
 test('how many birthdays fit, by the distance; pages for up to thirty people', () => {
     assert.equal(birthdaysPerPage(3, true), 9);
@@ -35,4 +35,13 @@ test('allergens: those of its dishes, once; none is nothing, never «without all
         {label: 'Segundo', dishes: ['Merluza'], allergens: [['fish']]}]});
     assert.deepEqual(parts.mainAllergens, ['fish']);
     assert.deepEqual(parts.others[0].allergens, ['celery']);
+});
+
+test('an icon gives way when the words have paid for it, not before', () => {
+    const lead = (cls, step) => ({classList: {contains: (c) => c === cls}, getAttribute: () => String(step), querySelector: () => null});
+    assert.equal(wordsCramped(lead('', 0), {style: {}}), false);
+    assert.equal(wordsCramped(lead('', 2), {style: {}}), false);
+    assert.equal(wordsCramped(lead('', 3), {style: {}}), true);
+    assert.equal(wordsCramped(lead('hk-lider-corto', 0), {style: {}}), true);
+    assert.equal(wordsCramped(lead('', 0), {style: {fontSize: '40px'}}), true);
 });

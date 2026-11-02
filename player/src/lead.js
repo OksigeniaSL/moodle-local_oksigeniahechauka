@@ -715,6 +715,20 @@ export function fitWord(headline) {
 }
 
 /**
+ * Whether a lead's words have paid for what sits beside them: its title on its last step or under it, its second line
+ * gone, or its label broken in two.
+ *
+ * @param {HTMLElement} lead
+ * @param {HTMLElement} headline
+ * @returns {boolean}
+ */
+export function wordsCramped(lead, headline) {
+    const label = lead.querySelector('.hk-lider-etiqueta');
+    return lead.classList.contains('hk-lider-corto') || !!headline.style.fontSize ||
+        Number(lead.getAttribute('data-ajuste')) >= 3 || !!(label && linesOf(label) > 1);
+}
+
+/**
  * A headline in steps (data-ajuste 0 to 3 on its box: 100, 88, 76 and 64 % of --hk-t-titular; the sheets keep the last
  * over the distance's minimum title) until it takes no more than maxLines and its box does not overflow. If even the
  * last step does not fit, the box loses its second line (box.hkShort, the class) and tries again.

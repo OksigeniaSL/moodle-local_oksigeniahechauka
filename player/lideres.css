@@ -268,8 +268,28 @@
     width: calc(var(--hk-t-titular) * 2.2);
     font-size: calc(var(--hk-t-titular) * 2.7);
 }
+/* behind glass at 5 m the letter is larger and the card is not: a narrower board, so the name and its date stay */
+.hk.hk-horizontal[data-distancia="5"][data-cristal] .hk-paleta:only-child {
+    width: calc(var(--hk-t-titular) * 2.1);
+    font-size: calc(var(--hk-t-titular) * 2.4);
+}
+/* on a wide screen from 5 m, narrower still: two boards of that width would leave the name no room beside them */
+.hk.hk-horizontal[data-distancia="5"] .hk-paleta:first-child:not(:last-child),
+.hk.hk-horizontal[data-distancia="5"] .hk-paleta:last-child:not(:first-child) {
+    width: calc(var(--hk-t-titular) * 1.5);
+    font-size: calc(var(--hk-t-titular) * 1.75);
+}
 .hk-lider[data-tipo="cuenta"] .hk-lider-titular {
     font-size: var(--hk-t-titular);
+}
+.hk .hk-lider[data-tipo="cuenta"][data-ajuste="1"] .hk-lider-titular {
+    font-size: calc(var(--hk-t-titular) * .88);
+}
+.hk .hk-lider[data-tipo="cuenta"][data-ajuste="2"] .hk-lider-titular {
+    font-size: calc(var(--hk-t-titular) * .76);
+}
+.hk .hk-lider[data-tipo="cuenta"][data-ajuste="3"] .hk-lider-titular {
+    font-size: calc(var(--hk-t-titular) * .64);
 }
 .hk-lider[data-tipo="cuenta"] .hk-lider-etiqueta {
     color: var(--hk-texto-suave);
@@ -278,6 +298,9 @@
     letter-spacing: 0;
     line-height: 1.1;
     text-transform: none;
+}
+.hk .hk-lider[data-tipo="cuenta"] .hk-lider-entrada {
+    font-size: var(--hk-t-lista);          /* under the name of what is coming, and in one line beside the board */
 }
 
 /* --- A holiday: the sheet of a tear-off calendar -------------------------------------------------------------- */
@@ -413,6 +436,25 @@
 .hk[data-distancia="5"] .hk-lider[data-tipo="festivo"] .hk-lider-titular,
 .hk[data-distancia="8"] .hk-lider[data-tipo="cuenta"] .hk-lider-titular,
 .hk[data-distancia="8"] .hk-lider[data-tipo="festivo"] .hk-lider-titular {
+    font-size: calc(var(--hk-t-titular) * .76);
+}
+/* and the fit's steps go on from there, down to the distance's minimum title */
+.hk[data-distancia="5"] .hk-lider[data-tipo="cuenta"][data-ajuste="1"] .hk-lider-titular,
+.hk[data-distancia="5"] .hk-lider[data-tipo="festivo"][data-ajuste="1"] .hk-lider-titular {
+    font-size: calc(var(--hk-t-titular) * .68);
+}
+.hk[data-distancia="5"] .hk-lider[data-tipo="cuenta"][data-ajuste="2"] .hk-lider-titular,
+.hk[data-distancia="5"] .hk-lider[data-tipo="festivo"][data-ajuste="2"] .hk-lider-titular {
+    font-size: calc(var(--hk-t-titular) * .64);
+}
+.hk[data-distancia="5"] .hk-lider[data-tipo="cuenta"][data-ajuste="3"] .hk-lider-titular,
+.hk[data-distancia="5"] .hk-lider[data-tipo="festivo"][data-ajuste="3"] .hk-lider-titular,
+.hk[data-distancia="8"] .hk-lider[data-tipo="cuenta"][data-ajuste] .hk-lider-titular,
+.hk[data-distancia="8"] .hk-lider[data-tipo="festivo"][data-ajuste] .hk-lider-titular {
+    font-size: var(--hk-t-titulo-min);
+}
+.hk[data-distancia="8"] .hk-lider[data-tipo="cuenta"][data-ajuste="0"] .hk-lider-titular,
+.hk[data-distancia="8"] .hk-lider[data-tipo="festivo"][data-ajuste="0"] .hk-lider-titular {
     font-size: calc(var(--hk-t-titular) * .76);
 }
 .hk[data-distancia="5"] .hk-cuerpo[data-composicion="solo-hoy"] .hk-senal,
@@ -676,6 +718,14 @@
 .hk.hk-con-importante[data-distancia="8"] .hk-completa .hk-pie {
     bottom: 12rem;
 }
+/* A title in two lines at the band's smaller letter: as high as it needs, from the same 12 rem */
+.hk.hk[data-distancia="8"] > .hk-cinta.hk-cinta-importante[data-lineas="2"] {
+    min-height: 12rem;
+}
+/* The band goes to the bottom edge, as the ticker does: the margin of a body with nothing under it is not for it */
+.hk.hk-con-importante[data-distancia="8"]:not([data-zona-segura]) {
+    padding-bottom: 0;
+}
 /* With the band the body is lower: captions and the countdown's slide give up some air, not their words */
 .hk.hk-con-importante[data-distancia="8"] .hk-cuerpo .hk-pie {
     padding-top: 6rem;
@@ -688,7 +738,7 @@
     margin-bottom: 2rem;
 }
 .hk.hk-con-importante[data-distancia="8"] .hk-tipografica-cuenta b {
-    font-size: calc(var(--hk-t-titular) * 1.7);
+    font-size: calc(var(--hk-t-titular) * 1.4);    /* the figure gives way, and the name of what is coming stays over its date */
 }
 .hk.hk-con-importante[data-distancia="8"] .hk-tipografica-pie {
     margin-top: 1.6rem;
