@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<!-- A screen: one window, no decorations, no gaps, no menus and no shortcuts. -->
+<labwc_config>
+  <core>
+    <decoration>server</decoration>
+    <gap>0</gap>
+  </core>
+  <keyboard>
+  </keyboard>
+  <mouse>
+  </mouse>
+  <windowRules>
+    <windowRule identifier="hechauka" serverDecoration="no" skipTaskbar="yes" />
+  </windowRules>
+</labwc_config>

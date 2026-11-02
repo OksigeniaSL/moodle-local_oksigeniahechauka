@@ -374,6 +374,7 @@ class screens {
                 'throttled' => $text($device['throttled'] ?? null, 12),
                 'restarts_24h' => $int($device['restarts_24h'] ?? null),
                 'last_reboot' => $text($device['last_reboot'] ?? null, 80),
+                'software' => $text($device['software'] ?? null, 16),
             ], function ($v) {
                 return $v !== null;
             });

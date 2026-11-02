@@ -1,0 +1,8 @@
+[Plymouth Theme]
+Name=hechauka
+Description=Oksigenia Hechauka
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/hechauka
+ScriptFile=/usr/share/plymouth/themes/hechauka/hechauka.script

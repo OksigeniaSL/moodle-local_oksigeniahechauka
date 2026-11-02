@@ -1,0 +1,9 @@
+#!/bin/bash
+# One line a minute for the test of a device: temperature, throttling (vcgencmd get_throttled: 0x0 is fine), load,
+# free memory and what Chromium takes. In /var/log/hechauka-mide.log.
+T=$(vcgencmd measure_temp 2>/dev/null | cut -d= -f2)
+F=$(vcgencmd get_throttled 2>/dev/null | cut -d= -f2)
+C=$(ps -C chromium -o rss= 2>/dev/null | awk '{s+=$1} END {printf "%d", s/1024}')
+M=$(awk '/MemAvailable/ {printf "%d", $2/1024}' /proc/meminfo)
+echo "$(date '+%F %T') temp=$T throttled=$F load=$(cut -d' ' -f1-3 /proc/loadavg | tr ' ' ,) free=${M}MB chromium=${C}MB" \
+    >> /var/log/hechauka-mide.log

@@ -1,0 +1,250 @@
+{
+ "files": [
+  {
+   "mode": "644",
+   "path": "/etc/chromium/policies/managed/hechauka.json",
+   "sha256": "ea36ca044d50ea5f16917ab17732ce7b83b1cef32855418cbc597243d78fe992"
+  },
+  {
+   "mode": "644",
+   "path": "/etc/hechauka/firma.pub",
+   "sha256": "9ccfc0737aa466278457c3b5ebe3868f5cea14201431cdff43cc94740ee50a75"
+  },
+  {
+   "mode": "644",
+   "path": "/etc/hechauka/labwc/autostart",
+   "sha256": "420c3da9dcbf70fbdde69516e7aa13741bb3a71015f3bbb47fb596a536ed0a57"
+  },
+  {
+   "mode": "644",
+   "path": "/etc/hechauka/labwc/environment",
+   "sha256": "7d8e9cd702b4715e034227a4dd2974ac6708d13f6f047e6f6c790e2e9315af68"
+  },
+  {
+   "mode": "644",
+   "path": "/etc/hechauka/labwc/rc.xml",
+   "sha256": "fb53082408fe401177e5ef341ccb6ca841425f9c9103b38a878b24459df49710"
+  },
+  {
+   "mode": "644",
+   "path": "/etc/ssh/sshd_config.d/hechauka.conf",
+   "sha256": "302469d74db9bc33783e62981196be773273c8c2ec2f5397ef23ed44a89aa028"
+  },
+  {
+   "mode": "644",
+   "path": "/etc/sysctl.d/90-hechauka-panico.conf",
+   "sha256": "1ef794331acf83e7a19019304981ea11eedb22d5d6551211a15965f65e7f66d6"
+  },
+  {
+   "mode": "644",
+   "path": "/etc/systemd/journald.conf.d/90-hechauka-registro.conf",
+   "sha256": "9ba304a384e751b68b08a04a31110db75be590327506c418aa8b9e16124f06b5"
+  },
+  {
+   "mode": "644",
+   "path": "/etc/systemd/system/hechauka-guardian.service",
+   "sha256": "e224c0be3bca071f30e22c53a1cd1fb05c28fed59449cd1ecaf00d8b93ab67fa"
+  },
+  {
+   "mode": "644",
+   "path": "/etc/systemd/system/hechauka-mide.service",
+   "sha256": "e0932b615aff6177f483779afb735ddb4147e2dcad9e5555b20a46891eaa82a4"
+  },
+  {
+   "mode": "644",
+   "path": "/etc/systemd/system/hechauka-mide.timer",
+   "sha256": "97deabf4101746111dbb0464fa3c32480607f0dae86f86f80fd85a86dba4544d"
+  },
+  {
+   "mode": "644",
+   "path": "/etc/systemd/system/hechauka-reinicio.service",
+   "sha256": "f3b79a4fd34f0121c46a0248d61da39d86bfecc1bc5dd058a5aedae8247a8d90"
+  },
+  {
+   "mode": "644",
+   "path": "/etc/systemd/system/hechauka-reinicio.timer",
+   "sha256": "ba4758fc435720a899f61069f0c8b8347869ee027f58dc8c587e69c0e67ff588"
+  },
+  {
+   "mode": "644",
+   "path": "/etc/tmpfiles.d/hechauka.conf",
+   "sha256": "e732b78020d31519c347a2e32c5a7171a35453bbb830f870d64dde5152d2e6ee"
+  },
+  {
+   "mode": "755",
+   "path": "/usr/local/bin/hechauka-mide",
+   "sha256": "a53e977b1cdae45b2550aec047ade575f28ac98bf13d5befc98d5bd22378277c"
+  },
+  {
+   "mode": "755",
+   "path": "/usr/local/bin/hechauka-pantalla",
+   "sha256": "8da2b6336685d69e0303afa2643c7e06fc8a4e6c82ecbebb08c9d784b1a83582"
+  },
+  {
+   "mode": "755",
+   "path": "/usr/local/bin/hechauka-sesion",
+   "sha256": "4f0ae2d358eeaf2c7ae0d908370a550a26bd585fa64293942f98c7b07f1ba532"
+  },
+  {
+   "mode": "755",
+   "path": "/usr/local/lib/hechauka/actualiza.py",
+   "sha256": "2453a48137dd87b347e9246d8900eb78a461b7094e3b7d2df21a194c5c103ccb"
+  },
+  {
+   "mode": "755",
+   "path": "/usr/local/lib/hechauka/agente.py",
+   "sha256": "a1c69b8d9e19bce921a9a66cdbbf9f2cd995f9c4a411f3ee7b76bbc2ed2c2b2e"
+  },
+  {
+   "mode": "755",
+   "path": "/usr/local/lib/hechauka/guardian.py",
+   "sha256": "a1d93534a03520de89afeef8b66f81481247daa5c6caf749a0b0db003e9e64cc"
+  },
+  {
+   "mode": "644",
+   "path": "/usr/share/hechauka/preparando.png",
+   "sha256": "61811c9daad76d637232a9c305675826ccca4ac097a50de5d5c5dec8c55c93d3"
+  },
+  {
+   "mode": "644",
+   "path": "/usr/share/plymouth/themes/hechauka/animation-0001.png",
+   "sha256": "ed630ab137e3de2353d6b856620d28c6d41d45f5ee0fe5f4fd85cd9c78b23893"
+  },
+  {
+   "mode": "644",
+   "path": "/usr/share/plymouth/themes/hechauka/animation-0002.png",
+   "sha256": "2c86d03661d37aba60cb5b07f7d9fd1594d1f0fcdb43b57cf8772a0ea27b9723"
+  },
+  {
+   "mode": "644",
+   "path": "/usr/share/plymouth/themes/hechauka/animation-0003.png",
+   "sha256": "a2c3c7631fd74658141c19816544844a9b0e91fefe8fcf9aba1877ac7a1994dd"
+  },
+  {
+   "mode": "644",
+   "path": "/usr/share/plymouth/themes/hechauka/animation-0004.png",
+   "sha256": "25e405af5bd7e36f7b686e297b29a6b48349549845a62a555389b047d43bbe4d"
+  },
+  {
+   "mode": "644",
+   "path": "/usr/share/plymouth/themes/hechauka/animation-0005.png",
+   "sha256": "05a48ad49ad8a7747fffa5a71f34a2a7f14902adba47ba44ac7c88d329962b88"
+  },
+  {
+   "mode": "644",
+   "path": "/usr/share/plymouth/themes/hechauka/animation-0006.png",
+   "sha256": "4589ac1e073bb543770e89f84ce975a44c48850c436c140e69e33591ec2433fd"
+  },
+  {
+   "mode": "644",
+   "path": "/usr/share/plymouth/themes/hechauka/animation-0007.png",
+   "sha256": "28a10e428f70e83ae9d69809042cefdd3d118c08928a5abd5805c2d39620982a"
+  },
+  {
+   "mode": "644",
+   "path": "/usr/share/plymouth/themes/hechauka/animation-0008.png",
+   "sha256": "2b83674b74eb686adeac9a78f07aa04e8ce4e7c6d4c18a5ac02b70b9caddb355"
+  },
+  {
+   "mode": "644",
+   "path": "/usr/share/plymouth/themes/hechauka/animation-0009.png",
+   "sha256": "2b83674b74eb686adeac9a78f07aa04e8ce4e7c6d4c18a5ac02b70b9caddb355"
+  },
+  {
+   "mode": "644",
+   "path": "/usr/share/plymouth/themes/hechauka/animation-0010.png",
+   "sha256": "2b83674b74eb686adeac9a78f07aa04e8ce4e7c6d4c18a5ac02b70b9caddb355"
+  },
+  {
+   "mode": "644",
+   "path": "/usr/share/plymouth/themes/hechauka/animation-0011.png",
+   "sha256": "2b83674b74eb686adeac9a78f07aa04e8ce4e7c6d4c18a5ac02b70b9caddb355"
+  },
+  {
+   "mode": "644",
+   "path": "/usr/share/plymouth/themes/hechauka/animation-0012.png",
+   "sha256": "2b83674b74eb686adeac9a78f07aa04e8ce4e7c6d4c18a5ac02b70b9caddb355"
+  },
+  {
+   "mode": "644",
+   "path": "/usr/share/plymouth/themes/hechauka/animation-0013.png",
+   "sha256": "2b83674b74eb686adeac9a78f07aa04e8ce4e7c6d4c18a5ac02b70b9caddb355"
+  },
+  {
+   "mode": "644",
+   "path": "/usr/share/plymouth/themes/hechauka/animation-0014.png",
+   "sha256": "2b83674b74eb686adeac9a78f07aa04e8ce4e7c6d4c18a5ac02b70b9caddb355"
+  },
+  {
+   "mode": "644",
+   "path": "/usr/share/plymouth/themes/hechauka/animation-0015.png",
+   "sha256": "2b83674b74eb686adeac9a78f07aa04e8ce4e7c6d4c18a5ac02b70b9caddb355"
+  },
+  {
+   "mode": "644",
+   "path": "/usr/share/plymouth/themes/hechauka/animation-0016.png",
+   "sha256": "2b83674b74eb686adeac9a78f07aa04e8ce4e7c6d4c18a5ac02b70b9caddb355"
+  },
+  {
+   "mode": "644",
+   "path": "/usr/share/plymouth/themes/hechauka/animation-0017.png",
+   "sha256": "babccada8295ce2dde57687893698566d273ffc9f1a15a0f436d4919b3064330"
+  },
+  {
+   "mode": "644",
+   "path": "/usr/share/plymouth/themes/hechauka/animation-0018.png",
+   "sha256": "dadfb6de9dc5e5487d9bf80b5d6f38b053a220af1acce4660a8923716f575f04"
+  },
+  {
+   "mode": "644",
+   "path": "/usr/share/plymouth/themes/hechauka/animation-0019.png",
+   "sha256": "0f5a9cb514100d7149257052549c3b81f5775b53e32e7869e6de99da9d955d98"
+  },
+  {
+   "mode": "644",
+   "path": "/usr/share/plymouth/themes/hechauka/animation-0020.png",
+   "sha256": "66894a9de1fa42ea5b445bdb08741e11ce8b2a750205b993f1dced5c7ccce1cf"
+  },
+  {
+   "mode": "644",
+   "path": "/usr/share/plymouth/themes/hechauka/animation-0021.png",
+   "sha256": "14cbf73483fa2f250efe420aff3c39b13135049d77b613d27a2c848f38d09f59"
+  },
+  {
+   "mode": "644",
+   "path": "/usr/share/plymouth/themes/hechauka/animation-0022.png",
+   "sha256": "a558b581ce03455e58e643ea8a308fc897e9edf7c031f2c1a890cbedbfe27372"
+  },
+  {
+   "mode": "644",
+   "path": "/usr/share/plymouth/themes/hechauka/animation-0023.png",
+   "sha256": "ed630ab137e3de2353d6b856620d28c6d41d45f5ee0fe5f4fd85cd9c78b23893"
+  },
+  {
+   "mode": "644",
+   "path": "/usr/share/plymouth/themes/hechauka/animation-0024.png",
+   "sha256": "ed630ab137e3de2353d6b856620d28c6d41d45f5ee0fe5f4fd85cd9c78b23893"
+  },
+  {
+   "mode": "644",
+   "path": "/usr/share/plymouth/themes/hechauka/hechauka.plymouth",
+   "sha256": "2cfaa13b13b40ad6613b9b9b8243f52ca5a3882d282fb3f7df3375a0c6125c32"
+  },
+  {
+   "mode": "644",
+   "path": "/usr/share/plymouth/themes/hechauka/hechauka.script",
+   "sha256": "efb11413d6b675514d350911a3acc940474fea68d5ad556114479ce58fef5c88"
+  },
+  {
+   "mode": "644",
+   "path": "/usr/share/plymouth/themes/hechauka/palabra.png",
+   "sha256": "42d29a37897df2d7a625d347a287de82ce159d3870fa2be12ead119c40cb8cbf"
+  },
+  {
+   "mode": "644",
+   "path": "/usr/share/wayland-sessions/hechauka.desktop",
+   "sha256": "2a75bc7fb95c0cf402ac330202224deec3f0bb6f68c08dc41b6de60c5cad047e"
+  }
+ ],
+ "version": "dcdb72c04b320e9c"
+}

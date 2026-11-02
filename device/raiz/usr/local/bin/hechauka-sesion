@@ -1,0 +1,10 @@
+#!/bin/bash
+# The screen session: labwc with our configuration (/etc/hechauka/labwc), without the Raspberry desktop or its bar. The
+# same environment as labwc-pi (software rendering on the boards that need it, like the Pi 3).
+. /usr/bin/setup_env
+if raspi-config nonint is_pi; then
+    export WLR_DRM_FORCE_LIBLIFTOFF=1
+    raspi-config nonint gpu_has_mmu || export WLR_RENDERER=pixman
+fi
+mkdir -p "$HOME/.cache/hechauka"
+exec /usr/bin/labwc -C /etc/hechauka/labwc >> "$HOME/.cache/hechauka/labwc.log" 2>&1

@@ -1,0 +1,5 @@
+[Desktop Entry]
+Type=Application
+Name=Hechauka
+Comment=The screen: the Hechauka player at full screen
+Exec=/usr/local/bin/hechauka-sesion

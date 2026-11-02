@@ -1,0 +1,6 @@
+[Unit]
+Description=Hechauka: measurements of the device
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/hechauka-mide

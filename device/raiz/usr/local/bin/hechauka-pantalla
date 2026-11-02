@@ -1,0 +1,9 @@
+#!/bin/bash
+# The screen: the agent, which runs Chromium at full screen on the Hechauka player and looks after it. Unlike the board of a
+# classroom, the profile is kept: it holds the key of the screen and the media it shows without a network.
+. /etc/hechauka/pantalla.conf
+export HK_URL="$URL"
+mkdir -p "$HOME/.cache/hechauka"
+# A screen has no mouse, and labwc leaves the pointer in the middle.
+(sleep 4; wlrctl pointer move 10000 10000) >/dev/null 2>&1 &
+exec /usr/bin/python3 -B /usr/local/lib/hechauka/agente.py

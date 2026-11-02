@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.9.0
+
+- **The screen's own device keeps itself up to date from its Moodle.** Its software (`device/`) is now part of the plugin: the guardian of each Raspberry Pi asks for it twice a day, installs only what Oksigenia signed, waits for the screen to be off by its hours, and undoes it by itself if the agent gives no sign of life. Installing a new version of the plugin updates the devices of all its screens. See `device/README.md`.
+- The heartbeat says the version of the device's software.
+
 ## 0.8.9
 
 - **What deletes asks first, and its buttons say what they do**: deleting content, a screen or a group, taking the example out, taking someone off the birthdays list and a site that stops being one. Never «OK» or «Cancel».

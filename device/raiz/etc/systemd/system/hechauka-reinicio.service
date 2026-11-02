@@ -1,0 +1,6 @@
+[Unit]
+Description=Hechauka: the reboot of each night, if it has been on for more than 20 hours
+
+[Service]
+Type=oneshot
+ExecStart=/bin/sh -c 'if [ "$(cut -d. -f1 /proc/uptime)" -gt 72000 ]; then systemctl reboot; fi'
