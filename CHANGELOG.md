@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.8.1 (2026-11-02)
+
+- **«Empezar»**: the setting up on one page, with the screen beside it, the first time whoever runs the screens opens the panel: what kind of centre it is, its look, what
+  comes by itself with the figures there are right now, where it is and its first screen. The panel then says what is still missing, until it is done.
+- The sources can be turned on and off from the panel too, without going to the administration.
+- A long address under a QR says only where it goes.
+- The page of the birthdays no longer shows two stray characters at its top.
+
 ## 0.8.0 (2026-11-02)
 
 - **Birthdays**, off until a centre turns them on: from a date field of the Moodle profile, from a list kept in the panel, or both, with the name, the group and the

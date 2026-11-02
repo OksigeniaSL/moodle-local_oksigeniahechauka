@@ -44,34 +44,7 @@
             <section class="hkp-fs" aria-labelledby="hkp-loc-h">
                 <h2 id="hkp-loc-h" class="hkp-label hkp-section-label">{{#str}}centre_where, local_oksigeniahechauka{{/str}}</h2>
                 <p class="hkp-hint hkp-section-hint">{{#str}}centre_where_help, local_oksigeniahechauka{{/str}}</p>
-                {{#searched}}<form method="post" action="{{action}}" id="hkp-pick-form"><input type="hidden" name="sesskey" value="{{sesskey}}"><input type="hidden" name="results" value="{{resultsjson}}"></form>{{/searched}}
-                <form method="get" action="{{action}}" class="hkp-find" role="search">
-                    <div class="hkp-search">{{{icons.search}}}<input class="form-control is-big" id="hkp-q" name="q" value="{{query}}" aria-label="{{#str}}centre_search_label, local_oksigeniahechauka{{/str}}" autocomplete="off" spellcheck="false"{{#hasresults}} aria-controls="hkp-places" aria-expanded="true"{{/hasresults}}>
-                        {{#searched}}
-                        <ul class="hkp-listbox" id="hkp-places" aria-label="{{#str}}centre_found, local_oksigeniahechauka{{/str}}">
-                            {{#results}}<li><button type="submit" form="hkp-pick-form" name="pick" value="{{i}}" class="hkp-pick">{{{icons.pin}}}<span>{{before}}<mark>{{mark}}</mark>{{after}}<small>{{detail}}</small></span></button></li>{{/results}}
-                            <li aria-disabled="true" class="hkp-nofind"><small>{{^hasresults}}{{#str}}centre_none, local_oksigeniahechauka{{/str}} {{/hasresults}}{{#str}}centre_tip, local_oksigeniahechauka{{/str}}</small></li>
-                        </ul>
-                        {{/searched}}
-                    </div>
-                    <button type="submit" class="btn btn-outline-secondary">{{#str}}search{{/str}}</button>
-                </form>
-                {{#place}}
-                <div class="hkp-place" aria-live="polite">
-                    <span class="hkp-map"><svg viewBox="0 0 320 200" role="img" aria-label="{{#str}}centre_map, local_oksigeniahechauka, {{name}}{{/str}}"><rect class="sea" width="320" height="200"/><path class="grid" d="{{map.grid}}"/><path class="land" d="{{map.land}}"/><path class="grid-over" d="{{map.grid}}"/><circle class="ring" cx="160" cy="100" r="13"/><circle class="pin" cx="160" cy="100" r="5.5"/><path class="scale" d="M10 188h{{map.km100}}M10 185v6"/></svg><span class="hkp-map-scale">100 km</span></span>
-                    <div>
-                        <h3>{{name}}</h3>
-                        <p class="hkp-place-where">{{where}}</p>
-                        <p class="hkp-place-coords">{{coords}}</p>
-                        <div class="hkp-foot"><a class="btn btn-sm btn-outline-secondary" href="{{osm}}" target="_blank" rel="noopener">{{{icons.out}}}{{#str}}centre_onmap, local_oksigeniahechauka{{/str}}<span class="visually-hidden sr-only"> {{#str}}centre_newtab, local_oksigeniahechauka{{/str}}</span></a><a class="btn btn-sm btn-outline-secondary" href="#hkp-q" data-hkp-focus="hkp-q">{{#str}}compose_change, local_oksigeniahechauka{{/str}}</a></div>
-                    </div>
-                    <div class="hkp-place-check">
-                        {{#weather}}<div class="hkp-weather"><span class="hkp-weather-icon" aria-hidden="true" data-hk-sky="{{symbol}}"></span><span class="hkp-weather-deg">{{temp}}°</span><span class="hkp-weather-ext">{{max}}°<span>{{min}}°</span></span><span class="hkp-weather-sky">{{text}}<small>{{#str}}centre_now, local_oksigeniahechauka{{/str}}</small></span></div>{{/weather}}
-                        {{^weather}}<p class="hkp-hint">{{#str}}centre_noweather, local_oksigeniahechauka{{/str}}</p>{{/weather}}
-                        <p class="hkp-place-ok">{{{icons.check}}}{{#str}}centre_ok, local_oksigeniahechauka{{/str}}</p>
-                    </div>
-                </div>
-                {{/place}}
+                {{> local_oksigeniahechauka/place_finder }}
             </section>
             <form method="post" action="{{action}}" enctype="multipart/form-data" id="hkp-centre-form" class="hkp-centre-form">
                 <input type="hidden" name="sesskey" value="{{sesskey}}">

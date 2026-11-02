@@ -1094,3 +1094,66 @@ dialog.hkp-dialog > footer {
     line-height: 1.15;
     text-align: center;
 }
+
+/* «Empezar». */
+.hkp-start-brand {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .75rem;
+}
+.hkp-start-brand img {
+    max-width: 8rem;
+    max-height: 3.5rem;
+}
+.hkp-start-brand-text {
+    display: grid;
+    flex: 1 1 8rem;
+}
+.hkp-start-brand-text small {
+    color: var(--hkp-muted);
+}
+.hkp-start-swatches {
+    display: flex;
+    gap: .25rem;
+}
+.hkp-start-swatches i {
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 1px var(--hkp-line);
+}
+.hkp-start-sources {
+    display: grid;
+    gap: .6rem;
+    margin: 0 0 1rem;
+    padding: 0;
+    list-style: none;
+}
+.hkp-start-sources small {
+    display: block;
+    padding-left: 2.5rem;
+    color: var(--hkp-muted);
+}
+.hkp-start-url code {
+    overflow-wrap: anywhere;
+}
+.hkp-missing {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: .25rem .75rem;
+    margin: 0 0 1rem;
+    padding: .6rem .9rem;
+    border: 1px solid var(--hkp-accent-edge);
+    border-radius: var(--hkp-radius-sm);
+    background: var(--hkp-accent-tint);
+}
+.hkp-missing ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .25rem 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}

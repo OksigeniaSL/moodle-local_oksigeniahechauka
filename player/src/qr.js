@@ -43,5 +43,7 @@ export function qrPath(text) {
  * @returns {string}
  */
 export function shortWeb(url) {
-    return String(url || '').replace(/^https?:\/\//i, '').replace(/^www\./i, '').replace(/\/$/, '');
+    const web = String(url || '').replace(/^https?:\/\//i, '').replace(/^www\./i, '').replace(/\/$/, '');
+    // Too long to read from afar: where it goes, and the code does the rest.
+    return web.length > 34 ? web.split('/')[0] : web;
 }

@@ -323,6 +323,9 @@ Biblioteca, Secretaría y Comedor.» A teacher sees only their groups, already c
   opciones»). Under 60rem, while «Personalizar» is in sight, it goes
   in a band under the bar of the site, at 60 % of the width and with nothing else; when it is out of sight, it goes back to its place. The frame is not moved.
 - **The logo**: one for light screens and one for dark ones, each on its own background, with «Cambiar».
+- **«Empezar»** (`start.php`): the first time, with no screen yet, instead of an empty panel; five numbered steps beside the screen. The kind of centre changes only what is proposed
+  (its first categories, when its day ends), never what the product does. What comes by itself says what there is right now, in figures. Afterwards, a line on the panel says what is still
+  missing, each thing with its link, and goes away by itself.
 - **The surprises**: under the screen, with their own «Guardar», since the column of the form is long. Off by default. A switch, «Cada cuánto» as chips (cada 20 minutos, cada hora, cada tres horas) and
   «Quién sale», a row per character with its box, its portrait, what it does and «Verlo en la vista previa», which plays it on
   the screen above. A character crosses over whatever is there and does not stay, so nothing looks for a gap: it comes

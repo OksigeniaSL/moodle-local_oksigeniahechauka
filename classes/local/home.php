@@ -119,6 +119,7 @@ class home {
             'hasactions' => (bool) $actions,
             'tabs' => self::tabs('home', $managescreens),
             'hastabs' => $managescreens,
+            'missing' => $managescreens ? startpage::missing() : [],
             'style' => self::stages(),
             'health' => $urgents ? [] : self::health($states, $now, $managescreens),
             'urgent' => $urgents ? self::urgent_banner(end($urgents), $reached, $publishall) : null,

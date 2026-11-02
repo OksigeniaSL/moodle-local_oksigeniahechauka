@@ -149,7 +149,7 @@ class manifest {
      *
      * @return string
      */
-    protected static function centre_name(): string {
+    public static function centre_name(): string {
         global $SITE;
         $system = ['context' => \context_system::instance()];
         $full = items::plain(format_string($SITE->fullname, true, $system));

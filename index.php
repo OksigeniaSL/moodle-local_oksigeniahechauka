@@ -44,6 +44,10 @@ $PAGE->set_heading('');
 $PAGE->set_primary_active_tab('local_oksigeniahechauka');
 $action = optional_param('action', '', PARAM_ALPHA);
 $now = time();
+// The first time, with no screen yet: the setting up, not an empty panel.
+if ($action === '' && \local_oksigeniahechauka\local\startpage::is_due()) {
+    redirect(new moodle_url('/local/oksigeniahechauka/start.php'));
+}
 
 // The actions of the panel, each with its sesskey and with who may do it.
 if ($action !== '' && confirm_sesskey()) {

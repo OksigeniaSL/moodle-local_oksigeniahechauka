@@ -57,6 +57,7 @@
     <nav class="hkp-tabs" aria-label="{{#str}}tabs_label, local_oksigeniahechauka{{/str}}">
         {{#tabs}}<a href="{{url}}"{{#current}} aria-current="page"{{/current}}>{{{icon}}}{{label}}</a>{{/tabs}}
     </nav>
+    {{#missing.0}}<aside class="hkp-missing" aria-labelledby="hkp-missing-h"><b id="hkp-missing-h">{{#str}}start_missing_title, local_oksigeniahechauka{{/str}}</b><ul>{{#missing}}<li><a href="{{url}}">{{label}}</a></li>{{/missing}}</ul></aside>{{/missing.0}}
     {{/hastabs}}
     {{#urgent}}
     <section class="hkp-urgent-on" role="alert">{{{icon}}}<div><p class="k">{{line}}</p><p class="t">{{title}}</p></div>{{#remove}}<a class="btn" href="{{remove}}">{{#str}}urgent_take_off, local_oksigeniahechauka{{/str}}</a>{{/remove}}</section>
