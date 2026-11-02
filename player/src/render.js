@@ -5,7 +5,7 @@
 
 import {ratio, shapeOf} from './compose.js';
 import {buildWeatherThird} from './today.js';
-import {buildLead, buildRest, fitHeadline, fitWord, leadsOf, leadOfTurn, linesOf, MARK, paginateRest, showRestPage, turnFixed, weekHeadline} from './lead.js';
+import {MARK, buildLead, buildRest, fitAlso, fitHeadline, fitWord, leadOfTurn, leadsOf, linesOf, paginateRest, showRestPage, turnFixed, weekHeadline} from './lead.js';
 import {qrPath, shortWeb} from './qr.js';
 import {even} from './balance.js';
 import {buildAgenda, startAgenda} from './agendaview.js';
@@ -708,6 +708,8 @@ export class Screen {
             countdown: s.countdown || '',
             daysfor: s.daysfor || '',
             also: s.also || '',
+            alsoMore: s.also_more || '',
+            alsoOthers: s.also_others || '',
             notices: l.notices || s.notices || '',
             upcoming: l.upcoming || s.upcoming || '',
         };
@@ -887,6 +889,7 @@ export class Screen {
             lead.hkShort = 'hk-lider-corto';
             // Measured on what holds the words: a bubble's tail hangs out of the lead on purpose.
             const words = lead.querySelector('.hk-lider-cuerpo') || lead;
+            fitAlso(lead);
             fitHeadline(lead, t, comp === 'vertical-hoy' && vertical ? 2 : 3, function () {
                 return words.scrollHeight > words.clientHeight + 1 || t.scrollWidth > t.clientWidth + 1;
             });

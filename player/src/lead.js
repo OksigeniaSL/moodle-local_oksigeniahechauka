@@ -118,6 +118,17 @@ export function leadsOf(today, noon) {
 }
 
 /**
+ * Whether one of today's events says the centre is closed: «Festivo - …», «No lectivo - …», «Vacaciones - …», or a title «Festivo».
+ *
+ * @param {object} e {holiday, group, title}
+ * @returns {boolean}
+ */
+export function isHoliday(e) {
+    return e.holiday === true || /^(festivo|no lectivo|vacaciones)$/i.test(e.group || '') ||
+        (!e.group && /^(festivo|no lectivo)$/i.test(e.title || ''));
+}
+
+/**
  * The main dish of a menu and the other courses: the second course leads (the first when there is one).
  *
  * @param {object} menu {courses: [{label, dishes}]}
@@ -199,15 +210,16 @@ export function weekHeadline(today, days) {
  */
 export function buildLead(p, today, l) {
     const s = el('section', 'hk-lider');
-    const holiday = p.type === 'event' && (p.event.holiday === true || /^(festivo|no lectivo|vacaciones)$/i.test(p.event.group || ''));
+    const holiday = p.type === 'event' && isHoliday(p.event);
     s.setAttribute('data-tipo', p.type === 'notice' ? 'aviso' : (holiday ? 'festivo' : (p.type === 'event' ? 'evento' :
         (p.type === 'countdown' ? 'cuenta' : 'menu'))));
     s.setAttribute('data-ajuste', '0');
     const b = el('div', 'hk-lider-cuerpo');
     if (p.type === 'menu') {
         const m = today.menu;
-        colour(s, 'marca-2', 'marca-2-oscuro');
-        stage(s, 2);
+        // The skin's colour for the menu: the marca-* are the centre's categories, and mean something else.
+        s.style.setProperty('--hk-ev', 'var(--hk-menu)');
+        s.style.setProperty('--hk-sobre-ev', 'var(--hk-sobre-menu)');
         const table = el('div', 'hk-lider-pieza hk-mesa');
         table.innerHTML = PLATE;
         b.appendChild(el('p', 'hk-lider-etiqueta', m.label || ''));
@@ -230,6 +242,10 @@ export function buildLead(p, today, l) {
                 const also = el('p', 'hk-lider-tambien');
                 also.appendChild(el('small', '', l.also || ''));
                 also.appendChild(document.createTextNode(m.also.join(' · ')));
+                also.hkList = m.also;
+                also.hkKinds = m.alsoKinds || [];
+                also.hkMore = l.alsoMore || '';
+                also.hkOthers = l.alsoOthers || '';
                 b.appendChild(also);
             }
         }
@@ -378,7 +394,7 @@ export function buildRest(today, lead, l, turn) {
         const m = today.menu;
         const main = m.closed ? m.closed : menuParts(m).main;
         if (main) {
-            items.push({group: m.label || '', colour: ['marca-2', 'marca-2-oscuro'], make: function () {
+            items.push({group: m.label || '', colour: ['menu', 'menu'], make: function () {
                 return line(null, main, null);
             }});
         }
@@ -392,7 +408,7 @@ export function buildRest(today, lead, l, turn) {
     });
     (today.events || []).forEach(function (e) {
         if (!(lead && lead.type === 'event' && lead.event === e)) {
-            items.push({group: today.eventsLabel || l.events, colour: ['marca-3', 'marca-3-oscuro'], make: function (short) {
+            items.push({group: today.eventsLabel || l.events, colour: ['evento', 'evento'], make: function (short) {
                 return line(e.time && e.time !== '·' ? e.time : null, e.title, short ? null : e.group, e.color);
             }});
         }
@@ -561,6 +577,47 @@ export function turnFixed(a, turn, l) {
         void fresh.offsetWidth;
         fresh.classList.remove('hk-cambiando');
     }, 450);
+}
+
+/**
+ * «También» takes two lines at most: the first ones and how many more; if not even one fits, only the kinds («vegetariano y 2 más») or how
+ * many («3 menús más»). It goes before the headline's fit, which then has its room.
+ *
+ * @param {HTMLElement} lead
+ */
+export function fitAlso(lead) {
+    const box = lead.querySelector('.hk-lider-tambien');
+    if (!box || !box.hkList) {
+        return;
+    }
+    const list = box.hkList;
+    const kinds = box.hkKinds;
+    const text = box.lastChild;
+    const more = function (n) {
+        return box.hkMore.replace('{n}', String(n));
+    };
+    const tall = function () {
+        const cs = window.getComputedStyle(box);
+        const inside = box.offsetHeight - parseFloat(cs.paddingTop) - parseFloat(cs.borderTopWidth);
+        return Math.round(inside / parseFloat(cs.lineHeight)) > 2;
+    };
+    box.style.display = '';
+    text.nodeValue = list.join(' · ');
+    for (let n = list.length - 1; n >= 1 && tall(); n--) {
+        text.nodeValue = list.slice(0, n).join(' · ') + ' ' + more(list.length - n);
+    }
+    if (!tall()) {
+        return;
+    }
+    const rest = list.length - kinds.length;
+    if (kinds.length) {
+        text.nodeValue = kinds.join(' · ') + (rest ? ' ' + more(rest) : '');
+    } else if (list.length > 1) {
+        text.nodeValue = box.hkOthers.replace('{n}', String(list.length));
+    }
+    if (tall() || (!kinds.length && list.length < 2)) {
+        box.style.display = 'none';
+    }
 }
 
 // --- Headlines --------------------------------------------------------------------------------------------------

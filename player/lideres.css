@@ -128,7 +128,7 @@
     width: calc(var(--hk-t-cifra) * 3.7);  /* its hour always fits */
 }
 .hk-lider[data-tipo="evento"][data-sin-categoria] .hk-talon {
-    color: var(--hk-sobre-marca-3);
+    color: var(--hk-sobre-evento);
 }
 .hk .hk-talon-cuando {
     margin-bottom: 1.2rem;
@@ -168,7 +168,7 @@
         radial-gradient(circle at 100% 100%, var(--hk-fondo) 2.9rem, transparent 3rem);
 }
 .hk .hk-lider[data-tipo="evento"][data-sin-categoria] .hk-talon {
-    background-color: var(--hk-marca-3);   /* not the bubble's colour: from afar they must not be the same stain */
+    background-color: var(--hk-evento);    /* not the bubble's colour: from afar they must not be the same stain */
 }
 .hk-lider[data-tipo="evento"] .hk-talon::after {
     content: "";
@@ -518,7 +518,10 @@
    it leaves them room (the player says so with data-al-lado); otherwise over it, as on any other picture.
    (The blurred copy stays for the full screen, where it fills everything and looks like a decision.) ---------------- */
 .hk .hk-cuerpo .hk-medio-contener {
-    background: var(--hk-primario);
+    background: #111417;                   /* over it: a dark frame, the way a picture is hung, and no colour that competes */
+}
+.hk .hk-cuerpo .hk-medio-contener[data-al-lado] {
+    background: var(--hk-primario);        /* beside it: the words' own block */
 }
 .hk .hk-cuerpo .hk-medio-contener .hk-diapo-fondo {
     display: none;

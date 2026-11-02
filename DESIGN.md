@@ -314,6 +314,12 @@ Biblioteca, Secretaría y Comedor.» A teacher sees only their groups, already c
 - **The skin**: a gallery of cards, each drawn with its colours and its letter, chosen with a ring and seen at once on the screen beside
   it. If the Moodle site has a brand colour, a first card, «La de tu Moodle». Choosing one brings its colours to «Los colores»; touching them
   afterwards makes them the centre's own, which go over the skin.
+- **«Personalizar»**, under the gallery, closed until there is something of the centre's: its colours, a background (cards with the page in its
+  colour, a card in its surface and a line in its text), a letter (cards in their own letter, by family) and corners. Starts from the skin; another
+  skin undoes it. A tick besides the colour marks what is chosen, and the name goes inside the card. «Volver a la piel tal como viene» only when there is
+  a change. Beside it, the screen shows «Today» with its third, where what is chosen can be seen.
+- **The screen in «Tu centro»** stays in sight going down the page, and what is under it passes behind. Under 60rem, while «Personalizar» is in sight, it goes
+  in a band under the bar of the site, at 60 % of the width and with nothing else; when it is out of sight, it goes back to its place. The frame is not moved.
 - **The logo**: one for light screens and one for dark ones, each on its own background, with «Cambiar».
 - **The surprises**: under the screen, with their own «Guardar», since the column of the form is long. Off by default. A switch, «Cada cuánto» as chips (cada 20 minutos, cada hora, cada tres horas) and
   «Quién sale», a row per character with its box, its portrait, what it does and «Verlo en la vista previa», which plays it on

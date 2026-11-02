@@ -22,7 +22,7 @@
     {
      "weight": 800,
      "file": "fuentes/Gabarito-800.woff2",
-     "kb": 21.2
+     "kb": 21.3
     }
    ],
    "light": {
@@ -39,7 +39,9 @@
     "marca-1": "#0e4f5c",
     "marca-2": "#4f6b2d",
     "marca-3": "#a8481a",
-    "marca-4": "#a4324a"
+    "marca-4": "#a4324a",
+    "menu": "#4f6b2d",
+    "evento": "#a8481a"
    },
    "dark": {
     "fondo": "#0c1718",
@@ -69,12 +71,12 @@
     {
      "weight": 600,
      "file": "fuentes/Schibsted-600.woff2",
-     "kb": 24.9
+     "kb": 25.1
     },
     {
      "weight": 700,
      "file": "fuentes/Schibsted-700.woff2",
-     "kb": 24.8
+     "kb": 24.7
     },
     {
      "weight": 800,
@@ -96,7 +98,9 @@
     "marca-1": "#123f33",
     "marca-2": "#a8461f",
     "marca-3": "#1f5f8b",
-    "marca-4": "#8a2f52"
+    "marca-4": "#8a2f52",
+    "menu": "#a8461f",
+    "evento": "#1f5f8b"
    },
    "dark": {
     "fondo": "#0d1412",
@@ -153,7 +157,9 @@
     "marca-1": "#3f1f63",
     "marca-2": "#1d7a5f",
     "marca-3": "#c2410c",
-    "marca-4": "#a4324a"
+    "marca-4": "#a4324a",
+    "menu": "#1d7a5f",
+    "evento": "#c2410c"
    },
    "dark": {
     "fondo": "#120e17",

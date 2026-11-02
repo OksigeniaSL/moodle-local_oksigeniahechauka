@@ -227,7 +227,7 @@ export function eventsOn(events, today, ahead, categories) {
         const parts = splitTitle(ev.title);
         const timed = !ev.allday && ev.start.length >= 16 && dayNumber(dateOf(ev.start)) === day;
         return {time: timed ? ev.start.slice(11, 16) : '·', title: parts.title, group: parts.group || ev.detail || '',
-            color: colourOf(ev, parts.group || ev.detail, categories)};
+            color: colourOf(ev, parts.group || ev.detail, categories), holiday: ev.holiday === true};
     });
 }
 

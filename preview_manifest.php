@@ -33,6 +33,7 @@ use local_oksigeniahechauka\local\manifest;
 require_login(null, false);
 $context = context_system::instance();
 require_capability('local/oksigeniahechauka:view', $context);
+$PAGE->set_context($context);
 
 $screenid = optional_param('screen', 0, PARAM_INT);
 $screen = $screenid ? $DB->get_record('local_oksigeniahechauka_screen', ['id' => $screenid], '*', MUST_EXIST) : (object) [

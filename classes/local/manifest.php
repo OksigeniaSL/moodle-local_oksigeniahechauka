@@ -151,8 +151,9 @@ class manifest {
      */
     protected static function centre_name(): string {
         global $SITE;
-        $full = items::plain(format_string($SITE->fullname));
-        return \core_text::strlen($full) <= 28 ? $full : items::plain(format_string($SITE->shortname));
+        $system = ['context' => \context_system::instance()];
+        $full = items::plain(format_string($SITE->fullname, true, $system));
+        return \core_text::strlen($full) <= 28 ? $full : items::plain(format_string($SITE->shortname, true, $system));
     }
 
     /**

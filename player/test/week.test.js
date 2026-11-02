@@ -1,10 +1,12 @@
 // «La semana» without a page: which days, holidays, bands and their lanes, stages.
 
+import {readFileSync} from 'node:fs';
 import {menuKind} from '../src/lead.js';
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {afterDayEnd, categoryOf, colourOf, eventsOn, upcoming} from '../src/agenda.js';
 import {weekOf} from '../src/week.js';
+import {isHoliday} from '../src/lead.js';
 
 const L = {
     days: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
@@ -145,4 +147,17 @@ test('the kind of a menu, only when it says something', () => {
     assert.equal(menuKind('C (Vegetariano)'), 'vegetariano');
     assert.equal(menuKind('Menú C (VEGETARIANO)'), 'vegetariano');
     assert.equal(menuKind('Sin gluten'), 'sin gluten');
+});
+
+test('«También» is said in the screens\' own words', () => {
+    assert.ok(readFileSync(new URL('../demo/index.html', import.meta.url), 'utf8').includes('"also_more"'));
+});
+
+test('a day the agenda marks as closed', () => {
+    assert.equal(isHoliday({group: 'Festivo', title: 'Todos los Santos'}), true);
+    assert.equal(isHoliday({group: 'no lectivo', title: 'Puente'}), true);
+    assert.equal(isHoliday({group: '', title: 'Festivo'}), true);
+    assert.equal(isHoliday({holiday: true, group: 'Primaria', title: 'Excursión'}), true);
+    assert.equal(isHoliday({group: 'Primaria', title: 'Festivo de la ciencia'}), false);
+    assert.equal(isHoliday({group: '', title: 'Reunión'}), false);
 });

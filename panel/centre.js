@@ -175,8 +175,13 @@
         if (s.ticker) {
             items.push({id: 'sample-t', type: 'ticker', zone: 'ticker', text: s.ticker});
         }
+        // «Today» with its third, as on a screen: where the background, the surfaces and the second colour are seen.
+        items.push({id: 'sample-i', type: 'notice', zone: 'side', title: (s.important || {}).title || '',
+            body: (s.important || {}).body || '', tone: 'important'});
+        items.push({id: 'sample-s', type: 'notice', zone: 'side', title: (s.second || {}).title || '',
+            body: (s.second || {}).body || '', tone: 'normal'});
         return {item: {id: 'sample-n', type: 'notice', zone: 'side', title: (s.notice || {}).title || '',
-            body: (s.notice || {}).body || '', tone: 'normal'}, items, focus: 'main'};
+            body: (s.notice || {}).body || '', tone: 'normal'}, items, focus: 'today'};
     };
     const send = (override) => {
         if (frame && frame.contentWindow) {
@@ -222,21 +227,38 @@
     // The editor opens under the gallery; what it starts from is drawn from the skin, and a note says when it has changes.
     const opener = page.querySelector('#hkp-custom-open');
     const note = page.querySelector('#hkp-custom-note');
+    const reset = page.querySelector('#hkp-custom-reset');
     const paintCustom = () => {
         const skin = picked('skin');
         if (!skin) {
             return;
         }
+        const tones = JSON.parse(skin.getAttribute('data-tones')).light;
+        const tint = tinted(colourOf('colourprimary')).light;
+        const swatch = (selector, ground) => {
+            const art = page.querySelector(selector);
+            art.style.setProperty('--hkp-g-fondo', ground.fondo);
+            art.style.setProperty('--hkp-g-sup', ground.superficie);
+        };
+        swatch('[data-ground-skin]', tones);
+        swatch('[data-ground-tint]', tint);
+        page.querySelector('.hkp-grounds').style.setProperty('--hkp-g-texto', tones.texto);
+        page.querySelector('[data-ground-skin-name]').textContent = skin.getAttribute('data-skin-name');
         page.querySelector('[data-letter-skin]').style.fontFamily = skin.getAttribute('data-stack');
-        page.querySelector('[data-ground-skin]').style.background = JSON.parse(skin.getAttribute('data-tones')).light.fondo;
-        page.querySelector('[data-ground-tint]').style.background = tinted(colourOf('colourprimary')).light.fondo;
-        note.hidden = !(picked('skinletter').value || picked('skinground').value || picked('skincorners').value !== 'round' ||
+        page.querySelector('[data-letter-skin-name]').textContent = skin.getAttribute('data-letter-name');
+        const changed = picked('skinletter').value || picked('skinground').value || picked('skincorners').value !== 'round' ||
             colourOf('colourprimary') !== skin.getAttribute('data-primary') ||
-            colourOf('colouraccent') !== skin.getAttribute('data-accent'));
+            colourOf('colouraccent') !== skin.getAttribute('data-accent');
+        note.hidden = !changed;
+        reset.disabled = !changed;
     };
+    const narrow = () => page.offsetWidth < 60 * parseFloat(getComputedStyle(document.documentElement).fontSize);
     opener.addEventListener('click', () => {
         custom.hidden = !custom.hidden;
         opener.setAttribute('aria-expanded', custom.hidden ? 'false' : 'true');
+        if (!custom.hidden && narrow()) {
+            custom.scrollIntoView({block: 'start'});
+        }
     });
     ['skinletter', 'skinground', 'skincorners'].forEach((name) => {
         page.querySelectorAll('input[name="' + name + '"]').forEach((radio) => {
@@ -251,7 +273,7 @@
         page.querySelector('input[name="skinground"][value=""]').checked = true;
         page.querySelector('input[name="skincorners"][value="round"]').checked = true;
     };
-    page.querySelector('#hkp-custom-reset').addEventListener('click', () => {
+    reset.addEventListener('click', () => {
         dirty = true;
         picked('skin').dispatchEvent(new Event('change'));
     });
@@ -271,6 +293,21 @@
         });
     });
     paintCustom();
+    page.querySelectorAll('[data-colour]').forEach((input) => {
+        input.addEventListener('input', paintCustom);
+    });
+    // On a phone the screen is far down the page: while the editor is in sight, it goes in a band under the bar of the site. The
+    // frame is not moved, so it does not load again. Where a fixed box does not stay with the window, the screen stays in its place.
+    const preview = page.querySelector('.hkp-preview');
+    if (window.IntersectionObserver && preview) {
+        new IntersectionObserver((seen) => {
+            const on = seen[seen.length - 1].isIntersecting && narrow();
+            page.classList.toggle('hkp-with-band', on);
+            if (on && preview.getBoundingClientRect().top > 200) {
+                page.classList.remove('hkp-with-band');
+            }
+        }, {rootMargin: '-200px 0px 0px 0px'}).observe(custom);
+    }
     page.querySelectorAll('[data-ct]').forEach((button) => {
         button.addEventListener('click', () => {
             mode = button.getAttribute('data-ct');

@@ -207,11 +207,14 @@ class centre {
     protected static function samples(): array {
         $c = self::C;
         $out = ['notice' => ['title' => get_string('centre_sample_notice', $c), 'body' => get_string('centre_sample_body', $c)],
+            'important' => ['title' => get_string('centre_sample_important', $c),
+                'body' => get_string('centre_sample_important_body', $c)],
+            'second' => ['title' => get_string('centre_sample_second', $c), 'body' => get_string('centre_sample_second_body', $c)],
             'ticker' => get_string('centre_sample_ticker', $c), 'events' => []];
-        // An event in each category of the centre (or one without colour, if it has none).
+        // An event in each category of the centre; with none, two with the skin's colour, so that its column is not empty.
         $cats = categories::all();
         $hours = ['09:00', '10:00', '11:00', '12:00', '13:00', '16:00'];
-        foreach ($cats ?: [null] as $i => $cat) {
+        foreach ($cats ?: [null, null] as $i => $cat) {
             $titles = ['centre_sample_title1', 'centre_sample_title2', 'centre_sample_title3', 'centre_sample_title4',
                 'centre_sample_title5', 'centre_sample_title6'];
             $out['events'][] = ['title' => get_string($titles[$i], $c), 'detail' => $cat ? $cat['name'] : '',

@@ -85,9 +85,11 @@
 [data-tema="oscuro"] .hk .hk-aviso-fijo .hk-aviso-fijo-marca {
     color: inherit;
 }
-.hk .hk-resto-grupo {
+.hk .hk-resto-grupo,
+[data-tema="oscuro"] .hk .hk-resto-grupo {  /* its word always reads; its colour goes on the rule, where any colour will do */
     padding-top: 1.6rem;
-    border-top: .5rem solid currentColor;
+    border-top: .5rem solid var(--hk-color, var(--hk-linea));
+    color: var(--hk-texto-suave);
 }
 .hk .hk-resto-paginas {                   /* whoever passes does not need to know there are five pages */
     visibility: hidden;

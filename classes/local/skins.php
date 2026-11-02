@@ -287,6 +287,7 @@ class skins {
                 'id' => $ground['id'],
                 'name' => $word($ground['name'], $ground['id']),
                 'swatch' => $ground['claro']['fondo'],
+                'surface' => $ground['claro']['superficie'],
                 'tones' => json_encode(['light' => $ground['claro'], 'dark' => $ground['oscuro']]),
                 'checked' => $ground['id'] === $groundid,
             ];
@@ -393,6 +394,21 @@ class skins {
     }
 
     /**
+     * What a letter is called, from the family it goes by.
+     *
+     * @param string $family
+     * @return string
+     */
+    protected static function letter_name(string $family): string {
+        foreach (self::letters()['letters'] as $letter) {
+            if ($letter['family'] === $family) {
+                return $letter['name'];
+            }
+        }
+        return $family;
+    }
+
+    /**
      * What the gallery of «Tu centro» shows.
      *
      * @param \stdClass $config the plugin's
@@ -402,14 +418,17 @@ class skins {
         $c = 'local_oksigeniahechauka';
         $chosen = self::chosen($config);
         $first = self::get(self::first());
-        $card = function (array $skin, string $id, string $name, string $primary, string $accent, bool $checked) {
+        $word = function (array $names) {
+            return $names[substr(current_language(), 0, 2)] ?? $names['en'] ?? '';
+        };
+        $card = function (array $skin, string $id, string $name, string $primary, string $accent, bool $checked) use ($word) {
             return ['id' => $id, 'skin' => $skin['id'], 'name' => $name, 'family' => $skin['family'], 'checked' => $checked,
                 'fondo' => $skin['light']['fondo'], 'texto' => $skin['light']['texto'], 'primary' => $primary, 'accent' => $accent,
                 'skinprimary' => $skin['light']['primario'], 'skinaccent' => $skin['light']['acento'],
                 'stack' => '"' . $skin['family'] . '", sans-serif', 'tones' => json_encode([
-                    'light' => array_intersect_key($skin['light'], array_flip(['fondo', 'superficie'])),
-                    'dark' => array_intersect_key($skin['dark'], array_flip(['fondo', 'superficie'])),
-                ])];
+                    'light' => array_intersect_key($skin['light'], array_flip(['fondo', 'superficie', 'texto'])),
+                    'dark' => array_intersect_key($skin['dark'], array_flip(['fondo', 'superficie', 'texto'])),
+                ]), 'skinname' => $word($skin['name']), 'lettername' => self::letter_name($skin['family'])];
         };
         $cards = [];
         $lang = substr(current_language(), 0, 2);
@@ -420,7 +439,8 @@ class skins {
         foreach (self::all()['skins'] as $skin) {
             $name = $skin['name'][$lang] ?? $skin['name']['en'] ?? $skin['id'];
             $light = $skin['light'];
-            $cards[] = $card($skin, $skin['id'], $name, $light['primario'], $light['acento'], $chosen === $skin['id']);
+            $inuse = $chosen === $skin['id'] || (!$chosen && !$brand && $skin['id'] === self::first());
+            $cards[] = $card($skin, $skin['id'], $name, $light['primario'], $light['acento'], $inuse);
         }
         return $cards;
     }

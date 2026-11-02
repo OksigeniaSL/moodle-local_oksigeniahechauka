@@ -4,7 +4,7 @@
 // - preview: inside the management panel, with the session of the person signed in and a clock of their choosing;
 // - demo: a static manifest and its media, for development and for testing a device without a server.
 
-import {menuKind, menuParts} from './lead.js';
+import {menuKind, menuParts, isHoliday} from './lead.js';
 import {makeApi} from './api.js';
 import {realClock, simulatedClock} from './clock.js';
 import {MediaStore, mediaOf} from './media.js';
@@ -20,7 +20,7 @@ import {filesOf, isRaining, Surprises} from './surprises.js';
 import {countToday} from './today.js';
 import {weekOf} from './week.js';
 
-const VERSION = '0.7.17';
+const VERSION = '0.7.18';
 const COMING_DAYS = 7;
 const HEARTBEAT_MS = 60000;
 const REFRESH_MS = 15 * 60000;
@@ -217,7 +217,9 @@ class Player {
         }
         return request.then(function (m) {
             self.heardAt = Date.now();
-            if (m) {
+            if (m && m.errorcode) {
+                self.note('manifest: ' + m.errorcode);
+            } else if (m) {
                 self.apply(m);
                 if (self.mode === 'screen') {
                     store.setManifest(m);
@@ -311,15 +313,24 @@ class Player {
         if (item.closed || !item.menus || !item.menus.length) {
             return {label, closed: item.title || s.closed || ''};
         }
-        const also = [];
+        // Those with a kind first: whoever looks for the vegetarian one is who needs the line.
+        const kinds = [];
+        const plain = [];
+        const alsoKinds = [];
         item.menus.slice(1).forEach(function (menu) {
             const main = menuParts(menu).main;
             if (main) {
                 const kind = menuKind(menu.name);
-                also.push(kind ? main + ' (' + kind + ')' : main);
+                if (kind) {
+                    kinds.push(main + ' (' + kind + ')');
+                    alsoKinds.push(kind);
+                } else {
+                    plain.push(main);
+                }
             }
         });
-        return {label, courses: item.menus[0].courses || [], also, note: item.note || ''};
+        const also = kinds.concat(plain);
+        return {label, courses: item.menus[0].courses || [], also, alsoKinds, note: item.note || ''};
     }
 
     /**
@@ -362,7 +373,8 @@ class Player {
             big.day = dayLabel(big.date, wall.date, names);
         }
         return {
-            menu,
+            // A day the agenda marks as closed has no canteen, whatever the menus say.
+            menu: events.some(isHoliday) ? null : menu,
             notices,
             events,
             // The event of the countdown is not repeated among the coming days.

@@ -3211,6 +3211,35 @@ dialog.hkp-dialog > footer {
     gap: .75rem;
     margin-top: 1rem;
 }
+.hkp .hkp-custom-toggle,
+.hkp .hkp-custom-toggle:hover,
+.hkp .hkp-custom-toggle:focus,
+.hkp .hkp-custom-toggle:active {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    border-color: var(--hkp-edge);
+    background: var(--hkp-card);
+    color: var(--hkp-ink);
+    font-weight: 600;
+}
+.hkp .hkp-custom-toggle:hover {
+    border-color: var(--hkp-accent-edge);
+    background: var(--hkp-accent-tint);
+}
+.hkp-custom-toggle::after {
+    content: "";
+    width: .5em;
+    height: .5em;
+    margin-top: -.2em;
+    border-right: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
+    transform: rotate(45deg);
+}
+.hkp-custom-toggle[aria-expanded="true"]::after {
+    margin-top: .2em;
+    transform: rotate(225deg);
+}
 .hkp-custom {
     display: grid;
     gap: 1.25rem;
@@ -3230,32 +3259,111 @@ dialog.hkp-dialog > footer {
 }
 .hkp-grounds {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(5.5rem, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: .6rem;
+}
+.hkp-letters {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: .6rem;
+}
+
+/* stylelint-disable-next-line csstree/validator */
+@container hkp (min-width: 36rem) {
+    .hkp-grounds {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+    .hkp-letters {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
 }
 .hkp-ground,
 .hkp-letter {
     display: grid;
-    gap: .3rem;
     margin: 0;
     cursor: pointer;
 }
-.hkp-ground-art {
-    display: block;
-    height: 2.5rem;
+/* A card that is all one thing to touch: its sample and its name inside, and when chosen, a tick besides the colour. */
+.hkp-tile {
+    position: relative;
+    display: grid;
+    align-content: start;
+    gap: .4rem;
+    height: 100%;
+    padding: .4rem;
+    border: 1px solid var(--hkp-edge);
     border-radius: var(--hkp-radius-sm);
-    box-shadow: inset 0 0 0 1px var(--hkp-line);
+    background: var(--hkp-card);
 }
-.hkp-ground-name,
-.hkp-letter-name {
+.hkp-ground:hover .hkp-tile,
+.hkp-letter:hover .hkp-tile {
+    border-color: var(--hkp-accent-edge);
+}
+.hkp-ground input:checked + .hkp-tile,
+.hkp-letter input:checked + .hkp-tile {
+    border-color: var(--hkp-accent-edge);
+    background: var(--hkp-accent-tint);
+    box-shadow: inset 0 0 0 1px var(--hkp-accent-edge);
+}
+.hkp-ground input:checked + .hkp-tile::before,
+.hkp-letter input:checked + .hkp-tile::before {
+    content: "";
+    position: absolute;
+    z-index: 1;
+    top: .75rem;
+    right: .75rem;
+    width: 1.25rem;
+    height: 1.25rem;
+    border-radius: 50%;
+    background: var(--hkp-accent-edge);
+}
+.hkp-ground input:checked + .hkp-tile::after,
+.hkp-letter input:checked + .hkp-tile::after {
+    content: "";
+    position: absolute;
+    z-index: 2;
+    top: 1.05rem;
+    right: 1.03rem;
+    width: .7rem;
+    height: .4rem;
+    border-bottom: 2px solid #fff;
+    border-left: 2px solid #fff;
+    transform: rotate(-45deg);
+}
+.hkp-ground input:focus-visible + .hkp-tile,
+.hkp-letter input:focus-visible + .hkp-tile {
+    outline: 3px solid var(--bs-focus-ring-color, currentColor);
+    outline-offset: 2px;
+}
+.hkp-tile-name {
+    padding: 0 .15rem .1rem;
     font-size: .8125rem;
     font-weight: 600;
     line-height: 1.25;
 }
-.hkp-letters {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr));
-    gap: .6rem;
+/* The page in its background, a card in its surface, a line in its text: what the choice really changes. */
+.hkp-ground-art {
+    display: block;
+    padding: .5rem .5rem 0;
+    overflow: hidden;
+    height: 3.25rem;
+    border-radius: calc(var(--hkp-radius-sm) * .7);
+    box-shadow: inset 0 0 0 1px var(--hkp-line);
+    background: var(--hkp-g-fondo, transparent);
+}
+.hkp-ground-art i {
+    display: block;
+    height: 100%;
+    padding: .55rem .5rem;
+    border-radius: .3rem .3rem 0 0;
+    background: var(--hkp-g-sup, transparent);
+}
+.hkp-ground-art u {
+    display: block;
+    width: 65%;
+    height: .3rem;
+    border-radius: .15rem;
+    background: var(--hkp-g-texto, currentColor);
 }
 .hkp-letter-cat {
     grid-column: 1 / -1;
@@ -3266,21 +3374,41 @@ dialog.hkp-dialog > footer {
 .hkp-letter-art {
     display: block;
     overflow: hidden;
-    padding: .55rem .7rem;
-    border-radius: var(--hkp-radius-sm);
-    box-shadow: inset 0 0 0 1px var(--hkp-line);
+    padding: .2rem .3rem 0;
     font-size: 1.4rem;
     font-weight: 700;
     line-height: 1.15;
     white-space: nowrap;
 }
-.hkp-ground input:checked + .hkp-ground-art,
-.hkp-letter input:checked + .hkp-letter-art {
-    outline: 3px solid var(--hkp-accent, currentColor);
-    outline-offset: 2px;
-}
-.hkp-ground input:focus-visible + .hkp-ground-art,
-.hkp-letter input:focus-visible + .hkp-letter-art {
-    outline: 3px solid currentColor;
-    outline-offset: 2px;
+
+/* On a phone, while the editor is in sight, the screen goes in a band under the bar of the site, with nothing else. */
+/* stylelint-disable-next-line csstree/validator */
+@container hkp (max-width: 60rem) {
+    .hkp-with-band .hkp-centre-side > .hkp-preview {
+        position: fixed;
+        top: 61px;
+        right: 0;
+        left: 0;
+        z-index: 1020;
+        display: block;
+        padding: .4rem 0;
+        border-width: 0 0 1px;
+        border-radius: 0;
+        background: var(--hkp-page);
+        box-shadow: none;
+    }
+    .hkp-with-band .hkp-preview > :not(.hkp-stage) {
+        display: none;
+    }
+    .hkp-with-band .hkp-preview .hkp-stage {
+        width: 60%;
+        margin: 0 auto;
+        padding: 0;
+        background: none;
+    }
+    .hkp-custom,
+    .hkp-custom input,
+    .hkp-custom button {
+        scroll-margin-top: 14rem;              /* what gets the focus never stays under the band */
+    }
 }

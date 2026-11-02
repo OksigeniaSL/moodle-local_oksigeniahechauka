@@ -21,10 +21,14 @@
     --hk-marca-2: #4f6b2d;
     --hk-marca-3: #a8481a;
     --hk-marca-4: #a4324a;
+    --hk-menu: #4f6b2d;
+    --hk-evento: #a8481a;
     --hk-sobre-marca-1: #ffffff;
     --hk-sobre-marca-2: #ffffff;
     --hk-sobre-marca-3: #ffffff;
     --hk-sobre-marca-4: #ffffff;
+    --hk-sobre-menu: #ffffff;
+    --hk-sobre-evento: #ffffff;
 }
 [data-tema="oscuro"],
 [data-piel="petroleo"][data-tema="oscuro"] {
@@ -63,10 +67,14 @@
     --hk-marca-2: #a8461f;
     --hk-marca-3: #1f5f8b;
     --hk-marca-4: #8a2f52;
+    --hk-menu: #a8461f;
+    --hk-evento: #1f5f8b;
     --hk-sobre-marca-1: #ffffff;
     --hk-sobre-marca-2: #ffffff;
     --hk-sobre-marca-3: #ffffff;
     --hk-sobre-marca-4: #ffffff;
+    --hk-sobre-menu: #ffffff;
+    --hk-sobre-evento: #ffffff;
 }
 [data-piel="botella"][data-tema="oscuro"] {
     --hk-fondo: #0d1412;
@@ -104,10 +112,14 @@
     --hk-marca-2: #1d7a5f;
     --hk-marca-3: #c2410c;
     --hk-marca-4: #a4324a;
+    --hk-menu: #1d7a5f;
+    --hk-evento: #c2410c;
     --hk-sobre-marca-1: #ffffff;
     --hk-sobre-marca-2: #ffffff;
     --hk-sobre-marca-3: #ffffff;
     --hk-sobre-marca-4: #ffffff;
+    --hk-sobre-menu: #ffffff;
+    --hk-sobre-evento: #ffffff;
 }
 [data-piel="berenjena"][data-tema="oscuro"] {
     --hk-fondo: #120e17;

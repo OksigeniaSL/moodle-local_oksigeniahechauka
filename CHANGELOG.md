@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.7.18 (2026-11-02)
+
+- **The previews of the panel had been getting an error instead of the screen's data since 0.7.11**, so they came without the centre's name, its logo, its
+  weather or its content. Fixed, and the player no longer takes an error for a manifest.
+- «Personalizar» after the art director's review: each background shows its page, its surface and its text; a tick besides the colour for what is chosen; the
+  name inside the card; «La de la piel: Gabarito»; the screen beside it shows «Today» with its third; on a phone, the screen goes in a band at the top while
+  choosing. With no skin chosen and no brand colour, the first skin is marked as the one in use.
+- «También» under a menu takes two lines at most. The menu and the event have colours of the skin of their own, and no longer take the centre's categories'.
+- A day the agenda marks as closed shows no menu.
+- A whole picture with its caption over it hangs on a dark frame, not on the main colour.
+
 ## 0.7.17 (2026-11-02)
 
 - **«Personalizar», under the gallery of skins in «Tu centro»**: starting from a skin, each centre changes its colours, its background, its
