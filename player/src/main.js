@@ -574,6 +574,9 @@ class Player {
                 deadlines: liveItems(m.items || [], 'extra', wall).filter(function (it) {
                     return it.type === 'deadlines';
                 })[0] || null,
+                tables: liveItems(m.items || [], 'extra', wall).filter(function (it) {
+                    return it.type === 'table';
+                }),
                 albums: albums.map(function (a) {
                     return {id: a.id, count: a.photos.length};
                 }),

@@ -29,7 +29,7 @@ namespace local_oksigeniahechauka\local;
  */
 class items {
     /** The types the panel makes. */
-    const TYPES = ['media', 'album', 'notice', 'event', 'ticker', 'agenda', 'urgent'];
+    const TYPES = ['media', 'album', 'notice', 'event', 'ticker', 'agenda', 'table', 'urgent'];
 
     /** @var int How many photos an album can have. */
     const ALBUM_MAX = 20;
@@ -118,6 +118,13 @@ class items {
             case 'agenda':
                 // Its events, one by one: agendas::contract().
                 return null;
+            case 'table':
+                // Nothing until it has been read once; after that, the last good one.
+                if (empty($data['table'])) {
+                    return null;
+                }
+                return $item + ['type' => 'table', 'zone' => 'extra', 'title' => $title, 'head' => $data['table']['head'],
+                    'rows' => $data['table']['rows']];
         }
         return null;
     }

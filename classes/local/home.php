@@ -511,7 +511,7 @@ class home {
                 \core_user\fields::for_name()->get_sql('', false, '', '', false)->selects);
         }
         $out = ['now' => [], 'later' => [], 'done' => []];
-        $counts = ['all' => 0, 'notice' => 0, 'media' => 0, 'event' => 0, 'ticker' => 0, 'agenda' => 0];
+        $counts = ['all' => 0, 'notice' => 0, 'media' => 0, 'event' => 0, 'ticker' => 0, 'agenda' => 0, 'table' => 0];
         $mine = 0;
         foreach ($items as $item) {
             // An urgent notice is on until it is taken off or its hour comes.
@@ -541,7 +541,7 @@ class home {
             return ['empty' => self::empty_state($limited, $groups, $canadd)];
         }
         $filters = [];
-        foreach (['all', 'notice', 'media', 'event', 'ticker', 'agenda'] as $type) {
+        foreach (['all', 'notice', 'media', 'event', 'ticker', 'agenda', 'table'] as $type) {
             if ($type === 'all' || $counts[$type]) {
                 $filters[] = ['type' => $type, 'label' => get_string('filter_' . $type, $c), 'count' => $counts[$type],
                     'pressed' => $type === 'all'];
@@ -606,6 +606,11 @@ class home {
             $meta[] = ['text' => trim(items::plain((string) $item->body) . ' · ' .
                 phrases::weekday(schedule::day($start)) . ', ' . phrases::hour($start), ' ·')];
         }
+        if ($item->type === 'table') {
+            $meta[] = ['text' => ($data['result'] ?? '') === 'ok' ? get_string('table_meta', $c, (object) [
+                'count' => (int) ($data['count'] ?? 0), 'ago' => phrases::ago(time() - (int) ($data['fetched'] ?? 0))]) :
+                get_string('table_meta_failed', $c)];
+        }
         if ($item->type === 'agenda') {
             $meta[] = ['text' => ($data['result'] ?? '') === 'ok' ? get_string('agenda_meta', $c, (object) [
                 'count' => (int) ($data['count'] ?? 0), 'ago' => phrases::ago(time() - (int) ($data['fetched'] ?? 0))]) :
@@ -628,8 +633,9 @@ class home {
             $c,
             phrases::hour((int) $data['ends'])
         ) : get_string('urgent_until_off', $c), 'small' => '', 'soon' => false] :
-            ($item->type === 'agenda' ? ['when' => get_string('when_always', $c),
-            'small' => get_string('when_agenda', $c), 'soon' => false] : phrases::when($item, $today));
+            ($item->type === 'agenda' || $item->type === 'table' ? ['when' => get_string('when_always', $c),
+            'small' => get_string($item->type === 'table' ? 'when_table' : 'when_agenda', $c), 'soon' => false] :
+            phrases::when($item, $today));
         if (!$item->visible) {
             $when = ['when' => get_string('when_hidden', $c), 'small' => '', 'soon' => false];
         }
@@ -684,7 +690,7 @@ class home {
             'kind' => get_string('kind_' . $kind, $c) . ($thumb['video'] ? ' · ' . $thumb['video'] : '') .
                 ($photos ? ' · ' . get_string('kind_album_photos', $c, $photos) : ''),
             'kindicon' => icons::svg(['photo' => 'photo', 'video' => 'video', 'album' => 'photo', 'notice' => 'notice',
-                'event' => 'event', 'ticker' => 'ticker', 'agenda' => 'agenda', 'urgent' => 'urgent'][$kind]),
+                'event' => 'event', 'ticker' => 'ticker', 'agenda' => 'agenda', 'table' => 'table', 'urgent' => 'urgent'][$kind]),
             'meta' => $meta,
             'when' => $when['when'],
             'whensmall' => $when['small'],
@@ -743,12 +749,13 @@ class home {
             $out['day'] = \core_text::substr($words[0], 0, 3);
             $out['num'] = $words[1] ?? '';
             $out['stage'] = categories::resolve($data['category'] ?? ($data['color'] ?? 0));
-        } else if ($item->type === 'agenda') {
+        } else if ($item->type === 'agenda' || $item->type === 'table') {
             foreach ([0, 0, 2, 0, 3, 0, 0, 0, 1, 0, 0, 4, 0, 0, 0, 2, 2, 0, 0, 0, 0] as $stage) {
                 $out['agenda'][] = ['stage' => $stage ? 's' . $stage : ''];
             }
         }
-        $out['is' . ($item->type === 'urgent' ? 'notice' : ($item->type === 'album' ? 'media' : $item->type))] = true;
+        $look = ['urgent' => 'notice', 'album' => 'media', 'table' => 'agenda'];
+        $out['is' . ($look[$item->type] ?? $item->type)] = true;
         if ($item->type === 'album') {
             $out['photos'] = count(items::album_files((int) $item->id));
         }

@@ -164,7 +164,8 @@ class player_page {
         foreach (
             ['hechauka.css', 'composiciones.css', 'tiempo.css', 'semana.css', 'proximos-dias.css', 'urgente.css',
             'distancia.css', 'jerarquia.css', 'tercios.css', 'cinta.css', 'usos.css', 'agenda.css', 'fotos.css',
-            'lideres.css', 'agenda-lista.css', 'cumple.css', 'reposo.css', 'plazos.css', 'biblioteca.css', 'alergenos.css', 'identidad.css',
+            'lideres.css', 'agenda-lista.css', 'cumple.css', 'reposo.css', 'plazos.css', 'biblioteca.css', 'alergenos.css',
+            'identidad.css',
             'pieles.css', 'fondos.css', 'letras.css', 'actividad.css'] as $file
         ) {
             $sheets .= '<link rel="stylesheet" href="' . $url($file) . '">';

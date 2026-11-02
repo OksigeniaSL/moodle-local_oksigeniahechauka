@@ -302,3 +302,14 @@ test('with nothing at all to show, a screen at rest, with its code only while th
     assert.equal(new Composer().next([], 0, true, {distance: 3, phrases: ['Hola']}).comp, 'solo-hoy');
     assert.equal(new Composer().next([], 1, true, {distance: 3}).comp, 'solo-hoy');
 });
+
+test('the tables take turns, each with its own page', () => {
+    const c = new Composer();
+    const tables = [{id: 'a', type: 'table'}, {id: 'b', type: 'table'}];
+    const seen = [];
+    for (let i = 0; i < 40; i++) {
+        seen.push(c.next([], 4, true, {tables, distance: 3}));
+    }
+    const shown = seen.filter((x) => x.comp === 'tabla').map((x) => x.extra.item.id + x.extra.page);
+    assert.deepEqual(shown.slice(0, 4), ['a0', 'b0', 'a1', 'b1']);
+});

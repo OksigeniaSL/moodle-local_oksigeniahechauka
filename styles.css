@@ -3673,3 +3673,14 @@ dialog.hkp-dialog > footer {
     padding: 0;
     list-style: none;
 }
+
+/* The seven kinds of content fit in a row; the heading of a section without a fieldset reads like the legend of the others. */
+.hkp-types {
+    grid-template-columns: repeat(auto-fit, minmax(5rem, 1fr));
+}
+
+.hkp-fs > h2.hkp-label {
+    margin: 0 0 .75rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+}

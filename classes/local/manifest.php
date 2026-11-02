@@ -268,7 +268,7 @@ class manifest {
             $items = array_merge($items, sources::events($now, self::AGENDA_DAYS, $scope));
         }
         if (!empty($config->sourcenews)) {
-            $items = array_merge($items, sources::news($now, (int) ($config->newsdays ?? 7) ?: 7));
+            $items = array_merge($items, news::without_own(sources::news($now, (int) ($config->newsdays ?? 7) ?: 7)));
         }
         if (!empty($config->sourcebooks)) {
             $items = array_merge($items, sources::books($now, (int) ($config->booksdays ?? 14) ?: 14));

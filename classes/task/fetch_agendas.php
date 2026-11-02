@@ -25,9 +25,10 @@
 namespace local_oksigeniahechauka\task;
 
 use local_oksigeniahechauka\local\agendas;
+use local_oksigeniahechauka\local\tables;
 
 /**
- * Every quarter of an hour, the agendas read more than ten minutes ago.
+ * Every quarter of an hour, the agendas and the tables read more than ten minutes ago.
  */
 class fetch_agendas extends \core\task\scheduled_task {
     /**
@@ -47,6 +48,9 @@ class fetch_agendas extends \core\task\scheduled_task {
     public function execute(): void {
         foreach (agendas::fetch_all(time(), 600) as $itemid => $result) {
             mtrace('Agenda ' . $itemid . ': ' . $result);
+        }
+        foreach (tables::fetch_all(time(), 600) as $itemid => $result) {
+            mtrace('Table ' . $itemid . ': ' . $result);
         }
     }
 }

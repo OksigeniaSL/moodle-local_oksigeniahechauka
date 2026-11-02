@@ -307,7 +307,7 @@
         };
 
         const send = function () {
-            if (!frame || !frame.contentWindow || cfg.type === 'agenda' || cfg.type === 'album') {
+            if (!frame || !frame.contentWindow || cfg.type === 'agenda' || cfg.type === 'table' || cfg.type === 'album') {
                 return;
             }
             const item = draft();
@@ -335,7 +335,7 @@
                 case 'event':
                     return s.note_event;
             }
-            return s.note_agenda;
+            return cfg.type === 'table' ? s.note_table : s.note_agenda;
         };
 
         const update = function () {
@@ -385,7 +385,7 @@
             }
             const publish = q('#hkp-publish');
             if (publish) {
-                publish.textContent = cfg.type === 'agenda' ? s.publish_agenda : (list.length === 1 ? s.publish_one :
+                publish.textContent = cfg.type === 'agenda' ? s.publish_agenda : cfg.type === 'table' ? s.publish_table : (list.length === 1 ? s.publish_one :
                     fmt(s.publish_n, list.length));
             }
             // The screens to look at: those it goes to.
@@ -420,7 +420,7 @@
             // How long the title is, for reading it from afar.
             const len = q('#hkp-len');
             const title = q('#hkp-title');
-            if (len && title && !title.classList.contains('is-invalid') && cfg.type !== 'agenda') {
+            if (len && title && !title.classList.contains('is-invalid') && cfg.type !== 'agenda' && cfg.type !== 'table') {
                 const long = title.value.length > cfg.short;
                 len.className = 'hkp-hint' + (long ? ' is-warn' : '');
                 len.textContent = long ? s.len_long : s.len_ok;

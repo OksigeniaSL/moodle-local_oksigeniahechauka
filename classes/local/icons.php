@@ -48,6 +48,7 @@ class icons {
         'event' => '<rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/>' .
             '<circle cx="15.5" cy="15" r="1.7" fill="currentColor" stroke="none"/>',
         'ticker' => '<rect x="2.5" y="8" width="19" height="8" rx="1.6"/><path d="M6 12h2.5M11 12h7"/>',
+        'table' => '<rect x="3.5" y="5" width="17" height="14" rx="2"/><path d="M3.5 10h17M3.5 14.5h17M10 5v14"/>',
         'agenda' => '<rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/>' .
             '<path d="M8.6 15.6a3.4 3.4 0 0 0 6.2 1M15.4 14.4a3.4 3.4 0 0 0-6.2-1"/>',
         'urgent' => '<path d="M12 3.6 2.6 19.8h18.8L12 3.6z"/><path d="M12 10v4.4M12 17.1v.1"/>',

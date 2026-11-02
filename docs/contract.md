@@ -182,6 +182,7 @@ changed, or the manifest with its `ETag` header:
   - `{"type": "birthdays", "date": "YYYY-MM-DD", "when": {…}, "people": [{"name": "…", "group": "…", "photo": {media}}]}`: `group` and `photo` may be missing. Never an age or a year.
   - `{"type": "books", "label": "…", "books": [{"title": "…", "subtitle": "…", "authors": ["…"], "cover": {media}, "colour": {"bg": "#rrggbb", "ink": "#rrggbb"}, "library": "…", "web": "https://…"}]}`: without `cover`, a drawn cover in `colour`.
   - `{"type": "deadlines", "label": "…", "words": {"due": "…", "quiz": "…"}, "days": [{"date": "YYYY-MM-DD", "items": [{"course": "…", "activity": "…", "kind": "due|quiz", "time": "HH:MM", "color": 2}]}]}`: `color` is the centre's category of the course, when it has one.
+  - `{"type": "table", "title": "…", "head": ["…"], "rows": [["…"]]}`: a table of the centre, up to 6 columns and 100 rows, each cell as plain text.
 - In a `menu` item, `menus[].courses[].allergens` is a list per dish, aligned with `dishes`, of codes of Regulation (EU) 1169/2011, and `allergennames` gives their names. An empty list says nothing about the dish: never that it has none.
 - An `event` may have `icon`: a name of `player/actividad-iconos.js`, or `none`. Without it, the player chooses by the words of its title.
 - `sample`: true when the manifest carries example data; the screen says so in a corner.

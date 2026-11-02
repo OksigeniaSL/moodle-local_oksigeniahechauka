@@ -181,6 +181,7 @@ class compose {
             'title' => $title,
             'body' => $body,
             'important' => (bool) $v('important', !empty($data['important'])),
+            'alsonews' => (bool) $v('alsonews', false),
             'caption' => (bool) $v('caption', $item ? !empty($data['caption']) : true),
             'url' => (string) $v('url', $data['url'] ?? ''),
             'web' => (string) $v('web', $data['web'] ?? ''),
@@ -310,9 +311,9 @@ class compose {
         $types = [];
         foreach (
             ['notice' => 'notice', 'media' => 'photo', 'album' => 'photo', 'event' => 'event', 'ticker' => 'ticker',
-            'agenda' => 'agenda'] as $t => $icon
+            'agenda' => 'agenda', 'table' => 'table'] as $t => $icon
         ) {
-            if ($t === 'agenda' && !access::can('publishall')) {
+            if (($t === 'agenda' || $t === 'table') && !access::can('publishall')) {
                 continue;
             }
             $types[] = ['type' => $t, 'label' => get_string('add_' . $t, $c), 'icon' => icons::svg($icon),
@@ -332,6 +333,7 @@ class compose {
             'id' => $item ? (int) $item->id : 0,
             'type' => $type,
             'is' . $type => true,
+            'isfeed' => $type === 'agenda' || $type === 'table',
             'editing' => (bool) $item,
             'title' => get_string($item ? 'compose_edit' : 'compose_add', $c),
             'back' => (new \moodle_url('/local/oksigeniahechauka/index.php'))->out(false),
@@ -342,6 +344,10 @@ class compose {
             'hastypes' => !$item,
             'values' => $values,
             'stages' => $stages,
+            'news' => [
+                'can' => $type === 'notice' && empty($data['forumdiscussion']) && news::can_publish((int) $GLOBALS['USER']->id),
+                'sent' => !empty($data['forumdiscussion']) ? news::url((int) $data['forumdiscussion']) : '',
+            ],
             'activities' => self::activities((string) $v('icon', $data['icon'] ?? '')),
             'hascategories' => count($stages) > 1,
             'centre' => access::can('managescreens') ? (new \moodle_url('/local/oksigeniahechauka/centre.php'))->out(false) : '',
@@ -446,7 +452,8 @@ class compose {
         $c = self::C;
         $keys = ['s_today', 's_always', 's_until', 's_range', 's_from', 's_one', 's_untilover', 's_weekdays', 's_only',
             's_hours', 's_hours2', 's_allday', 's_every', 's_more', 'where_all_n', 'where_some', 'where_one_screen',
-            'where_none', 'publish_n', 'publish_one', 'publish_agenda', 'len_ok', 'len_long', 'note_notice',
+            'where_none', 'publish_n', 'publish_one', 'publish_agenda', 'note_table', 'publish_table', 'len_ok', 'len_long',
+            'note_notice',
             'note_important', 'note_landscape', 'note_vertical', 'note_video', 'note_full', 'note_ticker', 'note_event',
             'note_agenda', 'and', 'draft_title', 'draft_ticker', 'longday', 'mode_photo', 'mode_today', 'mode_withtoday',
             'mode_full'];
@@ -483,6 +490,7 @@ class compose {
             'title' => trim(optional_param('title', '', PARAM_TEXT)),
             'body' => trim(optional_param('body', '', PARAM_TEXT)),
             'important' => optional_param('important', 0, PARAM_BOOL),
+            'alsonews' => optional_param('alsonews', 0, PARAM_BOOL),
             'caption' => optional_param('caption', 0, PARAM_BOOL),
             'how' => optional_param('how', 'auto', PARAM_ALPHA),
             'url' => trim(optional_param('url', '', PARAM_RAW_TRIMMED)),
@@ -510,6 +518,9 @@ class compose {
         $errors = [];
         if ($type !== 'media' && $in['title'] === '') {
             $errors['title'] = get_string('compose_needtitle', $c);
+        }
+        if ($type === 'table' && !preg_match('#^https?://#i', $in['url'])) {
+            $errors['url'] = get_string('table_bad_url', $c);
         }
         if ($type === 'agenda' && !preg_match('#^(https?|webcal)://#i', $in['url'])) {
             $errors['url'] = get_string('agenda_bad_url', $c);
@@ -546,7 +557,7 @@ class compose {
         $days = array_values(array_unique(array_filter(array_map('intval', $in['days']), function ($d) {
             return $d >= 1 && $d <= 7;
         })));
-        if ($type !== 'agenda' && !$days) {
+        if ($type !== 'agenda' && $type !== 'table' && !$days) {
             $errors['days'] = get_string('power_nodays', $c);
         }
         $times = [];
@@ -661,12 +672,12 @@ class compose {
         $record->duration = $item->duration ?? 0;
         $record->visible = $in['publish'] ? 1 : 0;
         $record->targetall = $all ? 1 : 0;
-        $record->datefrom = $type === 'agenda' ? null : $datefrom;
-        $record->dateuntil = $type === 'agenda' ? null : $dateuntil;
+        $record->datefrom = $type === 'agenda' || $type === 'table' ? null : $datefrom;
+        $record->dateuntil = $type === 'agenda' || $type === 'table' ? null : $dateuntil;
         $single = $datefrom !== null && $datefrom === $dateuntil;
-        $record->days = $type !== 'agenda' && !$single && count($days) < 7 ? implode(',', $days) : null;
-        $record->times = $type !== 'agenda' && $times ? json_encode($times) : null;
-        $record->everyweeks = $type !== 'agenda' && !$single && $in['every'] > 1 ? min(4, $in['every']) : 0;
+        $record->days = $type !== 'agenda' && $type !== 'table' && !$single && count($days) < 7 ? implode(',', $days) : null;
+        $record->times = $type !== 'agenda' && $type !== 'table' && $times ? json_encode($times) : null;
+        $record->everyweeks = $type !== 'agenda' && $type !== 'table' && !$single && $in['every'] > 1 ? min(4, $in['every']) : 0;
         if ($type === 'notice') {
             $extra['important'] = (bool) $in['important'];
         } else if ($type === 'album') {
@@ -693,6 +704,8 @@ class compose {
             $extra['category'] = categories::position($in['colour']) ? $in['colour'] : '';
             $extra['icon'] = in_array($in['icon'], array_merge(['none'], self::ACTIVITIES), true) ? $in['icon'] : '';
             unset($extra['color']);
+        } else if ($type === 'table') {
+            $extra['url'] = $in['url'];
         } else if ($type === 'agenda') {
             $extra['url'] = $in['url'];
             $extra['category'] = categories::position($in['colour']) ? $in['colour'] : '';
@@ -705,6 +718,14 @@ class compose {
             $DB->update_record('local_oksigeniahechauka_item', $record);
         } else {
             $record->id = $DB->insert_record('local_oksigeniahechauka_item', $record);
+        }
+        // Also in the news forum, once, and only what is published. Changing the notice afterwards does not change what was sent.
+        if ($type === 'notice' && $in['alsonews'] && !empty($record->visible) && empty($extra['forumdiscussion'])) {
+            $discussion = news::publish($record->title, (string) $record->body, (int) $USER->id);
+            if ($discussion) {
+                $extra['forumdiscussion'] = $discussion;
+                $DB->set_field('local_oksigeniahechauka_item', 'data', json_encode($extra), ['id' => $record->id]);
+            }
         }
         if ($upload) {
             $fs = get_file_storage();

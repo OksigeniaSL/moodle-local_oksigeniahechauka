@@ -17,6 +17,7 @@
 namespace local_oksigeniahechauka;
 
 use local_oksigeniahechauka\local\categories;
+use local_oksigeniahechauka\local\news;
 use local_oksigeniahechauka\local\screens;
 use local_oksigeniahechauka\local\sources;
 
@@ -167,5 +168,31 @@ final class sources_test extends \advanced_testcase {
         $this->assertSame(['De la facultad', 'Del curso', 'Del sitio'], $titles);
         $all = array_merge(...array_column(sources::deadlines($now, 7, $scope)[0]['days'], 'items'));
         $this->assertSame(['Mi tarea'], array_column($all, 'activity'));
+    }
+
+    /**
+     * A notice sent to the news forum is posted once under the name of who writes it, and the screens do not show it twice.
+     */
+    public function test_notice_in_the_news(): void {
+        global $DB;
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        $now = time();
+        $user = $this->getDataGenerator()->create_user();
+        $this->assertFalse(news::can_publish((int) $user->id));
+        $this->assertNull(news::publish('No', 'Sin permiso', (int) $user->id));
+
+        $discussion = news::publish('Salida temprana', 'Las clases acaban antes', (int) get_admin()->id);
+        $this->assertNotEmpty($discussion);
+        $this->assertSame('Salida temprana', $DB->get_field('forum_discussions', 'name', ['id' => $discussion]));
+        $this->assertSame((int) get_admin()->id, (int) $DB->get_field('forum_discussions', 'userid', ['id' => $discussion]));
+
+        $found = sources::news($now + 5, 7);
+        $this->assertSame(['news-' . $discussion], array_column($found, 'id'));
+        $this->assertSame(['news-' . $discussion], array_column(news::without_own($found), 'id'));
+        $DB->insert_record('local_oksigeniahechauka_item', (object) ['type' => 'notice', 'title' => 'Salida temprana', 'body' => '',
+            'data' => json_encode(['forumdiscussion' => $discussion]), 'visible' => 1, 'targetall' => 1, 'sortorder' => 0,
+            'usermodified' => 2, 'timecreated' => $now, 'timemodified' => $now]);
+        $this->assertSame([], news::without_own($found));
     }
 }

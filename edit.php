@@ -26,6 +26,7 @@ require(__DIR__ . '/../../config.php');
 
 use local_oksigeniahechauka\local\access;
 use local_oksigeniahechauka\local\agendas;
+use local_oksigeniahechauka\local\tables;
 use local_oksigeniahechauka\local\compose;
 use local_oksigeniahechauka\local\items;
 
@@ -61,8 +62,8 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && empty($_POST) && !empty($_S
         \core\output\notification::NOTIFY_ERROR
     );
 }
-if ($type === 'agenda') {
-    // A calendar brings content for everyone: the office and who runs the screens.
+if ($type === 'agenda' || $type === 'table') {
+    // A calendar or a table brings content for everyone: the office and who runs the screens.
     access::require_cap('publishall');
 }
 $panel = new moodle_url('/local/oksigeniahechauka/index.php');
@@ -88,6 +89,18 @@ if (data_submitted() && confirm_sesskey()) {
             redirect(
                 $panel,
                 $ok ? get_string('agenda_read', $c, (int) ($data['count'] ?? 0)) : get_string('agenda_failed', $c, $result),
+                null,
+                $ok ? \core\output\notification::NOTIFY_SUCCESS : \core\output\notification::NOTIFY_WARNING
+            );
+        }
+        if ($type === 'table') {
+            // Read at once, too.
+            $result = tables::fetch($saved, $now);
+            $data = items::data($DB->get_record('local_oksigeniahechauka_item', ['id' => $saved]));
+            $ok = $result === 'ok';
+            redirect(
+                $panel,
+                $ok ? get_string('table_read', $c, (int) ($data['count'] ?? 0)) : get_string('table_failed', $c, $result),
                 null,
                 $ok ? \core\output\notification::NOTIFY_SUCCESS : \core\output\notification::NOTIFY_WARNING
             );

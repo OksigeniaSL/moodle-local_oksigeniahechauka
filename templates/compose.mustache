@@ -29,7 +29,7 @@
         "hows": [{"value": "auto", "label": "Automático", "checked": true}], "hastypes": true, "types": [{"type": "notice", "label": "Aviso", "icon": "", "checked": true, "url": "#"}],
         "values": {"title": "Salida temprana el viernes", "body": "", "important": false, "caption": true, "url": "", "web": "",
             "eventday": "2026-11-02", "eventfrom": "10:00", "eventto": ""},
-        "stages": [], "activities": [{"id": "", "label": "Según el título", "short": "Aa", "src": "", "checked": true}], "hascategories": false, "centre": "", "file": null, "maxbytes": "100 MB",
+        "stages": [], "news": {"can": true, "sent": ""}, "activities": [{"id": "", "label": "Según el título", "short": "Aa", "src": "", "checked": true}], "hascategories": false, "centre": "", "file": null, "maxbytes": "100 MB",
         "shortcuts": [{"value": "friday", "label": "Hasta el viernes", "checked": true}],
         "datesopen": false, "from": "", "to": "",
         "days": [{"n": 1, "letter": "L", "name": "lunes", "on": true}],
@@ -62,6 +62,8 @@
             <div class="hkp-field"><label class="form-label" for="hkp-title">{{#str}}compose_says, local_oksigeniahechauka{{/str}}</label><input class="form-control is-big{{#errors.title}} is-invalid{{/errors.title}}" id="hkp-title" name="title" value="{{values.title}}" maxlength="120" autocomplete="off" required><p class="hkp-hint" id="hkp-len">{{#errors.title}}{{errors.title}}{{/errors.title}}</p></div>
             <div class="hkp-field"><label class="form-label" for="hkp-body">{{#str}}compose_oneline, local_oksigeniahechauka{{/str}}</label><input class="form-control" id="hkp-body" name="body" value="{{values.body}}" maxlength="120" autocomplete="off"></div>
             <div class="hkp-switch form-switch form-check"><input class="form-check-input" type="checkbox" role="switch" id="hkp-imp" name="important" value="1"{{#values.important}} checked{{/values.important}}><div><label class="form-check-label" for="hkp-imp">{{#str}}flag_important, local_oksigeniahechauka{{/str}}</label><p>{{#str}}compose_important_help, local_oksigeniahechauka{{/str}}</p></div></div>
+            {{#news.can}}<div class="hkp-field"><div class="hkp-switch form-switch form-check"><input class="form-check-input" type="checkbox" role="switch" id="hkp-news" name="alsonews" value="1"{{#values.alsonews}} checked{{/values.alsonews}}><label class="form-check-label" for="hkp-news">{{#str}}compose_alsonews, local_oksigeniahechauka{{/str}}</label></div><p class="hkp-hint">{{#str}}compose_alsonews_help, local_oksigeniahechauka{{/str}}</p></div>{{/news.can}}
+            {{#news.sent}}<p class="hkp-hint"><a href="{{news.sent}}">{{#str}}compose_alsonews_sent, local_oksigeniahechauka{{/str}}</a></p>{{/news.sent}}
             {{/isnotice}}
             {{#ismedia}}
             <legend>{{#str}}compose_media, local_oksigeniahechauka{{/str}}</legend>
@@ -118,6 +120,12 @@
             {{#hascategories}}<div class="hkp-field"><span class="hkp-label" id="hkp-col-l">{{#str}}compose_category, local_oksigeniahechauka{{/str}}</span><div class="hkp-stages" role="radiogroup" aria-labelledby="hkp-col-l">{{#stages}}<label class="hkp-chip is-small" data-stage="{{n}}"><input type="radio" name="colour" value="{{id}}" data-n="{{n}}"{{#checked}} checked{{/checked}}><i aria-hidden="true"></i>{{label}}</label>{{/stages}}</div>
                 <p class="hkp-hint">{{#str}}compose_colour_help, local_oksigeniahechauka{{/str}}</p></div>{{/hascategories}}
             {{/isagenda}}
+            {{#istable}}
+            <legend>{{#str}}compose_table, local_oksigeniahechauka{{/str}}</legend>
+            <div class="hkp-field"><label class="form-label" for="hkp-title">{{#str}}compose_name, local_oksigeniahechauka{{/str}}</label><input class="form-control{{#errors.title}} is-invalid{{/errors.title}}" id="hkp-title" name="title" value="{{values.title}}" maxlength="120" required></div>
+            <div class="hkp-field"><label class="form-label" for="hkp-url">{{#str}}table_url, local_oksigeniahechauka{{/str}}</label><input class="form-control{{#errors.url}} is-invalid{{/errors.url}}" id="hkp-url" name="url" type="url" value="{{values.url}}" required>
+                <p class="hkp-hint">{{#errors.url}}<b class="text-danger">{{errors.url}}</b> {{/errors.url}}{{#str}}compose_table_help, local_oksigeniahechauka{{/str}}</p></div>
+            {{/istable}}
         </fieldset>
 
         <aside class="hkp-preview" aria-labelledby="hkp-pv-h">
@@ -128,10 +136,10 @@
             <p class="hkp-preview-note" id="hkp-pv-note" aria-live="polite"></p>
         </aside>
 
-        {{#isagenda}}
-        <section class="hkp-fs hkp-when"><h2 class="hkp-label">{{#str}}when, local_oksigeniahechauka{{/str}}</h2><p class="hkp-hint">{{#str}}compose_agenda_when, local_oksigeniahechauka{{/str}}</p></section>
-        {{/isagenda}}
-        {{^isagenda}}
+        {{#isfeed}}
+        <section class="hkp-fs hkp-when"><h2 class="hkp-label">{{#str}}when, local_oksigeniahechauka{{/str}}</h2><p class="hkp-hint">{{#isagenda}}{{#str}}compose_agenda_when, local_oksigeniahechauka{{/str}}{{/isagenda}}{{#istable}}{{#str}}compose_table_when, local_oksigeniahechauka{{/str}}{{/istable}}</p></section>
+        {{/isfeed}}
+        {{^isfeed}}
         <fieldset class="hkp-fs hkp-when">
             <legend>{{#isevent}}{{#str}}compose_when_event, local_oksigeniahechauka{{/str}}{{/isevent}}{{^isevent}}{{#str}}when, local_oksigeniahechauka{{/str}}{{/isevent}}</legend>
             <div class="hkp-chips" role="radiogroup" aria-label="{{#str}}compose_when_label, local_oksigeniahechauka{{/str}}">
@@ -159,7 +167,7 @@
                 </div>
             </details>
         </fieldset>
-        {{/isagenda}}
+        {{/isfeed}}
 
         <fieldset class="hkp-fs hkp-where">
             <legend>{{#str}}where, local_oksigeniahechauka{{/str}}</legend>

@@ -20,6 +20,7 @@
 // cumple          whose birthday it is today, with their pictures, by pages
 // biblioteca      what has come to the library: a book at a time with its QR, the next ones on the shelf
 // plazos          what falls due in the courses in the coming days, by days and by pages
+// tabla           a table of the centre: a spreadsheet or a list, by pages
 // reposo          nothing at all to show: the centre, the hour, the date and the weather, under a sky that goes by
 //
 // By the distance it is read from (the art direction's 0.7.0): at 3 m, all; at 5 m, all but «semana»; at 8 m, no
@@ -34,6 +35,9 @@ const BOOKS_EVERY = 16;
 
 /** How many slides go by between one of the deadlines and the next. */
 const DEADLINES_EVERY = 12;
+
+/** How many slides go by between one of the tables and the next. */
+const TABLES_EVERY = 8;
 
 /** Width over height of an item's picture or video; landscape when it does not say. */
 export function ratio(item) {
@@ -183,6 +187,17 @@ export class Composer {
             this.sinceDeadlines = 1;
             this.deadlinePage = (this.deadlinePage === undefined ? -1 : this.deadlinePage) + 1;
             return pick('plazos', [], 15, {item: o.deadlines, page: this.deadlinePage});
+        }
+        this.sinceTables = (this.sinceTables === undefined ? TABLES_EVERY / 2 : this.sinceTables) + 1;
+        if (o.tables && o.tables.length && this.sinceTables > TABLES_EVERY) {
+            this.sinceTables = 1;
+            // Each table in turn, and each with its own page.
+            this.tableTurn = (this.tableTurn === undefined ? -1 : this.tableTurn) + 1;
+            this.tablePages = this.tablePages || {};
+            const table = o.tables[this.tableTurn % o.tables.length];
+            const page = this.tablePages[table.id] === undefined ? 0 : this.tablePages[table.id] + 1;
+            this.tablePages[table.id] = page;
+            return pick('tabla', [], 15, {item: table, page});
         }
         // At 8 m the ticker's sentences and the countdown come as slides of their own, one every four.
         if (far && this.n % 4 === 3) {

@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.8.3 (in progress)
+
+- **Tables**: a new kind of content, from a spreadsheet published as CSV or from a JSON, read every few minutes, with the last good one kept if the source fails.
+- **A notice can go to the site news too**, written once: Moodle sends it to whoever follows that forum, by mail or on their phone, and the screens do not show it twice.
+
 ## 0.8.2 (2026-11-02)
 
 - What falls due in the courses has its slide: a sheet by days, with the course first and big, in the centre's colour, off until a centre turns it on.
