@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.6
+
+- **An example the first time:** a new installation starts with a piece of each kind (an important notice, notices, photos, an event, a table and the ticker), each one saying what it does, in the language of the site, so neither the panel nor the first screen starts empty. The screens say «Example data» while any of it is left; the panel takes it all out with one button, and anything of it changed in the panel becomes the centre's. Its event moves ahead by itself.
+
 ## 0.8.5
 
 - **Sites of a centre:** a group of screens somewhere else (a camp, another campus, a branch) can have its own name, place and weather, and logos, from its card in «Screens and groups». Its screens take them instead of the centre's; the screens of a centre do not need to be on the same network.

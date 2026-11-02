@@ -23,6 +23,7 @@
 
     Example context (json):
     {
+        "sample": {"remove": "#"},
         "style": "",
         "title": "Pantallas",
         "sub": "",
@@ -65,6 +66,7 @@
         {{#ok}}<p class="hkp-health" data-state="ok" role="status"><span class="hkp-state" data-state="on"><span class="hkp-dot" aria-hidden="true"></span>{{title}}</span>{{#detail}}<span>{{detail}}</span>{{/detail}}</p>{{/ok}}
         {{^ok}}<section class="hkp-health" data-state="down" role="status"><span class="hkp-health-icon">{{{icon}}}</span><p><b>{{bold}}</b> {{detail}}</p>{{#see}}<a class="btn btn-sm btn-outline-secondary" href="{{see}}">{{#str}}health_see, local_oksigeniahechauka{{/str}}</a>{{/see}}</section>{{/ok}}
     {{/health}}
+    {{#sample}}<aside class="hkp-sample" role="note"><p><b>{{#str}}sample_on_title, local_oksigeniahechauka{{/str}}</b> {{#str}}sample_on, local_oksigeniahechauka{{/str}}</p><a class="btn btn-outline-secondary" href="{{remove}}">{{#str}}sample_remove, local_oksigeniahechauka{{/str}}</a></aside>{{/sample}}
     {{#missing.0}}<aside class="hkp-missing" aria-labelledby="hkp-missing-h"><b id="hkp-missing-h">{{#str}}start_missing_title, local_oksigeniahechauka{{/str}}</b><ul>{{#missing}}<li><a href="{{url}}">{{label}}</a></li>{{/missing}}</ul></aside>{{/missing.0}}
     {{#minefirst}}{{> local_oksigeniahechauka/home_content}}{{> local_oksigeniahechauka/home_wall}}{{/minefirst}}
     {{^minefirst}}{{> local_oksigeniahechauka/home_wall}}{{> local_oksigeniahechauka/home_content}}{{/minefirst}}

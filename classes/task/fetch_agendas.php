@@ -25,6 +25,7 @@
 namespace local_oksigeniahechauka\task;
 
 use local_oksigeniahechauka\local\agendas;
+use local_oksigeniahechauka\local\sample;
 use local_oksigeniahechauka\local\tables;
 
 /**
@@ -52,5 +53,6 @@ class fetch_agendas extends \core\task\scheduled_task {
         foreach (tables::fetch_all(time(), 600) as $itemid => $result) {
             mtrace('Table ' . $itemid . ': ' . $result);
         }
+        sample::refresh(time());
     }
 }

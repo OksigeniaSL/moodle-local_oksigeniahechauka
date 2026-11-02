@@ -3950,3 +3950,22 @@ dialog.hkp-dialog > footer {
 .hkp-site .hkp-foot {
     margin-top: 1rem;
 }
+
+/* The example the centre finds the first time, and the way to take it out. */
+.hkp-sample {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .75rem 1.25rem;
+    align-items: center;
+    justify-content: space-between;
+    margin: 0 0 1rem;
+    padding: .9rem 1.25rem;
+    border: 1px dashed var(--hkp-line);
+    border-radius: var(--hkp-radius);
+    background: var(--hkp-card);
+}
+
+.hkp-sample p {
+    flex: 1 1 20rem;
+    margin: 0;
+}

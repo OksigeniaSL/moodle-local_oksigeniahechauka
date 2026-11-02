@@ -120,6 +120,7 @@ class home {
             'tabs' => self::tabs('home', $managescreens),
             'hastabs' => $managescreens,
             'missing' => $managescreens ? startpage::missing() : [],
+            'sample' => $publishall && sample::exists() ? ['remove' => self::remove_sample_url()] : null,
             'style' => self::stages(),
             'health' => $urgents ? [] : self::health($states, $now, $managescreens),
             'urgent' => $urgents ? self::urgent_banner(end($urgents), $reached, $publishall) : null,
@@ -229,6 +230,15 @@ class home {
             $out[] = '--hkp-stage-' . $n . ': ' . $colour;
         }
         return implode('; ', $out);
+    }
+
+    /**
+     * Where the button that takes the example out goes.
+     *
+     * @return string
+     */
+    protected static function remove_sample_url(): string {
+        return (new \moodle_url('/local/oksigeniahechauka/index.php', ['action' => 'removesample', 'sesskey' => sesskey()]))->out(false);
     }
 
     /**

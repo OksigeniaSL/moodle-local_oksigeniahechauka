@@ -54,7 +54,7 @@ if ($action !== '' && confirm_sesskey()) {
     $id = optional_param('id', 0, PARAM_INT);
     if (in_array($action, ['reload', 'reloadall'])) {
         access::require_cap('managescreens');
-    } else if (in_array($action, ['up', 'down'])) {
+    } else if (in_array($action, ['up', 'down', 'removesample'])) {
         access::require_cap('publishall');
     }
     if (in_array($action, ['show', 'hide', 'delete', 'up', 'down', 'duplicate'])) {
@@ -64,6 +64,10 @@ if ($action !== '' && confirm_sesskey()) {
         }
     }
     switch ($action) {
+        case 'removesample':
+            $gone = \local_oksigeniahechauka\local\sample::remove();
+            redirect($url, get_string('sample_removed', $c, $gone), null, \core\output\notification::NOTIFY_SUCCESS);
+            break;
         case 'duplicate':
             // A copy to change and publish, open at once.
             if (items::copyable($item)) {

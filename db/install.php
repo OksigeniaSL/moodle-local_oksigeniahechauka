@@ -23,7 +23,7 @@
  */
 
 /**
- * The two roles to run the screens without being administrators.
+ * The roles to run the screens without being administrators, and the example the centre finds the first time.
  *
  * @return bool
  */
@@ -31,5 +31,8 @@ function xmldb_local_oksigeniahechauka_install() {
     // Moodle stores the capabilities of a plugin after this function: the roles need them now.
     update_capabilities('local_oksigeniahechauka');
     \local_oksigeniahechauka\local\access::create_roles();
+    if (\local_oksigeniahechauka\local\sample::at_install()) {
+        \local_oksigeniahechauka\local\sample::add(time());
+    }
     return true;
 }

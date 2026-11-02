@@ -184,7 +184,8 @@ class tables {
         $out = [];
         foreach ($DB->get_records('local_oksigeniahechauka_item', ['type' => 'table', 'visible' => 1]) as $item) {
             $data = items::data($item);
-            if ($now - (int) ($data['fetched'] ?? 0) >= $age) {
+            // One with no address (the example's) keeps what it has.
+            if (($data['url'] ?? '') !== '' && $now - (int) ($data['fetched'] ?? 0) >= $age) {
                 $out[$item->id] = self::fetch((int) $item->id, $now);
             }
         }
