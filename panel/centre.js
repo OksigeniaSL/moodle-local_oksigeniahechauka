@@ -159,6 +159,13 @@
             send();
         });
     });
+    // The cards are drawn in the letter of each skin.
+    const gallery = page.querySelector('[data-letters]');
+    if (gallery) {
+        const letters = document.createElement('style');
+        letters.textContent = gallery.getAttribute('data-letters');
+        document.head.appendChild(letters);
+    }
     // Choosing a skin brings its colours; touching them afterwards makes them the centre's own.
     page.querySelectorAll('input[name="skin"]').forEach((radio) => {
         radio.addEventListener('change', () => {

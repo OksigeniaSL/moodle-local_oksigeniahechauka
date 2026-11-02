@@ -81,8 +81,7 @@
                 <section class="hkp-fs" aria-labelledby="hkp-skin-h">
                     <h2 id="hkp-skin-h" class="hkp-label hkp-section-label">{{#str}}centre_skin, local_oksigeniahechauka{{/str}}</h2>
                     <p class="hkp-hint hkp-section-hint">{{#str}}centre_skin_help, local_oksigeniahechauka{{/str}}</p>
-                    <style>{{{skinletters}}}</style>
-                    <div class="hkp-skins" role="radiogroup" aria-labelledby="hkp-skin-h">{{#skins}}<label class="hkp-skin"><input class="visually-hidden sr-only" type="radio" name="skin" value="{{id}}" data-skin="{{skin}}" data-primary="{{primary}}" data-accent="{{accent}}" data-skin-primary="{{skinprimary}}" data-skin-accent="{{skinaccent}}"{{#checked}} checked{{/checked}}><span class="hkp-skin-art" style="background:{{fondo}};color:{{texto}};font-family:'{{family}}',sans-serif" aria-hidden="true"><b>Aa</b><i style="background:{{primary}}"><u style="background:{{accent}}"></u></i></span><span class="hkp-skin-name">{{name}}</span></label>{{/skins}}</div>
+                    <div class="hkp-skins" role="radiogroup" aria-labelledby="hkp-skin-h" data-letters="{{skinletters}}">{{#skins}}<label class="hkp-skin"><input class="visually-hidden sr-only" type="radio" name="skin" value="{{id}}" data-skin="{{skin}}" data-primary="{{primary}}" data-accent="{{accent}}" data-skin-primary="{{skinprimary}}" data-skin-accent="{{skinaccent}}"{{#checked}} checked{{/checked}}><span class="hkp-skin-art" style="background:{{fondo}};color:{{texto}};font-family:'{{family}}',sans-serif" aria-hidden="true"><b>Aa</b><i style="background:{{primary}}"><u style="background:{{accent}}"></u></i></span><span class="hkp-skin-name">{{name}}</span></label>{{/skins}}</div>
                 </section>
                 <section class="hkp-fs" aria-labelledby="hkp-col-h">
                     <h2 id="hkp-col-h" class="hkp-label hkp-section-label">{{#str}}centre_colours, local_oksigeniahechauka{{/str}}</h2>
