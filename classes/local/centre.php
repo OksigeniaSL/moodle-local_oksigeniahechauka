@@ -174,6 +174,8 @@ class centre {
             'skins' => skins::gallery($config),
             'skinletters' => skins::gallery_letters(),
             'custom' => skins::editor($config),
+            'birthdays' => ['on' => !empty($config->sourcebirthdays),
+                'url' => (new \moodle_url('/local/oksigeniahechauka/birthdays.php'))->out(false)],
             'sitelogo' => !files::first(files::LOGO, 0) && files::site_logo(),
             'categories' => $cats,
             'hascategories' => (bool) $cats,

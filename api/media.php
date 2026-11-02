@@ -41,7 +41,7 @@ if (!$file || !files::readable($file)) {
     endpoint::fail(404, 'notfound');
 }
 $area = $file->get_filearea();
-if (!files::is_logo($file) && !items::reaches((int) $file->get_itemid(), (int) $screen->id)) {
+if (!files::is_logo($file) && !files::from_source($file) && !items::reaches((int) $file->get_itemid(), (int) $screen->id)) {
     endpoint::fail(404, 'notfound');
 }
 \core\session\manager::write_close();

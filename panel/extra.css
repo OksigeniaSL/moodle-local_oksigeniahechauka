@@ -996,3 +996,101 @@ dialog.hkp-dialog > footer {
         scroll-margin-top: 14rem;              /* what gets the focus never stays under the band */
     }
 }
+
+/* The birthdays. */
+.hkp-birthdays {
+    display: grid;
+    gap: 1rem;
+}
+.hkp-birthdays form + form {
+    margin-top: 1.25rem;
+}
+.hkp-bd-today {
+    margin: .75rem 0 0;
+}
+.hkp-bd-list {
+    display: grid;
+    gap: .35rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+.hkp-bd-row {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    padding: .35rem .5rem;
+    border: 1px solid var(--hkp-line);
+    border-radius: var(--hkp-radius-sm);
+}
+.hkp-bd-face {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    overflow: hidden;
+    border-radius: 50%;
+    background: var(--hkp-wall);
+    font-weight: 700;
+}
+.hkp-bd-face img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.hkp-bd-who {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+.hkp-bd-who small {
+    color: var(--hkp-muted);
+}
+.hkp-bd-date {
+    flex: none;
+    color: var(--hkp-muted);
+    font-size: .875rem;
+}
+
+/* The icon of an event. */
+.hkp-activities {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(5rem, 1fr));
+    gap: .4rem;
+}
+.hkp-activity {
+    display: grid;
+    justify-items: center;
+    gap: .2rem;
+    margin: 0;
+    padding: .35rem .2rem;
+    border: 1px solid var(--hkp-edge);
+    border-radius: var(--hkp-radius-sm);
+    background: var(--hkp-card);
+    cursor: pointer;
+}
+.hkp-activity:has(input:checked) {
+    border-color: var(--hkp-accent-edge);
+    background: var(--hkp-accent-tint);
+    box-shadow: inset 0 0 0 1px var(--hkp-accent-edge);
+}
+.hkp-activity:has(input:focus-visible) {
+    outline: 3px solid var(--bs-focus-ring-color, currentColor);
+    outline-offset: 2px;
+}
+.hkp-activity-art {
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    font-weight: 700;
+}
+.hkp-activity-art img {
+    width: 100%;
+    height: 100%;
+}
+.hkp-activity-name {
+    font-size: .75rem;
+    line-height: 1.15;
+    text-align: center;
+}

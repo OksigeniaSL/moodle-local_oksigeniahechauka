@@ -73,6 +73,20 @@ export function colourOf(ev, text, categories) {
     return n >= 1 && n <= 6 ? n : (categoryOf(text, categories) || categoryOf(ev && ev.title, categories));
 }
 
+/**
+ * The icon of an event: the one chosen for it, else the one its words point to (actividad-iconos.js, which comes before the player).
+ *
+ * @param {object} ev
+ * @param {string} title
+ * @returns {string} a name, or '' for none
+ */
+export function iconOf(ev, title) {
+    if (ev.icon) {
+        return ev.icon === 'none' ? '' : ev.icon;
+    }
+    return typeof HK_ACTIVIDAD !== 'undefined' ? HK_ACTIVIDAD.porTitulo(title || '') : '';
+}
+
 /** «3º ESO - Acampada» reads as «Acampada» with «3º ESO» under it; a title without « - » stays whole. */
 export function splitTitle(title) {
     const t = String(title || '');
@@ -142,6 +156,7 @@ export function upcoming(events, today, days, s, skip) {
             title: parts.title,
             group: parts.group || ev.detail || '',
             color: colourOf(ev, parts.group || ev.detail, s.categories),
+            icon: iconOf(ev, parts.title),
             sameDay: date === before,
         };
         before = date;
@@ -168,7 +183,7 @@ export function countdown(events, today, max, categories) {
         if (long && days >= 2 && days <= (max || 14) && (!best || days < best.days)) {
             const parts = splitTitle(ev.title);
             best = {id: ev.id, days, title: parts.title, group: parts.group || ev.detail || '', date: dateOf(ev.start),
-                color: colourOf(ev, parts.group || ev.detail, categories)};
+                color: colourOf(ev, parts.group || ev.detail, categories), icon: iconOf(ev, parts.title)};
         }
     });
     return best;
@@ -227,7 +242,7 @@ export function eventsOn(events, today, ahead, categories) {
         const parts = splitTitle(ev.title);
         const timed = !ev.allday && ev.start.length >= 16 && dayNumber(dateOf(ev.start)) === day;
         return {time: timed ? ev.start.slice(11, 16) : '·', title: parts.title, group: parts.group || ev.detail || '',
-            color: colourOf(ev, parts.group || ev.detail, categories), holiday: ev.holiday === true};
+            color: colourOf(ev, parts.group || ev.detail, categories), holiday: ev.holiday === true, icon: iconOf(ev, parts.title)};
     });
 }
 
@@ -316,6 +331,7 @@ export function agendaOf(events, today, days, max, s) {
             title: parts.title,
             group: parts.group || ev.detail || '',
             color: colourOf(ev, parts.group || ev.detail, s.categories),
+            icon: iconOf(ev, parts.title),
             until,
         });
     });

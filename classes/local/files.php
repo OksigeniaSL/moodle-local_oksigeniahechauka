@@ -40,6 +40,9 @@ class files {
     /** A still of a video. */
     const POSTER = 'poster';
 
+    /** The picture of someone on the list of birthdays. */
+    const BIRTHDAY = 'birthday';
+
     /** A blurred still of a video, behind it when it does not fill its zone. */
     const BACKDROP = 'backdrop';
 
@@ -125,6 +128,23 @@ class files {
     }
 
     /**
+     * Whether a file comes with what arrives by itself and is no item's: a cover of the library, a picture of a birthday.
+     *
+     * @param \stored_file $file
+     * @return bool
+     */
+    public static function from_source(\stored_file $file): bool {
+        if ($file->get_component() === sources::BOOKS && $file->get_filearea() === 'cover') {
+            return !$file->is_directory() && sources::has_books();
+        }
+        $listed = $file->get_component() === self::COMPONENT && $file->get_filearea() === self::BIRTHDAY;
+        if ($file->get_component() === 'user' || $listed) {
+            return birthdays::may_show($file);
+        }
+        return false;
+    }
+
+    /**
      * Whether a file is one of the screens', in an area a screen may read.
      *
      * @param \stored_file $file
@@ -133,6 +153,9 @@ class files {
     public static function readable(\stored_file $file): bool {
         if ($file->get_component() === 'core_admin') {
             return in_array($file->get_filearea(), ['logo', 'logocompact']) && !$file->is_directory();
+        }
+        if (self::from_source($file)) {
+            return true;
         }
         return $file->get_component() === self::COMPONENT
             && (int) $file->get_contextid() === (int) self::context()->id

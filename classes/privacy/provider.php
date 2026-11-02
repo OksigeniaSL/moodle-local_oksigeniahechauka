@@ -54,6 +54,13 @@ class provider implements
             'usermodified' => 'privacy:metadata:item:usermodified',
             'timemodified' => 'privacy:metadata:item:timemodified',
         ], 'privacy:metadata:item');
+        $collection->add_database_table('local_oksigeniahechauka_birthday', [
+            'name' => 'privacy:metadata:birthday:name',
+            'groupname' => 'privacy:metadata:birthday:groupname',
+            'month' => 'privacy:metadata:birthday:month',
+            'day' => 'privacy:metadata:birthday:day',
+            'usermodified' => 'privacy:metadata:birthday:usermodified',
+        ], 'privacy:metadata:birthday');
         return $collection;
     }
 

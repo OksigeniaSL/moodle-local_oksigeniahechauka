@@ -17,10 +17,18 @@
 // agenda          the month and a diary of the next thirty days that goes up by stretches and stops to be read
 // fotos-tercio    an album's photos, one at a time, in a third, and what leads in the other two
 // muro            three to five photos of an album, one changing at a time; on a showcase, with a poster and its QR
+// cumple          whose birthday it is today, with their pictures, by pages
+// biblioteca      what has come to the library: a book at a time with its QR, the next ones on the shelf
 //
 // By the distance it is read from (the art direction's 0.7.0): at 3 m, all; at 5 m, all but «semana»; at 8 m, no
 // thirds (foto-hoy is foto-sola, a landscape video is foto-completa, «Today» comes one thing at a time) and the
 // ticker's sentences come as slides of their own.
+
+/** How many slides go by between one of the birthdays and the next. */
+const BIRTHDAY_EVERY = 7;
+
+/** How many slides go by between one of the library and the next. */
+const BOOKS_EVERY = 16;
 
 /** Width over height of an item's picture or video; landscape when it does not say. */
 export function ratio(item) {
@@ -150,6 +158,20 @@ export class Composer {
             }
             const it = queue[this.position(queue)];
             return pick('escaparate', [it], it.web && it.type !== 'video' ? Math.max(15, secondsOf(it)) : secondsOf(it));
+        }
+        // What comes by itself has slides of its own: a birthday at once and then one slide in seven, so that nobody passes without
+        // seeing their name; the library, one in sixteen. Each turn the next page, which the slide knows how to show.
+        this.sinceBirthday = (this.sinceBirthday === undefined ? BIRTHDAY_EVERY : this.sinceBirthday) + 1;
+        this.sinceBooks = (this.sinceBooks === undefined ? BOOKS_EVERY / 2 : this.sinceBooks) + 1;
+        if (o.birthdays && this.sinceBirthday > BIRTHDAY_EVERY) {
+            this.sinceBirthday = 1;
+            this.birthdayPage = (this.birthdayPage === undefined ? -1 : this.birthdayPage) + 1;
+            return pick('cumple', [], 12, {item: o.birthdays, page: this.birthdayPage});
+        }
+        if (o.books && this.sinceBooks > BOOKS_EVERY) {
+            this.sinceBooks = 1;
+            this.bookPage = (this.bookPage === undefined ? -1 : this.bookPage) + 1;
+            return pick('biblioteca', [], 15, {item: o.books, page: this.bookPage});
         }
         // At 8 m the ticker's sentences and the countdown come as slides of their own, one every four.
         if (far && this.n % 4 === 3) {

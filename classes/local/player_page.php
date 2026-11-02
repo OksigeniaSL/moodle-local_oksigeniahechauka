@@ -160,7 +160,7 @@ class player_page {
         foreach (
             ['hechauka.css', 'composiciones.css', 'tiempo.css', 'semana.css', 'proximos-dias.css', 'urgente.css',
             'distancia.css', 'jerarquia.css', 'tercios.css', 'cinta.css', 'usos.css', 'agenda.css', 'fotos.css',
-            'lideres.css', 'agenda-lista.css', 'identidad.css', 'pieles.css', 'fondos.css', 'letras.css'] as $file
+            'lideres.css', 'agenda-lista.css', 'identidad.css', 'pieles.css', 'fondos.css', 'letras.css', 'actividad.css'] as $file
         ) {
             $sheets .= '<link rel="stylesheet" href="' . $url($file) . '">';
         }
@@ -181,6 +181,7 @@ class player_page {
             '<div id="hechauka"></div>' .
             '<script id="hechauka-boot" type="application/json">' . $json . '</script>' .
             '<script src="' . $url('tiempo-iconos.js') . '"></script>' .
+            '<script src="' . $url('actividad-iconos.js') . '"></script>' .
             '<script src="' . $url('build/hechauka.js') . '"></script>' .
             '</body></html>';
     }

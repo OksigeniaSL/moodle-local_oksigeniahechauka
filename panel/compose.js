@@ -186,6 +186,9 @@
                 const start = f.eventDay + 'T' + (isHour(f.eventFrom) ? f.eventFrom : '00:00');
                 const item = {id: 'draft', type: 'event', zone: 'side', title: title || s.draft_title, start,
                     color: Number(f.colour) || 0, allday: !isHour(f.eventFrom)};
+                if (f.icon) {
+                    item.icon = f.icon;
+                }
                 if (isHour(f.eventTo) && f.eventTo > f.eventFrom) {
                     item.end = f.eventDay + 'T' + f.eventTo;
                 }
@@ -297,6 +300,7 @@
                 eventFrom: value('#hkp-ef'),
                 eventTo: value('#hkp-et'),
                 colour: colour ? colour.getAttribute('data-n') : 0,
+                icon: q('input[name="icon"]:checked') ? q('input[name="icon"]:checked').value : '',
                 how: q('input[name="how"]:checked') ? q('input[name="how"]:checked').value : 'auto',
                 media,
             }, s);

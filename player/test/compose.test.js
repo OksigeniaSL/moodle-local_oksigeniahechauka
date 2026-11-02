@@ -138,7 +138,7 @@ test('the coming days: after today, within the week, in order, the same day not 
 
 test('one countdown, for the nearest event of more than a day, from two to fourteen days ahead', () => {
     const events = [
-        {id: 'a', title: '5º Pri - Acampada', start: '2026-11-09T08:00', end: '2026-11-11T16:00', color: 3},
+        {id: 'a', title: '5º Pri - Acampada', start: '2026-11-09T08:00', end: '2026-11-11T16:00', color: 3, icon: ''},
         {id: 'b', title: '3º ESO - Acampada', start: '2026-11-03T08:00', end: '2026-11-06T16:00'},
         {id: 'c', title: 'Teatro', start: '2026-11-02T10:00', end: '2026-11-02T12:00'},
         {id: 'd', title: 'Mañana mismo', start: '2026-11-01T08:00', end: '2026-11-03T16:00'},
@@ -146,7 +146,7 @@ test('one countdown, for the nearest event of more than a day, from two to fourt
     // The colour comes from the centre's categories (here, a school's), or is 0 without them.
     const cats = [{n: 3, words: ['eso']}];
     assert.deepEqual(countdown(events, '2026-10-31', 14, cats), {id: 'b', days: 3, title: 'Acampada', group: '3º ESO',
-        date: '2026-11-03', color: 3});
+        date: '2026-11-03', color: 3, icon: ''});
     assert.equal(countdown(events, '2026-10-31', 14).color, 0);
     assert.equal(countdown(events, '2026-11-09', 14), null);
 });
@@ -250,4 +250,31 @@ test('a draft in the preview stands where it would go', () => {
     assert.equal(draftChoice(notice, 'main', [], true).comp, 'solo-hoy');
     assert.equal(draftChoice(notice, 'today', [photo], true).comp, 'solo-hoy');
     assert.equal(draftChoice({id: 'draft', type: 'event'}, 'week', [photo], true).comp, 'agenda');
+});
+
+test('birthdays come at once and every seven slides, each time the next page; the library, one in sixteen', () => {
+    const c = new Composer();
+    const birthdays = {id: 'b', type: 'birthdays', people: [{name: 'A'}]};
+    const books = {id: 'l', type: 'books', books: [{title: 'T'}]};
+    const seen = [];
+    for (let i = 0; i < 40; i++) {
+        seen.push(c.next([], 4, true, {birthdays, books, distance: 3}));
+    }
+    assert.equal(seen[0].comp, 'cumple');
+    assert.deepEqual(seen[0].extra, {item: birthdays, page: 0});
+    const cumple = seen.filter((x) => x.comp === 'cumple');
+    const biblioteca = seen.filter((x) => x.comp === 'biblioteca');
+    assert.ok(cumple.length >= 5 && cumple.length <= 6, 'birthdays: ' + cumple.length);
+    assert.ok(biblioteca.length >= 2 && biblioteca.length <= 3, 'library: ' + biblioteca.length);
+    assert.equal(cumple[1].extra.page, 1);
+    assert.equal(biblioteca[1].extra.page, 1);
+});
+
+test('a showcase has neither birthdays nor the library', () => {
+    const c = new Composer();
+    const seen = [];
+    for (let i = 0; i < 20; i++) {
+        seen.push(c.next([], 4, true, {use: 'showcase', birthdays: {id: 'b'}, books: {id: 'l'}}).comp);
+    }
+    assert.ok(!seen.includes('cumple') && !seen.includes('biblioteca'));
 });

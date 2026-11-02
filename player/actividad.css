@@ -1,0 +1,46 @@
+/* Oksigenia Hechauka: the icons by kind of activity (Gaudí, 2 November 2026). Nothing newer than Chromium 56. The outline stays
+ * dark on the dark theme too: these are stickers, and the fill is what reads on either ground. */
+:root {
+    --hk-actividad-trazo: #2c3a4b;
+    --hk-actividad-linea: #2c3a4b;
+    --hk-actividad-rojo: #ec5f52;
+    --hk-actividad-naranja: #f7953a;
+    --hk-actividad-amarillo: #ffc533;
+    --hk-actividad-verde: #4cb37a;
+    --hk-actividad-azul: #4b9be6;
+    --hk-actividad-violeta: #9a78dd;
+    --hk-actividad-crema: #fff3da;
+    --hk-actividad-gris: #c5cfdb;
+    --hk-actividad-marron: #c08a52;
+}
+[data-tema="oscuro"],
+.hk-sobre-foto {
+    --hk-actividad-trazo: #0c1420;
+    --hk-actividad-linea: #e3e9f1;
+    --hk-actividad-rojo: #ee6a5e;
+    --hk-actividad-naranja: #f9a050;
+    --hk-actividad-amarillo: #ffc533;
+    --hk-actividad-verde: #5cc08a;
+    --hk-actividad-azul: #68aeee;
+    --hk-actividad-violeta: #ab8ee6;
+    --hk-actividad-crema: #fff3da;
+    --hk-actividad-gris: #c5cfdb;
+    --hk-actividad-marron: #cc9a66;
+}
+.hk-icono-actividad {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}
+.hk-icono-actividad .a-l { fill: none; stroke: var(--hk-actividad-trazo); }
+.hk-icono-actividad .a-f { fill: none; stroke: var(--hk-actividad-linea); }
+.hk-icono-actividad .a-rojo { fill: var(--hk-actividad-rojo); stroke: var(--hk-actividad-trazo); }
+.hk-icono-actividad .a-naranja { fill: var(--hk-actividad-naranja); stroke: var(--hk-actividad-trazo); }
+.hk-icono-actividad .a-amarillo { fill: var(--hk-actividad-amarillo); stroke: var(--hk-actividad-trazo); }
+.hk-icono-actividad .a-verde { fill: var(--hk-actividad-verde); stroke: var(--hk-actividad-trazo); }
+.hk-icono-actividad .a-azul { fill: var(--hk-actividad-azul); stroke: var(--hk-actividad-trazo); }
+.hk-icono-actividad .a-violeta { fill: var(--hk-actividad-violeta); stroke: var(--hk-actividad-trazo); }
+.hk-icono-actividad .a-crema { fill: var(--hk-actividad-crema); stroke: var(--hk-actividad-trazo); }
+.hk-icono-actividad .a-gris { fill: var(--hk-actividad-gris); stroke: var(--hk-actividad-trazo); }
+.hk-icono-actividad .a-marron { fill: var(--hk-actividad-marron); stroke: var(--hk-actividad-trazo); }

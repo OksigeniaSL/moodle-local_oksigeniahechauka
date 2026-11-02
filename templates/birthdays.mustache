@@ -1,0 +1,81 @@
+{{!
+    This file is part of Moodle - https://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+}}
+}}
+{{!
+    @template local_oksigeniahechauka/birthdays
+
+    The birthdays: whether the screens show them, the field of the profile and the list kept here.
+
+    Example context (json):
+    {
+        "tabs": [{"url": "#", "label": "Tu centro", "icon": "", "current": true}], "hastabs": true, "centre": "#", "action": "#",
+        "sesskey": "abc", "on": true, "fields": [{"value": "", "label": "Ninguno", "selected": true}], "hasfields": false,
+        "days": [1, 2], "months": [{"value": 1, "label": "enero"}], "count": 1, "haspeople": true, "hastoday": true,
+        "today": "Lucía Pérez",
+        "people": [{"id": 1, "name": "Lucía Pérez", "group": "3.º A", "date": "15 marzo", "photo": "", "initial": "L"}]
+    }
+}}
+<div class="hkp" id="hkp-birthdays-page">
+    <header class="hkp-head"><div class="hkp-head-title"><h1>{{#str}}birthdays_title, local_oksigeniahechauka{{/str}}</h1></div></header>
+    {{#hastabs}}<nav class="hkp-tabs" aria-label="{{#str}}tabs_label, local_oksigeniahechauka{{/str}}">{{#tabs}}<a href="{{url}}"{{#current}} aria-current="page"{{/current}}>{{{icon}}}{{label}}</a>{{/tabs}}</nav>{{/hastabs}}
+    <div class="hkp-birthdays">
+        <section class="hkp-fs" aria-labelledby="hkp-bd-on">
+            <h2 id="hkp-bd-on" class="hkp-label hkp-section-label">{{#str}}birthdays_screens, local_oksigeniahechauka{{/str}}</h2>
+            <p class="hkp-hint hkp-section-hint">{{#str}}birthdays_help, local_oksigeniahechauka{{/str}}</p>
+            <form method="post" action="{{action}}">
+                <input type="hidden" name="sesskey" value="{{sesskey}}"><input type="hidden" name="action" value="settings">
+                <div class="form-switch form-check hkp-field"><input class="form-check-input" type="checkbox" role="switch" id="hkp-bd-switch" name="on" value="1"{{#on}} checked{{/on}}><label class="form-check-label" for="hkp-bd-switch">{{#str}}birthdays_on, local_oksigeniahechauka{{/str}}</label></div>
+                {{#hasfields}}<div class="hkp-field"><label class="form-label" for="hkp-bd-field">{{#str}}birthdays_field, local_oksigeniahechauka{{/str}}</label><select class="form-select" id="hkp-bd-field" name="field">{{#fields}}<option value="{{value}}"{{#selected}} selected{{/selected}}>{{label}}</option>{{/fields}}</select><p class="hkp-hint">{{#str}}birthdays_field_help, local_oksigeniahechauka{{/str}}</p></div>{{/hasfields}}
+                {{^hasfields}}<p class="hkp-hint">{{#str}}birthdays_field_empty, local_oksigeniahechauka{{/str}}</p>{{/hasfields}}
+                <div class="hkp-foot"><button type="submit" class="btn btn-primary">{{#str}}centre_save, local_oksigeniahechauka{{/str}}</button></div>
+            </form>
+            <p class="hkp-hint hkp-bd-today">{{#hastoday}}{{#str}}birthdays_today, local_oksigeniahechauka, {{today}}{{/str}}{{/hastoday}}{{^hastoday}}{{#str}}birthdays_today_none, local_oksigeniahechauka{{/str}}{{/hastoday}}</p>
+        </section>
+        <section class="hkp-fs" aria-labelledby="hkp-bd-add">
+            <h2 id="hkp-bd-add" class="hkp-label hkp-section-label">{{#str}}birthdays_add, local_oksigeniahechauka{{/str}}</h2>
+            <p class="hkp-hint hkp-section-hint">{{#str}}birthdays_add_help, local_oksigeniahechauka{{/str}}</p>
+            <form method="post" action="{{action}}" enctype="multipart/form-data">
+                <input type="hidden" name="sesskey" value="{{sesskey}}"><input type="hidden" name="action" value="add">
+                <div class="hkp-row">
+                    <div class="hkp-field"><label class="form-label" for="hkp-bd-name">{{#str}}birthdays_name, local_oksigeniahechauka{{/str}}</label><input class="form-control" id="hkp-bd-name" name="name" maxlength="120" required autocomplete="off"></div>
+                    <div class="hkp-field"><label class="form-label" for="hkp-bd-group">{{#str}}birthdays_group, local_oksigeniahechauka{{/str}}</label><input class="form-control" id="hkp-bd-group" name="group" maxlength="60" autocomplete="off"></div>
+                </div>
+                <div class="hkp-row">
+                    <div class="hkp-field"><label class="form-label" for="hkp-bd-day">{{#str}}birthdays_day, local_oksigeniahechauka{{/str}}</label><select class="form-select" id="hkp-bd-day" name="day">{{#days}}<option value="{{.}}">{{.}}</option>{{/days}}</select></div>
+                    <div class="hkp-field"><label class="form-label" for="hkp-bd-month">{{#str}}birthdays_month, local_oksigeniahechauka{{/str}}</label><select class="form-select" id="hkp-bd-month" name="month">{{#months}}<option value="{{value}}">{{label}}</option>{{/months}}</select></div>
+                    <div class="hkp-field"><label class="form-label" for="hkp-bd-photo">{{#str}}birthdays_photo, local_oksigeniahechauka{{/str}}</label><input class="form-control" type="file" id="hkp-bd-photo" name="photo" accept="image/jpeg,image/png"></div>
+                </div>
+                <div class="hkp-foot"><button type="submit" class="btn btn-outline-secondary">{{#str}}birthdays_add_button, local_oksigeniahechauka{{/str}}</button></div>
+            </form>
+            <form method="post" action="{{action}}">
+                <input type="hidden" name="sesskey" value="{{sesskey}}"><input type="hidden" name="action" value="import">
+                <div class="hkp-field"><label class="form-label" for="hkp-bd-list">{{#str}}birthdays_import, local_oksigeniahechauka{{/str}}</label><textarea class="form-control" id="hkp-bd-list" name="list" rows="4"></textarea><p class="hkp-hint">{{#str}}birthdays_import_help, local_oksigeniahechauka{{/str}}</p></div>
+                <div class="hkp-foot"><button type="submit" class="btn btn-outline-secondary">{{#str}}birthdays_import_button, local_oksigeniahechauka{{/str}}</button></div>
+            </form>
+            <form method="post" action="{{action}}" enctype="multipart/form-data">
+                <input type="hidden" name="sesskey" value="{{sesskey}}"><input type="hidden" name="action" value="photos">
+                <div class="hkp-field"><label class="form-label" for="hkp-bd-photos">{{#str}}birthdays_photos, local_oksigeniahechauka{{/str}}</label><input class="form-control" type="file" id="hkp-bd-photos" name="photos[]" accept="image/jpeg,image/png" multiple><p class="hkp-hint">{{#str}}birthdays_photos_help, local_oksigeniahechauka{{/str}}</p></div>
+                <div class="hkp-foot"><button type="submit" class="btn btn-outline-secondary">{{#str}}birthdays_photos_button, local_oksigeniahechauka{{/str}}</button></div>
+            </form>
+        </section>
+        <section class="hkp-fs" aria-labelledby="hkp-bd-people">
+            <h2 id="hkp-bd-people" class="hkp-label hkp-section-label">{{#str}}birthdays_list, local_oksigeniahechauka, {{count}}{{/str}}</h2>
+            {{^haspeople}}<p class="hkp-hint">{{#str}}birthdays_list_empty, local_oksigeniahechauka{{/str}}</p>{{/haspeople}}
+            {{#haspeople}}<ul class="hkp-bd-list">{{#people}}<li class="hkp-bd-row"><span class="hkp-bd-face" aria-hidden="true">{{#photo}}<img src="{{photo}}" alt="">{{/photo}}{{^photo}}{{initial}}{{/photo}}</span><span class="hkp-bd-who"><b>{{name}}</b>{{#group}} <small>{{group}}</small>{{/group}}</span><span class="hkp-bd-date">{{date}}</span><form method="post" action="{{action}}"><input type="hidden" name="sesskey" value="{{sesskey}}"><input type="hidden" name="action" value="delete"><input type="hidden" name="id" value="{{id}}"><button type="submit" class="btn btn-sm btn-outline-secondary" aria-label="{{#str}}birthdays_delete, local_oksigeniahechauka, {{name}}{{/str}}">×</button></form></li>{{/people}}</ul>{{/haspeople}}
+        </section>
+    </div>
+</div>

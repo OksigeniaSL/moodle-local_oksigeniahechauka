@@ -4,7 +4,7 @@ import {readFileSync} from 'node:fs';
 import {menuKind} from '../src/lead.js';
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {afterDayEnd, categoryOf, colourOf, eventsOn, upcoming} from '../src/agenda.js';
+import {afterDayEnd, categoryOf, colourOf, eventsOn, iconOf, upcoming} from '../src/agenda.js';
 import {weekOf} from '../src/week.js';
 import {isHoliday} from '../src/lead.js';
 
@@ -160,4 +160,14 @@ test('a day the agenda marks as closed', () => {
     assert.equal(isHoliday({holiday: true, group: 'Primaria', title: 'Excursión'}), true);
     assert.equal(isHoliday({group: 'Primaria', title: 'Festivo de la ciencia'}), false);
     assert.equal(isHoliday({group: '', title: 'Reunión'}), false);
+});
+
+test('the icon of an event: the chosen one, none, or what its words say', () => {
+    globalThis.HK_ACTIVIDAD = {porTitulo: (t) => (t.indexOf('Teatro') >= 0 ? 'teatro' : '')};
+    assert.equal(iconOf({icon: 'musica'}, 'Teatro en inglés'), 'musica');
+    assert.equal(iconOf({icon: 'none'}, 'Teatro en inglés'), '');
+    assert.equal(iconOf({}, 'Teatro en inglés'), 'teatro');
+    assert.equal(iconOf({}, 'Reunión'), '');
+    delete globalThis.HK_ACTIVIDAD;
+    assert.equal(iconOf({}, 'Teatro en inglés'), '');
 });

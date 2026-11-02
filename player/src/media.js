@@ -213,6 +213,12 @@ export function mediaOf(manifest) {
         add(it.media);
         add(it.poster);
         add(it.backdrop);
+        (it.people || []).forEach(function (person) {
+            add(person.photo);
+        });
+        (it.books || []).forEach(function (book) {
+            add(book.cover);
+        });
     });
     return out;
 }

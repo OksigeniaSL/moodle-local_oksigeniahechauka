@@ -28,6 +28,12 @@ namespace local_oksigeniahechauka\local;
  * Each source gives items of the contract, ready for the manifest, with their own «when».
  */
 class sources {
+    /** @var string The library's plugin. */
+    const BOOKS = 'local_oksigeniaayvurenda';
+
+    /** @var int The most books a screen gets. */
+    const BOOKS_MOST = 12;
+
     /** After this hour the screens show tomorrow's menu, as the canteen's own board does. */
     /** @var string When the day ends for the screens if the centre has not said (then «Today» shows tomorrow). */
     const DAY_END = '16:00';
@@ -118,6 +124,8 @@ class sources {
             return null;
         }
         $menus = [];
+        $names = [];
+        $allergens = (bool) get_config('local_oksigeniahechauka', 'menuallergens');
         foreach ($data['meals'] ?? [] as $meal) {
             foreach ($meal['menus'] ?? [] as $menu) {
                 if (isset($menu['chosen']) && !$menu['chosen']) {
@@ -131,6 +139,15 @@ class sources {
                         $courses[$part] = ['label' => $part, 'dishes' => []];
                     }
                     $courses[$part]['dishes'][] = (string) ($dish['name'] ?? '');
+                    if ($allergens) {
+                        // One list per dish, in its order. An empty one says nothing about the dish, never that it has none.
+                        $codes = [];
+                        foreach ($dish['allergens'] ?? [] as $allergen) {
+                            $codes[] = (string) $allergen['code'];
+                            $names[$allergen['code']] = (string) $allergen['name'];
+                        }
+                        $courses[$part]['allergens'][] = $codes;
+                    }
                 }
                 if ($courses) {
                     $menus[] = ['name' => (string) ($menu['name'] ?? ''), 'courses' => array_values($courses)];
@@ -141,7 +158,57 @@ class sources {
             return null;
         }
         $item['menus'] = $menus;
+        if ($names) {
+            $item['allergennames'] = $names;
+        }
         return $item;
+    }
+
+    /**
+     * Whether the site has the library's function.
+     *
+     * @return bool
+     */
+    public static function has_books(): bool {
+        return class_exists('\\local_oksigeniaayvurenda\\api') && method_exists('\\local_oksigeniaayvurenda\\api', 'new_books');
+    }
+
+    /**
+     * What has come to the library lately, as an item of the contract. The library is not needed: nothing, if it is not there.
+     *
+     * @param int $now
+     * @param int $days how far back
+     * @return array items of the contract
+     */
+    public static function books(int $now, int $days): array {
+        if (!self::has_books()) {
+            return [];
+        }
+        try {
+            $list = \local_oksigeniaayvurenda\api::new_books($now - $days * DAYSECS, self::BOOKS_MOST);
+        } catch (\Throwable $e) {
+            debugging('Hechauka: the books of Ayvurenda failed: ' . $e->getMessage(), DEBUG_DEVELOPER);
+            return [];
+        }
+        $books = [];
+        foreach ($list as $book) {
+            $one = ['title' => items::plain((string) $book['title']),
+                'authors' => array_map([items::class, 'plain'], $book['authors']),
+                'colour' => ['bg' => $book['colour']['background'], 'ink' => $book['colour']['ink']],
+                'library' => items::plain((string) $book['library']), 'web' => (string) $book['url']];
+            if ((string) $book['subtitle'] !== '') {
+                $one['subtitle'] = items::plain((string) $book['subtitle']);
+            }
+            if ($book['cover']) {
+                $one['cover'] = files::media($book['cover']);
+            }
+            $books[] = $one;
+        }
+        if (!$books) {
+            return [];
+        }
+        return [['id' => 'books-' . schedule::day($now), 'type' => 'books', 'zone' => 'extra',
+            'label' => get_string('label_books', 'local_oksigeniahechauka'), 'books' => $books]];
     }
 
     /**

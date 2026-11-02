@@ -177,6 +177,11 @@ changed, or the manifest with its `ETag` header:
 - `weather`: optional. The sky as a `symbol_code` of MET Norway (the player has an icon for each), temperatures in
   degrees Celsius, `rain` the chance of rain in percent only where the source gives it, `text` the sky in words, and
   the `credit` the source asks to show. `now` is the current hour; `today` and `tomorrow`, days of the site's calendar. `days`: the next three days, each with its `date` (for the weather in a third).
+- Items of `zone: "extra"`, which have slides of their own and no place in «Today»:
+  - `{"type": "birthdays", "date": "YYYY-MM-DD", "when": {…}, "people": [{"name": "…", "group": "…", "photo": {media}}]}`: `group` and `photo` may be missing. Never an age or a year.
+  - `{"type": "books", "label": "…", "books": [{"title": "…", "subtitle": "…", "authors": ["…"], "cover": {media}, "colour": {"bg": "#rrggbb", "ink": "#rrggbb"}, "library": "…", "web": "https://…"}]}`: without `cover`, a drawn cover in `colour`.
+- In a `menu` item, `menus[].courses[].allergens` is a list per dish, aligned with `dishes`, of codes of Regulation (EU) 1169/2011, and `allergennames` gives their names. An empty list says nothing about the dish: never that it has none.
+- An `event` may have `icon`: a name of `player/actividad-iconos.js`, or `none`. Without it, the player chooses by the words of its title.
 - `sample`: true when the manifest carries example data; the screen says so in a corner.
 - `theme.skin`: the skin of the screen (`player/pieles.css`, `pieles.json`), which sets its colours and its letter; `theme.vars` goes
   over it. Without it, the first one.

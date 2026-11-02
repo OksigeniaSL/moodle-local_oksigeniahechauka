@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.8.0 (in progress)
+
+- **Birthdays**, off until a centre turns them on: from a date field of the Moodle profile, from a list kept in the panel, or both, with the name, the group and the
+  picture. Never the age or the year, and never on a showcase screen.
+- **New in the library**, from Oksigenia Ayvurenda when it is on the site: the books that have come, with their cover and a QR to their record.
+- **Allergens** of each dish on the menu, from Oksigenia Meals.
+- **Icons by kind of activity** on the coming days and the agenda: by the words of the title, or chosen for each event in the panel.
+
 ## 0.7.19 (2026-11-02)
 
 - In «Tu centro», the screen no longer covers the options when going down the page: it stays above, a little smaller, and the surprises scroll under it.

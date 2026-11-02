@@ -9,6 +9,7 @@ import {MARK, buildLead, buildRest, fitAlso, fitHeadline, fitWord, leadOfTurn, l
 import {qrPath, shortWeb} from './qr.js';
 import {even} from './balance.js';
 import {buildAgenda, startAgenda} from './agendaview.js';
+import {buildBirthdays, buildBooks} from './extras.js';
 import {buildCarousel, buildWall, buildWallBand, startCarousel, startWall, wallCount} from './photos.js';
 import {buildWeek, fitWeek} from './weekview.js';
 
@@ -643,6 +644,14 @@ export class Screen {
         }
         if (comp === 'agenda') {
             buildAgenda(c, extra.data, this.agendaWords());
+            return c;
+        }
+        if (comp === 'cumple') {
+            c.appendChild(buildBirthdays(extra, this.media, this.s));
+            return c;
+        }
+        if (comp === 'biblioteca') {
+            c.appendChild(buildBooks(extra, this.media));
             return c;
         }
         if (comp === 'muro') {

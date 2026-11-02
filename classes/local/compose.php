@@ -26,6 +26,31 @@ namespace local_oksigeniahechauka\local;
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class compose {
+    /** @var string[] The icons by kind of activity, as the art direction drew them (pix/actividad, player/actividad-iconos.js). */
+    const ACTIVITIES = ['campamento', 'halloween', 'excursion', 'teatro', 'deporte', 'reunion', 'musica', 'examen', 'graduacion',
+        'taller', 'conferencia', 'fiesta', 'vacaciones'];
+
+    /**
+     * The icons to choose from for an event: by its words, none, or one of them.
+     *
+     * @param string $chosen
+     * @return array
+     */
+    protected static function activities(string $chosen): array {
+        global $OUTPUT;
+        $c = 'local_oksigeniahechauka';
+        $out = [
+            ['id' => '', 'label' => get_string('compose_icon_auto', $c), 'short' => 'Aa', 'src' => '', 'checked' => $chosen === ''],
+            ['id' => 'none', 'label' => get_string('compose_icon_none', $c), 'short' => '–', 'src' => '',
+                'checked' => $chosen === 'none'],
+        ];
+        foreach (self::ACTIVITIES as $name) {
+            $out[] = ['id' => $name, 'label' => get_string('activity_' . $name, $c), 'short' => '',
+                'src' => $OUTPUT->image_url('actividad/' . $name, $c)->out(false), 'checked' => $chosen === $name];
+        }
+        return $out;
+    }
+
     /** @var string[] How a picture or a video comes out: by its shape, over the whole screen, or whole with no cut. */
     const HOWS = ['auto', 'full', 'whole'];
 
@@ -317,6 +342,7 @@ class compose {
             'hastypes' => !$item,
             'values' => $values,
             'stages' => $stages,
+            'activities' => self::activities((string) $v('icon', $data['icon'] ?? '')),
             'hascategories' => count($stages) > 1,
             'centre' => access::can('managescreens') ? (new \moodle_url('/local/oksigeniahechauka/centre.php'))->out(false) : '',
             'file' => $file,
@@ -462,6 +488,7 @@ class compose {
             'url' => trim(optional_param('url', '', PARAM_RAW_TRIMMED)),
             'web' => trim(optional_param('web', '', PARAM_RAW_TRIMMED)),
             'colour' => optional_param('colour', '', PARAM_ALPHANUM),
+            'icon' => optional_param('icon', '', PARAM_ALPHA),
             'eventday' => optional_param('eventday', '', PARAM_RAW_TRIMMED),
             'eventfrom' => optional_param('eventfrom', '', PARAM_RAW_TRIMMED),
             'eventto' => optional_param('eventto', '', PARAM_RAW_TRIMMED),
@@ -664,6 +691,7 @@ class compose {
             $extra['start'] = $eventstart;
             $extra['end'] = $eventend;
             $extra['category'] = categories::position($in['colour']) ? $in['colour'] : '';
+            $extra['icon'] = in_array($in['icon'], array_merge(['none'], self::ACTIVITIES), true) ? $in['icon'] : '';
             unset($extra['color']);
         } else if ($type === 'agenda') {
             $extra['url'] = $in['url'];

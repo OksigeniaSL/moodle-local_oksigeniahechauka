@@ -20,7 +20,7 @@ import {filesOf, isRaining, Surprises} from './surprises.js';
 import {countToday} from './today.js';
 import {weekOf} from './week.js';
 
-const VERSION = '0.7.19';
+const VERSION = '0.8.0';
 const COMING_DAYS = 7;
 const HEARTBEAT_MS = 60000;
 const REFRESH_MS = 15 * 60000;
@@ -330,7 +330,19 @@ class Player {
             }
         });
         const also = kinds.concat(plain);
-        return {label, courses: item.menus[0].courses || [], also, alsoKinds, note: item.note || ''};
+        // Every allergen of the menu that leads, and their names; what a dish has is in its course, in the order of its dishes.
+        const allergens = [];
+        (item.menus[0].courses || []).forEach(function (course) {
+            (course.allergens || []).forEach(function (codes) {
+                codes.forEach(function (code) {
+                    if (allergens.indexOf(code) < 0) {
+                        allergens.push(code);
+                    }
+                });
+            });
+        });
+        return {label, courses: item.menus[0].courses || [], also, alsoKinds, note: item.note || '', allergens,
+            allergenNames: item.allergennames || {}};
     }
 
     /**
@@ -552,6 +564,12 @@ class Player {
                 distance: (m.screen && m.screen.distance) || 3,
                 countdown: !!today.countdown,
                 agenda: agenda.count > 0,
+                birthdays: liveItems(m.items || [], 'extra', wall).filter(function (it) {
+                    return it.type === 'birthdays';
+                })[0] || null,
+                books: liveItems(m.items || [], 'extra', wall).filter(function (it) {
+                    return it.type === 'books';
+                })[0] || null,
                 albums: albums.map(function (a) {
                     return {id: a.id, count: a.photos.length};
                 }),

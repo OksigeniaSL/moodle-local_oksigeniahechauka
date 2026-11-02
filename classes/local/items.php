@@ -93,6 +93,9 @@ class items {
                 if ($category) {
                     $event['color'] = $category;
                 }
+                if (!empty($data['icon'])) {
+                    $event['icon'] = (string) $data['icon'];
+                }
                 if (!empty($data['end']) && $data['end'] > $data['start']) {
                     $event['end'] = schedule::stamp((int) $data['end']);
                 }

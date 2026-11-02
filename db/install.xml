@@ -142,5 +142,23 @@
         <INDEX NAME="timestart" UNIQUE="false" FIELDS="timestart"/>
       </INDEXES>
     </TABLE>
+    <TABLE NAME="local_oksigeniahechauka_birthday" COMMENT="The birthdays kept in the panel, for those not in Moodle or without the date there. Never the year">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="120" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="groupname" TYPE="char" LENGTH="60" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="month" TYPE="int" LENGTH="2" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="day" TYPE="int" LENGTH="2" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="usermodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="monthday" UNIQUE="false" FIELDS="month, day"/>
+      </INDEXES>
+    </TABLE>
   </TABLES>
 </XMLDB>

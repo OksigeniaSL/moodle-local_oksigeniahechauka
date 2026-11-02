@@ -1,0 +1,392 @@
+<?php
+// This file is part of Moodle - https://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+
+namespace local_oksigeniahechauka\local;
+
+/**
+ * Who has a birthday: from a date field of the Moodle profile the centre chooses, from a list kept in the panel, or both. Never
+ * the year: the list does not keep it, and the screens only ever get a name, a group and a picture.
+ *
+ * @package    local_oksigeniahechauka
+ * @copyright  2026 Oksigenia SL <dev@oksigenia.cc>
+ * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class birthdays {
+    /** @var string The list kept in the panel. */
+    const TABLE = 'local_oksigeniahechauka_birthday';
+
+    /** @var int The side of a picture of the list, in pixels. */
+    const PHOTO = 640;
+
+    /**
+     * The date fields of the Moodle profile, to choose from.
+     *
+     * @return array shortname => name
+     */
+    public static function fields(): array {
+        global $DB;
+        $out = [];
+        $records = $DB->get_records('user_info_field', ['datatype' => 'datetime'], 'sortorder', 'id, shortname, name');
+        foreach ($records as $field) {
+            $out[$field->shortname] = format_string($field->name, true, ['context' => \context_system::instance()]);
+        }
+        return $out;
+    }
+
+    /**
+     * The month and the day to look for on a date. Whoever was born on 29 February has it on the 28th when there is no 29.
+     *
+     * @param string $date YYYY-MM-DD
+     * @return array of [month, day]
+     */
+    protected static function days_of(string $date): array {
+        [$year, $month, $day] = array_map('intval', explode('-', $date));
+        $days = [[$month, $day]];
+        if ($month === 2 && $day === 28 && !checkdate(2, 29, $year)) {
+            $days[] = [2, 29];
+        }
+        return $days;
+    }
+
+    /**
+     * The users whose date field falls on a date.
+     *
+     * @param string $shortname the field
+     * @param string $date YYYY-MM-DD
+     * @return int[] their ids
+     */
+    protected static function users_on(string $shortname, string $date): array {
+        global $DB;
+        if ($shortname === '') {
+            return [];
+        }
+        $cache = \cache::make('local_oksigeniahechauka', 'birthdays');
+        $key = sha1($shortname . '|' . $date);
+        $ids = $cache->get($key);
+        if ($ids !== false) {
+            return $ids;
+        }
+        $ids = [];
+        $wanted = array_map(function ($d) {
+            return sprintf('%02d-%02d', $d[0], $d[1]);
+        }, self::days_of($date));
+        $zone = \core_date::get_server_timezone_object();
+        $rows = $DB->get_recordset_sql(
+            "SELECT d.userid, d.data
+               FROM {user_info_data} d
+               JOIN {user_info_field} f ON f.id = d.fieldid
+               JOIN {user} u ON u.id = d.userid
+              WHERE f.shortname = :shortname AND u.deleted = 0 AND u.suspended = 0",
+            ['shortname' => $shortname]
+        );
+        foreach ($rows as $row) {
+            $time = (int) $row->data;
+            if ($time !== 0 && in_array((new \DateTime('@' . $time))->setTimezone($zone)->format('m-d'), $wanted, true)) {
+                $ids[] = (int) $row->userid;
+            }
+        }
+        $rows->close();
+        $cache->set($key, $ids);
+        return $ids;
+    }
+
+    /**
+     * The picture of a Moodle user.
+     *
+     * @param int $userid
+     * @return \stored_file|null
+     */
+    protected static function user_picture(int $userid): ?\stored_file {
+        $context = \context_user::instance($userid, IGNORE_MISSING);
+        if (!$context) {
+            return null;
+        }
+        foreach (get_file_storage()->get_area_files($context->id, 'user', 'icon', 0, 'id', false) as $file) {
+            if (strpos($file->get_filename(), 'f3.') === 0) {
+                return $file;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * The picture of someone on the list.
+     *
+     * @param int $id
+     * @return \stored_file|null
+     */
+    public static function list_picture(int $id): ?\stored_file {
+        $files = get_file_storage()->get_area_files(files::context()->id, files::COMPONENT, files::BIRTHDAY, $id, 'id', false);
+        return $files ? reset($files) : null;
+    }
+
+    /**
+     * Who has a birthday on a date, by name.
+     *
+     * @param \stdClass $config the plugin's
+     * @param string $date YYYY-MM-DD
+     * @return array of {name, group, photo}, those without a group or a picture without them
+     */
+    public static function on(\stdClass $config, string $date): array {
+        global $DB;
+        $people = [];
+        foreach (self::days_of($date) as [$month, $day]) {
+            foreach ($DB->get_records(self::TABLE, ['month' => $month, 'day' => $day]) as $row) {
+                $people[] = self::person($row->name, (string) $row->groupname, self::list_picture((int) $row->id));
+            }
+        }
+        $ids = self::users_on((string) ($config->birthdayfield ?? ''), $date);
+        if ($ids) {
+            foreach ($DB->get_records_list('user', 'id', $ids, '', 'id, firstname, lastname, department, picture') as $user) {
+                // The first name and the first surname: enough to know who it is, and no more.
+                $surname = preg_split('/\s+/', trim((string) $user->lastname))[0];
+                $people[] = self::person(
+                    trim($user->firstname . ' ' . $surname),
+                    (string) $user->department,
+                    $user->picture ? self::user_picture((int) $user->id) : null
+                );
+            }
+        }
+        usort($people, function ($a, $b) {
+            return strcoll($a['name'], $b['name']);
+        });
+        return $people;
+    }
+
+    /**
+     * Someone, as the screens get them.
+     *
+     * @param string $name
+     * @param string $group
+     * @param \stored_file|null $photo
+     * @return array
+     */
+    protected static function person(string $name, string $group, ?\stored_file $photo): array {
+        $out = ['name' => items::plain($name)];
+        if (trim($group) !== '') {
+            $out['group'] = items::plain($group);
+        }
+        if ($photo) {
+            $out['photo'] = files::media($photo);
+        }
+        return $out;
+    }
+
+    /**
+     * Today's and tomorrow's, as items of the contract: a screen without a network still knows tomorrow's.
+     *
+     * @param \stdClass $config the plugin's
+     * @param int $now
+     * @return array
+     */
+    public static function items(\stdClass $config, int $now): array {
+        if (empty($config->sourcebirthdays)) {
+            return [];
+        }
+        $items = [];
+        foreach ([0, 1] as $add) {
+            $date = schedule::day($now, $add);
+            $people = self::on($config, $date);
+            if ($people) {
+                $items[] = ['id' => 'birthdays-' . $date, 'type' => 'birthdays', 'zone' => 'extra', 'date' => $date,
+                    'when' => ['from' => $date, 'until' => $date], 'people' => $people];
+            }
+        }
+        return $items;
+    }
+
+    /**
+     * Whether a screen may read this picture: only of someone whose birthday is around now, and only with the birthdays on.
+     *
+     * @param \stored_file $file
+     * @return bool
+     */
+    public static function may_show(\stored_file $file): bool {
+        global $DB;
+        $config = get_config('local_oksigeniahechauka');
+        if (empty($config->sourcebirthdays) || $file->is_directory()) {
+            return false;
+        }
+        $now = time();
+        $dates = [schedule::day($now, -1), schedule::day($now), schedule::day($now, 1)];
+        if ($file->get_component() === 'user') {
+            if ($file->get_filearea() !== 'icon' || strpos($file->get_filename(), 'f3.') !== 0) {
+                return false;
+            }
+            $context = \context::instance_by_id($file->get_contextid(), IGNORE_MISSING);
+            if (!$context || (int) $context->contextlevel !== CONTEXT_USER) {
+                return false;
+            }
+            foreach ($dates as $date) {
+                if (in_array((int) $context->instanceid, self::users_on((string) ($config->birthdayfield ?? ''), $date), true)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        $row = $DB->get_record(self::TABLE, ['id' => $file->get_itemid()]);
+        if (!$row) {
+            return false;
+        }
+        foreach ($dates as $date) {
+            foreach (self::days_of($date) as [$month, $day]) {
+                if ((int) $row->month === $month && (int) $row->day === $day) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * The list, in the order of the year.
+     *
+     * @return array of records
+     */
+    public static function all(): array {
+        global $DB;
+        return array_values($DB->get_records(self::TABLE, null, 'month, day, name'));
+    }
+
+    /**
+     * Someone on the list. With the same name on the same day, what comes updates what was there.
+     *
+     * @param string $name
+     * @param string $group
+     * @param int $day
+     * @param int $month
+     * @return int|null the id, or null if the date is no date or there is no name
+     */
+    public static function add(string $name, string $group, int $day, int $month): ?int {
+        global $DB, $USER;
+        $name = \core_text::substr(trim($name), 0, 120);
+        $group = \core_text::substr(trim($group), 0, 60);
+        // Any leap year: 29 February is a date.
+        if ($name === '' || !checkdate($month, $day, 2024)) {
+            return null;
+        }
+        $now = time();
+        $same = $DB->get_record(self::TABLE, ['name' => $name, 'month' => $month, 'day' => $day]);
+        if ($same) {
+            $DB->update_record(self::TABLE, (object) ['id' => $same->id, 'groupname' => $group, 'usermodified' => $USER->id,
+                'timemodified' => $now]);
+            return (int) $same->id;
+        }
+        return (int) $DB->insert_record(self::TABLE, (object) ['name' => $name, 'groupname' => $group, 'month' => $month,
+            'day' => $day, 'usermodified' => $USER->id, 'timecreated' => $now, 'timemodified' => $now]);
+    }
+
+    /**
+     * A list pasted in: a person per line, with name, group and date («Lucía Pérez; 3.º A; 15/03»), separated by a semicolon, a
+     * tab or a comma. The group may be left out. Of the date, the day and the month: a year there is ignored and not kept.
+     *
+     * @param string $text
+     * @return array {added: how many, wrong: the lines not understood}
+     */
+    public static function import(string $text): array {
+        $added = 0;
+        $wrong = [];
+        foreach (preg_split('/\R/u', $text) as $line) {
+            if (trim($line) === '') {
+                continue;
+            }
+            $parts = array_map('trim', preg_split('/[;\t,]/', $line));
+            $date = array_pop($parts);
+            $name = (string) array_shift($parts);
+            $group = implode(' ', $parts);
+            $id = null;
+            if (preg_match('~^(\d{1,2})[/.-](\d{1,2})(?:[/.-]\d{2,4})?$~', $date, $m)) {
+                $id = self::add($name, $group, (int) $m[1], (int) $m[2]);
+            }
+            if ($id) {
+                $added++;
+            } else {
+                $wrong[] = $line;
+            }
+        }
+        return ['added' => $added, 'wrong' => $wrong];
+    }
+
+    /**
+     * Takes someone off the list, with their picture.
+     *
+     * @param int $id
+     * @return void
+     */
+    public static function delete(int $id): void {
+        global $DB;
+        get_file_storage()->delete_area_files(files::context()->id, files::COMPONENT, files::BIRTHDAY, $id);
+        $DB->delete_records(self::TABLE, ['id' => $id]);
+    }
+
+    /**
+     * The picture of someone on the list: reduced, since a screen shows it small and a phone's may weigh megabytes.
+     *
+     * @param int $id
+     * @param string $path the file uploaded
+     * @param string $filename its name
+     * @return bool whether it was a picture
+     */
+    public static function set_picture(int $id, string $path, string $filename): bool {
+        $fs = get_file_storage();
+        $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+        if (!in_array($ext, ['jpg', 'jpeg', 'png'], true)) {
+            return false;
+        }
+        // Read it whole first: a damaged one has a good header, and it must not take the rest of a folder with it.
+        // phpcs:ignore Generic.PHP.NoSilencedErrors.Discouraged
+        if (!@imagecreatefromstring((string) file_get_contents($path))) {
+            return false;
+        }
+        $context = files::context()->id;
+        $fs->delete_area_files($context, files::COMPONENT, files::BIRTHDAY, $id);
+        $record = ['contextid' => $context, 'component' => files::COMPONENT, 'filearea' => files::BIRTHDAY, 'itemid' => $id,
+            'filepath' => '/', 'filename' => 'o.' . $ext];
+        $original = $fs->create_file_from_pathname($record, $path);
+        $record['filename'] = 'p.' . $ext;
+        $fs->convert_image($record, $original, self::PHOTO, self::PHOTO, true);
+        $original->delete();
+        return true;
+    }
+
+    /**
+     * Who a file is for, by its name: a folder of pictures named after each person is what a centre usually has.
+     *
+     * @param string $filename
+     * @return int|null the id of the person on the list, when only one fits
+     */
+    public static function who_is(string $filename): ?int {
+        $wanted = self::plain_name(pathinfo($filename, PATHINFO_FILENAME));
+        $found = [];
+        foreach (self::all() as $row) {
+            if (self::plain_name($row->name) === $wanted) {
+                $found[] = (int) $row->id;
+            }
+        }
+        return count($found) === 1 ? $found[0] : null;
+    }
+
+    /**
+     * A name to compare: no accents, no capitals, nothing but letters and numbers.
+     *
+     * @param string $name
+     * @return string
+     */
+    protected static function plain_name(string $name): string {
+        $ascii = \core_text::strtolower(\core_text::specialtoascii($name));
+        return trim(preg_replace('/[^a-z0-9]+/', ' ', $ascii));
+    }
+}

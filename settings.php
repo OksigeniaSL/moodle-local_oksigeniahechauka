@@ -115,6 +115,27 @@ if ($hassiteconfig) {
             PARAM_INT,
             6
         ));
+        $settings->add(new admin_setting_configcheckbox(
+            "$p/menuallergens",
+            get_string('menuallergens', $p),
+            get_string('menuallergens_desc', $p),
+            1
+        ));
+        $hasbooks = \local_oksigeniahechauka\local\sources::has_books();
+        $settings->add(new admin_setting_configcheckbox(
+            "$p/sourcebooks",
+            get_string('sourcebooks', $p),
+            $hasbooks ? get_string('sourcebooks_desc', $p) : get_string('sourcebooks_missing', $p),
+            $hasbooks ? 1 : 0
+        ));
+        $settings->add(new admin_setting_configtext(
+            "$p/booksdays",
+            get_string('booksdays', $p),
+            get_string('booksdays_desc', $p),
+            14,
+            PARAM_INT,
+            4
+        ));
         $settings->add(new admin_setting_configcheckbox("$p/sourcecalendar", get_string('sourcecalendar', $p), '', 1));
         $settings->add(new admin_setting_configcheckbox("$p/sourcenews", get_string('sourcenews', $p), '', 1));
         $settings->add(new admin_setting_configtext("$p/newsdays", get_string('newsdays', $p), '', 7, PARAM_INT, 4));
