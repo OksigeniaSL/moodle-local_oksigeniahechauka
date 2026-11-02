@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.7.10 (2026-11-02)
+
+- **The octopus**, a new character of the surprises: the screen fills with water up to 40 %, and it comes along the glass in
+  its duck float. It sees you and lets out ink or waves all eight arms until it lets go, and then the water goes down. The
+  water is part of the character's atlas, moved by the compositor with no frames.
+- **The window cleaner**: the screen steams up, a gecko in a helmet peeps through a porthole and wipes it from bottom to top
+  with a squeegee as wide as the screen, until it falls on his head. The steam, its cut and the squeegee are moved in the same
+  step as the character.
+
 ## 0.7.9 (2026-11-02)
 
 - **The spider**, a new character of the surprises: it comes down its thread in eight striped socks, brakes as if on elastic

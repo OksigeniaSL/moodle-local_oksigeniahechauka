@@ -145,7 +145,11 @@ changed, or the manifest with its `ETag` header:
   `characters`: `[{"id": "gusanito", "atlas": "https://…/spr.gusanito.atlas.json"}]`, one of them each time. The atlas
   says its pages (beside it), states, frames per second, speed and shadow; what flies, a step per frame (`avance`), the
   heights it goes at (`altura`) and no shadow; what hangs, also `hilo` (a `[x, y]` of the cell per frame, where its thread
-  ends; the player draws the thread), and `altura` is where it stops. With `tipo: "capas"` (snow, rain), no character: tiles that join on their four
+  ends; the player draws the thread), and `altura` is where it stops; what swims, also `agua`: its water, with `nivel`
+  (`alto`, the part of the screen it fills; `sube` and `baja`, in seconds; `bicho_a`, when the character comes), a body as a
+  gradient (`cuerpo`) and its `capas`, whose tiles are beside the atlas; who comes with steam, also `vaho` (a veil for each
+  shape of screen with its porthole, the squeegee and a ring that closes in) and, per state, `corte` (the height of the cut per
+  frame, `null` once the squeegee is let go) and `tapon` (the opacity of the cover over the porthole). With `tipo: "capas"` (snow, rain), no character: tiles that join on their four
   sides, over the whole screen for `dura` seconds, fades `entra` and `sale` included; by layer, `image`, `w`, `h`,
   `velocidad` `[dx, dy]` in px/s at base 1080 and `opacidad`. A tile down has to be a whole number of tiles across.
   `season`, only on what has dates: `{"from": "12-15", "until": "01-06"}`, month and day, every year; it may go over New

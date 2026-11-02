@@ -9,7 +9,8 @@
 // is drawn in the frame that moves that way, so what is planted stays planted only if both change together.
 //
 // What falls over the whole screen (`tipo: capas`, snow and rain) has no frames: tiles that join on their four sides, one element per
-// layer, each moved by a CSS animation of `transform` on the compositor, with no code per frame.
+// layer, each moved by a CSS animation of `transform` on the compositor, with no code per frame. What swims brings its water in
+// its atlas (`agua`), made the same way; and who comes with steam, the steam (`vaho`), with its cut in step with the sheet.
 
 const LEAST_MINUTES = 15;
 // An order waits this long for the manifest that says who comes out: it may have been given right after turning them on.
@@ -82,6 +83,51 @@ export function walkOf(meta, width, scale, random) {
 }
 
 /**
+ * The way of one who comes with steam: where the veil goes on this screen, how many turns of each loop, and the steps in order. He comes up behind the steam to the
+ * porthole, drops out of sight, and comes back up with the squeegee, from out of sight, so that he ends with the top of his cell on the top of the screen.
+ *
+ * @param {object} meta the atlas's
+ * @param {number} width of the screen
+ * @param {number} height of the screen
+ * @param {number} scale
+ * @param {string} gesture
+ * @param {boolean} slips whether his feet go half way up
+ * @returns {{shape: object, k: number, ox: number, oy: number, x: number, over: number, steps: object[]}}
+ */
+export function cleanOf(meta, width, height, scale, gesture, slips) {
+    const est = meta.estados;
+    const v = meta.vaho;
+    const sum = (state) => est[state].avance.reduce((total, step) => total + step[1], 0) * scale;
+    const shape = width >= height ? v.ancha : v.alta;
+    // The picture covers the screen, centred, with its own proportions: the porthole stays round.
+    const k = Math.max(width / shape.w, height / shape.h);
+    const ox = (width - shape.w * k) / 2;
+    const oy = (height - shape.h * k) / 2;
+    const below = (meta.cell.h - meta.anchor.y) * scale;
+    const stop = oy + shape.hueco[1] * k + (meta.anchor.y - v.cara_y) * scale;
+    const turn = -sum('cruza');
+    const brake = -sum('para');
+    const turns = Math.max(1, Math.ceil((height + below - (stop + brake)) / turn));
+    const over = (v.barra.corte - v.barra.arriba) * scale;
+    const top = meta.anchor.y * scale;
+    const up = -sum('limpia');
+    const from = height + over - (est.limpia.corte[0] - meta.anchor.y) * scale;
+    const times = Math.max(2, Math.ceil((from - top) / up));
+    const first = Math.max(1, Math.round(times * v.resbala_a));
+    const steps = [
+        {state: 'cruza', times: turns, y: stop + brake + turns * turn, behind: true},
+        {state: 'para', times: 1},
+        {state: 'baja', times: 1},
+        {state: 'cae', times: 0, leaves: height + below},
+        {state: 'limpia', times: slips ? first : times, y: top + times * up, wait: v.espera, behind: false},
+    ].concat(slips ? [{state: 'resbala', times: 1}, {state: 'limpia', times: times - first}] : [], [
+        {state: gesture, times: 1},
+        {state: 'huye', times: 0, leaves: -below},
+    ]);
+    return {shape, k, ox, oy, x: ox + shape.hueco[0] * k, over, steps};
+}
+
+/**
  * What hangs comes down instead of crossing: whole turns of its loop, as many as it takes to start out of sight, so that it
  * brakes just at the height it stops at. It leaves upwards.
  *
@@ -148,9 +194,17 @@ export function pagesOf(atlas, states) {
  * @returns {string[]}
  */
 export function filesOf(atlas) {
-    return atlas.meta.pages || atlas.meta.capas.map(function (capa) {
+    const files = atlas.meta.pages || atlas.meta.capas.map(function (capa) {
         return capa.image;
     });
+    const steam = atlas.meta.vaho;
+    if (steam) {
+        return files.concat([steam.ancha.image, steam.ancha.tapon.image, steam.alta.image, steam.alta.tapon.image, steam.barra.image],
+            steam.borde ? [steam.borde.image] : []);
+    }
+    return atlas.meta.agua ? files.concat(atlas.meta.agua.capas.map(function (capa) {
+        return capa.image;
+    })) : files;
 }
 
 /**
@@ -198,6 +252,134 @@ function frameOf(atlas, state, i) {
     return atlas.frames[state + '_' + (i < 10 ? '0' : '') + i];
 }
 
+/**
+ * The water a creature comes with: no frames and no code per frame. A parent goes up, stays and goes down, with one CSS transition
+ * each way; under it, one more that sways a few px; and under that the layers, each moved by one CSS animation of `transform`. The
+ * body is a row of one px of gradient stretched across the screen, so it weighs nothing. The bubbles are in a box with
+ * `overflow: hidden`, so that what reaches the surface is gone.
+ */
+class Water {
+    constructor(layer, water, base) {
+        this.water = water;
+        this.base = base;
+        this.timers = [];
+        this.style = null;
+        this.gone = false;
+        this.root = document.createElement('div');
+        css(this.root, {position: 'absolute', left: '0', top: '0', width: '100%', height: '0', willChange: 'transform', visibility: 'hidden'});
+        layer.appendChild(this.root);
+    }
+
+    /** Waits for the tiles. */
+    prepare() {
+        this.images = this.water.capas.map((capa) => {
+            const image = new Image();
+            image.src = this.base + capa.image;
+            return image;
+        });
+        return Promise.all(this.images.map(function (img) {
+            return new Promise(function (resolve, reject) {
+                img.onload = resolve;
+                img.onerror = reject;
+            });
+        }));
+    }
+
+    /** Builds it for this screen and has it painted once, almost invisible, where it will end up. */
+    mount(width, height, scale) {
+        const a = this.water;
+        const n = a.nivel;
+        const rules = [];
+        const tall = height * n.alto;
+        // past the bottom of the screen, because it sways
+        const reach = tall + 60 * scale;
+        this.top = height - tall;
+        this.bottom = height + 60 * scale;
+        const sway = document.createElement('div');
+        rules.push('@keyframes hk-water-n{from{transform:translate3d(0,' + (-n.meneo[0] * scale) + 'px,0)}to{transform:translate3d(0,' + (n.meneo[0] * scale) + 'px,0)}}');
+        css(sway, {position: 'absolute', left: '0', top: '0', width: '100%', height: '0', willChange: 'transform',
+            animation: 'hk-water-n ' + (n.meneo[1] / 2) + 's cubic-bezier(.37,0,.63,1) infinite alternate'});
+        const c0 = a.cuerpo[0];
+        const stops = ['rgba(' + c0.slice(1, 4).join(',') + ',0) 0', 'rgba(' + c0.slice(1, 4).join(',') + ',' + c0[4] + ') ' + (a.cuerpo_fundido * scale) + 'px'];
+        a.cuerpo.slice(1).forEach(function (p) {
+            stops.push('rgba(' + p.slice(1, 4).join(',') + ',' + p[4] + ') ' + (p[0] * 100) + '%');
+        });
+        const body = document.createElement('div');
+        css(body, {position: 'absolute', left: '0', top: (a.cuerpo_y * scale) + 'px', width: '1px', height: (reach - a.cuerpo_y * scale) + 'px',
+            background: 'linear-gradient(to bottom,' + stops.join(',') + ')', transformOrigin: '0 0', transform: 'scale(' + width + ',1)', willChange: 'transform'});
+        sway.appendChild(body);
+        a.capas.forEach((capa, i) => {
+            const w = Math.round(capa.w * scale);
+            const h = Math.round(capa.h * scale);
+            const name = 'hk-water-' + i;
+            const el = document.createElement('div');
+            css(el, {backgroundImage: 'url("' + this.base + capa.image + '")', backgroundSize: w + 'px ' + h + 'px', willChange: 'transform', position: 'absolute', left: '0'});
+            if (capa.repite === 'x') {
+                const vx = capa.velocidad[0];
+                rules.push('@keyframes ' + name + '{from{transform:translate3d(' + (vx > 0 ? -w : 0) + 'px,0,0)}to{transform:translate3d(' + (vx > 0 ? 0 : -w) + 'px,0,0)}}');
+                css(el, {top: (capa.y * scale) + 'px', width: (width + w) + 'px', height: h + 'px', backgroundRepeat: 'repeat-x',
+                    animation: name + ' ' + (capa.w / Math.abs(vx)) + 's linear infinite'});
+                sway.appendChild(el);
+            } else {
+                const vy = capa.velocidad[1];
+                const boxH = reach - capa.y * scale;
+                const box = document.createElement('div');
+                css(box, {position: 'absolute', left: '0', top: (capa.y * scale) + 'px', width: '100%', height: boxH + 'px', overflow: 'hidden'});
+                rules.push('@keyframes ' + name + '{from{transform:translate3d(0,' + (vy > 0 ? -h : 0) + 'px,0)}to{transform:translate3d(0,' + (vy > 0 ? 0 : -h) + 'px,0)}}');
+                css(el, {top: '0', width: '100%', height: (boxH + h) + 'px', backgroundRepeat: 'repeat',
+                    animation: name + ' ' + (capa.h / Math.abs(vy)) + 's linear infinite'});
+                box.appendChild(el);
+                sway.appendChild(box);
+            }
+        });
+        this.style = document.createElement('style');
+        this.style.textContent = rules.join('\n');
+        document.head.appendChild(this.style);
+        this.root.appendChild(sway);
+        css(this.root, {transform: 'translate3d(0,' + this.top + 'px,0)', opacity: '0.001', visibility: 'visible', transition: 'none'});
+        return new Promise((resolve) => {
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    css(this.root, {transform: 'translate3d(0,' + this.bottom + 'px,0)', opacity: '1'});
+                    requestAnimationFrame(resolve);
+                });
+            });
+        });
+    }
+
+    /** Up, and the creature `bicho_a` seconds later. */
+    rise(creature) {
+        const n = this.water.nivel;
+        css(this.root, {transition: 'transform ' + n.sube + 's cubic-bezier(' + n.curva_sube.join(',') + ')', transform: 'translate3d(0,' + this.top + 'px,0)'});
+        this.timers.push(setTimeout(creature, n.bicho_a * 1000));
+    }
+
+    /** @param {function(): void} done */
+    fall(done) {
+        const n = this.water.nivel;
+        css(this.root, {transition: 'transform ' + n.baja + 's cubic-bezier(' + n.curva_baja.join(',') + ')', transform: 'translate3d(0,' + this.bottom + 'px,0)'});
+        this.timers.push(setTimeout(done, n.baja * 1000));
+    }
+
+    /** Off the screen, and its tiles and rules with it. */
+    remove() {
+        this.gone = true;
+        this.timers.forEach(clearTimeout);
+        if (this.root.parentNode) {
+            this.root.parentNode.removeChild(this.root);
+        }
+        if (this.style && this.style.parentNode) {
+            this.style.parentNode.removeChild(this.style);
+        }
+        (this.images || []).forEach(function (img) {
+            img.onload = null;
+            img.onerror = null;
+            img.src = '';
+        });
+        this.images = [];
+    }
+}
+
 /** One character on its way, from the moment its pages are ready until it is out of the screen. */
 class Walk {
     constructor(layer, atlas, base, states) {
@@ -206,6 +388,7 @@ class Walk {
         this.layer = layer;
         this.page = -1;
         this.timer = 0;
+        this.water = m.agua ? new Water(layer, m.agua, base) : null;
         this.root = document.createElement('div');
         css(this.root, {position: 'absolute', left: '0', top: '0', width: m.cell.w + 'px', height: m.cell.h + 'px',
             willChange: 'transform', visibility: 'hidden', transformOrigin: m.anchor.x + 'px ' + m.anchor.y + 'px'});
@@ -255,7 +438,7 @@ class Walk {
                 img.onload = resolve;
                 img.onerror = reject;
             });
-        })).then(() => new Promise((resolve) => {
+        }).concat(this.water ? [this.water.prepare()] : [])).then(() => new Promise((resolve) => {
             this.root.style.visibility = 'visible';
             this.root.style.opacity = '0.001';
             if (this.thread) {
@@ -370,6 +553,9 @@ class Walk {
     /** Off the screen, and its pages out of memory. */
     remove() {
         clearTimeout(this.timer);
+        if (this.water) {
+            this.water.remove();
+        }
         if (this.root.parentNode) {
             this.root.parentNode.removeChild(this.root);
         }
@@ -382,6 +568,238 @@ class Walk {
             this.images[p].src = '';
         });
         this.images = {};
+    }
+}
+
+/** One who comes with steam: the veil, its cut, the cover over the porthole and the squeegee, all moved in the same step as the sheet. */
+class Clean extends Walk {
+    constructor(layer, atlas, base, states, plan, width, height, scale) {
+        super(layer, atlas, base, states);
+        const v = atlas.meta.vaho;
+        const shape = plan.shape;
+        const cover = shape.tapon;
+        const bar = v.barra;
+        this.plan = plan;
+        this.height = height;
+        this.scale = scale;
+        this.barAt = Math.round(bar.corte * scale);
+        this.timers = [];
+        this.veilOn = true;
+        this.barOn = false;
+        this.shownCover = 1;
+        this.root.style.zIndex = '1';
+        this.fading = null;
+        if (v.borde) {
+            // What comes in first: a soft ring at the size of its little picture, stretched by the compositor.
+            this.fading = new Image();
+            css(this.fading, {position: 'absolute', left: '0', top: '0', width: v.borde.w + 'px', height: v.borde.h + 'px', transformOrigin: '0 0', willChange: 'transform, opacity', zIndex: '2', opacity: '0.001',
+                transform: 'translate3d(0,0,0) scale(1)'});
+            this.fading.src = base + v.borde.image;
+            layer.appendChild(this.fading);
+        }
+        this.width = width;
+        this.cut = document.createElement('div');
+        this.back = document.createElement('div');
+        this.bar = document.createElement('div');
+        this.veil = new Image();
+        this.cover = new Image();
+        css(this.cut, {position: 'absolute', left: '0', top: '0', width: width + 'px', height: height + 'px', overflow: 'hidden', willChange: 'transform', zIndex: '2'});
+        css(this.back, {position: 'absolute', left: '0', top: '0', width: width + 'px', height: height + 'px', willChange: 'transform'});
+        // At scale 1 the first time they are seen: what the browser keeps painted is the picture, not a whole screen of it (from memory of the compositor, to be verified).
+        this.place = (image, x, y, w, h, k) => css(image, {position: 'absolute', left: '0', top: '0', width: w + 'px', height: h + 'px', transformOrigin: '0 0',
+            willChange: 'transform, opacity', transform: 'translate3d(' + x + 'px,' + y + 'px,0) scale(' + k + ')'});
+        this.veilAt = [plan.ox, plan.oy, shape.w, shape.h];
+        this.coverAt = [plan.ox + cover.x * plan.k, plan.oy + cover.y * plan.k, cover.w, cover.h];
+        this.place(this.veil, this.veilAt[0], this.veilAt[1], shape.w, shape.h, 1);
+        this.place(this.cover, this.coverAt[0], this.coverAt[1], cover.w, cover.h, 1);
+        this.veil.style.opacity = '0.001';
+        this.cover.style.opacity = '0.001';
+        const barH = Math.round(bar.h * scale);
+        css(this.bar, {position: 'absolute', left: '0', top: '0', width: width + 'px', height: barH + 'px', zIndex: '3', willChange: 'transform', visibility: 'hidden',
+            backgroundImage: 'url("' + base + bar.image + '")', backgroundRepeat: 'repeat-x', backgroundSize: Math.round(bar.w * scale) + 'px ' + barH + 'px',
+            transform: 'translate3d(0,' + (-barH) + 'px,0)'});
+        this.veil.src = base + shape.image;
+        this.cover.src = base + cover.image;
+        this.back.appendChild(this.veil);
+        this.back.appendChild(this.cover);
+        this.cut.appendChild(this.back);
+        layer.appendChild(this.cut);
+        layer.appendChild(this.bar);
+    }
+
+    /** Waits for the veil and for the pages, paints them once, almost invisible, and takes the veil to the size of the screen. */
+    prepare() {
+        return Promise.all([this.veil, this.cover].concat(this.fading ? [this.fading] : []).map(function (img) {
+            return new Promise(function (resolve, reject) {
+                if (img.complete && img.naturalWidth) {
+                    resolve();
+                    return;
+                }
+                img.onload = resolve;
+                img.onerror = reject;
+            });
+        })).then(() => super.prepare()).then(() => {
+            const k = this.plan.k;
+            this.place(this.veil, this.veilAt[0], this.veilAt[1], this.veilAt[2], this.veilAt[3], k);
+            this.place(this.cover, this.coverAt[0], this.coverAt[1], this.coverAt[2], this.coverAt[3], k);
+            this.veil.style.opacity = '0.001';
+            this.cover.style.opacity = '0.001';
+            return new Promise(function (resolve) {
+                requestAnimationFrame(resolve);
+            });
+        });
+    }
+
+    /** What the cover, the cut and the squeegee do in this frame: the same task as the sheet, so they cannot get out of step. */
+    drawSteam(st, i, y) {
+        if (st.tapon && st.tapon[i] !== this.shownCover) {
+            this.cover.style.opacity = st.tapon[i];
+            this.shownCover = st.tapon[i];
+        }
+        if (!st.corte) {
+            return;
+        }
+        const c = st.corte[i];
+        if (c === null) {
+            if (this.barOn) {
+                this.dropBar();
+            }
+            return;
+        }
+        const at = Math.round(y + (c - this.atlas.meta.anchor.y) * this.scale);
+        if (!this.barOn) {
+            this.barOn = true;
+            this.bar.style.visibility = 'visible';
+        }
+        this.barY = at;
+        this.bar.style.transform = 'translate3d(0,' + (at - this.barAt) + 'px,0)';
+        if (this.veilOn) {
+            this.cut.style.transform = 'translate3d(0,' + (at - this.height) + 'px,0)';
+            this.back.style.transform = 'translate3d(0,' + (this.height - at) + 'px,0)';
+            if (at < -this.plan.over - 2) {
+                // No steam left: it stops costing.
+                this.veilOn = false;
+                this.cut.style.visibility = 'hidden';
+                this.veil.src = '';
+                this.cover.src = '';
+            }
+        }
+    }
+
+    /** He has got out from under it: it falls off the bottom with one transition, whose curve is exactly t². */
+    dropBar() {
+        const to = this.height + this.plan.over + 4;
+        const seconds = Math.sqrt(2 * (to - this.barY) / (this.atlas.meta.vaho.caida * this.scale));
+        this.barOn = false;
+        this.bar.style.transition = 'transform ' + seconds + 's cubic-bezier(.33333,0,.66667,.33333)';
+        this.bar.style.transform = 'translate3d(0,' + (to - this.barAt) + 'px,0)';
+        this.timers.push(setTimeout(() => {
+            this.bar.style.visibility = 'hidden';
+        }, seconds * 1000));
+    }
+
+    /** @param {number} mirrored -1 to go the other way round, 1 not; @param {function(): void} done */
+    run(mirrored, done) {
+        const m = this.atlas.meta;
+        const v = m.vaho;
+        const steps = this.plan.steps;
+        const scale = this.scale;
+        const fade = 'opacity ' + (v.entra - v.velo_a) + 's cubic-bezier(' + v.curva_entra.join(',') + ') ' + v.velo_a + 's';
+        this.veil.style.transition = fade;
+        this.cover.style.transition = fade;
+        this.veil.style.opacity = '1';
+        this.cover.style.opacity = '1';
+        if (this.fading) {
+            const sx = this.width / v.borde.w;
+            const sy = this.height / v.borde.h;
+            const at = (s) => 'translate3d(' + (this.width * (1 - s) / 2) + 'px,' + (this.height * (1 - s) / 2) + 'px,0) scale(' + (sx * s) + ',' + (sy * s) + ')';
+            this.style = document.createElement('style');
+            this.style.textContent = '@keyframes hk-edge-o{' + v.borde_op.map((k) => (100 * k[0] / v.entra) + '%{opacity:' + k[1] + '}').join('') + '}' +
+                '@keyframes hk-edge-t{from{transform:' + at(v.borde_escala[0]) + '}to{transform:' + at(v.borde_escala[1]) + '}}';
+            document.head.appendChild(this.style);
+            this.fading.style.animation = 'hk-edge-o ' + v.entra + 's linear both,hk-edge-t ' + v.entra + 's cubic-bezier(' + v.borde_curva.join(',') + ') both';
+            this.timers.push(setTimeout(() => this.dropFading(), v.entra * 1000));
+        }
+        // From then on the cover follows the atlas, frame by frame.
+        this.timers.push(setTimeout(() => {
+            this.cover.style.transition = 'none';
+        }, v.entra * 1000));
+        this.timers.push(setTimeout(() => {
+            let y = 0;
+            let step = 0;
+            let time = 0;
+            let i = 0;
+            let due = performance.now();
+            this.root.style.visibility = 'visible';
+            const frame = () => {
+                const now = steps[step];
+                const st = m.estados[now.state];
+                if (i === 0 && time === 0) {
+                    if (now.y !== undefined) {
+                        y = now.y;
+                    }
+                    if (now.behind !== undefined) {
+                        // It changes while he is out of sight: behind the steam, or on top of the squeegee.
+                        this.root.style.zIndex = now.behind ? '1' : '4';
+                    }
+                }
+                this.draw(now.state, i, this.plan.x, y, scale, mirrored < 0);
+                this.drawSteam(st, i, y);
+                due += 1000 / st.fps;
+                y += st.avance[i][1] * scale;
+                i++;
+                if (i >= st.frames) {
+                    i = 0;
+                    time++;
+                    if (now.times && time >= now.times) {
+                        step++;
+                        time = 0;
+                    }
+                }
+                if (now.leaves !== undefined && (now.leaves > 0 ? y > now.leaves : y < now.leaves)) {
+                    if (now.state === 'huye') {
+                        done();
+                        return;
+                    }
+                    step++;
+                    i = 0;
+                    time = 0;
+                }
+                if (i === 0 && time === 0 && steps[step].wait) {
+                    due += steps[step].wait * 1000;
+                }
+                this.timer = setTimeout(frame, Math.max(0, due - performance.now()));
+            };
+            frame();
+        }, v.bicho_a * 1000));
+    }
+
+    /** Its seconds are over: out, with its picture and its rules. */
+    dropFading() {
+        if (this.fading && this.fading.parentNode) {
+            this.fading.parentNode.removeChild(this.fading);
+        }
+        if (this.fading) {
+            this.fading.src = '';
+        }
+        this.fading = null;
+        if (this.style && this.style.parentNode) {
+            this.style.parentNode.removeChild(this.style);
+        }
+    }
+
+    remove() {
+        this.timers.forEach(clearTimeout);
+        this.timers = [];
+        this.dropFading();
+        [this.cut, this.bar].forEach(function (el) {
+            if (el.parentNode) {
+                el.parentNode.removeChild(el);
+            }
+        });
+        this.veil.src = '';
+        this.cover.src = '';
+        super.remove();
     }
 }
 
@@ -606,6 +1024,13 @@ export class Surprises {
             if (atlas.meta.tipo === 'capas') {
                 walk = new Fall(this.layer, atlas, base, width, height, scale);
                 start = () => walk.run(done);
+            } else if (atlas.meta.vaho) {
+                const gesture = atlas.meta.gestos[Math.floor(Math.random() * atlas.meta.gestos.length)];
+                const slips = Math.random() < atlas.meta.vaho.resbala_p;
+                const states = ['cruza', 'para', 'baja', 'cae', 'limpia', gesture, 'huye'].concat(slips ? ['resbala'] : []);
+                walk = new Clean(this.layer, atlas, base, states, cleanOf(atlas.meta, width, height, scale, gesture, slips), width, height,
+                    scale);
+                start = () => walk.run(Math.random() < 0.5 ? 1 : -1, done);
             } else {
                 const gestures = atlas.meta.gestos;
                 const gesture = gestures[Math.floor(Math.random() * gestures.length)];
@@ -613,7 +1038,19 @@ export class Surprises {
                 const stop = heightOf(atlas.meta, height, scale, this.hooks.floor(), Math.random);
                 const plan = atlas.meta.estados.cruza.hilo ? hangOf(atlas.meta, width, stop, scale, Math.random) :
                     walkOf(atlas.meta, width, scale, Math.random);
-                start = () => walk.run(plan, stop, scale, gesture, done);
+                const run = (end) => walk.run(plan, stop, scale, gesture, end);
+                // What comes with water: the water rises, the creature comes a moment later and, once it is gone, the water goes down.
+                start = () => {
+                    if (!walk.water) {
+                        run(done);
+                        return;
+                    }
+                    walk.water.mount(width, height, scale).then(() => {
+                        if (!walk.water.gone) {
+                            walk.water.rise(() => run(() => walk.water.fall(done)));
+                        }
+                    });
+                };
             }
             return walk.prepare().then(() => {
                 if (holding.cut) {

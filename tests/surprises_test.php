@@ -188,6 +188,16 @@ final class surprises_test extends \advanced_testcase {
             $folder = $CFG->dirroot . '/local/oksigeniahechauka/player/sorpresas/' . $id . '/';
             $atlas = json_decode(file_get_contents($folder . 'spr.' . $id . '.atlas.json'), true);
             $files = $atlas['meta']['pages'] ?? array_column($atlas['meta']['capas'], 'image');
+            $files = array_merge($files, array_column($atlas['meta']['agua']['capas'] ?? [], 'image'));
+            if (isset($atlas['meta']['vaho'])) {
+                $steam = $atlas['meta']['vaho'];
+                foreach (['ancha', 'alta'] as $shape) {
+                    $files[] = $steam[$shape]['image'];
+                    $files[] = $steam[$shape]['tapon']['image'];
+                }
+                $files[] = $steam['barra']['image'];
+                $files[] = $steam['borde']['image'];
+            }
             $this->assertNotEmpty($files);
             foreach ($files as $page) {
                 $this->assertFileExists($folder . $page);

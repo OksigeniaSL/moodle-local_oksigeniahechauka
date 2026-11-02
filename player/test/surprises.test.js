@@ -1,12 +1,12 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {readFileSync} from 'node:fs';
-import {dueAfter, filesOf, hangOf, heightOf, inSeason, isRaining, pagesOf, scaleOf, Surprises, tileOf, walkOf} from '../src/surprises.js';
+import {existsSync, readFileSync} from 'node:fs';
+import {cleanOf, dueAfter, filesOf, hangOf, heightOf, inSeason, isRaining, pagesOf, scaleOf, Surprises, tileOf, walkOf} from '../src/surprises.js';
 
 const atlasOf = (id) => JSON.parse(readFileSync(new URL('../sorpresas/' + id + '/spr.' + id + '.atlas.json', import.meta.url), 'utf8'));
 const atlas = atlasOf('gusanito');
 const m = atlas.meta;
-const ALL = ['gusanito', 'abeja', 'mosca', 'arana'];
+const ALL = ['gusanito', 'abeja', 'mosca', 'arana', 'pulpo', 'geco'];
 const at = (v) => () => v;
 
 test('it comes now and then, never closer than a quarter of an hour', () => {
@@ -75,7 +75,7 @@ test('every frame of every state of everyone is in its atlas, and the states it 
             }
         }
         // What hangs goes by its `avance`: it has no way forward.
-        if (!one.meta.estados.cruza.hilo) {
+        if (!one.meta.estados.cruza.hilo && !one.meta.vaho) {
             assert.ok(one.meta.estados.cruza.speed > 0, id);
             assert.ok(one.meta.estados.huye.speed > 0, id);
         }
@@ -115,6 +115,82 @@ test('a flyer also starts out of sight and stops on the screen', () => {
                 assert.ok(stop > 0 && stop < width);
                 assert.ok(w.dir > 0 ? w.from + one.cell.w - one.anchor.x <= 0 : w.from - (one.cell.w - one.anchor.x) >= width);
             }
+        }
+    }
+});
+
+test('what comes with water brings its tiles, goes under the surface on any shape of screen and keeps its files', () => {
+    const one = atlasOf('pulpo');
+    const water = one.meta.agua;
+    assert.ok(water);
+    const files = filesOf(one);
+    for (const name of one.meta.pages.concat(water.capas.map((capa) => capa.image))) {
+        assert.ok(files.includes(name), name);
+        assert.ok(existsSync(new URL('../sorpresas/pulpo/' + name, import.meta.url)), name);
+    }
+    assert.equal(files.length, one.meta.pages.length + water.capas.length);
+    for (const capa of water.capas) {
+        assert.ok(['x', 'xy'].includes(capa.repite));
+        assert.ok(capa.repite === 'x' ? capa.velocidad[0] !== 0 : capa.velocidad[1] !== 0);
+    }
+    for (const [width, height] of [[1920, 1080], [1080, 1920], [3840, 2160]]) {
+        const surface = height * (1 - water.nivel.alto);
+        for (const r of [0, 0.5, 1]) {
+            assert.ok(heightOf(one.meta, height, scaleOf(width, height, 3), null, at(r)) > surface, width + ' ' + r);
+        }
+    }
+    assert.ok(water.nivel.bicho_a < water.nivel.sube);
+    assert.equal(atlasOf('abeja').meta.agua, undefined);
+});
+
+test('who comes with steam gets to the porthole from out of sight, brings the squeegee from below the screen and ends at the top', () => {
+    const one = atlasOf('geco');
+    const m2 = one.meta;
+    const v = m2.vaho;
+    const files = filesOf(one);
+    for (const name of files) {
+        assert.ok(existsSync(new URL('../sorpresas/geco/' + name, import.meta.url)), name);
+    }
+    assert.equal(files.length, m2.pages.length + 6);
+    for (const state of ['baja', 'cae', 'limpia', 'resbala', 'gesto.clonk']) {
+        const e = m2.estados[state];
+        assert.equal(e.avance.length, e.frames, state);
+        for (let i = 0; i < e.frames; i++) {
+            assert.ok(one.frames[state + '_' + (i < 10 ? '0' : '') + i], state + ' ' + i);
+        }
+        if (e.corte) {
+            assert.equal(e.corte.length, e.frames, state);
+        }
+    }
+    assert.equal(m2.estados.para.tapon.length, m2.estados.para.frames);
+    // Once it lets the squeegee go, it does not pick it up.
+    const cut = m2.estados['gesto.clonk'].corte;
+    const free = cut.indexOf(null);
+    assert.ok(free > 0 && cut.slice(free).every((c) => c === null));
+    assert.ok(m2.estados.limpia.corte.every((c) => c !== null));
+    const down = (name) => m2.estados[name].avance.reduce((total, step) => total + step[1], 0);
+    assert.ok(down('resbala') === 0);
+    for (const [width, height, distance] of [[1920, 1080, 3], [1080, 1920, 3], [1920, 1080, 8], [3840, 2160, 3]]) {
+        const scale = scaleOf(width, height, distance);
+        const below = (m2.cell.h - m2.anchor.y) * scale;
+        for (const slips of [false, true]) {
+            const plan = cleanOf(m2, width, height, scale, 'gesto.clonk', slips);
+            assert.equal(plan.shape, width >= height ? v.ancha : v.alta);
+            assert.ok(plan.shape.w * plan.k >= width - 0.001 && plan.shape.h * plan.k >= height - 0.001, 'the steam covers the screen');
+            const first = plan.steps[0];
+            assert.equal(first.state, 'cruza');
+            assert.ok(first.y >= height + below - 0.001, 'starts out of sight');
+            const face = first.y + (first.times * down('cruza') + down('para')) * scale;
+            const porthole = plan.oy + plan.shape.hueco[1] * plan.k;
+            assert.ok(Math.abs(face + (v.cara_y - m2.anchor.y) * scale - porthole) < 0.001, 'its face in the porthole');
+            const up = plan.steps.filter((s) => s.state === 'limpia');
+            assert.equal(up.length, slips ? 2 : 1);
+            const y = up[0].y;
+            assert.ok(y + (m2.estados.limpia.corte[0] - m2.anchor.y) * scale >= height + plan.over - 0.001, 'the squeegee starts below');
+            const times = up.reduce((total, s) => total + s.times, 0);
+            assert.ok(Math.abs(y + times * down('limpia') * scale - m2.anchor.y * scale) < 0.001, 'ends with its cell at the top');
+            assert.equal(plan.steps[plan.steps.length - 1].state, 'huye');
+            assert.equal(plan.steps[plan.steps.length - 1].leaves, -below);
         }
     }
 });
