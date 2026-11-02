@@ -3,7 +3,7 @@
 // ticker, and a layer over everything for a picture at full screen. The frame is built once; layers come and go, so a
 // screen that runs for months does not pile up nodes.
 
-import {shapeOf} from './compose.js';
+import {ratio, shapeOf} from './compose.js';
 import {buildWeatherThird} from './today.js';
 import {buildLead, buildRest, fitHeadline, fitWord, leadsOf, leadOfTurn, linesOf, MARK, paginateRest, showRestPage, turnFixed, weekHeadline} from './lead.js';
 import {qrPath, shortWeb} from './qr.js';
@@ -12,6 +12,8 @@ import {buildAgenda, startAgenda} from './agendaview.js';
 import {buildCarousel, buildWall, buildWallBand, startCarousel, startWall, wallCount} from './photos.js';
 import {buildWeek, fitWeek} from './weekview.js';
 
+// The share of a wide zone a picture must leave free to have its words on a block beside it.
+const BESIDE_LEAST = 0.3;
 const PHRASE_WAITS_MS = 25000;
 const CAPTION_MS = 2800;
 
@@ -549,6 +551,7 @@ export class Screen {
         if (shape && comp !== 'foto-hoy' && comp !== 'foto-sola') {
             s.setAttribute('data-forma', shape);
         }
+        s.hkRatio = ratio(item);
         const d = this.slide(item);
         d.classList.add('hk-visible');
         s.appendChild(d);
@@ -764,6 +767,34 @@ export class Screen {
         }
     }
 
+    /**
+     * A whole picture of another shape has its words on a block beside it, when it leaves them room and the longest word
+     * fits: they do not cover it, so nothing to shorten. Otherwise it stays centred, and its words go over it as on any other.
+     *
+     * @param {HTMLElement} m the picture's slot
+     * @param {HTMLElement} pie its caption
+     * @param {HTMLElement} h2 its headline
+     * @returns {boolean} whether they went beside it
+     */
+    wordsBeside(m, pie, h2) {
+        const pic = m.querySelector('.hk-diapo > img, .hk-diapo > video');
+        const width = m.clientHeight * m.hkRatio;
+        if (!pic || m.clientWidth - width < m.clientWidth * BESIDE_LEAST) {
+            return false;
+        }
+        // Its width comes from the manifest and not from the file, which may still be on its way: the block is measured now.
+        pic.style.width = Math.round(width) + 'px';
+        m.setAttribute('data-al-lado', '');
+        pie.setAttribute('data-ajuste', '0');
+        even(h2);
+        if (h2.scrollWidth <= h2.clientWidth + 1) {
+            return true;
+        }
+        pic.style.width = '';
+        m.removeAttribute('data-al-lado');
+        return false;
+    }
+
     /** The headline of each picture's caption, by steps and evened; in a band, one line or the smaller step. */
     fitCaptions(c, comp) {
         const vertical = !this.horizontal;
@@ -789,10 +820,8 @@ export class Screen {
             if (!h2 || comp === 'vertical-hoy') {
                 continue;
             }
-            // A picture of another shape has its words on a block beside it: they do not cover it, so nothing to shorten.
-            if (!vertical && m.classList.contains('hk-medio-contener') && (comp === 'foto-hoy' || comp === 'foto-sola')) {
-                pie.setAttribute('data-ajuste', '0');
-                even(h2);
+            if (!vertical && m.classList.contains('hk-medio-contener') && (comp === 'foto-hoy' || comp === 'foto-sola') &&
+                    this.wordsBeside(m, pie, h2)) {
                 continue;
             }
             if (comp === 'apaisado' || comp === 'tiempo-tercio') {

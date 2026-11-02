@@ -514,7 +514,8 @@
     height: auto;
 }
 
-/* --- A picture of another shape in a wide zone: whole, its words on a block of the colour beside it, no blurred copy.
+/* --- A picture of another shape in a wide zone: whole, on the colour, no blurred copy. Its words on a block beside it when
+   it leaves them room (the player says so with data-al-lado); otherwise over it, as on any other picture.
    (The blurred copy stays for the full screen, where it fills everything and looks like a decision.) ---------------- */
 .hk .hk-cuerpo .hk-medio-contener {
     background: var(--hk-primario);
@@ -522,21 +523,21 @@
 .hk .hk-cuerpo .hk-medio-contener .hk-diapo-fondo {
     display: none;
 }
-.hk-horizontal .hk-cuerpo[data-composicion="foto-hoy"] .hk-medio-contener .hk-diapo,
-.hk-horizontal .hk-cuerpo[data-composicion="foto-sola"] .hk-medio-contener .hk-diapo {
+.hk-horizontal .hk-cuerpo[data-composicion="foto-hoy"] .hk-medio-contener[data-al-lado] .hk-diapo,
+.hk-horizontal .hk-cuerpo[data-composicion="foto-sola"] .hk-medio-contener[data-al-lado] .hk-diapo {
     display: flex;
 }
-.hk-horizontal .hk-cuerpo[data-composicion="foto-hoy"] .hk-medio-contener .hk-diapo > img,
-.hk-horizontal .hk-cuerpo[data-composicion="foto-sola"] .hk-medio-contener .hk-diapo > img,
-.hk-horizontal .hk-cuerpo[data-composicion="foto-hoy"] .hk-medio-contener .hk-diapo > video,
-.hk-horizontal .hk-cuerpo[data-composicion="foto-sola"] .hk-medio-contener .hk-diapo > video {
+.hk-horizontal .hk-cuerpo[data-composicion="foto-hoy"] .hk-medio-contener[data-al-lado] .hk-diapo > img,
+.hk-horizontal .hk-cuerpo[data-composicion="foto-sola"] .hk-medio-contener[data-al-lado] .hk-diapo > img,
+.hk-horizontal .hk-cuerpo[data-composicion="foto-hoy"] .hk-medio-contener[data-al-lado] .hk-diapo > video,
+.hk-horizontal .hk-cuerpo[data-composicion="foto-sola"] .hk-medio-contener[data-al-lado] .hk-diapo > video {
     position: static;
     flex: none;
     width: auto;
     height: 100%;
 }
-.hk-horizontal .hk-cuerpo[data-composicion="foto-hoy"] .hk-medio-contener .hk-pie,
-.hk-horizontal .hk-cuerpo[data-composicion="foto-sola"] .hk-medio-contener .hk-pie {
+.hk-horizontal .hk-cuerpo[data-composicion="foto-hoy"] .hk-medio-contener[data-al-lado] .hk-pie,
+.hk-horizontal .hk-cuerpo[data-composicion="foto-sola"] .hk-medio-contener[data-al-lado] .hk-pie {
     position: static;
     display: flex;
     flex: 1 1 0px;
@@ -547,8 +548,8 @@
     background: none;
     color: var(--hk-sobre-primario);
 }
-.hk-horizontal .hk-cuerpo[data-composicion="foto-hoy"] .hk-medio-contener .hk-pie h2,
-.hk-horizontal .hk-cuerpo[data-composicion="foto-sola"] .hk-medio-contener .hk-pie h2 {
+.hk-horizontal .hk-cuerpo[data-composicion="foto-hoy"] .hk-medio-contener[data-al-lado] .hk-pie h2,
+.hk-horizontal .hk-cuerpo[data-composicion="foto-sola"] .hk-medio-contener[data-al-lado] .hk-pie h2 {
     font-size: calc(var(--hk-t-titular) * .64);
 }
 

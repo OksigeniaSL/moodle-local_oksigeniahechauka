@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.7.16 (2026-11-02)
+
+- A whole photo or video beside «Today» no longer squeezes its caption into a sliver at the edge: the words go on a block beside the
+  picture when it leaves them room and their longest word fits, and over the picture otherwise.
+- With no weather, the clock stays at the right of the header.
+
 ## 0.7.15 (2026-11-02)
 
 - **A new look for the screens, with skins each centre chooses**: colours and a letter that goes with the plugin, the same on every

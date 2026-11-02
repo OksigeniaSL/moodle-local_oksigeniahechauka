@@ -72,7 +72,7 @@
     padding-right: 3.2rem;
     border-right: .3rem solid var(--hk-linea);
 }
-.hk-tiempo + .hk-hora {
+.hk-con-tiempo:not(.hk-cab-sin-tiempo) > .hk-tiempo + .hk-hora {
     margin-left: 0;
 }
 .hk-tiempo-icono {
