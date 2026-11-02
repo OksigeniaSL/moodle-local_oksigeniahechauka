@@ -356,6 +356,10 @@ class home {
                 'drift' => 0];
         }
         if (screens::online($s, $now)) {
+            if (screens::frozen($info)) {
+                return ['key' => 'down', 'label' => get_string('state_frozen', $c), 'meta' => get_string('meta_frozen', $c),
+                    'drift' => 0];
+            }
             $drift = !empty($info['time']) ? (int) $s->lastseen - (int) $info['time'] : 0;
             if (abs($drift) > self::DRIFT) {
                 $minutes = (int) round(abs($drift) / MINSECS);

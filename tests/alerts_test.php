@@ -111,4 +111,20 @@ final class alerts_test extends \advanced_testcase {
         $this->assertSame(['down' => 1, 'back' => 0], alerts::check($this->moment('2026-11-09 07:50')));
         $this->assertCount(1, $sink->get_messages());
     }
+
+    /**
+     * A screen that still answers but paints nothing counts as down, with its agent or without one; and only what is known is kept.
+     */
+    public function test_a_frozen_picture(): void {
+        $this->assertFalse(\local_oksigeniahechauka\local\screens::frozen(['on' => true, 'stalled' => 40]));
+        $this->assertTrue(\local_oksigeniahechauka\local\screens::frozen(['on' => true, 'stalled' => 300]));
+        $this->assertFalse(\local_oksigeniahechauka\local\screens::frozen(['on' => false, 'stalled' => 900]));
+        $this->assertTrue(\local_oksigeniahechauka\local\screens::frozen(['device' => ['frozen' => true]]));
+        $kept = \local_oksigeniahechauka\local\screens::clean_beat(['stalled' => 5, 'device' => ['frozen' => false,
+            'tv' => 'standby', 'temp' => 58.4, 'nonsense' => 'x', 'last_reboot' => '2026-11-02 frozen picture again']]);
+        $this->assertSame(5, $kept['stalled']);
+        $this->assertSame('standby', $kept['device']['tv']);
+        $this->assertArrayNotHasKey('nonsense', $kept['device']);
+        $this->assertArrayNotHasKey('frozen', $kept['device']);
+    }
 }

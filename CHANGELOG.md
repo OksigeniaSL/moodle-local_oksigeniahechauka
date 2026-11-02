@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.7.13 (2026-11-02)
+
+- **A frozen picture no longer goes unnoticed**: a screen that answers but paints nothing says «No picture» in the panel and warns
+  as one that is down. With the image for a Raspberry Pi, an agent looks at what the screen really shows from outside the browser
+  and restarts what it takes, within limits; it also follows the power hours by CEC where the display answers, and sends a capture
+  every ten minutes.
+- The sheet of a screen says what its device knows: its display, its temperature, why it last rebooted and if its card is failing.
+
 ## 0.7.12 (2026-11-02)
 
 - **A first time with a path**: with no screen yet, the panel says so and offers only the step that comes first.

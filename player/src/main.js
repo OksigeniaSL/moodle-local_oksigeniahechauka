@@ -19,7 +19,7 @@ import {filesOf, isRaining, Surprises} from './surprises.js';
 import {countToday} from './today.js';
 import {weekOf} from './week.js';
 
-const VERSION = '0.7.12';
+const VERSION = '0.7.13';
 const COMING_DAYS = 7;
 const HEARTBEAT_MS = 60000;
 const REFRESH_MS = 15 * 60000;
@@ -599,6 +599,65 @@ class Player {
         }
     }
 
+    /**
+     * The agent of the device, through the browser's debugging channel, which is the only way between the two: what it knows comes
+     * in, to go with the heartbeat; what it needs comes out. A pixel in a corner changes for it, so that it can tell from outside
+     * that the picture still moves. It changes nothing on a screen with no agent.
+     *
+     * @param {object} device what the device knows
+     * @returns {string} JSON
+     */
+    agent(device) {
+        this.device = device;
+        this.keepPixel();
+        const m = this.manifest;
+        return JSON.stringify({version: VERSION, key: store.key(), revoked: store.revoked(),
+            on: m ? isPowerOn(m.power, this.clock.wall()) : true});
+    }
+
+    keepPixel() {
+        if (this.pixel) {
+            return;
+        }
+        const pixel = document.createElement('div');
+        pixel.style.cssText = 'position:fixed;left:0;top:0;width:4px;height:4px;z-index:1000;pointer-events:none';
+        document.body.appendChild(pixel);
+        this.pixel = pixel;
+        let turn = false;
+        const change = function () {
+            turn = !turn;
+            pixel.style.background = turn ? 'rgba(128,128,128,.02)' : 'rgba(128,128,128,.05)';
+        };
+        change();
+        setInterval(change, 20000);
+    }
+
+    /** A capture from the agent, in base64: it goes up with the key of the screen, which stays here. */
+    sendShot(base64) {
+        const raw = atob(base64);
+        const bytes = new Uint8Array(raw.length);
+        for (let i = 0; i < raw.length; i++) {
+            bytes[i] = raw.charCodeAt(i);
+        }
+        const self = this;
+        return this.api.screenshot(new Blob([bytes], {type: 'image/png'})).catch(function (e) {
+            self.note('screenshot: ' + (e && e.message || e));
+        });
+    }
+
+    /** Seconds with no frame painted, with the page in sight: on a screen with no agent, the only sign of a frozen picture. */
+    stalled() {
+        const self = this;
+        if (document.visibilityState !== 'visible') {
+            this.frameAt = Date.now();
+            return 0;
+        }
+        requestAnimationFrame(function () {
+            self.frameAt = Date.now();
+        });
+        return Math.max(0, Math.floor((Date.now() - (this.frameAt || this.startedAt)) / 1000));
+    }
+
     heartbeat() {
         const m = this.manifest;
         const wall = this.clock.wall();
@@ -612,6 +671,8 @@ class Player {
             on: m ? isPowerOn(m.power, wall) : true,
             showing: this.screen ? this.screen.showing() : [],
             display: {width: window.innerWidth, height: window.innerHeight},
+            stalled: this.stalled(),
+            device: this.device,
             cache: this.media ? this.media.usage() : {files: 0, bytes: 0},
             errors: this.errors.concat(this.media ? this.media.errors() : []).slice(-5),
         };

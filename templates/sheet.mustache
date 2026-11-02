@@ -54,7 +54,7 @@
                     {{#shot}}<div class="hkp-stage"><span class="hkp-bezel{{#vertical}} is-v{{/vertical}}" data-state="on" role="img" aria-label="{{#str}}picture_alt, local_oksigeniahechauka, {{name}}{{/str}}"><img src="{{shot}}" alt=""><span class="hkp-led" aria-hidden="true"></span></span></div><p class="hkp-hint">{{shotwhen}}</p>{{/shot}}
                     {{^shot}}<p class="hkp-hint">{{#str}}sheet_noshot, local_oksigeniahechauka{{/str}}</p>{{/shot}}
                 </div>
-                <dl class="hkp-facts">{{#facts}}<div><dt>{{term}}</dt><dd>{{value}}</dd></div>{{/facts}}</dl>
+                <dl class="hkp-facts">{{#facts}}<div><dt>{{term}}</dt><dd>{{value}}</dd></div>{{/facts}}{{#device}}<div><dt>{{term}}</dt><dd>{{value}}</dd></div>{{/device}}</dl>
             </section>
             <div class="hkp-sheet-settings">
                 <section class="hkp-card"><h2>{{#str}}sheet_namegroups, local_oksigeniahechauka{{/str}}</h2>

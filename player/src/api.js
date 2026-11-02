@@ -90,6 +90,16 @@ export function makeApi(endpoints, key, session) {
         heartbeat: function (body) {
             return postJson(endpoints.heartbeat, body);
         },
+        /** What the screen is really showing, from the agent of the device. */
+        screenshot: function (blob) {
+            return request(endpoints.screenshot, {
+                method: 'POST',
+                headers: headers({'Content-Type': blob.type}),
+                body: blob,
+            }).then(function (res) {
+                return res.ok ? null : failure(res);
+            });
+        },
         /** A media file, as a Response, for the cache. Videos can be big: a long time limit. */
         media: function (url) {
             return request(url, {method: 'GET', headers: headers()}, 30 * 60000).then(function (res) {

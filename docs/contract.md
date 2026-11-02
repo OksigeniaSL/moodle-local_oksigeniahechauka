@@ -274,8 +274,19 @@ Answer:
 ## Screenshot
 
 `POST screenshot` with the image as the body (`Content-Type: image/jpeg` or `image/png`, 2 MB at most), answered with
-`204`. It shows what the screen is really showing, a few times an hour. Usually the device agent sends it; the player
-does it where the platform lets a page capture itself.
+`204`. It shows what the screen is really showing, a few times an hour. The agent of the device takes it and hands it to the
+player, which sends it: the key of the screen never leaves the page for this.
+
+## The agent of the device
+
+Where there is one (the image for a Raspberry Pi), it talks to the page through the browser's debugging pipe, with no port:
+`hechauka.agent(device)` brings in what the device knows and returns JSON with `version`, `on`, `key` and `revoked`;
+`hechauka.sendShot(base64)` hands over a capture. The first call makes a 4 px element in the top left corner change every 20 s,
+which lets the agent tell from outside the browser that the picture still moves. A screen with no agent has none of this.
+
+The heartbeat then carries `device`: `frozen`, `stuck`, `disk_ro`, `tv` (`on`, `standby`, `unknown`, `none`), `temp`, `throttled`,
+`restarts_24h` and `last_reboot`. And always `stalled`, the seconds with no frame painted with the page in sight: with no agent, the
+only sign of a frozen picture. A screen that still answers but is frozen counts as down.
 
 ## Preview
 
@@ -289,7 +300,6 @@ Because it is the same player with the same manifest, what the preview shows is 
 
 ## Still open in version 1
 
-- How a device agent (CEC, screenshots, restarts) gets the key of the screen it lives with.
 - The record of what was played («proof of play»).
 - Approval before publishing.
 

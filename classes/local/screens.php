@@ -186,6 +186,17 @@ class screens {
     }
 
     /**
+     * Whether a screen that still talks has its picture frozen: its agent says so or, with no agent, nothing has been painted for
+     * five minutes.
+     *
+     * @param array $info what its last heartbeat said
+     * @return bool
+     */
+    public static function frozen(array $info): bool {
+        return !empty($info['device']['frozen']) || (!empty($info['on']) && (int) ($info['stalled'] ?? 0) >= 300);
+    }
+
+    /**
      * Drops the codes that expired. A key that was claimed and never collected must not stay in the clear: that screen asks
      * for a code again.
      *
@@ -318,7 +329,23 @@ class screens {
             'manifest' => $text($beat['manifest'] ?? null, 64),
             'stale' => isset($beat['stale']) ? !empty($beat['stale']) : null,
             'on' => isset($beat['on']) ? !empty($beat['on']) : null,
+            'stalled' => $int($beat['stalled'] ?? null),
         ];
+        $device = $beat['device'] ?? null;
+        if (is_array($device)) {
+            $keep['device'] = array_filter([
+                'frozen' => !empty($device['frozen']) ?: null,
+                'stuck' => !empty($device['stuck']) ?: null,
+                'disk_ro' => !empty($device['disk_ro']) ?: null,
+                'tv' => $text($device['tv'] ?? null, 10),
+                'temp' => is_numeric($device['temp'] ?? null) ? (float) $device['temp'] : null,
+                'throttled' => $text($device['throttled'] ?? null, 12),
+                'restarts_24h' => $int($device['restarts_24h'] ?? null),
+                'last_reboot' => $text($device['last_reboot'] ?? null, 80),
+            ], function ($v) {
+                return $v !== null;
+            });
+        }
         $display = $beat['display'] ?? null;
         if (is_array($display)) {
             $keep['display'] = ['width' => $int($display['width'] ?? null), 'height' => $int($display['height'] ?? null)];

@@ -33,6 +33,36 @@ class sheet {
     const THEMES = ['site', 'light', 'dark', 'auto'];
 
     /**
+     * What the device of a screen says of itself, when it has an agent.
+     *
+     * @param array $info what its last heartbeat said
+     * @return array
+     */
+    protected static function device_lines(array $info): array {
+        $c = self::C;
+        $device = $info['device'] ?? [];
+        $out = [];
+        if (isset($device['tv']) && in_array($device['tv'], ['on', 'standby', 'unknown', 'none'])) {
+            $out[] = ['term' => get_string('sheet_tv', $c), 'value' => get_string('sheet_tv_' . $device['tv'], $c)];
+        }
+        if (isset($device['temp'])) {
+            $hot = ($device['throttled'] ?? '0x0') !== '0x0';
+            $out[] = ['term' => get_string('sheet_temp', $c), 'value' => round($device['temp']) . ' °C' .
+                ($hot ? ' · ' . get_string('sheet_temp_hot', $c) : '')];
+        }
+        if (!empty($device['last_reboot'])) {
+            $out[] = ['term' => get_string('sheet_rebooted', $c), 'value' => $device['last_reboot']];
+        }
+        if (!empty($device['disk_ro'])) {
+            $out[] = ['term' => get_string('sheet_card', $c), 'value' => get_string('sheet_card_ro', $c)];
+        }
+        if (!empty($device['stuck'])) {
+            $out[] = ['term' => get_string('sheet_agent', $c), 'value' => get_string('sheet_agent_stuck', $c)];
+        }
+        return $out;
+    }
+
+    /**
      * Everything the page needs.
      *
      * @param \stdClass $screen
@@ -108,6 +138,7 @@ class sheet {
             // A clock that is off says what to do about it.
             'clockhint' => $card['state'] === 'warn' ? get_string('sheet_clock_hint', $c) : '',
             'downhelp' => $card['state'] === 'down',
+            'device' => self::device_lines($info),
             'reloadicon' => icons::svg('reload'),
             'clockicon' => icons::svg('clock'),
             'moment' => get_string('preview_moment', $c, phrases::weekday(schedule::day($now)) . ', ' . phrases::hour($now)),

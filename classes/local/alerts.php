@@ -46,7 +46,8 @@ class alerts {
             'keyhash IS NOT NULL AND lastseen > 0'
         );
         foreach ($screens as $screen) {
-            $down = $now - $screen->lastseen > self::DOWN_AFTER;
+            $info = json_decode((string) ($screen->lastinfo ?? ''), true) ?: [];
+            $down = $now - $screen->lastseen > self::DOWN_AFTER || screens::frozen($info);
             if ($down && !$screen->alerted && $screen->alerts && self::expected($screen, $now)) {
                 self::send($screen, 'down');
                 $DB->set_field('local_oksigeniahechauka_screen', 'alerted', $now, ['id' => $screen->id]);

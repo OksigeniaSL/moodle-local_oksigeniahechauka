@@ -45,10 +45,16 @@ export const store = {
     },
     setKey: function (key) {
         set('key', key);
+        set('revoked', null);
     },
     forget: function () {
         set('key', null);
         set('manifest', null);
+        set('revoked', '1');
+    },
+    /** Taken out in the panel: what keeps a copy of the key must not put it back. */
+    revoked: function () {
+        return get('revoked') === '1';
     },
     manifest: function () {
         const raw = get('manifest');
