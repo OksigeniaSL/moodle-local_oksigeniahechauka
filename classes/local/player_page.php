@@ -61,6 +61,9 @@ class player_page {
             'week_from' => get_string('week_from', $c),
             'week_until' => get_string('week_until', $c),
             'date_format' => get_string('date_format', $c),
+            'birthdays_one' => get_string('label_birthdays_one', $c),
+            'birthdays_many' => get_string('label_birthdays_many', $c),
+            'allergens' => get_string('label_allergens', $c),
             'also' => get_string('label_also', $c),
             'also_more' => get_string('label_also_more', $c),
             'also_others' => get_string('label_also_others', $c),
@@ -160,7 +163,7 @@ class player_page {
         foreach (
             ['hechauka.css', 'composiciones.css', 'tiempo.css', 'semana.css', 'proximos-dias.css', 'urgente.css',
             'distancia.css', 'jerarquia.css', 'tercios.css', 'cinta.css', 'usos.css', 'agenda.css', 'fotos.css',
-            'lideres.css', 'agenda-lista.css', 'identidad.css', 'pieles.css', 'fondos.css', 'letras.css', 'actividad.css'] as $file
+            'lideres.css', 'agenda-lista.css', 'cumple.css', 'biblioteca.css', 'alergenos.css', 'identidad.css', 'pieles.css', 'fondos.css', 'letras.css', 'actividad.css'] as $file
         ) {
             $sheets .= '<link rel="stylesheet" href="' . $url($file) . '">';
         }

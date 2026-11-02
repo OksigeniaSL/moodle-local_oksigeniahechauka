@@ -111,6 +111,13 @@ function buildEvent(e) {
     if (e.until) {
         b.setAttribute('data-sigue', '');
     }
+    const set = window.HK_ACTIVIDAD;
+    const svg = e.icon && e.icon !== 'none' && set ? set.svg(e.icon) : '';
+    if (svg) {
+        const mark = el('span', 'hk-agenda-icono');
+        mark.innerHTML = svg;
+        b.appendChild(mark);
+    }
     if (e.time && !e.until) {
         b.appendChild(el('b', 'hk-agenda-hora', e.time));
     }

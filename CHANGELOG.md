@@ -1,12 +1,13 @@
 # Changelog
 
-## 0.8.0 (in progress)
+## 0.8.0 (2026-11-02)
 
 - **Birthdays**, off until a centre turns them on: from a date field of the Moodle profile, from a list kept in the panel, or both, with the name, the group and the
   picture. Never the age or the year, and never on a showcase screen.
 - **New in the library**, from Oksigenia Ayvurenda when it is on the site: the books that have come, with their cover and a QR to their record.
 - **Allergens** of each dish on the menu, from Oksigenia Meals.
 - **Icons by kind of activity** on the coming days and the agenda: by the words of the title, or chosen for each event in the panel.
+- The important notice in the ticker grows instead of cutting long titles, and a header that does not fit gives up the centre's name before leaving the screen.
 
 ## 0.7.19 (2026-11-02)
 

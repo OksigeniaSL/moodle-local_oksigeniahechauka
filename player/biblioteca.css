@@ -1,0 +1,279 @@
+/* Oksigenia Hechauka 0.8: «Novedades de la biblioteca», a slide of its own: a shelf (Gaudí, 2 November 2026). Goes after lideres.css.
+ *
+ *   <div class="hk-cuerpo hk-capa" data-composicion="biblioteca">
+ *     <section class="hk-biblio">
+ *       <div class="hk-biblio-sala">
+ *         <div class="hk-libro hk-libro-grande"><img> or <div class="hk-libro-dibujado">…</div></div>
+ *         <div class="hk-biblio-lado">
+ *           <div class="hk-biblio-cabeza"><div class="hk-biblio-texto">…</div><div class="hk-qr">…</div></div>
+ *           <div class="hk-biblio-otros"><div class="hk-libro">…</div>…</div>
+ *       <div class="hk-biblio-tabla"></div>        (the plank)
+ *
+ * Chromium 56: flexbox only, margins instead of gap. */
+.hk-cuerpo[data-composicion="biblioteca"] {
+    flex-direction: column;
+}
+.hk .hk-biblio {
+    --hk-libro-alto: 62rem;
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+    border-radius: calc(2.8rem * var(--hk-esquina));
+    background: var(--hk-superficie);
+    color: var(--hk-texto);
+}
+.hk .hk-biblio-sala {
+    display: flex;
+    flex: 1 1 auto;
+    align-items: flex-end;
+    min-height: 0;
+    padding: 4rem 5rem 0;
+}
+/* the plank: the books stand on it */
+.hk .hk-biblio-tabla {
+    position: relative;
+    z-index: 1;
+    flex: none;
+    height: 3.6rem;
+    background: #8a5c36;
+    box-shadow: inset 0 .7rem 0 #a97a4e, inset 0 -.5rem 0 #6d4527;
+}
+/* --- A book --- */
+.hk .hk-libro {
+    position: relative;
+    flex: none;
+    width: calc(var(--hk-libro-alto) * .23);
+    height: calc(var(--hk-libro-alto) * .345);
+    margin-right: 2.6rem;
+    overflow: hidden;
+    border-radius: .4rem calc(.8rem * var(--hk-esquina)) calc(.8rem * var(--hk-esquina)) .4rem;
+    background: var(--hk-linea);
+    box-shadow: .6rem 0 1.4rem rgba(0, 0, 0, .28);
+}
+.hk .hk-libro:last-child {
+    margin-right: 0;
+}
+.hk .hk-libro::after {                    /* its spine: it is a book, not a card */
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 6%;
+    background: linear-gradient(to right, rgba(0, 0, 0, .28), rgba(0, 0, 0, .04) 70%, rgba(255, 255, 255, .14));
+}
+.hk .hk-libro img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.hk .hk-libro-grande {
+    width: calc(var(--hk-libro-alto) * .667);
+    height: var(--hk-libro-alto);
+    margin-right: 5rem;
+    box-shadow: 1rem 0 2.4rem rgba(0, 0, 0, .3);
+}
+.hk .hk-libro-dibujado {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    padding: 12% 10% 10% 14%;
+    background: var(--hk-primario);
+    color: var(--hk-sobre-primario);
+    font-family: var(--hk-letra-titulos);
+}
+.hk .hk-libro-dibujado-titulo {
+    overflow-wrap: break-word;
+    font-size: 2.2rem;
+    font-weight: 800;
+    line-height: 1.08;
+}
+.hk .hk-libro-dibujado-autor {
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1.1;
+}
+/* The size of a cover goes with the cover, not with the distance: the title is read beside it. */
+.hk .hk-libro-grande .hk-libro-dibujado-titulo {
+    font-size: calc(var(--hk-libro-alto) * .068);
+}
+.hk .hk-libro-grande .hk-libro-dibujado-autor {
+    font-size: calc(var(--hk-libro-alto) * .042);
+}
+/* --- What it says --- */
+.hk .hk-biblio-lado {
+    display: flex;
+    flex: 1 1 0px;
+    flex-direction: column;
+    align-self: stretch;
+    justify-content: flex-start;
+    min-width: 0;
+}
+.hk .hk-biblio-cabeza {
+    display: flex;
+    flex: none;
+    align-items: flex-start;
+}
+.hk .hk-biblio-texto {
+    flex: 1 1 0px;
+    min-width: 0;
+}
+.hk .hk-biblio-etiqueta {
+    flex: none;
+    margin-bottom: 1.6rem;
+    color: var(--hk-acento-texto);
+    font-size: var(--hk-t-min);
+    font-weight: 800;
+    letter-spacing: .05em;
+    line-height: 1.04;
+    text-transform: uppercase;
+}
+.hk .hk-biblio-titulo {
+    padding-bottom: .1em;                  /* the descenders of a tight line, inside its box: otherwise the column measures as overflowing */
+    font-family: var(--hk-letra-titulos);
+    font-size: var(--hk-t-titular);
+    font-weight: 800;
+    letter-spacing: -.015em;
+    line-height: 1.02;
+}
+.hk .hk-biblio[data-ajuste="1"] .hk-biblio-titulo { font-size: calc(var(--hk-t-titular) * .88); }
+.hk .hk-biblio[data-ajuste="2"] .hk-biblio-titulo { font-size: calc(var(--hk-t-titular) * .76); }
+.hk .hk-biblio[data-ajuste="3"] .hk-biblio-titulo { font-size: calc(var(--hk-t-titular) * .64); }
+.hk .hk-biblio-subtitulo {
+    margin-top: 1.2rem;
+    color: var(--hk-texto-suave);
+    font-size: var(--hk-t-lista);
+    font-weight: 700;
+    line-height: 1.08;
+}
+.hk .hk-biblio-autor {
+    margin-top: 1.6rem;
+    font-size: var(--hk-t-lista);
+    font-weight: 700;
+    line-height: 1.08;
+}
+.hk .hk-biblio-sitio {
+    margin-top: 1rem;
+    color: var(--hk-texto-suave);
+    font-size: var(--hk-t-min);
+    font-weight: 700;
+    line-height: 1.08;
+}
+.hk .hk-biblio.hk-biblio-corto .hk-biblio-subtitulo,
+.hk .hk-biblio.hk-biblio-corto .hk-biblio-sitio,
+.hk .hk-biblio.hk-biblio-sin-otros .hk-biblio-otros {
+    display: none;
+}
+.hk[data-distancia="8"] .hk-biblio[data-ajuste="3"] .hk-biblio-titulo {
+    font-size: calc(var(--hk-t-titular) * .76);
+}
+.hk .hk-biblio.hk-biblio-sin-qr .hk-qr {
+    display: none;
+}
+.hk .hk-biblio.hk-biblio-solo-titulo .hk-biblio-etiqueta,
+.hk .hk-biblio.hk-biblio-solo-titulo .hk-biblio-autor {
+    display: none;
+}
+.hk .hk-biblio-otros {
+    display: flex;
+    flex: none;
+    align-items: flex-end;
+    margin-top: auto;                     /* on the plank, whatever the words above them take */
+    padding-top: 2rem;
+}
+/* --- Its code --- */
+.hk .hk-biblio .hk-qr {
+    flex: none;
+    width: 34rem;
+    margin-left: 3.6rem;
+    padding: 2.8rem 2.8rem 2.2rem;
+    border-radius: calc(2.2rem * var(--hk-esquina));
+    background: #fff;
+    box-shadow: 0 0 0 .3rem var(--hk-linea);
+    color: #16191d;
+    text-align: center;
+}
+.hk .hk-biblio .hk-qr svg {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+.hk .hk-biblio .hk-qr path {
+    fill: #16191d;
+}
+.hk .hk-biblio .hk-qr-web {
+    margin-top: 1.4rem;
+    color: #16191d;
+    font-size: 2.6rem;
+    font-weight: 800;
+    line-height: 1.05;
+    overflow-wrap: break-word;
+}
+.hk .hk-biblio .hk-qr-llamada {
+    margin-top: .6rem;
+    color: #4b5563;
+    font-size: 2.4rem;
+    font-weight: 700;
+    line-height: 1.05;
+}
+/* --- Vertical: its words on top, the books at the bottom, on the plank --- */
+.hk.hk-vertical .hk-biblio {
+    --hk-libro-alto: 60rem;
+}
+.hk.hk-vertical[data-distancia="5"] .hk-biblio {
+    --hk-libro-alto: 52rem;
+}
+.hk.hk-vertical[data-distancia="8"] .hk-biblio {
+    --hk-libro-alto: 44rem;
+}
+.hk.hk-vertical .hk-biblio-sala {
+    position: relative;
+    flex-direction: column-reverse;
+    align-items: stretch;
+    padding: 4rem 4rem 0;
+}
+.hk.hk-vertical .hk-libro-grande {
+    flex: none;
+    margin: 0;
+}
+.hk.hk-vertical .hk-biblio-lado {
+    flex: 1 1 0px;
+    justify-content: flex-start;
+    min-height: 0;
+    margin-bottom: 3rem;
+}
+.hk.hk-vertical .hk-biblio-otros {
+    position: absolute;
+    right: 4rem;
+    bottom: 0;
+    margin: 0;
+    padding: 0;
+}
+/* Its code beside the book, over the others: the title takes the whole width, or a long word does not fit */
+.hk.hk-vertical .hk-biblio .hk-qr {
+    position: absolute;
+    right: 4rem;
+    bottom: calc(var(--hk-libro-alto) * .345 + 3rem);
+    width: 32rem;
+    margin: 0;
+}
+.hk.hk-vertical .hk-biblio.hk-biblio-sin-otros .hk-qr,
+.hk.hk-vertical[data-distancia="8"] .hk-biblio .hk-qr {
+    bottom: 1.6rem;
+}
+.hk .hk-biblio-otros .hk-libro-dibujado-titulo,
+.hk .hk-biblio-otros .hk-libro-dibujado-autor {
+    overflow: hidden;
+}
+.hk[data-distancia="8"] .hk-biblio .hk-qr {
+    width: 30rem;
+    margin-left: 2.4rem;
+    padding: 2rem 2rem 1.6rem;
+}

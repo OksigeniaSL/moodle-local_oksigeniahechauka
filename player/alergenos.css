@@ -1,0 +1,99 @@
+/* Oksigenia Hechauka 0.8: the allergens on the menu (Gaudí, 2 November 2026). The 14 drawings of Meals, in alergenos/, always on a white
+ * disc: black line on white reads on any colour of a skin and in the dark theme. Goes after lideres.css.
+ *
+ * That a dish has no drawings says nothing: they may just not be there. Nothing here, nor anywhere on the screen, says «sin alérgenos». */
+.hk .hk-alergenos {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+}
+.hk .hk-alergeno {
+    display: block;
+    flex: none;
+    width: var(--hk-alergeno, var(--hk-t-min));
+    height: var(--hk-alergeno, var(--hk-t-min));
+    margin: 0 .6rem .4rem 0;
+    border-radius: 50%;
+    background-color: #fff;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+}
+.hk .hk-lider-alergenos {
+    --hk-alergeno: calc(var(--hk-t-min) * 1.25);
+    margin-top: 1.6rem;
+}
+.hk .hk-alergenos-rotulo {
+    margin-right: 1.2rem;
+    font-size: var(--hk-t-min);
+    font-weight: 800;
+    line-height: 1;
+}
+.hk .hk-plato-alergenos {
+    --hk-alergeno: var(--hk-t-min);
+    display: inline;
+    margin-left: .3em;
+}
+.hk .hk-plato-alergenos .hk-alergeno {
+    display: inline-block;
+    margin: 0 .1em -.12em 0;
+    vertical-align: baseline;
+}
+.hk .hk-lider-plato .hk-plato-texto {
+    flex: 1 1 0px;
+    min-width: 0;
+}
+.hk .hk-linea-alergenos {
+    --hk-alergeno: var(--hk-t-min);
+    margin-top: .6rem;
+}
+.hk .hk-linea-alergenos .hk-alergeno {
+    box-shadow: 0 0 0 .2rem var(--hk-linea);
+}
+.hk-alergeno-celery { background-image: url(alergenos/celery.svg); }
+.hk-alergeno-crustaceans { background-image: url(alergenos/crustaceans.svg); }
+.hk-alergeno-eggs { background-image: url(alergenos/eggs.svg); }
+.hk-alergeno-fish { background-image: url(alergenos/fish.svg); }
+.hk-alergeno-gluten { background-image: url(alergenos/gluten.svg); }
+.hk-alergeno-lupin { background-image: url(alergenos/lupin.svg); }
+.hk-alergeno-milk { background-image: url(alergenos/milk.svg); }
+.hk-alergeno-molluscs { background-image: url(alergenos/molluscs.svg); }
+.hk-alergeno-mustard { background-image: url(alergenos/mustard.svg); }
+.hk-alergeno-nuts { background-image: url(alergenos/nuts.svg); }
+.hk-alergeno-peanuts { background-image: url(alergenos/peanuts.svg); }
+.hk-alergeno-sesame { background-image: url(alergenos/sesame.svg); }
+.hk-alergeno-soy { background-image: url(alergenos/soy.svg); }
+.hk-alergeno-sulphites { background-image: url(alergenos/sulphites.svg); }
+
+/* --- The icons by kind of activity (actividad-iconos.js, actividad.css) --- */
+.hk .hk-linea-icono {
+    display: block;
+    flex: none;
+    width: calc(var(--hk-t-lista) * 1.15);
+    height: calc(var(--hk-t-lista) * 1.15);
+    margin: 0 1.2rem 0 0;
+}
+.hk .hk-agenda-icono {
+    display: block;
+    flex: none;
+    box-sizing: border-box;
+    width: calc(var(--hk-t-lista) * 1.3);
+    height: calc(var(--hk-t-lista) * 1.3);
+    margin: -.4rem 1.6rem -.4rem -1.2rem;
+    padding: .4rem;
+    border-radius: 50%;
+    background: #fff;
+}
+/* In the ticket and the countdown, big, in the room that was left: it says the kind of thing at a glance */
+.hk .hk-lider-sello {
+    position: relative;
+    flex: none;
+    align-self: center;
+    width: calc(var(--hk-t-cifra) * 2.2);
+    height: calc(var(--hk-t-cifra) * 2.2);
+    margin-right: 4.4rem;
+}
+.hk-vertical .hk-lider-sello,
+.hk[data-distancia="8"] .hk-lider-sello {
+    display: none;
+}

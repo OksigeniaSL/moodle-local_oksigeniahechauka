@@ -139,12 +139,58 @@ export function menuParts(menu) {
     const main = courses[1] || courses[0];
     return {
         main: main ? (main.dishes || []).join(' · ') : '',
+        mainAllergens: allergensOf(main),
         others: courses.filter(function (c) {
             return c !== main;
         }).map(function (c) {
-            return {label: c.label, text: (c.dishes || []).join(' · ')};
+            return {label: c.label, text: (c.dishes || []).join(' · '), allergens: allergensOf(c)};
         }),
     };
+}
+
+/**
+ * The allergens of a course: all those of its dishes, once. A dish without codes says nothing, never «without allergens».
+ *
+ * @param {object} [course] {dishes, allergens: [[code]], aligned with its dishes}
+ * @returns {string[]}
+ */
+export function allergensOf(course) {
+    const out = [];
+    ((course && course.allergens) || []).forEach(function (list) {
+        (list || []).forEach(function (code) {
+            if (/^[a-z]+$/.test(code) && out.indexOf(code) < 0) {
+                out.push(code);
+            }
+        });
+    });
+    return out;
+}
+
+// A row of allergens, each its drawing on a white disc (alergenos.css). Null when there are none.
+function allergensRow(codes, cls, label) {
+    if (!codes || !codes.length) {
+        return null;
+    }
+    const d = el('div', 'hk-alergenos ' + cls);
+    if (label) {
+        d.appendChild(el('span', 'hk-alergenos-rotulo', label));
+    }
+    codes.forEach(function (code) {
+        d.appendChild(el('i', 'hk-alergeno hk-alergeno-' + code));
+    });
+    return d;
+}
+
+// An icon by kind of activity, inline so its colours follow the theme. Null with none, or without the icons' script.
+function activityIcon(icon, cls) {
+    const set = window.HK_ACTIVIDAD;
+    const svg = icon && icon !== 'none' && set ? set.svg(icon) : '';
+    if (!svg) {
+        return null;
+    }
+    const d = el('span', cls);
+    d.innerHTML = svg;
+    return d;
 }
 
 /**
@@ -228,12 +274,22 @@ export function buildLead(p, today, l) {
         } else {
             const parts = menuParts(m);
             b.appendChild(el('h2', 'hk-lider-titular', parts.main));
+            const inMain = allergensRow(parts.mainAllergens, 'hk-lider-alergenos', l.allergens);
+            if (inMain) {
+                b.appendChild(inMain);
+            }
             if (parts.others.length) {
                 const dishes = el('div', 'hk-lider-platos');
                 parts.others.forEach(function (o) {
-                    const x = el('p', 'hk-lider-plato');
+                    const x = el('div', 'hk-lider-plato');
                     x.appendChild(el('small', '', o.label));
-                    x.appendChild(document.createTextNode(o.text));
+                    // In the same line of text: they flow after the dish, and the dish does not wrap to leave them a column.
+                    const dish = el('span', 'hk-plato-texto', o.text);
+                    const inDish = allergensRow(o.allergens, 'hk-plato-alergenos');
+                    if (inDish) {
+                        dish.appendChild(inDish);
+                    }
+                    x.appendChild(dish);
                     dishes.appendChild(x);
                 });
                 b.appendChild(dishes);
@@ -313,6 +369,10 @@ export function buildLead(p, today, l) {
             b.appendChild(el('p', 'hk-lider-entrada', e.group));
         }
         s.appendChild(b);
+        const stamp = activityIcon(e.icon, 'hk-lider-sello');
+        if (stamp) {
+            s.appendChild(stamp);
+        }
     } else {
         const c = today.countdown;
         const n = c.color || 0;
@@ -332,6 +392,10 @@ export function buildLead(p, today, l) {
             b.appendChild(el('p', 'hk-lider-entrada', foot));
         }
         s.appendChild(b);
+        const stamp = activityIcon(c.icon, 'hk-lider-sello');
+        if (stamp) {
+            s.appendChild(stamp);
+        }
     }
     s.hkLead = p;
     return s;
@@ -339,11 +403,15 @@ export function buildLead(p, today, l) {
 
 // --- The rest ---------------------------------------------------------------------------------------------------
 
-function line(when, title, detail, n, coming) {
+function line(when, title, detail, n, coming, icon) {
     const d = el('div', 'hk-linea' + (coming ? ' hk-linea-proxima' : ''));
     if (when) {
         d.appendChild(el('b', 'hk-linea-cuando', when));
         stage(d, n || 0);
+    }
+    const mark = activityIcon(icon, 'hk-linea-icono');
+    if (mark) {
+        d.appendChild(mark);
     }
     const t = el('span', 'hk-linea-texto', title);
     if (detail) {
@@ -395,7 +463,13 @@ export function buildRest(today, lead, l, turn) {
         const main = m.closed ? m.closed : menuParts(m).main;
         if (main) {
             items.push({group: m.label || '', colour: ['menu', 'menu'], make: function () {
-                return line(null, main, null);
+                const row = line(null, main, null);
+                // Those of the dish it names: the menu's whole list under one dish would say what is not so.
+                const codes = allergensRow(m.closed ? [] : menuParts(m).mainAllergens, 'hk-linea-alergenos');
+                if (codes) {
+                    row.querySelector('.hk-linea-texto').appendChild(codes);
+                }
+                return row;
             }});
         }
     }
@@ -409,13 +483,13 @@ export function buildRest(today, lead, l, turn) {
     (today.events || []).forEach(function (e) {
         if (!(lead && lead.type === 'event' && lead.event === e)) {
             items.push({group: today.eventsLabel || l.events, colour: ['evento', 'evento'], make: function (short) {
-                return line(e.time && e.time !== '·' ? e.time : null, e.title, short ? null : e.group, e.color);
+                return line(e.time && e.time !== '·' ? e.time : null, e.title, short ? null : e.group, e.color, false, e.icon);
             }});
         }
     });
     (today.upcoming || []).forEach(function (e) {
         items.push({group: l.upcoming, colour: ['texto-suave', 'texto-suave'], make: function (short) {
-            return line(e.day, e.title, short ? null : e.group, e.color, true);
+            return line(e.day, e.title, short ? null : e.group, e.color, true, e.icon);
         }});
     });
     if (!items.length && !important.length) {

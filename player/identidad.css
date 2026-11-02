@@ -41,6 +41,10 @@
 .hk .hk-completa .hk-lugar {             /* over a photo */
     color: #fff;
 }
+.hk .hk-cab-sin-nombre .hk-lugar,
+.hk.hk .hk-cab-sin-nombre .hk-lugar {
+    display: none;
+}
 /* from 5 m it stays too: there it is the only thing that says whose screen it is */
 .hk[data-distancia="5"] .hk-lugar,
 .hk[data-distancia="8"] .hk-lugar {

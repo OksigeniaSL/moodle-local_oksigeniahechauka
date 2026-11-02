@@ -6,10 +6,11 @@
 import {ratio, shapeOf} from './compose.js';
 import {buildWeatherThird} from './today.js';
 import {MARK, buildLead, buildRest, fitAlso, fitHeadline, fitWord, leadOfTurn, leadsOf, linesOf, paginateRest, showRestPage, turnFixed, weekHeadline} from './lead.js';
+import {buildBirthdays, fitBirthdays} from './cumple.js';
+import {buildBooks, fitBooks} from './biblioteca.js';
 import {qrPath, shortWeb} from './qr.js';
 import {even} from './balance.js';
 import {buildAgenda, startAgenda} from './agendaview.js';
-import {buildBirthdays, buildBooks} from './extras.js';
 import {buildCarousel, buildWall, buildWallBand, startCarousel, startWall, wallCount} from './photos.js';
 import {buildWeek, fitWeek} from './weekview.js';
 
@@ -19,7 +20,7 @@ const PHRASE_WAITS_MS = 25000;
 const CAPTION_MS = 2800;
 
 /** The compositions that are made anew each time, never only their pictures changed. */
-const NEW_EACH = {'solo-hoy': true, semana: true, titular: true, agenda: true, muro: true, 'fotos-tercio': true};
+const NEW_EACH = {'solo-hoy': true, semana: true, titular: true, agenda: true, muro: true, 'fotos-tercio': true, cumple: true, biblioteca: true};
 
 /** The compositions over the whole screen, in their own layer. */
 const FULL = {'foto-completa': true, 'escaparate': true};
@@ -438,7 +439,7 @@ export class Screen {
      * clock and the degrees a bit smaller, and at last the weather leaves the header.
      */
     fitHeaders() {
-        const steps = ['hk-fecha-larga', 'hk-cab-justa', 'hk-cab-sin-tiempo'];
+        const steps = ['hk-fecha-larga', 'hk-cab-justa', 'hk-cab-sin-tiempo', 'hk-cab-sin-nombre'];
         this.headers.forEach(function (p) {
             steps.forEach(function (c) {
                 p.node.classList.remove(c);
@@ -449,7 +450,7 @@ export class Screen {
             }
             const fits = function () {
                 const box = p.node.getBoundingClientRect();
-                return box.width === 0 || hour.getBoundingClientRect().right <= box.right + 1;
+                return box.width === 0 || hour.getBoundingClientRect().right <= Math.min(box.right, window.innerWidth) + 1;
             };
             for (let i = 0; i < steps.length && !fits(); i++) {
                 p.node.classList.add(steps[i]);
@@ -591,6 +592,22 @@ export class Screen {
     makeLayer(comp, items, today, week, extra) {
         const c = el('div', 'hk-cuerpo hk-capa');
         c.setAttribute('data-composicion', comp);
+        const self0 = this;
+        const mediaOf = function (ref) {
+            return self0.media.url(ref);
+        };
+        if (comp === 'cumple') {
+            buildBirthdays(c, extra && extra.item, (extra && extra.page) || 0, {distance: this.distance || 3, horizontal: this.horizontal,
+                glass: !!this.glass, one: this.s.birthdays_one || '', many: this.s.birthdays_many || '', media: mediaOf});
+            return c;
+        }
+        if (comp === 'biblioteca') {
+            buildBooks(c, extra && extra.item, (extra && extra.page) || 0, {distance: this.distance || 3, horizontal: this.horizontal,
+                media: mediaOf, more: this.s.also_more || '', qr: function (url) {
+                    return self0.qrBox(url, false);
+                }});
+            return c;
+        }
         if (comp === 'semana') {
             const l = this.labelsFull();
             // What comes next and matters, in a strip in the centre's colour; the five days under it.
@@ -644,14 +661,6 @@ export class Screen {
         }
         if (comp === 'agenda') {
             buildAgenda(c, extra.data, this.agendaWords());
-            return c;
-        }
-        if (comp === 'cumple') {
-            c.appendChild(buildBirthdays(extra, this.media, this.s));
-            return c;
-        }
-        if (comp === 'biblioteca') {
-            c.appendChild(buildBooks(extra, this.media));
             return c;
         }
         if (comp === 'muro') {
@@ -718,6 +727,7 @@ export class Screen {
             daysfor: s.daysfor || '',
             also: s.also || '',
             alsoMore: s.also_more || '',
+            allergens: s.allergens || '',
             alsoOthers: s.also_others || '',
             notices: l.notices || s.notices || '',
             upcoming: l.upcoming || s.upcoming || '',
@@ -792,15 +802,27 @@ export class Screen {
             return;
         }
         this.bandLabel.innerHTML = MARK;
-        this.bandLabel.appendChild(document.createTextNode(this.s.important || ''));
+        this.bandLabel.appendChild(el('span', '', this.s.important || ''));
         this.bandLine.appendChild(document.createTextNode(n.title));
+        const line = this.bandLine;
+        const band = this.ticker;
+        const over = function () {
+            return line.scrollWidth > line.clientWidth + 1 || line.scrollHeight > line.clientHeight + 1;
+        };
+        // Its second line, if it fits; then, the title in two lines. It stays still, so it never comes in pieces.
+        line.classList.remove('hk-solo-titulo');
+        band.removeAttribute('data-lineas');
         if (n.body) {
-            const body = el('span', '', n.body);
-            this.bandLine.appendChild(body);
-            this.bandLine.classList.remove('hk-solo-titulo');
-            if (this.bandLine.scrollWidth > this.bandLine.clientWidth + 1 || body.scrollWidth > body.clientWidth + 1) {
-                this.bandLine.classList.add('hk-solo-titulo');
+            line.appendChild(el('span', '', n.body));
+            const inside = line.querySelector('span');
+            if (over() || inside.scrollWidth > inside.clientWidth + 1) {
+                line.classList.add('hk-solo-titulo');
             }
+        }
+        if (over()) {
+            // The band grows with its title: it says it whole, or it would not be there to be read.
+            line.classList.add('hk-solo-titulo');
+            band.setAttribute('data-lineas', '2');
         }
     }
 
@@ -909,6 +931,12 @@ export class Screen {
             }
         }
         this.fitCaptions(c, comp);
+        fitBirthdays(c);
+        fitBooks(c, this.horizontal);
+        const shelfTitle = c.querySelector('.hk-biblio-titulo');
+        if (shelfTitle) {
+            even(shelfTitle);
+        }
         const type = c.querySelector('.hk-tipografica-texto');
         if (type) {
             const box = c.querySelector('.hk-tipografica');

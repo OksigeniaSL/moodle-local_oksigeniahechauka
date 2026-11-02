@@ -1,0 +1,231 @@
+/* Oksigenia Hechauka 0.8: «Hoy cumplen años», a slide of its own (Gaudí, 2 November 2026). Goes after lideres.css.
+ *
+ *   <div class="hk-cuerpo hk-capa" data-composicion="cumple">
+ *     <section class="hk-cumple">
+ *       <svg class="hk-guirnalda">…</svg>
+ *       <h2 class="hk-cumple-titulo">Hoy cumplen años</h2>
+ *       <div class="hk-cumple-gente" data-columnas="3" data-tam="uno|grande|lista" data-ajuste="1|2|3">
+ *         <article class="hk-cumple-persona">
+ *           <div class="hk-cumple-cara" data-tono="0|1|2"><img> or <span>LP</span></div>
+ *           <div class="hk-cumple-texto"><p class="hk-cumple-nombre">Lucía Pérez</p><p class="hk-cumple-grupo">3.º A</p></div>
+ *
+ * Chromium 56: flexbox only, margins instead of gap, no aspect-ratio. */
+.hk-cuerpo[data-composicion="cumple"] {
+    flex-direction: column;
+}
+.hk .hk-cumple {
+    position: relative;
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+    border-radius: calc(2.8rem * var(--hk-esquina));
+    background: var(--hk-primario);
+    color: var(--hk-sobre-primario);
+}
+.hk .hk-guirnalda {
+    display: block;
+    flex: none;
+    width: 100%;
+    height: auto;
+}
+.hk-guirnalda-cuerda {
+    fill: none;
+    stroke: var(--hk-sobre-primario);
+    stroke-width: 3;
+    stroke-linecap: round;
+}
+.hk-banderin-0 { fill: var(--hk-acento); }
+.hk-banderin-1 { fill: var(--hk-superficie); }
+.hk-banderin-2 { fill: var(--hk-menu); }
+.hk-banderin-3 { fill: var(--hk-evento); }
+.hk .hk-cumple-titulo {
+    flex: none;
+    margin-top: -1rem;
+    padding: 0 5rem;
+    font-family: var(--hk-letra-titulos);
+    font-size: calc(var(--hk-t-entrada) * 1.35);
+    font-weight: 800;
+    letter-spacing: -.015em;
+    line-height: 1.04;
+    text-align: center;
+}
+.hk .hk-cumple-gente {
+    display: flex;
+    flex: 1 1 auto;
+    flex-wrap: wrap;
+    align-content: center;
+    justify-content: center;
+    min-height: 0;
+    padding: 1.6rem 3rem 3rem;
+    overflow: hidden;
+}
+.hk .hk-cumple-persona {
+    display: flex;
+    flex: none;
+    align-items: center;
+    width: calc(100% - 2.4rem);
+    min-width: 0;
+    margin: 1.2rem;
+    padding: 1.6rem 2.4rem 1.6rem 1.6rem;
+    border-radius: calc(2rem * var(--hk-esquina));
+    background: var(--hk-superficie);
+    color: var(--hk-texto);
+}
+.hk-cumple-gente[data-columnas="2"] .hk-cumple-persona { width: calc(50% - 2.4rem); }
+.hk-cumple-gente[data-columnas="3"] .hk-cumple-persona { width: calc(33.333% - 2.4rem); }
+.hk-cumple-gente[data-columnas="4"] .hk-cumple-persona { width: calc(25% - 2.4rem); }
+.hk .hk-cumple-cara {
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: calc(var(--hk-t-lista) * 2.3);
+    height: calc(var(--hk-t-lista) * 2.3);
+    margin-right: 2rem;
+    overflow: hidden;
+    border-radius: 50%;
+    background: var(--hk-primario);
+    color: var(--hk-sobre-primario);
+    font-family: var(--hk-letra-titulos);
+    font-size: var(--hk-t-lista);
+    font-weight: 800;
+    line-height: 1;
+}
+.hk .hk-cumple-cara[data-tono="1"] { background: var(--hk-menu); color: var(--hk-sobre-menu); }
+.hk .hk-cumple-cara[data-tono="2"] { background: var(--hk-evento); color: var(--hk-sobre-evento); }
+.hk .hk-cumple-cara img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.hk .hk-cumple-texto {
+    flex: 1 1 0px;
+    min-width: 0;
+}
+.hk .hk-cumple-nombre {
+    font-size: var(--hk-t-lista);
+    font-weight: 800;
+    line-height: 1.06;
+}
+.hk .hk-cumple-grupo {
+    margin-top: .4rem;
+    color: var(--hk-texto-suave);
+    font-size: var(--hk-t-min);
+    font-weight: 700;
+    line-height: 1.08;
+}
+.hk[data-distancia="8"] .hk-cumple-titulo {
+    font-size: calc(var(--hk-t-entrada) * 1.1);
+}
+/* Long names: a step down, to the least that is read; then each of them loses its group */
+.hk .hk-cumple-gente[data-ajuste] .hk-cumple-nombre {
+    font-size: var(--hk-t-min);
+}
+.hk .hk-cumple-gente[data-ajuste="1"] .hk-cumple-nombre {
+    font-size: calc((var(--hk-t-lista) + var(--hk-t-min)) / 2);
+}
+.hk .hk-cumple-gente[data-ajuste="3"] .hk-cumple-grupo {
+    display: none;
+}
+/* Two or three: each of them stands up */
+.hk .hk-cumple-gente[data-tam="grande"] .hk-cumple-persona {
+    display: block;
+    padding: 3rem 3rem 3.2rem;
+    text-align: center;
+}
+.hk .hk-cumple-gente[data-tam="grande"] .hk-cumple-cara {
+    width: calc(var(--hk-t-entrada) * 3.2);
+    height: calc(var(--hk-t-entrada) * 3.2);
+    margin: 0 auto 2rem;
+    font-size: calc(var(--hk-t-entrada) * 1.3);
+}
+.hk .hk-cumple-gente[data-tam="grande"] .hk-cumple-nombre {
+    font-family: var(--hk-letra-titulos);
+    font-size: var(--hk-t-entrada);
+}
+.hk .hk-cumple-gente[data-tam="grande"] .hk-cumple-grupo {
+    font-size: var(--hk-t-lista);
+}
+/* Up to three from further away: a line each, larger */
+.hk .hk-cumple-gente[data-tam="medio"] .hk-cumple-cara {
+    width: calc(var(--hk-t-entrada) * 1.75);
+    height: calc(var(--hk-t-entrada) * 1.75);
+    font-size: var(--hk-t-lista);
+}
+.hk .hk-cumple-gente[data-tam="medio"] .hk-cumple-nombre {
+    font-size: var(--hk-t-entrada);
+}
+.hk .hk-cumple-gente[data-tam="medio"] .hk-cumple-grupo {
+    font-size: var(--hk-t-min);
+}
+.hk .hk-cumple-gente[data-tam="medio"][data-ajuste] .hk-cumple-nombre {
+    font-size: var(--hk-t-lista);
+}
+.hk .hk-cumple-gente[data-tam="medio"][data-ajuste="2"] .hk-cumple-grupo,
+.hk .hk-cumple-gente[data-tam="grande"][data-ajuste="3"] .hk-cumple-grupo {
+    display: none;
+}
+/* From 5 and 8 m, the line takes the name at its size, with a smaller face */
+.hk[data-distancia="5"] .hk-cumple-gente[data-tam="lista"] .hk-cumple-cara,
+.hk[data-distancia="8"] .hk-cumple-gente[data-tam="lista"] .hk-cumple-cara,
+.hk[data-distancia="8"] .hk-cumple-gente[data-tam="medio"] .hk-cumple-cara {
+    width: calc(var(--hk-t-lista) * 1.5);
+    height: calc(var(--hk-t-lista) * 1.5);
+    font-size: var(--hk-t-min);
+}
+.hk[data-distancia="8"] .hk-cumple-gente[data-tam="medio"] .hk-cumple-nombre {
+    font-size: var(--hk-t-lista);
+}
+.hk[data-distancia="8"] .hk-cumple-gente {
+    padding: .4rem 3rem 1rem;
+}
+.hk[data-distancia="8"] .hk-cumple-persona {
+    margin: .8rem 1.2rem;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+}
+/* One: the whole slide is theirs */
+.hk .hk-cumple-gente[data-tam="uno"] .hk-cumple-persona {
+    width: auto;
+    max-width: calc(100% - 2.4rem);
+    padding: 2.4rem 6rem 2.4rem 2.4rem;
+}
+.hk .hk-cumple-gente[data-tam="uno"] .hk-cumple-cara {
+    width: calc(var(--hk-t-cifra) * 2.4);
+    height: calc(var(--hk-t-cifra) * 2.4);
+    margin-right: 4rem;
+    font-size: var(--hk-t-cifra);
+}
+.hk-horizontal[data-distancia="5"] .hk-cumple-gente[data-tam="uno"] .hk-cumple-cara,
+.hk-horizontal[data-distancia="8"] .hk-cumple-gente[data-tam="uno"] .hk-cumple-cara {
+    width: calc(var(--hk-t-cifra) * 1.7);
+    height: calc(var(--hk-t-cifra) * 1.7);
+}
+.hk .hk-cumple-gente[data-tam="uno"] .hk-cumple-texto {
+    flex: 0 1 auto;
+}
+.hk .hk-cumple-gente[data-tam="uno"] .hk-cumple-nombre {
+    font-family: var(--hk-letra-titulos);
+    font-size: var(--hk-t-titular);
+    letter-spacing: -.015em;
+    line-height: 1.02;
+}
+.hk .hk-cumple-gente[data-tam="uno"] .hk-cumple-grupo {
+    margin-top: 1.4rem;
+    font-size: var(--hk-t-entrada);
+}
+.hk .hk-cumple-gente[data-tam="uno"][data-ajuste] .hk-cumple-nombre {
+    font-size: calc(var(--hk-t-titular) * .76);
+}
+.hk-vertical .hk-cumple-gente[data-tam="uno"] .hk-cumple-persona {
+    display: block;
+    padding: 4rem;
+    text-align: center;
+}
+.hk-vertical .hk-cumple-gente[data-tam="uno"] .hk-cumple-cara {
+    margin: 0 auto 3rem;
+}

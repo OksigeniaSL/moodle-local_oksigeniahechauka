@@ -473,8 +473,8 @@
 .hk.hk-vertical .hk-lider[data-tipo="menu"] .hk-mesa {
     order: -1;
     align-self: center;
-    width: 30rem;
-    padding: 4rem 0 0;
+    width: 22rem;
+    padding: 3rem 0 0;
 }
 /* a vertical screen read from afar, and the lead under a picture, have no room left for a plate or a sign */
 .hk-vertical[data-distancia="5"] .hk-lider .hk-mesa,
@@ -642,6 +642,31 @@
 }
 .hk.hk-con-importante .hk-completa .hk-pie {
     bottom: var(--hk-cinta-alto);
+}
+/* A narrow screen, or a long notice: the mark alone, and the title in two lines */
+.hk-vertical .hk-cinta-rotulo span {
+    display: none;
+}
+.hk-vertical .hk-cinta-rotulo svg {
+    margin-right: 0;
+}
+.hk .hk-cinta.hk-cinta-importante[data-lineas="2"] > .hk-cinta-aviso {
+    align-items: center;
+    font-size: var(--hk-t-min);
+    line-height: 1.06;
+    white-space: normal;
+}
+.hk.hk > .hk-cinta.hk-cinta-importante[data-lineas="2"] {
+    align-items: stretch;
+    height: auto;
+    min-height: var(--hk-cinta-alto);
+}
+.hk .hk-cinta.hk-cinta-importante[data-lineas="2"] > .hk-cinta-rotulo {
+    height: auto;
+}
+.hk .hk-cinta.hk-cinta-importante[data-lineas="2"] > .hk-cinta-aviso {
+    padding-top: .8rem;
+    padding-bottom: .8rem;
 }
 /* From 8 m there is no ticker, but the important one needs its band: thin, the rest of the screen is what is being read */
 .hk[data-distancia="8"] > .hk-cinta.hk-cinta-importante {
