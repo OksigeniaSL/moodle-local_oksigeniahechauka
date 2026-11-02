@@ -9,6 +9,7 @@ import {MARK, buildLead, buildRest, fitAlso, fitHeadline, fitWord, leadOfTurn, l
 import {buildBirthdays, fitBirthdays} from './cumple.js';
 import {buildDeadlines, fitDeadlines} from './plazos.js';
 import {buildIdle} from './reposo.js';
+import {buildTable, fitTable} from './tabla.js';
 import {buildBooks, fitBooks} from './biblioteca.js';
 import {qrPath, shortWeb} from './qr.js';
 import {even} from './balance.js';
@@ -22,7 +23,7 @@ const PHRASE_WAITS_MS = 25000;
 const CAPTION_MS = 2800;
 
 /** The compositions that are made anew each time, never only their pictures changed. */
-const NEW_EACH = {'solo-hoy': true, semana: true, titular: true, agenda: true, muro: true, 'fotos-tercio': true, cumple: true, biblioteca: true, plazos: true};
+const NEW_EACH = {'solo-hoy': true, semana: true, titular: true, agenda: true, muro: true, 'fotos-tercio': true, cumple: true, biblioteca: true, plazos: true, tabla: true};
 
 /** The compositions over the whole screen, in their own layer. */
 const FULL = {'foto-completa': true, 'escaparate': true, 'reposo': true};
@@ -610,6 +611,10 @@ export class Screen {
                 glass: !!this.glass, one: this.s.birthdays_one || '', many: this.s.birthdays_many || '', media: mediaOf});
             return c;
         }
+        if (comp === 'tabla') {
+            buildTable(c, extra && extra.item, (extra && extra.page) || 0);
+            return c;
+        }
         if (comp === 'plazos') {
             const now = this.lastDate || new Date();
             buildDeadlines(c, extra && extra.item, (extra && extra.page) || 0, {distance: this.distance || 3, horizontal: this.horizontal,
@@ -972,6 +977,7 @@ export class Screen {
         fitBirthdays(c);
         fitBooks(c, this.horizontal);
         fitDeadlines(c);
+        fitTable(c);
         const shelfTitle = c.querySelector('.hk-biblio-titulo');
         if (shelfTitle) {
             even(shelfTitle);

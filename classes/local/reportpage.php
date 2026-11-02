@@ -27,8 +27,11 @@ class reportpage {
     /** Lines of each list of what came out. */
     const MOST_LINES = 12;
 
+    /** Cuts in sight; the others, one click away. */
+    const CUTS_IN_SIGHT = 5;
+
     /** Cuts listed. */
-    const MOST_CUTS = 20;
+    const MOST_CUTS = 100;
 
     /**
      * Seconds in words: «5 h 12 min».
@@ -52,14 +55,58 @@ class reportpage {
     }
 
     /**
-     * The month in words, with its capital: «Octubre 2026».
+     * With its capital.
+     *
+     * @param string $text
+     * @return string
+     */
+    protected static function capital(string $text): string {
+        return \core_text::strtoupper(\core_text::substr($text, 0, 1)) . \core_text::substr($text, 1);
+    }
+
+    /**
+     * The name of a month alone, with its capital: «Septiembre».
      *
      * @param string $month
      * @return string
      */
-    public static function month_name(string $month): string {
-        $name = userdate(report::bounds($month)[0], get_string('strftimemonthyear', 'langconfig'));
-        return \core_text::strtoupper(\core_text::substr($name, 0, 1)) . \core_text::substr($name, 1);
+    protected static function month_alone(string $month): string {
+        return self::capital(userdate(report::bounds($month)[0], '%B'));
+    }
+
+    /**
+     * What the page says first: the month as a whole, and the screen that failed most if one did.
+     *
+     * @param array $data what report::month() gives
+     * @param string $decsep
+     * @return array [sentence, what follows]
+     */
+    protected static function summary(array $data, string $decsep): array {
+        $c = 'local_oksigeniahechauka';
+        $hours = array_values(array_filter($data['screens'], function ($s) {
+            return $s['percent'] !== null;
+        }));
+        $count = count($hours);
+        $percent = report::say_percent($data['percent'], $decsep);
+        $first = $count === 1 ? get_string('report_summary_one', $c, $percent) :
+            get_string('report_summary_many', $c, (object) ['count' => $count, 'percent' => $percent]);
+        $cuts = array_sum(array_map(function ($s) {
+            return count($s['cuts']);
+        }, $hours));
+        $saycuts = function (int $n) use ($c): string {
+            return get_string($n === 1 ? 'report_cuts_one' : 'report_cuts_many', $c, $n);
+        };
+        // Screens come worst first.
+        $worst = $hours[0];
+        if ($count > 1 && $worst['percent'] < report::NAME_UNDER) {
+            $a = (object) ['name' => $worst['name'], 'percent' => report::say_percent($worst['percent'], $decsep),
+                'cuts' => $saycuts(count($worst['cuts']))];
+            return [$first, get_string($worst['cuts'] ? 'report_worst' : 'report_worst_nocuts', $c, $a)];
+        }
+        if (!$cuts) {
+            return [$first, get_string('report_cuts_empty', $c)];
+        }
+        return [$first, get_string('report_cuts_total', $c, $saycuts($cuts))];
     }
 
     /**
@@ -132,44 +179,41 @@ class reportpage {
             foreach ($s['days'] as $d => $percent) {
                 $state = 'none';
                 if ($percent !== null) {
-                    $state = $percent >= 99.5 ? 'full' : ($percent >= 90 ? 'some' : 'low');
-                    $troubled += $percent < 99.5 ? 1 : 0;
+                    $state = $percent >= report::FULL_DAY ? 'full' : ($percent >= report::LOW_DAY ? 'some' : 'low');
+                    $troubled += $percent < report::FULL_DAY ? 1 : 0;
                 }
                 $bars[] = ['state' => $state, 'height' => $percent === null ? 0 : max(8, (int) round($percent)),
                     'title' => $d . ': ' . ($percent === null ? get_string('report_day_none', $c) :
                         report::say_percent($percent, $decsep) . ' %')];
             }
             $count = count($s['cuts']);
-            $facts = [!$count ? get_string('report_cuts_none', $c) :
-                get_string($count === 1 ? 'report_cuts_one' : 'report_cuts_many', $c, $count)];
-            if ($s['tvon'] + $s['tvoff'] > 0) {
-                // A month of a television in whole hours.
-                $facts[] = get_string('report_tv', $c, (object) ['on' => self::duration((int) round($s['tvon'] / 3600) * 3600),
-                    'off' => self::duration((int) round($s['tvoff'] / 3600) * 3600)]);
-            }
+            $facts = !$count ? get_string('report_cuts_none', $c) :
+                get_string($count === 1 ? 'report_cuts_one' : 'report_cuts_many', $c, $count);
             $screens[] = [
                 'name' => $s['name'],
                 'url' => (new \moodle_url('/local/oksigeniahechauka/screen.php', ['id' => $s['id']]))->out(false),
                 'percent' => $s['percent'] === null ? '' : report::say_percent($s['percent'], $decsep),
                 'hours' => $s['percent'] !== null,
-                'low' => $s['percent'] !== null && $s['percent'] < 90,
+                'low' => $s['percent'] !== null && $s['percent'] < report::LOW_DAY,
                 'bars' => $bars,
                 'lastday' => count($s['days']),
                 'barslabel' => get_string('report_bars', $c, (object) ['days' => count($s['days']), 'troubled' => $troubled]),
-                'facts' => implode(' · ', $facts),
+                'facts' => self::capital($facts),
             ];
             foreach ($s['cuts'] as $cut) {
-                $cuts[] = ['started' => (int) $cut->started, 'name' => $s['name'],
-                    'when' => userdate((int) $cut->started, get_string('strftimedaydatetime', 'langconfig')),
+                $cuts[] = ['seconds' => ($cut->ended ? (int) $cut->ended : $now) - (int) $cut->started, 'name' => $s['name'],
+                    'when' => self::capital(userdate((int) $cut->started, get_string('report_cut_when', $c))),
                     'length' => $cut->ended ? self::duration((int) $cut->ended - (int) $cut->started) :
                         get_string('report_cut_open', $c), 'open' => !$cut->ended];
             }
         }
         usort($cuts, function ($a, $b) {
-            return $b['started'] <=> $a['started'];
+            return $b['seconds'] <=> $a['seconds'];
         });
+        $allcuts = count($cuts);
+        $cuts = array_slice($cuts, 0, self::MOST_CUTS);
         [$own, $sources] = self::played($data['played']);
-        $count = count($screens);
+        [$summary, $summarymore] = $data['hasdata'] ? self::summary($data, $decsep) : ['', ''];
         $first = self::first_month();
         $start = new \DateTimeImmutable($month . '-01', \core_date::get_server_timezone_object());
         $prev = $start->modify('-1 month')->format('Y-m');
@@ -177,19 +221,24 @@ class reportpage {
         return [
             'tabs' => home::tabs('report', true),
             'hastabs' => true,
-            'title' => self::month_name($month),
+            'title' => get_string('report_heading', $c, userdate(report::bounds($month)[0], get_string('report_month_format', $c))),
+            'centre' => manifest::centre_name(),
             'inprogress' => $month === $current,
             'prevurl' => $first && $first <= $prev ? (new \moodle_url($base, ['month' => $prev]))->out(false) : '',
+            'prevname' => self::month_alone($prev),
             'nexturl' => $next <= $current ? (new \moodle_url($base, ['month' => $next]))->out(false) : '',
+            'nextname' => self::month_alone($next),
             'downloadurl' => (new \moodle_url($base, ['month' => $month, 'download' => 1]))->out(false),
             'hasdata' => $data['hasdata'],
-            'summary' => !$data['hasdata'] ? '' : ($count === 1 ?
-                get_string('report_summary_one', $c, report::say_percent($data['percent'], $decsep)) :
-                get_string('report_summary_many', $c, (object) ['count' => $count,
-                    'percent' => report::say_percent($data['percent'], $decsep)])),
+            'summary' => $summary,
+            'summarymore' => $summarymore,
             'screens' => $screens,
-            'cuts' => array_slice($cuts, 0, self::MOST_CUTS),
             'hascuts' => (bool) $cuts,
+            'cutstitle' => get_string($allcuts > self::CUTS_IN_SIGHT ? 'report_cuts_longest' : 'report_cuts_title', $c),
+            'cuts' => array_slice($cuts, 0, self::CUTS_IN_SIGHT),
+            'hasmorecuts' => $allcuts > self::CUTS_IN_SIGHT,
+            'morecuts' => array_slice($cuts, self::CUTS_IN_SIGHT),
+            'morecutslabel' => get_string('report_cuts_more', $c, $allcuts),
             'own' => $own,
             'hasown' => (bool) $own,
             'sources' => $sources,

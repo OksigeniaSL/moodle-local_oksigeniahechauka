@@ -45,6 +45,15 @@ class report {
     /** Different things kept for a screen and a day. */
     const MOST_KEYS = 300;
 
+    /** A day at or above this share counts as all of it: a restart is not a bad day. */
+    const FULL_DAY = 99.5;
+
+    /** A day below this share was a bad one. */
+    const LOW_DAY = 90;
+
+    /** The report names the screen that failed most only below this share: a cut of eleven minutes is nobody's fault. */
+    const NAME_UNDER = 99;
+
     /** Months kept. */
     const KEEP_MONTHS = 14;
 
@@ -310,7 +319,7 @@ class report {
                 ], $lang);
             }
             $a = (object) [
-                'month' => userdate(self::bounds($month)[0], $strings->get_string('strftimemonthyear', 'langconfig', null, $lang)),
+                'month' => userdate(self::bounds($month)[0], $strings->get_string('report_month_format', $c, null, $lang)),
                 'percent' => self::say_percent($data['percent'], $decsep),
                 'lines' => implode("\n", $lines),
                 'url' => $url->out(false),

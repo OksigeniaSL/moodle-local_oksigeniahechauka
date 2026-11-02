@@ -1228,8 +1228,69 @@ dialog.hkp-dialog > footer {
     line-height: 1.3;
 }
 
+.hkp-rep-centre {
+    display: none;
+}
+
+.hkp-rep-actions {
+    gap: .5rem 1.25rem;
+}
+
+.hkp-rep-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .4rem;
+}
+
 .hkp-rep-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .25rem 1.25rem;
+    align-items: center;
     margin: 0 0 1rem;
+}
+
+.hkp-rep-legend .hkp-hint {
+    margin: 0;
+}
+
+.hkp-rep-key {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .25rem 1rem;
+    margin: 0;
+    padding: 0;
+    color: var(--hkp-muted);
+    font-size: .875rem;
+    list-style: none;
+}
+
+.hkp-rep-key li {
+    display: flex;
+    gap: .35rem;
+    align-items: center;
+}
+
+.hkp-rep-key i {
+    display: block;
+    width: .7rem;
+    height: .7rem;
+    border-radius: 2px;
+}
+
+.hkp-rep-bars i.is-full,
+.hkp-rep-key i.is-full {
+    background: color-mix(in srgb, var(--hkp-muted) 38%, var(--hkp-card));
+}
+
+.hkp-rep-bars i.is-some,
+.hkp-rep-key i.is-some {
+    background: var(--hkp-warn);
+}
+
+.hkp-rep-bars i.is-low,
+.hkp-rep-key i.is-low {
+    background: var(--hkp-bad-dot);
 }
 
 .hkp-rep-screens,
@@ -1301,15 +1362,6 @@ dialog.hkp-dialog > footer {
     display: block;
     min-height: 3px;
     border-radius: 2px 2px 0 0;
-    background: var(--hkp-ok-dot);
-}
-
-.hkp-rep-bars i.is-some {
-    background: var(--hkp-warn-dot);
-}
-
-.hkp-rep-bars i.is-low {
-    background: var(--hkp-bad-dot);
 }
 
 .hkp-rep-bars i.is-none {
@@ -1334,6 +1386,15 @@ dialog.hkp-dialog > footer {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
     gap: 1rem;
+    align-items: start;
+}
+
+.hkp-rep-more summary {
+    padding: .55rem 0;
+    border-top: 1px solid var(--hkp-line);
+    color: var(--hkp-accent-ink);
+    font-weight: 600;
+    cursor: pointer;
 }
 
 .hkp-rep-lines li {
@@ -1366,8 +1427,22 @@ dialog.hkp-dialog > footer {
 
 @media print {
     .hkp-rep-actions,
-    .hkp-page .hkp-tabs {
+    .hkp-page .hkp-tabs,
+    .hkp-page .btn-footer-popover,
+    .hkp-page #page-footer {
         display: none;
+    }
+
+    .hkp-rep-centre {
+        display: block;
+        flex-basis: 100%;
+        margin: 0;
+        font-weight: 700;
+    }
+
+    .hkp-rep-bars i,
+    .hkp-rep-key i {
+        print-color-adjust: exact;
     }
 
     .hkp-rep-screen,

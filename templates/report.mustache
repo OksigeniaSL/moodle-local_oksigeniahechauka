@@ -23,18 +23,26 @@
     {
         "tabs": [],
         "hastabs": false,
-        "title": "Octubre 2026",
+        "title": "Informe de octubre de 2026",
+        "centre": "Centro de ejemplo",
         "inprogress": false,
         "prevurl": "https://example.com/report.php?month=2026-09",
+        "prevname": "Septiembre",
         "nexturl": "",
+        "nextname": "Noviembre",
         "downloadurl": "https://example.com/report.php?download=1",
         "hasdata": true,
         "summary": "Las 2 pantallas han estado en marcha el 99,6 % de su horario.",
+        "summarymore": "Ningún corte de más de 10 minutos.",
         "screens": [{"name": "Entrada", "url": "https://example.com/screen.php?id=1", "hours": true, "percent": "99,6", "low": false,
             "bars": [{"state": "full", "height": 100, "title": "1: 100 %"}, {"state": "some", "height": 92, "title": "2: 92,0 %"}],
             "lastday": 2, "barslabel": "2 días, 1 con cortes", "facts": "1 corte"}],
         "hascuts": true,
-        "cuts": [{"name": "Entrada", "when": "martes, 6 de octubre, 09:05", "length": "40 min", "open": false}],
+        "cutstitle": "Los cortes más largos",
+        "cuts": [{"name": "Entrada", "when": "Jueves 29, 10:12", "length": "40 min", "open": false}],
+        "hasmorecuts": true,
+        "morecutslabel": "Ver los 6",
+        "morecuts": [{"name": "Comedor", "when": "Lunes 5, 09:00", "length": "12 min", "open": false}],
         "hasplayed": true,
         "hasown": true,
         "own": [{"title": "Reunión de familias", "times": "312 veces", "length": "5 h 12 min"}],
@@ -45,14 +53,19 @@
 <div class="hkp hkp-rep">
     <header class="hkp-head">
         <div class="hkp-head-title">
+            <p class="hkp-rep-centre">{{centre}}</p>
             <h1>{{title}}</h1>
             {{#inprogress}}<p class="hkp-head-sub">{{#str}}report_inprogress, local_oksigeniahechauka{{/str}}</p>{{/inprogress}}
         </div>
         <div class="hkp-head-actions hkp-rep-actions">
-            {{#prevurl}}<a class="btn btn-outline-secondary" href="{{prevurl}}">{{#str}}report_prev, local_oksigeniahechauka{{/str}}</a>{{/prevurl}}
-            {{#nexturl}}<a class="btn btn-outline-secondary" href="{{nexturl}}">{{#str}}report_next, local_oksigeniahechauka{{/str}}</a>{{/nexturl}}
-            {{#hasdata}}<a class="btn btn-outline-secondary" href="{{downloadurl}}">{{#str}}report_download, local_oksigeniahechauka{{/str}}</a>
-            <button type="button" class="btn btn-outline-secondary" data-hkp-print>{{#str}}report_print, local_oksigeniahechauka{{/str}}</button>{{/hasdata}}
+            <div class="hkp-rep-group">
+                {{#prevurl}}<a class="btn btn-outline-secondary" href="{{prevurl}}" aria-label="{{#str}}report_prev, local_oksigeniahechauka{{/str}}: {{prevname}}">‹ {{prevname}}</a>{{/prevurl}}
+                {{#nexturl}}<a class="btn btn-outline-secondary" href="{{nexturl}}" aria-label="{{#str}}report_next, local_oksigeniahechauka{{/str}}: {{nextname}}">{{nextname}} ›</a>{{/nexturl}}
+            </div>
+            {{#hasdata}}<div class="hkp-rep-group">
+                <a class="btn btn-outline-secondary" href="{{downloadurl}}">{{#str}}report_download, local_oksigeniahechauka{{/str}}</a>
+                <button type="button" class="btn btn-outline-secondary" data-hkp-print>{{#str}}report_print, local_oksigeniahechauka{{/str}}</button>
+            </div>{{/hasdata}}
         </div>
     </header>
     {{#hastabs}}
@@ -62,13 +75,20 @@
     {{/hastabs}}
     {{^hasdata}}<p class="hkp-rep-summary">{{#str}}report_empty, local_oksigeniahechauka{{/str}}</p>{{/hasdata}}
     {{#hasdata}}
-    <p class="hkp-rep-summary">{{summary}}</p>
-    <p class="hkp-hint hkp-rep-legend">{{#str}}report_bars_help, local_oksigeniahechauka{{/str}}</p>
+    <p class="hkp-rep-summary">{{summary}} {{summarymore}}</p>
+    <div class="hkp-rep-legend">
+        <span class="hkp-hint">{{#str}}report_bars_help, local_oksigeniahechauka{{/str}}</span>
+        <ul class="hkp-rep-key">
+            <li><i class="is-full"></i>{{#str}}report_key_full, local_oksigeniahechauka{{/str}}</li>
+            <li><i class="is-some"></i>{{#str}}report_key_some, local_oksigeniahechauka{{/str}}</li>
+            <li><i class="is-low"></i>{{#str}}report_key_low, local_oksigeniahechauka{{/str}}</li>
+        </ul>
+    </div>
     <ul class="hkp-rep-screens">
         {{#screens}}
         <li class="hkp-rep-screen">
             <div class="hkp-rep-name"><a href="{{url}}">{{name}}</a><small>{{facts}}</small></div>
-            <div class="hkp-rep-percent{{#low}} is-low{{/low}}">{{#hours}}{{percent}} %{{/hours}}{{^hours}}<small>{{#str}}report_nohours, local_oksigeniahechauka{{/str}}</small>{{/hours}}</div>
+            <div class="hkp-rep-percent{{#low}} is-low{{/low}}">{{#hours}}{{percent}}&nbsp;%{{/hours}}{{^hours}}<small>{{#str}}report_nohours, local_oksigeniahechauka{{/str}}</small>{{/hours}}</div>
             <div class="hkp-rep-month">
                 <div class="hkp-rep-bars" role="img" aria-label="{{barslabel}}">{{#bars}}<i class="is-{{state}}" style="height: {{height}}%" title="{{title}}"></i>{{/bars}}</div>
                 <div class="hkp-rep-axis" aria-hidden="true"><span>1</span><span>{{lastday}}</span></div>
@@ -77,10 +97,13 @@
         {{/screens}}
     </ul>
     <section class="hkp-fs hkp-rep-cuts">
-        <h2 class="hkp-label">{{#str}}report_cuts_title, local_oksigeniahechauka{{/str}}</h2>
+        <h2 class="hkp-label">{{cutstitle}}</h2>
         <p class="hkp-hint">{{#str}}report_cuts_help, local_oksigeniahechauka{{/str}}</p>
         {{^hascuts}}<p>{{#str}}report_cuts_empty, local_oksigeniahechauka{{/str}}</p>{{/hascuts}}
         {{#hascuts}}<ul class="hkp-rep-lines">{{#cuts}}<li><span>{{name}}<small>{{when}}</small></span><b{{#open}} class="is-open"{{/open}}>{{length}}</b></li>{{/cuts}}</ul>{{/hascuts}}
+        {{#hasmorecuts}}<details class="hkp-rep-more"><summary>{{morecutslabel}}</summary>
+            <ul class="hkp-rep-lines">{{#morecuts}}<li><span>{{name}}<small>{{when}}</small></span><b{{#open}} class="is-open"{{/open}}>{{length}}</b></li>{{/morecuts}}</ul>
+        </details>{{/hasmorecuts}}
     </section>
     {{#hasplayed}}
     <div class="hkp-rep-two">
@@ -91,7 +114,7 @@
         </section>{{/hasown}}
         {{#hassources}}<section class="hkp-fs">
             <h2 class="hkp-label">{{#str}}report_sources, local_oksigeniahechauka{{/str}}</h2>
-            {{^hasown}}<p class="hkp-hint">{{#str}}report_played_help, local_oksigeniahechauka{{/str}}</p>{{/hasown}}
+            <p class="hkp-hint">{{#str}}report_sources_help, local_oksigeniahechauka{{/str}}</p>
             <ul class="hkp-rep-lines">{{#sources}}<li><span>{{title}}<small>{{times}}</small></span><b>{{length}}</b></li>{{/sources}}</ul>
         </section>{{/hassources}}
     </div>

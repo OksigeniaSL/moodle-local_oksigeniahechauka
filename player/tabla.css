@@ -1,0 +1,219 @@
+/* Oksigenia Hechauka 0.8: a table from a sheet or a JSON of the centre (Gaudí, 2 November 2026). Goes after composiciones.css and identidad.css.
+ *
+ * The player lays it out with the real letter and measures it (tabla.js): a table, as large as lets it all fit, by pages if it cannot; or,
+ * if not even so, each row as a card, whole on its page; and if a card does not fit on the sheet at all, from afar, with its first columns.
+ * No word is cut: cells break between words and at the joints of a long one, and a figure or an hour does not break at all.
+ *
+ *   <section class="hk-tabla" data-modo="tabla|fichas" data-letra="enorme|grande|normal|justa" data-fichas="dos|una" data-ancha="si" data-columnas="3" data-titulo="largo" data-sin-cabeza="no">
+ *     <header class="hk-tabla-cabeza"><h2 class="hk-tabla-titulo">Horario</h2><p class="hk-tabla-pagina"><b>1</b>/3</p></header>
+ *     <div class="hk-tabla-cuerpo">
+ *       <table class="hk-tabla-t"><thead>…</thead><tbody><tr><th scope="row">…</th><td class="hk-tabla-cifra">…</td></tr></tbody></table>
+ *       or <div class="hk-tabla-fichas"><article class="hk-tabla-ficha"><h3 class="hk-tabla-ficha-titulo">…</h3>
+ *            <div class="hk-tabla-pares"><div class="hk-tabla-par"><span class="hk-tabla-par-nombre">…</span><span class="hk-tabla-par-valor">…</span></div></div>
+ *
+ * Chromium 56: a real table, flexbox for the rest, margins instead of gap. */
+.hk-cuerpo[data-composicion="tabla"] > .hk-tabla {
+    flex: 1 1 auto;
+}
+.hk-tabla {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+    border-radius: calc(2.8rem * var(--hk-esquina));
+    background: var(--hk-superficie);
+    color: var(--hk-texto);
+    --hk-tabla-letra: var(--hk-t-lista);
+}
+.hk-tabla[data-letra="enorme"] {
+    --hk-tabla-letra: calc(var(--hk-t-titular) * .62);
+}
+.hk-tabla[data-letra="grande"] {
+    --hk-tabla-letra: var(--hk-t-entrada);
+}
+.hk-tabla[data-letra="justa"] {
+    --hk-tabla-letra: var(--hk-t-min);
+}
+
+/* --- Its title ------------------------------------------------------------------------------------------------------------ */
+.hk-tabla-cabeza {
+    display: flex;
+    flex: none;
+    align-items: center;
+    padding: 1.8rem 4rem 2rem;
+    background: var(--hk-primario);
+    color: var(--hk-sobre-primario);
+}
+.hk-tabla[data-sin-cabeza="si"] .hk-tabla-cabeza {
+    display: none;
+}
+.hk .hk-tabla[data-titulo="largo"] .hk-tabla-titulo {
+    font-size: var(--hk-t-lista);
+}
+.hk .hk-tabla-titulo {
+    flex: 1 1 0px;
+    min-width: 0;
+    margin: 0;
+    font-family: var(--hk-letra-titulos);
+    font-size: var(--hk-t-entrada);
+    font-weight: 800;
+    letter-spacing: -.01em;
+    line-height: 1.04;
+}
+.hk .hk-tabla-pagina {
+    flex: none;
+    margin: 0 0 0 3rem;
+    font-size: var(--hk-t-min);
+    font-weight: 700;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+}
+.hk .hk-tabla-pagina:empty {
+    display: none;
+}
+.hk .hk-tabla-pagina b {
+    font-weight: 800;
+}
+.hk-tabla-cuerpo {
+    position: relative;
+    flex: 1 1 0px;
+    min-height: 0;
+    overflow: hidden;
+    padding: 0 2rem;
+}
+
+/* --- A table ---------------------------------------------------------------------------------------------------------------- */
+.hk .hk-tabla-t {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--hk-tabla-letra);
+    font-weight: 700;
+    line-height: 1.1;
+}
+.hk .hk-tabla-t th,
+.hk .hk-tabla-t td {
+    padding: .34em 1.8rem .38em;
+    overflow-wrap: normal;
+    text-align: left;
+    vertical-align: top;
+    word-break: normal;
+    word-wrap: normal;
+}
+.hk .hk-tabla-t thead th {
+    padding-top: 1.4rem;
+    padding-bottom: 1rem;
+    border-bottom: .4rem solid var(--hk-primario);
+    color: var(--hk-texto-suave);
+    font-size: var(--hk-t-min);
+    font-weight: 800;
+    line-height: 1.06;
+    vertical-align: bottom;
+}
+[data-tema="oscuro"] .hk .hk-tabla-t thead th {
+    border-bottom-color: var(--hk-texto-suave);
+}
+.hk .hk-tabla-t tbody th {
+    font-weight: 800;
+}
+.hk .hk-tabla-t tbody tr:nth-child(even) {
+    background: var(--hk-fondo);
+}
+.hk .hk-tabla-t .hk-tabla-cifra {
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+    white-space: nowrap;
+}
+.hk .hk-tabla-t .hk-tabla-hora {
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+/* A figure against the right edge of its column and words against the left of the next would read as one: some air between them */
+.hk .hk-tabla-t .hk-tabla-cifra + :not(.hk-tabla-cifra) {
+    padding-left: 5rem;
+}
+.hk .hk-tabla[data-letra="enorme"] .hk-tabla-t thead th,
+.hk .hk-tabla[data-letra="grande"] .hk-tabla-t thead th {
+    font-size: var(--hk-t-lista);
+}
+.hk .hk-tabla-t[data-estirada] tbody th,
+.hk .hk-tabla-t[data-estirada] tbody td {
+    vertical-align: middle;
+}
+
+/* --- Each row as a card ------------------------------------------------------------------------------------------------------ */
+.hk-tabla-fichas {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    padding-top: .6rem;
+}
+.hk-tabla-ficha {
+    box-sizing: border-box;
+    flex: none;
+    width: 50%;
+    padding: 1.2rem 2rem 1.4rem;
+    font-size: var(--hk-t-lista);
+}
+.hk-tabla[data-letra="justa"] .hk-tabla-ficha {
+    font-size: var(--hk-t-min);
+}
+.hk-vertical .hk-tabla-ficha,
+.hk[data-distancia="8"] .hk-tabla-ficha,
+.hk-tabla[data-fichas="una"] .hk-tabla-ficha {
+    width: 100%;
+}
+.hk .hk-tabla-ficha-titulo {
+    margin: 0;
+    padding: 0 0 .4em;
+    border-bottom: .4rem solid var(--hk-primario);
+    color: var(--hk-texto);
+    font-size: 1em;
+    font-weight: 800;
+    line-height: 1.08;
+}
+[data-tema="oscuro"] .hk .hk-tabla-ficha-titulo {
+    border-bottom-color: var(--hk-texto-suave);
+}
+.hk-tabla-pares {
+    display: flex;
+    flex-wrap: wrap;
+}
+.hk-tabla-par {
+    flex: 0 1 auto;
+    max-width: 100%;
+    margin: .5em 1.4em 0 0;
+}
+/* A wide screen, a card to itself: a name beside each value */
+.hk-tabla[data-ancha="si"][data-fichas="una"] .hk-tabla-pares {
+    display: block;
+}
+.hk-tabla[data-ancha="si"][data-fichas="una"] .hk-tabla-par {
+    display: flex;
+    align-items: baseline;
+    width: auto;
+    max-width: none;
+    margin: .4em 0 0;
+}
+.hk .hk-tabla[data-ancha="si"][data-fichas="una"] .hk-tabla-par-nombre {
+    flex: none;
+    width: var(--hk-tabla-nombre, auto);
+    margin-right: 2.4rem;
+}
+.hk .hk-tabla[data-ancha="si"][data-fichas="una"] .hk-tabla-par-valor {
+    flex: 1 1 0px;
+    min-width: 0;
+}
+.hk .hk-tabla-par-nombre {
+    display: block;
+    color: var(--hk-texto-suave);
+    font-size: var(--hk-t-min);
+    font-weight: 700;
+    line-height: 1.1;
+}
+.hk .hk-tabla-par-valor {
+    display: block;
+    font-size: 1em;
+    font-weight: 700;
+    line-height: 1.12;
+}

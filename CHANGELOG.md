@@ -2,8 +2,8 @@
 
 ## 0.8.3
 
-- **The monthly report**: how much of its hours each screen was working, day by day, its cuts of more than ten minutes, the hours the television was on and off, and what came out and how many times; a new tab in the panel, a CSV and a page to print, and a message on the first of each month to whoever runs the screens. The player adds up what it shows and sends it every ten heartbeats.
-- **Tables**, the server's half: a kind of content from a spreadsheet published as CSV or from a JSON, read every few minutes, with the last good one kept if the source fails. Not offered in the panel until its slide is in the player.
+- **The monthly report**: how much of its hours each screen was working, day by day, its longest cuts, and what came out and how many times, with the hours the television was on and off in the CSV; a new tab in the panel, a CSV and a page to print, and a message on the first of each month to whoever runs the screens. The player adds up what it shows and sends it every ten heartbeats.
+- **Tables**: a new kind of content, from a spreadsheet published as CSV or from a JSON, read every few minutes, with the last good one kept if the source fails. Its slide measures itself: the whole table, by pages, or a card per row when it does not fit across.
 - **A notice can go to the site news too**, written once: Moodle sends it to whoever follows that forum, by mail or on their phone, and the screens do not show it twice.
 
 ## 0.8.2 (2026-11-02)

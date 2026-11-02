@@ -6,6 +6,7 @@ import {birthdaysPages, birthdaysPerPage, initialsOf} from '../src/cumple.js';
 import {booksPages} from '../src/biblioteca.js';
 import {allergensOf, menuParts, wordsCramped} from '../src/lead.js';
 import {contrast, skyAt} from '../src/reposo.js';
+import {pagesOf, tableShape} from '../src/tabla.js';
 import {deadlineTime, deadlinesPage, deadlinesPages, deadlinesPerPage} from '../src/plazos.js';
 
 test('how many birthdays fit, by the distance; pages for up to thirty people', () => {
@@ -94,4 +95,25 @@ test('deadlines: the hour, when it says something', () => {
     assert.equal(deadlineTime('00:00'), '');
     assert.equal(deadlineTime(''), '');
     assert.equal(deadlineTime('14:00'), '14:00');
+});
+
+test('a table: no empty columns or rows, six columns at most, and what reads as figures told apart', () => {
+    const t = tableShape({title: ' Horario ', head: ['Hora', '', 'Aula', 'Nota'], rows: [['8:00', '', 'Física', '7,5'], ['', '', '', ''], ['9:00–10:00', '', 'Dibujo técnico', '9'], ['10:00', '', '', 'Apto']]});
+    assert.equal(t.title, 'Horario');
+    assert.deepEqual(t.head, ['Hora', 'Aula', 'Nota']);
+    assert.equal(t.rows.length, 3);
+    assert.deepEqual(t.figures, [true, false, false]);
+    const wide = tableShape({head: [], rows: [['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']]});
+    assert.equal(wide.rows[0].length, 6);
+    assert.deepEqual(wide.head, []);
+    assert.deepEqual(tableShape({}).rows, []);
+    assert.deepEqual(tableShape({head: ['A', 'B'], rows: [['1']]}).head, ['A', 'B']);
+});
+
+test('pages out of measures: as many as fit, and at least one each', () => {
+    assert.deepEqual(pagesOf([10, 10, 10], 25), [[0, 1], [2]]);
+    assert.deepEqual(pagesOf([40, 10], 25), [[0], [1]]);
+    assert.deepEqual(pagesOf([], 25), [[]]);
+    // As even as they can be: not four rows and one alone.
+    assert.deepEqual(pagesOf([10, 10, 10, 10, 10], 40), [[0, 1, 2], [3, 4]]);
 });

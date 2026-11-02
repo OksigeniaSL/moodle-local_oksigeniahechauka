@@ -17,6 +17,7 @@
 namespace local_oksigeniahechauka;
 
 use local_oksigeniahechauka\local\report;
+use local_oksigeniahechauka\local\reportpage;
 use local_oksigeniahechauka\local\schedule;
 use local_oksigeniahechauka\local\screens;
 
@@ -171,6 +172,34 @@ final class report_test extends \advanced_testcase {
         $this->assertCount(31, $data['screens'][0]['days']);
         $this->assertSame('99,9', report::say_percent(99.9, ','));
         $this->assertSame('100', report::say_percent(100.0, ','));
+    }
+
+    /**
+     * The page says first which screen failed, if one did; a cut of minutes names nobody.
+     */
+    public function test_summary(): void {
+        global $DB;
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        $good = $this->screen(1);
+        $bad = $this->screen(1);
+        $DB->set_field('local_oksigeniahechauka_screen', 'name', 'Comedor', ['id' => $bad->id]);
+        $now = (new \DateTimeImmutable('2026-11-02', \core_date::get_server_timezone_object()))->getTimestamp();
+        $DB->insert_record(report::STAT, (object) ['screenid' => $good->id, 'day' => '2026-10-05', 'due' => 100000,
+            'up' => 100000]);
+        $id = $DB->insert_record(report::STAT, (object) ['screenid' => $bad->id, 'day' => '2026-10-05', 'due' => 100000,
+            'up' => 99900]);
+        $nocuts = get_string('report_cuts_empty', 'local_oksigeniahechauka');
+        $this->assertSame($nocuts, reportpage::context('2026-10', $now)['summarymore']);
+        $start = report::bounds('2026-10')[0] + 3600;
+        $DB->insert_record(report::CUT, (object) ['screenid' => $bad->id, 'started' => $start, 'ended' => $start + 700]);
+        $this->assertStringNotContainsString('Comedor', reportpage::context('2026-10', $now)['summarymore']);
+        $DB->set_field(report::STAT, 'up', 50000, ['id' => $id]);
+        $page = reportpage::context('2026-10', $now);
+        $this->assertStringContainsString('Comedor', $page['summarymore']);
+        $this->assertSame('Comedor', $page['screens'][0]['name']);
+        $this->assertFalse($page['hasmorecuts']);
+        $this->assertTrue($page['hascuts']);
     }
 
     /**
