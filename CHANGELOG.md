@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.8.2 (2026-11-02)
+
+- What falls due in the courses has its slide: a sheet by days, with the course first and big, in the centre's colour, off until a centre turns it on.
+- The header and the body are measured again once the clock has its first time, so that a clock does not leave the screen until the next slide.
+
 ## 0.8.1 (2026-11-02)
 
 - **«Empezar»**: the setting up on one page, with the screen beside it, the first time whoever runs the screens opens the panel: what kind of centre it is, its look, what

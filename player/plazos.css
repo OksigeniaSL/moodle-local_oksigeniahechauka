@@ -1,0 +1,309 @@
+/* Oksigenia Hechauka 0.8: what falls due in the courses (Gaudí, 2 November 2026). Goes after composiciones.css and identidad.css.
+ *
+ * Rows to be run down at a walk: the day on the left, the course first and largest, then what is due and the hour if it says anything.
+ * The agenda is about the centre, with bars of colour; this is about one's own course, so it is a sheet, with a mark of the colour of
+ * its category. From 8 m on a wide screen, only the course and its day.
+ *
+ *   <section class="hk-plazos" data-filas="7" data-pocas>
+ *     <header class="hk-plazos-cabeza"><h2 class="hk-plazos-titulo">Entregas de esta semana</h2><p class="hk-plazos-pagina"><b>1</b>/3</p></header>
+ *     <div class="hk-plazos-lista">
+ *       <article class="hk-plazos-dia" data-hoy>
+ *         <p class="hk-plazos-cuando"><b>Jue 5</b></p>
+ *         <div class="hk-plazos-filas">
+ *           <div class="hk-plazos-fila" style="--hk-ev…">
+ *             <b class="hk-plazos-curso">Matemáticas de 2.º</b>
+ *             <p class="hk-plazos-que"><i>Entrega</i>Problemas del tema 3</p>
+ *             <b class="hk-plazos-hora">14:00</b>
+ *
+ * Chromium 56: flexbox only, margins instead of gap. */
+.hk-cuerpo[data-composicion="plazos"] > .hk-plazos {
+    flex: 1 1 auto;
+}
+.hk-plazos {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+    border-radius: calc(2.8rem * var(--hk-esquina));
+    background: var(--hk-superficie);
+    color: var(--hk-texto);
+}
+
+/* --- Its heading: in the centre's colour, so that it is told from the agenda across a hall ------------------------------ */
+.hk-plazos-cabeza {
+    display: flex;
+    flex: none;
+    align-items: center;
+    padding: 1.8rem 4rem 2rem;
+    background: var(--hk-primario);
+    color: var(--hk-sobre-primario);
+}
+.hk .hk-plazos-titulo {
+    flex: 1 1 0px;
+    min-width: 0;
+    margin: 0;
+    font-family: var(--hk-letra-titulos);
+    font-size: var(--hk-t-entrada);
+    font-weight: 800;
+    letter-spacing: -.01em;
+    line-height: 1.04;
+}
+.hk .hk-plazos-pagina {
+    flex: none;
+    margin: 0 0 0 3rem;
+    font-size: var(--hk-t-min);
+    font-weight: 700;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+}
+.hk .hk-plazos-pagina b {
+    font-weight: 800;
+}
+
+/* --- A day ---------------------------------------------------------------------------------------------------------------- */
+.hk-plazos-lista {
+    display: flex;
+    flex: 1 1 0px;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+    padding: 0 4rem;
+}
+.hk-plazos-dia {
+    display: flex;
+    flex: none;
+    padding: 1.6rem 0;
+    border-top: .3rem solid var(--hk-linea);
+}
+.hk-plazos-dia:first-child {
+    border-top: 0;
+}
+.hk .hk-plazos-cuando {
+    flex: none;
+    width: calc(var(--hk-t-lista) * 4.3);
+    margin: 0;
+    padding-right: 2rem;
+    font-size: var(--hk-t-lista);
+    line-height: 1.08;
+}
+.hk .hk-plazos-cuando b {
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+}
+/* Today: the accent, on its name only */
+.hk .hk-plazos-dia[data-hoy] .hk-plazos-cuando b {
+    display: inline-block;
+    margin: -.2rem 0 0 -1.2rem;
+    padding: .2rem 1.2rem .4rem;
+    border-radius: calc(1.1rem * var(--hk-esquina));
+    background: var(--hk-acento);
+    color: var(--hk-sobre-acento);
+}
+.hk-plazos-filas {
+    flex: 1 1 0px;
+    min-width: 0;
+}
+
+/* --- A date: its mark, the course, what is due, the hour --------------------------------------------------------------------- */
+.hk-plazos-fila {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    padding-left: 2.6rem;
+}
+.hk-plazos-fila + .hk-plazos-fila {
+    margin-top: 1.6rem;
+}
+.hk-plazos-fila::before {
+    content: "";
+    position: absolute;
+    top: .4rem;
+    bottom: .4rem;
+    left: 0;
+    width: 1.1rem;
+    border-radius: calc(.55rem * var(--hk-esquina));
+    background: var(--hk-ev);
+}
+[data-tema="oscuro"] .hk-plazos-fila::before {
+    background: var(--hk-ev-oscuro, var(--hk-ev));
+}
+.hk .hk-plazos-curso {
+    display: block;
+    display: -webkit-box;
+    flex: 6 1 0px;
+    min-width: 0;
+    overflow: hidden;
+    font-size: var(--hk-t-lista);
+    font-weight: 800;
+    line-height: 1.08;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+.hk .hk-plazos-que {
+    display: block;
+    flex: 5 1 0px;
+    min-width: 0;
+    margin: .3rem 0 0 3rem;
+    overflow: hidden;
+    color: var(--hk-texto-suave);
+    font-size: var(--hk-t-min);
+    font-weight: 700;
+    line-height: 1.12;
+    text-overflow: ellipsis;               /* one line, cut by letters: a clamp would leave «Control de…» where a word was long */
+    white-space: nowrap;
+}
+.hk .hk-plazos-que i {
+    margin-right: .5em;
+    color: var(--hk-texto);
+    font-style: normal;
+    font-weight: 800;
+}
+.hk .hk-plazos-hora {
+    flex: none;
+    width: calc(var(--hk-t-lista) * 2.8);
+    margin-left: 2rem;
+    font-size: var(--hk-t-lista);
+    font-weight: 800;
+    line-height: 1.08;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+/* --- What gives way, measured by the player -------------------------------------------------------------------------------- */
+.hk.hk .hk-plazos-sin-que .hk-plazos-que {
+    display: none;
+}
+.hk .hk-plazos-una-linea .hk-plazos-curso {
+    display: block;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* --- From 8 m on a wide screen: the course and its day -------------------------------------------------------------------- */
+.hk.hk.hk-horizontal[data-distancia="8"] .hk-plazos-que {
+    display: none;
+}
+
+/* --- At 5 m on a wide screen: what is due under the course, where it has the whole width --------------------------------------- */
+.hk-horizontal[data-distancia="5"] .hk-plazos-fila {
+    flex-wrap: wrap;
+}
+.hk.hk-horizontal[data-distancia="5"] .hk-plazos-curso {
+    flex: 1 1 50%;
+}
+.hk.hk-horizontal[data-distancia="5"] .hk-plazos-hora {
+    order: 1;
+}
+.hk.hk-horizontal[data-distancia="5"] .hk-plazos-que {
+    order: 2;
+    flex: 1 1 100%;
+    margin: .4rem 0 0;
+}
+.hk.hk-horizontal[data-distancia="5"] .hk-plazos-curso {
+    -webkit-line-clamp: 1;
+}
+
+/* --- A few dates: large, and at ease --------------------------------------------------------------------------------------- */
+.hk .hk-plazos[data-pocas] .hk-plazos-lista {
+    justify-content: center;
+}
+.hk .hk-plazos[data-pocas] .hk-plazos-dia {
+    padding: 3rem 0;
+}
+.hk .hk-plazos[data-pocas] .hk-plazos-cuando {
+    width: calc(var(--hk-t-entrada) * 4.3);
+    font-size: var(--hk-t-entrada);
+}
+.hk .hk-plazos[data-pocas] .hk-plazos-curso,
+.hk .hk-plazos[data-pocas] .hk-plazos-hora {
+    font-size: var(--hk-t-entrada);
+}
+.hk .hk-plazos[data-pocas] .hk-plazos-que {
+    display: -webkit-box;
+    margin-top: .9rem;
+    font-size: var(--hk-t-lista);
+    white-space: normal;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+.hk .hk-plazos[data-pocas] .hk-plazos-hora {
+    width: calc(var(--hk-t-entrada) * 2.8);
+}
+.hk .hk-plazos[data-pocas] .hk-plazos-fila + .hk-plazos-fila {
+    margin-top: 2.8rem;
+}
+
+/* --- One date only: the whole sheet is for it ------------------------------------------------------------------------------- */
+.hk .hk-plazos[data-filas="1"] .hk-plazos-dia {
+    display: block;
+    padding: 0 2rem;
+}
+.hk .hk-plazos[data-filas="1"] .hk-plazos-cuando {
+    width: auto;
+    margin-bottom: 2.4rem;
+    font-size: var(--hk-t-entrada);
+}
+.hk .hk-plazos[data-filas="1"] .hk-plazos-fila {
+    flex-wrap: wrap;
+}
+.hk .hk-plazos[data-filas="1"] .hk-plazos-curso {
+    flex: 1 1 60%;
+    font-size: calc(var(--hk-t-titular) * .8);
+    line-height: 1.04;
+    -webkit-line-clamp: 3;
+}
+.hk .hk-plazos[data-filas="1"] .hk-plazos-hora {
+    order: 1;
+    width: auto;
+    font-size: calc(var(--hk-t-titular) * .8);
+    line-height: 1.04;
+}
+.hk .hk-plazos[data-filas="1"] .hk-plazos-que {
+    order: 2;
+    flex: 1 1 100%;
+    margin: 2rem 0 0;
+    font-size: var(--hk-t-entrada);
+    -webkit-line-clamp: 3;
+}
+
+/* --- A vertical screen: the day over its dates, what is due under the course ------------------------------------------------- */
+.hk-vertical .hk-plazos-cabeza {
+    padding-right: 3rem;
+    padding-left: 3rem;
+}
+.hk-vertical .hk-plazos-lista {
+    padding: 0 3rem;
+}
+.hk-vertical .hk-plazos-dia {
+    display: block;
+    padding: 1.4rem 0;
+}
+.hk.hk-vertical .hk-plazos-cuando {
+    width: auto;
+    margin-bottom: 1rem;
+    padding-right: 0;
+}
+.hk.hk-vertical .hk-plazos[data-pocas] .hk-plazos-cuando {
+    width: auto;
+    margin-bottom: 2rem;
+}
+.hk-vertical .hk-plazos-fila {
+    flex-wrap: wrap;
+}
+.hk.hk-vertical .hk-plazos-curso {
+    flex: 1 1 50%;                         /* with no basis of its own, what is due would stay on its line and leave it no width */
+}
+.hk.hk-vertical .hk-plazos-hora {
+    order: 1;
+    width: auto;
+    margin-left: 2rem;
+}
+.hk.hk-vertical .hk-plazos-hora:empty {
+    display: none;
+}
+.hk.hk-vertical .hk-plazos-que {
+    order: 2;
+    flex: 1 1 100%;
+    margin: .5rem 0 0;
+}

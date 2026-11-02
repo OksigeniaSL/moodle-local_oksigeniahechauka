@@ -6,6 +6,7 @@ import {birthdaysPages, birthdaysPerPage, initialsOf} from '../src/cumple.js';
 import {booksPages} from '../src/biblioteca.js';
 import {allergensOf, menuParts, wordsCramped} from '../src/lead.js';
 import {contrast, skyAt} from '../src/reposo.js';
+import {deadlineTime, deadlinesPage, deadlinesPages, deadlinesPerPage} from '../src/plazos.js';
 
 test('how many birthdays fit, by the distance; pages for up to thirty people', () => {
     assert.equal(birthdaysPerPage(3, true), 9);
@@ -70,4 +71,27 @@ test('a sun needs its sky: the two colours of a centre, measured as the browser 
     assert.ok(contrast('rgb(14, 79, 92)', 'rgb(255, 138, 61)') > 2);
     assert.ok(contrast('rgb(14, 79, 92)', 'rgb(16, 84, 98)') < 1.5);
     assert.equal(contrast('', 'rgb(0, 0, 0)'), 21);
+});
+
+test('deadlines: how many fit, by the distance; a day cut by the page comes again with its name', () => {
+    assert.equal(deadlinesPerPage(3, true), 7);
+    assert.equal(deadlinesPerPage(8, true), 4);
+    assert.ok(deadlinesPerPage(5, true, true) < deadlinesPerPage(5, true));
+    const item = {days: [
+        {date: '2026-11-05', items: new Array(6).fill({course: 'A'})},
+        {date: '2026-11-06', items: new Array(6).fill({course: 'B'})},
+    ]};
+    assert.equal(deadlinesPages(item, 8, true), 3);
+    const second = deadlinesPage(item, 1, 4);
+    assert.deepEqual(second.days.map((d) => [d.date, d.items.length]), [['2026-11-05', 2], ['2026-11-06', 2]]);
+    assert.equal(deadlinesPage(item, 4, 4).at, 1);
+    assert.equal(deadlinesPages({days: []}, 3, true), 1);
+    assert.deepEqual(deadlinesPage({days: []}, 0, 7).days, []);
+});
+
+test('deadlines: the hour, when it says something', () => {
+    assert.equal(deadlineTime('23:59'), '');
+    assert.equal(deadlineTime('00:00'), '');
+    assert.equal(deadlineTime(''), '');
+    assert.equal(deadlineTime('14:00'), '14:00');
 });

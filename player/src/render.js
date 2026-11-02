@@ -7,6 +7,7 @@ import {ratio, shapeOf} from './compose.js';
 import {buildWeatherThird} from './today.js';
 import {MARK, buildLead, buildRest, fitAlso, fitHeadline, fitWord, leadOfTurn, leadsOf, linesOf, paginateRest, showRestPage, turnFixed, weekHeadline, wordsCramped} from './lead.js';
 import {buildBirthdays, fitBirthdays} from './cumple.js';
+import {buildDeadlines, fitDeadlines} from './plazos.js';
 import {buildIdle} from './reposo.js';
 import {buildBooks, fitBooks} from './biblioteca.js';
 import {qrPath, shortWeb} from './qr.js';
@@ -21,7 +22,7 @@ const PHRASE_WAITS_MS = 25000;
 const CAPTION_MS = 2800;
 
 /** The compositions that are made anew each time, never only their pictures changed. */
-const NEW_EACH = {'solo-hoy': true, semana: true, titular: true, agenda: true, muro: true, 'fotos-tercio': true, cumple: true, biblioteca: true};
+const NEW_EACH = {'solo-hoy': true, semana: true, titular: true, agenda: true, muro: true, 'fotos-tercio': true, cumple: true, biblioteca: true, plazos: true};
 
 /** The compositions over the whole screen, in their own layer. */
 const FULL = {'foto-completa': true, 'escaparate': true, 'reposo': true};
@@ -405,7 +406,12 @@ export class Screen {
         this.lastDate = d;
         this.headers.forEach((p) => this.paintClock(p, d));
         if (first) {
+            // The headers were measured with no clock in them, and the body with what they left it.
+            this.fitHeaders();
             this.fitIdle();
+            if (this.layer) {
+                this.adjustLayer(this.layer);
+            }
         } else {
             this.tickIdle();
         }
@@ -601,6 +607,12 @@ export class Screen {
         if (comp === 'cumple') {
             buildBirthdays(c, extra && extra.item, (extra && extra.page) || 0, {distance: this.distance || 3, horizontal: this.horizontal,
                 glass: !!this.glass, one: this.s.birthdays_one || '', many: this.s.birthdays_many || '', media: mediaOf});
+            return c;
+        }
+        if (comp === 'plazos') {
+            const now = this.lastDate || new Date();
+            buildDeadlines(c, extra && extra.item, (extra && extra.page) || 0, {distance: this.distance || 3, horizontal: this.horizontal,
+                glass: !!this.glass, today: now.getFullYear() + '-' + two(now.getMonth() + 1) + '-' + two(now.getDate()), s: this.s});
             return c;
         }
         if (comp === 'biblioteca') {
@@ -956,6 +968,7 @@ export class Screen {
         this.fitCaptions(c, comp);
         fitBirthdays(c);
         fitBooks(c, this.horizontal);
+        fitDeadlines(c);
         const shelfTitle = c.querySelector('.hk-biblio-titulo');
         if (shelfTitle) {
             even(shelfTitle);
