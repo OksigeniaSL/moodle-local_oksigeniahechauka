@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.9.2
+
+- **Whoever gets a permission hears about it**: publishing in a group, publishing everywhere or running the screens, with the way to the panel and to the guide.
+- **A group can be renamed** from its menu in «Screens and groups».
+
 ## 0.9.1
 
 - **A public demonstration screen** (`demo.php`): what goes to every screen, in the frame of a television, for anyone and without signing in, landscape or portrait, and refreshed every half minute so what is published shows at once. Off by default; a site turns it on in its settings. Never the birthdays.

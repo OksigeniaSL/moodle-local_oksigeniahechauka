@@ -552,6 +552,10 @@ $string['groups_none'] = 'Todavía no hay grupos. Por ejemplo: «Vestíbulo y pa
 $string['groups_people'] = 'Quién publica aquí';
 $string['groups_permissions'] = 'Permisos';
 $string['groups_permissions_help'] = 'Lo que alguien puede hacer en todas las pantallas sin ser administrador del sitio.';
+$string['groups_rename'] = 'Cambiar el nombre';
+$string['groups_rename_keep'] = 'Dejarlo así';
+$string['groups_rename_save'] = 'Guardar el nombre';
+$string['groups_renamed'] = 'Ahora se llama «{$a}».';
 $string['groups_runs'] = 'Lleva las pantallas';
 $string['groups_screens'] = 'Sus pantallas';
 $string['groups_search'] = 'Añadir a alguien del centro';
@@ -632,6 +636,7 @@ $string['menucentre'] = 'Comedor';
 $string['menucentre_desc'] = 'El número del comedor en Oksigenia Meals; 0 para el primero del sitio.';
 $string['menulink'] = 'Pantallas';
 $string['messageprovider:monthlyreport'] = 'El informe mensual de las pantallas';
+$string['messageprovider:permission'] = 'Un permiso nuevo en las pantallas';
 $string['messageprovider:screendown'] = 'Una pantalla deja de responder o vuelve';
 $string['meta_ahead'] = 'va {$a} min adelantado';
 $string['meta_frozen'] = 'responde, pero la imagen no cambia';
@@ -676,6 +681,21 @@ $string['pair_steps'] = 'Abre esta dirección en el móvil o escanea el código,
 $string['pair_title'] = 'Una pantalla nueva';
 $string['panel_sub_groups'] = 'Publicas en las pantallas de {$a}.';
 $string['panel_title'] = 'Pantallas';
+$string['permission_everywhere_body'] = 'Ya puedes publicar avisos, fotos y eventos en todas las pantallas del centro, y cambiar lo que han publicado los demás.
+
+El panel: {$a->panel}
+Cómo se publica: {$a->guide}';
+$string['permission_everywhere_subject'] = 'Ya puedes publicar en todas las pantallas';
+$string['permission_group_body'] = 'Ya puedes publicar avisos, fotos y eventos en las pantallas de «{$a->group}».
+
+El panel: {$a->panel}
+Cómo se publica: {$a->guide}';
+$string['permission_group_subject'] = 'Ya puedes publicar en las pantallas de «{$a->group}»';
+$string['permission_manager_body'] = 'Ya llevas las pantallas del centro: darlas de alta, sus horarios y sus grupos, y quién publica en cada una. También te llegan los avisos cuando una deja de dar señales.
+
+El panel: {$a->panel}
+La guía: {$a->guide}';
+$string['permission_manager_subject'] = 'Ya llevas las pantallas del centro';
 $string['picture_alt'] = 'Lo que enseña {$a}';
 $string['place_east'] = 'E';
 $string['place_north'] = 'N';

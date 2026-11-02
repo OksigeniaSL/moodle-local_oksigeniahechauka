@@ -552,6 +552,10 @@ $string['groups_none'] = 'No groups yet. For example: «Lobby and corridors» or
 $string['groups_people'] = 'Who publishes here';
 $string['groups_permissions'] = 'Permissions';
 $string['groups_permissions_help'] = 'What someone may do on every screen without being an administrator of the site.';
+$string['groups_rename'] = 'Rename';
+$string['groups_rename_keep'] = 'Leave it';
+$string['groups_rename_save'] = 'Save the name';
+$string['groups_renamed'] = 'It is now called «{$a}».';
 $string['groups_runs'] = 'Runs the screens';
 $string['groups_screens'] = 'Its screens';
 $string['groups_search'] = 'Add someone of the centre';
@@ -632,6 +636,7 @@ $string['menucentre'] = 'Canteen';
 $string['menucentre_desc'] = 'The id of the canteen in Oksigenia Meals; 0 for the first one of the site.';
 $string['menulink'] = 'Screens';
 $string['messageprovider:monthlyreport'] = 'The monthly report of the screens';
+$string['messageprovider:permission'] = 'A new permission on the screens';
 $string['messageprovider:screendown'] = 'A screen stops answering or comes back';
 $string['meta_ahead'] = '{$a} min ahead';
 $string['meta_frozen'] = 'it answers, but the picture does not change';
@@ -676,6 +681,21 @@ $string['pair_steps'] = 'Open this address on your phone or scan the code, and g
 $string['pair_title'] = 'A new screen';
 $string['panel_sub_groups'] = 'You publish on the screens of {$a}.';
 $string['panel_title'] = 'Screens';
+$string['permission_everywhere_body'] = 'You can now publish notices, photos and events on all the screens of the centre, and change what others published.
+
+The panel: {$a->panel}
+How to publish: {$a->guide}';
+$string['permission_everywhere_subject'] = 'You can now publish on all the screens';
+$string['permission_group_body'] = 'You can now publish notices, photos and events on the screens of «{$a->group}».
+
+The panel: {$a->panel}
+How to publish: {$a->guide}';
+$string['permission_group_subject'] = 'You can now publish on the screens of «{$a->group}»';
+$string['permission_manager_body'] = 'You now run the screens of the centre: adding them, their hours and their groups, and who publishes on each. You also get the warnings when one stops giving signs of life.
+
+The panel: {$a->panel}
+The guide: {$a->guide}';
+$string['permission_manager_subject'] = 'You now run the screens of the centre';
 $string['picture_alt'] = 'What {$a} shows';
 $string['place_east'] = 'E';
 $string['place_north'] = 'N';

@@ -25,6 +25,13 @@
 defined('MOODLE_INTERNAL') || die();
 
 $messageproviders = [
+    // Someone can now publish on the screens, or run them.
+    'permission' => [
+        'defaults' => [
+            'popup' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_ENABLED,
+            'email' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_ENABLED,
+        ],
+    ],
     // How the screens did last month.
     'monthlyreport' => [
         'capability' => 'local/oksigeniahechauka:managescreens',

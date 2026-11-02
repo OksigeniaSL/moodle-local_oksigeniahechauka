@@ -98,6 +98,13 @@
     </aside>
     </div>
     <form method="post" action="{{action}}" id="hkp-people-form" hidden><input type="hidden" name="sesskey" value="{{sesskey}}"><input type="hidden" name="action" value="addeditor"><input type="hidden" name="group" value=""><input type="hidden" name="user" value=""></form>
+    <dialog class="hkp-dialog is-narrow" id="hkp-rename-dialog" aria-labelledby="hkp-rn-h">
+        <header><h2 id="hkp-rn-h">{{#str}}groups_rename, local_oksigeniahechauka{{/str}}</h2><button type="button" class="btn btn-icon" data-hkp-close aria-label="{{#str}}closebuttontitle{{/str}}">{{{icons.x}}}</button></header>
+        <form class="hkp-dialog-body" id="hkp-rn-form" method="post" action="{{action}}"><input type="hidden" name="sesskey" value="{{sesskey}}"><input type="hidden" name="action" value="renamegroup"><input type="hidden" name="group" value="">
+            <div class="hkp-field"><label class="form-label" for="hkp-rn">{{#str}}name, local_oksigeniahechauka{{/str}}</label><input class="form-control" id="hkp-rn" name="name" maxlength="100" required autocomplete="off"></div>
+        </form>
+        <footer><button type="button" class="btn btn-outline-secondary" data-hkp-close>{{#str}}groups_rename_keep, local_oksigeniahechauka{{/str}}</button><button type="submit" class="btn btn-primary" form="hkp-rn-form">{{#str}}groups_rename_save, local_oksigeniahechauka{{/str}}</button></footer>
+    </dialog>
     <dialog class="hkp-dialog is-narrow" id="hkp-group-dialog" aria-labelledby="hkp-ng-h">
         <header>{{{icons.plus}}}<h2 id="hkp-ng-h">{{#str}}groups_new, local_oksigeniahechauka{{/str}}</h2><button type="button" class="btn btn-icon" data-hkp-close aria-label="{{#str}}closebuttontitle{{/str}}">{{{icons.x}}}</button></header>
         <form class="hkp-dialog-body" id="hkp-ng-form" method="post" action="{{action}}"><input type="hidden" name="sesskey" value="{{sesskey}}"><input type="hidden" name="action" value="addgroup">
@@ -149,6 +156,18 @@
             }
         });
     });
+    // Renaming a group, from its menu: the dialog with its name.
+    var rename = page.querySelector('#hkp-rename-dialog');
+    page.querySelectorAll('[data-hkp-rename]').forEach(function(a) {
+        a.addEventListener('click', function(e) {
+            e.preventDefault();
+            rename.querySelector('[name="group"]').value = a.getAttribute('data-hkp-rename');
+            var field = rename.querySelector('[name="name"]');
+            field.value = a.getAttribute('data-name');
+            rename.showModal();
+            field.select();
+        });
+    });
     page.querySelectorAll('dialog [data-hkp-close]').forEach(function(b) {
         b.addEventListener('click', function() {
             b.closest('dialog').close();
@@ -167,7 +186,7 @@
             }
         });
     });
-    // Who publishes: removing, and the search to add someone of the school.
+    // Who publishes: removing, and the search to add someone of the centre.
     page.querySelectorAll('[data-remove-user]').forEach(function(b) {
         b.addEventListener('click', function(e) {
             e.preventDefault();

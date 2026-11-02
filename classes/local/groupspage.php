@@ -89,6 +89,12 @@ class groupspage {
                 get_string('more_actions', $c, format_string($name)),
                 'visually-hidden sr-only'
             ), 'btn btn-sm btn-outline-secondary btn-icon no-caret');
+            $menu->add_secondary_action(new \action_link(
+                new \moodle_url('#'),
+                get_string('groups_rename', $c),
+                null,
+                ['data-hkp-rename' => $id, 'data-name' => format_string($name)]
+            ));
             $menu->add_secondary_action(new \action_link(new \moodle_url($url, ['action' => 'deletegroup', 'id' => $id,
                 'sesskey' => sesskey()]), get_string('groups_delete', $c)));
             $siteurl = (new \moodle_url('/local/oksigeniahechauka/site.php', ['group' => $id]))->out(false);
@@ -201,6 +207,14 @@ class groupspage {
                     $DB->insert_record('local_oksigeniahechauka_group', (object) ['name' => $name, 'sortorder' => 0,
                         'timecreated' => $now, 'timemodified' => $now]);
                     return get_string('groups_made', $c, $name);
+                }
+                return null;
+            case 'renamegroup':
+                $name = \core_text::substr(trim(optional_param('name', '', PARAM_TEXT)), 0, 100);
+                if ($exists && $name !== '') {
+                    $DB->update_record('local_oksigeniahechauka_group', (object) ['id' => $group, 'name' => $name,
+                        'timemodified' => $now]);
+                    return get_string('groups_renamed', $c, $name);
                 }
                 return null;
             case 'groupcategory':
