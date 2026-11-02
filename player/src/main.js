@@ -701,10 +701,13 @@ class Player {
             this.frameAt = Date.now();
             return 0;
         }
+        // Measured from one heartbeat to the next: at the first there is nothing to measure yet, and a screen that took minutes to be
+        // paired would look frozen.
+        const since = this.frameAt;
         requestAnimationFrame(function () {
             self.frameAt = Date.now();
         });
-        return Math.max(0, Math.floor((Date.now() - (this.frameAt || this.startedAt)) / 1000));
+        return since ? Math.max(0, Math.floor((Date.now() - since) / 1000)) : 0;
     }
 
     heartbeat() {
