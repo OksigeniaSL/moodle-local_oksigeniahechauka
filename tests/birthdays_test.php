@@ -148,7 +148,8 @@ final class birthdays_test extends \advanced_testcase {
         $this->assertSame(['Sin fecha;1.º B;;'], $done['wrong']);
         $this->assertSame('A-77', $DB->get_field(birthdays::TABLE, 'idnumber', ['name' => 'Pérez, Ana']));
         // What a spreadsheet in Spanish saves as CSV: commas and Windows letters.
-        $done = birthdays::import(\core_text::convert("Nombre,Grupo,Día,Mes\nMaría Núñez,2.º C,1,12", 'utf-8', 'windows-1252'), true);
+        $sheet = \core_text::convert("Nombre,Grupo,Día,Mes\nMaría Núñez,2.º C,1,12", 'utf-8', 'windows-1252');
+        $done = birthdays::import($sheet, true);
         $this->assertSame(1, $done['added']);
         $this->assertTrue($DB->record_exists(birthdays::TABLE, ['name' => 'María Núñez', 'groupname' => '2.º C', 'day' => 1,
             'month' => 12]));

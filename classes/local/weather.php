@@ -75,26 +75,27 @@ class weather {
      * Asks for the forecast if the last answer has expired, and keeps it.
      *
      * @param int $now
+     * @param string $suffix the place of a site of the centre (sites::suffix()), or '' for the centre's
      * @return string what happened: off, nowhere, fresh, kept, failed
      */
-    public static function fetch(int $now): string {
+    public static function fetch(int $now, string $suffix = ''): string {
         $c = 'local_oksigeniahechauka';
         if (!get_config($c, 'sourceweather')) {
             return 'off';
         }
-        $lat = get_config($c, 'lat');
-        $lon = get_config($c, 'lon');
+        $lat = get_config($c, 'lat' . $suffix);
+        $lon = get_config($c, 'lon' . $suffix);
         if ($lat === false || $lat === '' || $lon === false || $lon === '') {
             return 'nowhere';
         }
-        if ((int) get_config($c, 'weatherexpires') > $now) {
+        if ((int) get_config($c, 'weatherexpires' . $suffix) > $now) {
             return 'fresh';
         }
         global $CFG;
         require_once($CFG->libdir . '/filelib.php'); // The curl class, which a task does not have loaded.
         $curl = new \curl(['ignoresecurity' => false]);
         $curl->setHeader(['User-Agent: ' . self::AGENT, 'Accept: application/json']);
-        $modified = (string) get_config($c, 'weathermodified');
+        $modified = (string) get_config($c, 'weathermodified' . $suffix);
         if ($modified !== '') {
             $curl->setHeader(['If-Modified-Since: ' . $modified]);
         }
@@ -107,18 +108,18 @@ class weather {
         $code = (int) ($info['http_code'] ?? 0);
         $headers = self::headers((array) $curl->getResponse());
         $expires = isset($headers['expires']) ? strtotime($headers['expires']) : false;
-        set_config('weatherexpires', $expires && $expires > $now ? $expires : $now + 1800, $c);
+        set_config('weatherexpires' . $suffix, $expires && $expires > $now ? $expires : $now + 1800, $c);
         if ($code === 304) {
             return 'kept';
         }
         $json = $code === 200 ? json_decode((string) $body, true) : null;
         if (!is_array($json)) {
-            set_config('weatherexpires', $now + 600, $c);
+            set_config('weatherexpires' . $suffix, $now + 600, $c);
             return 'failed';
         }
-        $hours = self::merge(self::parse($json), self::hours(), $now);
-        set_config('weatherdata', json_encode(['hours' => $hours, 'updated' => $now]), $c);
-        set_config('weathermodified', $headers['last-modified'] ?? '', $c);
+        $hours = self::merge(self::parse($json), self::hours($suffix), $now);
+        set_config('weatherdata' . $suffix, json_encode(['hours' => $hours, 'updated' => $now]), $c);
+        set_config('weathermodified' . $suffix, $headers['last-modified'] ?? '', $c);
         return 'fresh';
     }
 
@@ -186,10 +187,11 @@ class weather {
     /**
      * The hours kept.
      *
+     * @param string $suffix the place of a site of the centre, or '' for the centre's
      * @return array
      */
-    public static function hours(): array {
-        $data = json_decode((string) get_config('local_oksigeniahechauka', 'weatherdata'), true);
+    public static function hours(string $suffix = ''): array {
+        $data = json_decode((string) get_config('local_oksigeniahechauka', 'weatherdata' . $suffix), true);
         return is_array($data) && is_array($data['hours'] ?? null) ? $data['hours'] : [];
     }
 

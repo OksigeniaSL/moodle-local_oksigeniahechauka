@@ -24,6 +24,7 @@
 
 namespace local_oksigeniahechauka\task;
 
+use local_oksigeniahechauka\local\sites;
 use local_oksigeniahechauka\local\weather;
 
 /**
@@ -46,5 +47,8 @@ class fetch_weather extends \core\task\scheduled_task {
      */
     public function execute(): void {
         mtrace('Weather: ' . weather::fetch(time()));
+        foreach (sites::fetch_weather(time()) as $groupid => $result) {
+            mtrace('Weather of site ' . $groupid . ': ' . $result);
+        }
     }
 }

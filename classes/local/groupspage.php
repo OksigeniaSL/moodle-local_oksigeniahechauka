@@ -58,6 +58,7 @@ class groupspage {
                 ))->out(false)];
         }
         $linked = $DB->get_records_menu('local_oksigeniahechauka_group', null, '', 'id, coursecat');
+        $config = get_config($c);
         $categorylist = \core_course_category::make_categories_list();
         $cards = [];
         foreach ($groups as $id => $name) {
@@ -90,9 +91,19 @@ class groupspage {
             ), 'btn btn-sm btn-outline-secondary btn-icon no-caret');
             $menu->add_secondary_action(new \action_link(new \moodle_url($url, ['action' => 'deletegroup', 'id' => $id,
                 'sesskey' => sesskey()]), get_string('groups_delete', $c)));
+            $siteurl = (new \moodle_url('/local/oksigeniahechauka/site.php', ['group' => $id]))->out(false);
+            $site = null;
+            if (sites::is_site((int) $id, $config)) {
+                $suffix = sites::suffix((int) $id);
+                $site = ['name' => sites::name((int) $id, $config),
+                    'where' => (string) ($config->{'place' . $suffix} ?? '') !== '' ? (string) $config->{'place' . $suffix} :
+                        get_string('site_noplace', $c)];
+            }
             $cards[] = [
                 'id' => (int) $id,
                 'name' => format_string($name),
+                'site' => $site,
+                'siteurl' => $siteurl,
                 'screens' => $mine,
                 'coursecats' => $coursecats,
                 'hascoursecats' => (bool) $categorylist,
@@ -142,7 +153,7 @@ class groupspage {
             'people' => (new \moodle_url('/local/oksigeniahechauka/people.php'))->out(false),
             'admin' => has_capability('moodle/site:config', \context_system::instance()) ?
                 (new \moodle_url('/admin/settings.php', ['section' => 'local_oksigeniahechauka_settings']))->out(false) : '',
-            'icons' => ['qr' => icons::svg('qr'), 'x' => icons::svg('x'), 'plus' => icons::svg('plus'),
+            'icons' => ['qr' => icons::svg('qr'), 'x' => icons::svg('x'), 'plus' => icons::svg('plus'), 'pin' => icons::svg('pin'),
                 'search' => icons::svg('search'), 'sliders' => icons::svg('sliders'), 'copy' => icons::svg('copy')],
             'strings' => json_encode(
                 ['already' => get_string('groups_already', $c), 'none' => get_string('groups_nobody', $c),

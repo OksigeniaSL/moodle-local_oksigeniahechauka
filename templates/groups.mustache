@@ -55,6 +55,11 @@
                         </details>{{/hasothers}}
                     </div>
                 </div>
+                <div class="hkp-group-site"><span class="hkp-k">{{#str}}site_k, local_oksigeniahechauka{{/str}}</span>
+                    {{#site}}<p class="hkp-site-line">{{{icons.pin}}}<span><b>{{name}}</b><small>{{where}}</small></span></p>
+                    <a class="btn btn-sm btn-outline-secondary" href="{{siteurl}}">{{#str}}compose_change, local_oksigeniahechauka{{/str}}</a>{{/site}}
+                    {{^site}}<p class="hkp-hint">{{#str}}site_none, local_oksigeniahechauka{{/str}} <a href="{{siteurl}}">{{#str}}site_make, local_oksigeniahechauka{{/str}}</a></p>{{/site}}
+                </div>
                 {{#hascoursecats}}<div><label class="hkp-k" for="hkp-gc-{{id}}">{{#str}}groups_category, local_oksigeniahechauka{{/str}}</label>
                     <form method="post" action="{{action}}" class="hkp-find"><input type="hidden" name="sesskey" value="{{sesskey}}"><input type="hidden" name="action" value="groupcategory"><input type="hidden" name="group" value="{{id}}"><select class="form-select" id="hkp-gc-{{id}}" name="coursecat">{{#coursecats}}<option value="{{value}}"{{#selected}} selected{{/selected}}>{{label}}</option>{{/coursecats}}</select><button type="submit" class="btn btn-outline-secondary">{{#str}}centre_save, local_oksigeniahechauka{{/str}}</button></form>
                     <p class="hkp-hint">{{#str}}groups_category_help, local_oksigeniahechauka{{/str}}</p>

@@ -46,42 +46,7 @@ class centre {
         $config = get_config($c);
 
         // Where the school is.
-        $results = $query !== '' ? place::search($query) : [];
-        $options = [];
-        foreach ($results as $i => $r) {
-            $pos = \core_text::strpos(\core_text::strtolower($r['name']), \core_text::strtolower(trim($query)));
-            $options[] = ['i' => $i, 'before' => $pos !== false && $pos > 0 ? \core_text::substr($r['name'], 0, $pos) : '',
-                'mark' => $pos !== false ? \core_text::substr($r['name'], $pos, \core_text::strlen(trim($query))) : '',
-                'after' => $pos !== false ? \core_text::substr($r['name'], $pos + \core_text::strlen(trim($query))) : $r['name'],
-                'detail' => $r['detail']];
-        }
-        $place = null;
-        if (!empty($config->lat) && !empty($config->lon) && $query === '') {
-            $lat = (float) $config->lat;
-            $lon = (float) $config->lon;
-            $map = json_decode((string) ($config->placemap ?? ''), true);
-            if (!is_array($map) || empty($map['grid'])) {
-                $map = place::map($lat, $lon);
-                set_config('placemap', json_encode($map), $c);
-            }
-            $parts = array_map('trim', explode(',', (string) ($config->place ?? $config->location ?? '')));
-            $name = array_shift($parts);
-            $weather = weather::summary(weather::hours(), $now);
-            $place = [
-                'name' => $name,
-                'where' => implode(', ', $parts),
-                'coords' => place::degrees($lat, $lon),
-                'map' => $map,
-                'osm' => 'https://www.openstreetmap.org/?mlat=' . $lat . '&mlon=' . $lon . '#map=11/' . $lat . '/' . $lon,
-                'weather' => $weather ? [
-                    'symbol' => $weather['now']['symbol'] ?? '',
-                    'temp' => $weather['now']['temp'] ?? '',
-                    'max' => $weather['today']['max'] ?? '',
-                    'min' => $weather['today']['min'] ?? '',
-                    'text' => $weather['today']['text'] ?? '',
-                ] : null,
-            ];
-        }
+        $finder = place::view($query, $now);
 
         // The two colours, each with the text that will go on it; «de serie» while the centre has not chosen its own.
         $tiles = [];
@@ -163,12 +128,12 @@ class centre {
             'hastabs' => true,
             'action' => (new \moodle_url('/local/oksigeniahechauka/centre.php'))->out(false),
             'sesskey' => sesskey(),
-            'query' => $query !== '' ? $query : (string) ($config->location ?? ''),
-            'searched' => $query !== '',
-            'results' => $options,
-            'hasresults' => (bool) $options,
-            'resultsjson' => json_encode($results),
-            'place' => $place,
+            'query' => $finder['query'],
+            'searched' => $finder['searched'],
+            'results' => $finder['results'],
+            'hasresults' => $finder['hasresults'],
+            'resultsjson' => $finder['resultsjson'],
+            'place' => $finder['place'],
             'tiles' => $tiles,
             'defaults' => !$chosen,
             'skins' => skins::gallery($config),

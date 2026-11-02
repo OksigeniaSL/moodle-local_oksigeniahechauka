@@ -1,0 +1,66 @@
+{{!
+    This file is part of Moodle - https://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_oksigeniahechauka/site
+
+    A site of the centre: the name its screens show, where it is (with its map and its weather) and its logos.
+
+    Example context (json):
+    {
+        "tabs": [], "hastabs": false, "back": "#", "backicon": "", "title": "La sede: Campamento", "action": "#", "sesskey": "abc", "groupid": 5,
+        "issite": true, "sitename": "", "groupname": "Campamento",
+        "logos": [{"area": "logo", "dark": false, "label": "Para el tema claro", "url": "", "alt": "Logo"}],
+        "query": "", "searched": false, "results": [], "hasresults": false, "resultsjson": "[]", "place": null,
+        "icons": {"search": "", "pin": "", "out": "", "check": ""}
+    }
+}}
+<div class="hkp hkp-site">
+    <a class="hkp-back" href="{{back}}">{{{backicon}}}{{#str}}tab_screens, local_oksigeniahechauka{{/str}}</a>
+    <header class="hkp-head">
+        <div class="hkp-head-title">
+            <h1>{{title}}</h1>
+            <p class="hkp-head-sub">{{#str}}site_help, local_oksigeniahechauka{{/str}}</p>
+        </div>
+    </header>
+    {{#hastabs}}
+    <nav class="hkp-tabs" aria-label="{{#str}}tabs_label, local_oksigeniahechauka{{/str}}">
+        {{#tabs}}<a href="{{url}}"{{#current}} aria-current="page"{{/current}}>{{{icon}}}{{label}}</a>{{/tabs}}
+    </nav>
+    {{/hastabs}}
+    <section class="hkp-fs" aria-labelledby="hkp-site-where">
+        <h2 id="hkp-site-where" class="hkp-label hkp-section-label">{{#str}}site_where, local_oksigeniahechauka{{/str}}</h2>
+        <p class="hkp-hint hkp-section-hint">{{#str}}site_where_help, local_oksigeniahechauka{{/str}}</p>
+        {{> local_oksigeniahechauka/place_finder }}
+    </section>
+    <form method="post" action="{{action}}" enctype="multipart/form-data">
+        <input type="hidden" name="sesskey" value="{{sesskey}}">
+        <section class="hkp-fs" aria-labelledby="hkp-site-name">
+            <h2 id="hkp-site-name" class="hkp-label hkp-section-label">{{#str}}site_name, local_oksigeniahechauka{{/str}}</h2>
+            <div class="hkp-field"><label class="form-label" for="hkp-site-n">{{#str}}site_name_label, local_oksigeniahechauka{{/str}}</label><input class="form-control" id="hkp-site-n" name="sitename" value="{{sitename}}" maxlength="60" placeholder="{{groupname}}">
+                <p class="hkp-hint">{{#str}}site_name_help, local_oksigeniahechauka{{/str}}</p></div>
+        </section>
+        <section class="hkp-fs" aria-labelledby="hkp-site-logo">
+            <h2 id="hkp-site-logo" class="hkp-label hkp-section-label">{{#str}}centre_logo, local_oksigeniahechauka{{/str}}</h2>
+            <p class="hkp-hint hkp-section-hint">{{#str}}site_logo_help, local_oksigeniahechauka{{/str}}</p>
+            <div class="hkp-logos">{{#logos}}<div class="hkp-logo"><span class="hkp-logo-art{{#dark}} is-dark{{/dark}}">{{#url}}<img src="{{url}}" alt="{{alt}}">{{/url}}</span><b>{{label}}</b><label class="btn btn-sm btn-outline-secondary">{{#str}}compose_change, local_oksigeniahechauka{{/str}}<input class="visually-hidden sr-only" type="file" name="{{area}}" accept=".svg,.png,.jpg,.jpeg,.webp"></label></div>{{/logos}}</div>
+        </section>
+        <div class="hkp-foot">
+            <button type="submit" class="btn btn-primary">{{#str}}site_save, local_oksigeniahechauka{{/str}}</button>
+            {{#issite}}<button type="submit" class="btn btn-outline-secondary" name="forget" value="1">{{#str}}site_forget, local_oksigeniahechauka{{/str}}</button>{{/issite}}
+        </div>
+    </form>
+</div>

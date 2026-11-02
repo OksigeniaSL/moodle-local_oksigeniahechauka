@@ -55,6 +55,8 @@ class manifest {
         $config = get_config('local_oksigeniahechauka');
         $info = json_decode((string) $screen->lastinfo, true) ?: [];
         $display = $info['display'] ?? [];
+        // A screen of a site of the centre (a camp, another campus) takes its name, its place and its logos.
+        $site = sites::of_screen((int) $screen->id);
         $m = [
             'contract' => self::CONTRACT,
             'etag' => '',
@@ -73,8 +75,8 @@ class manifest {
                 'glass' => !empty($screen->glass),
             ],
             'template' => uses::valid($screen->screenuse ?? null) === 'showcase' ? 'full' : 'zones',
-            'centre' => ['name' => self::centre_name()],
-            'theme' => self::theme($screen, $config),
+            'centre' => ['name' => $site ? sites::name($site, $config) : self::centre_name()],
+            'theme' => self::theme($screen, $config, $site),
             'labels' => [
                 'menu' => get_string('label_menu', 'local_oksigeniahechauka'),
                 'notices' => get_string('label_notices', 'local_oksigeniahechauka'),
@@ -97,7 +99,8 @@ class manifest {
             $m['sample'] = true;
         }
         if (!empty($config->sourceweather)) {
-            $weather = weather::summary(weather::hours(), $now);
+            $where = $site && sites::has_place($site, $config) ? sites::suffix($site) : '';
+            $weather = weather::summary(weather::hours($where), $now);
             if ($weather) {
                 $m['weather'] = $weather;
             }
@@ -166,9 +169,10 @@ class manifest {
      *
      * @param \stdClass $screen
      * @param \stdClass $config
+     * @param int|null $site the group of its site, if it is in one
      * @return array
      */
-    protected static function theme(\stdClass $screen, \stdClass $config): array {
+    protected static function theme(\stdClass $screen, \stdClass $config, ?int $site = null): array {
         $mode = $screen->theme !== 'site' ? $screen->theme : ($config->thememode ?? 'light');
         $theme = ['mode' => in_array($mode, ['light', 'dark', 'auto']) ? $mode : 'light', 'vars' => []];
         if ($theme['mode'] === 'auto') {
@@ -193,11 +197,13 @@ class manifest {
         if (!$theme['vars']) {
             unset($theme['vars']);
         }
-        $logo = files::first(files::LOGO, 0) ?: files::site_logo();
+        // A site with a logo of its own takes both of its own: the centre's dark one would not go with it.
+        $own = $site ? sites::logo($site) : null;
+        $logo = $own ?: files::first(files::LOGO, 0) ?: files::site_logo();
         if ($logo) {
             $theme['logo'] = files::media($logo);
         }
-        $dark = files::first(files::LOGODARK, 0);
+        $dark = $own ? sites::logo($site, true) : files::first(files::LOGODARK, 0);
         if ($dark) {
             $theme['logo_dark'] = files::media($dark);
         }

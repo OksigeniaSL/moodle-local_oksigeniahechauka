@@ -53,6 +53,7 @@ if ($action !== '' && confirm_sesskey()) {
                 screens::delete($id);
             } else {
                 access::forget_group($id);
+                \local_oksigeniahechauka\local\sites::forget($id);
                 $DB->delete_records('local_oksigeniahechauka_member', ['groupid' => $id]);
                 $DB->delete_records('local_oksigeniahechauka_target', ['groupid' => $id]);
                 $DB->delete_records('local_oksigeniahechauka_group', ['id' => $id]);

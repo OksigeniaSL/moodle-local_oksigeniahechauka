@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.5
+
+- **Sites of a centre:** a group of screens somewhere else (a camp, another campus, a branch) can have its own name, place and weather, and logos, from its card in «Screens and groups». Its screens take them instead of the centre's; the screens of a centre do not need to be on the same network.
+
 ## 0.8.4
 
 - **A model to fill in:** the birthdays list and the tables offer a model as CSV, with the separator of the user's language and its letters right in a spreadsheet.

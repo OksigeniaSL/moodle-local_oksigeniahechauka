@@ -217,20 +217,106 @@ class place {
      * @param float $lat
      * @param float $lon
      * @param int $now
+     * @param string $suffix a site of the centre (sites::suffix()), or '' for the centre
      * @return void
      */
-    public static function choose(string $name, string $detail, float $lat, float $lon, int $now): void {
+    public static function choose(string $name, string $detail, float $lat, float $lon, int $now, string $suffix = ''): void {
         $c = self::C;
-        set_config('location', $name, $c);
-        set_config('lat', round($lat, 4), $c);
-        set_config('lon', round($lon, 4), $c);
-        set_config('place', $detail !== '' ? $name . ', ' . $detail : $name, $c);
-        set_config('placemap', json_encode(self::map($lat, $lon)), $c);
+        set_config('location' . $suffix, $name, $c);
+        set_config('lat' . $suffix, round($lat, 4), $c);
+        set_config('lon' . $suffix, round($lon, 4), $c);
+        set_config('place' . $suffix, $detail !== '' ? $name . ', ' . $detail : $name, $c);
+        set_config('placemap' . $suffix, json_encode(self::map($lat, $lon)), $c);
         foreach (['weatherdata', 'weathermodified'] as $setting) {
-            unset_config($setting, $c);
+            unset_config($setting . $suffix, $c);
         }
-        set_config('weatherexpires', 0, $c);
+        set_config('weatherexpires' . $suffix, 0, $c);
         // Its weather now, for the card that confirms it; if the service does not answer, the task brings it.
-        weather::fetch($now);
+        weather::fetch($now, $suffix);
+    }
+
+    /**
+     * A place picked from the list the page sent back, if it is one.
+     *
+     * @param int $now
+     * @param string $suffix
+     * @return bool whether one was chosen
+     */
+    public static function pick(int $now, string $suffix = ''): bool {
+        $pick = optional_param('pick', -1, PARAM_INT);
+        $results = json_decode(optional_param('results', '[]', PARAM_RAW), true);
+        $chosen = $pick >= 0 && is_array($results) ? ($results[$pick] ?? null) : null;
+        if (!is_array($chosen) || !isset($chosen['lat'], $chosen['lon'])) {
+            return false;
+        }
+        self::choose(
+            clean_param($chosen['name'] ?? '', PARAM_TEXT),
+            clean_param($chosen['detail'] ?? '', PARAM_TEXT),
+            (float) $chosen['lat'],
+            (float) $chosen['lon'],
+            $now,
+            $suffix
+        );
+        return true;
+    }
+
+    /**
+     * What the place finder shows: the search, the places found and the one chosen, with its map and its weather.
+     *
+     * @param string $query what was searched, if anything
+     * @param int $now
+     * @param string $suffix a site of the centre, or '' for the centre
+     * @return array query, searched, results, hasresults, resultsjson, place
+     */
+    public static function view(string $query, int $now, string $suffix = ''): array {
+        $c = self::C;
+        $config = get_config($c);
+        $results = $query !== '' ? self::search($query) : [];
+        $options = [];
+        foreach ($results as $i => $r) {
+            $pos = \core_text::strpos(\core_text::strtolower($r['name']), \core_text::strtolower(trim($query)));
+            $options[] = ['i' => $i, 'before' => $pos !== false && $pos > 0 ? \core_text::substr($r['name'], 0, $pos) : '',
+                'mark' => $pos !== false ? \core_text::substr($r['name'], $pos, \core_text::strlen(trim($query))) : '',
+                'after' => $pos !== false ? \core_text::substr($r['name'], $pos + \core_text::strlen(trim($query))) : $r['name'],
+                'detail' => $r['detail']];
+        }
+        $get = function (string $key) use ($config, $suffix) {
+            return $config->{$key . $suffix} ?? null;
+        };
+        $place = null;
+        if (!empty($get('lat')) && !empty($get('lon')) && $query === '') {
+            $lat = (float) $get('lat');
+            $lon = (float) $get('lon');
+            $map = json_decode((string) $get('placemap'), true);
+            if (!is_array($map) || empty($map['grid'])) {
+                $map = self::map($lat, $lon);
+                set_config('placemap' . $suffix, json_encode($map), $c);
+            }
+            $parts = array_map('trim', explode(',', (string) ($get('place') ?? $get('location') ?? '')));
+            $name = array_shift($parts);
+            $weather = weather::summary(weather::hours($suffix), $now);
+            $place = [
+                'name' => $name,
+                'where' => implode(', ', $parts),
+                'coords' => self::degrees($lat, $lon),
+                'map' => $map,
+                'osm' => 'https://www.openstreetmap.org/?mlat=' . $lat . '&mlon=' . $lon . '#map=11/' . $lat . '/' . $lon,
+                'weather' => $weather ? [
+                    'symbol' => $weather['now']['symbol'] ?? '',
+                    'temp' => $weather['now']['temp'] ?? '',
+                    'max' => $weather['today']['max'] ?? '',
+                    'min' => $weather['today']['min'] ?? '',
+                    'text' => $weather['today']['text'] ?? '',
+                ] : null,
+            ];
+        }
+        return [
+            'query' => $query !== '' ? $query : (string) ($get('location') ?? ''),
+            'searched' => $query !== '',
+            'results' => $options,
+            'hasresults' => (bool) $options,
+            'resultsjson' => json_encode($results),
+            'place' => $place,
+        ];
     }
 }

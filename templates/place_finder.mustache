@@ -28,6 +28,7 @@
 }}
                 {{#searched}}<form method="post" action="{{action}}" id="hkp-pick-form"><input type="hidden" name="sesskey" value="{{sesskey}}"><input type="hidden" name="results" value="{{resultsjson}}"></form>{{/searched}}
                 <form method="get" action="{{action}}" class="hkp-find" role="search">
+                    {{#groupid}}<input type="hidden" name="group" value="{{groupid}}">{{/groupid}}
                     <div class="hkp-search">{{{icons.search}}}<input class="form-control is-big" id="hkp-q" name="q" value="{{query}}" aria-label="{{#str}}centre_search_label, local_oksigeniahechauka{{/str}}" autocomplete="off" spellcheck="false"{{#hasresults}} aria-controls="hkp-places" aria-expanded="true"{{/hasresults}}>
                         {{#searched}}
                         <ul class="hkp-listbox" id="hkp-places" aria-label="{{#str}}centre_found, local_oksigeniahechauka{{/str}}">
