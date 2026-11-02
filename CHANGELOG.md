@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.7.15 (2026-11-02)
+
+- **A new look for the screens, with skins each centre chooses**: colours and a letter that goes with the plugin, the same on every
+  device. Three to start with, in a gallery in «Tu centro» with the screen beside it; the centre's own colours go over the skin and, with
+  none chosen, the first one takes the brand colour of its Moodle.
+- What leads is told apart from afar: a plate, a speech bubble, a sign, a ticket, a scoreboard and a page of a calendar. One menu a day,
+  with the others under «También», without the kitchen's letter.
+- Rows of portrait photos, an agenda as a list instead of the table of the week and the month, and the important notice in the ticker where
+  there is no column for it, and leading only one turn in twelve.
+
 ## 0.7.14 (2026-11-02)
 
 - **«How it comes out»** for a photo or a video: automatic (by its shape, cropped a little, with no margins), full screen, or whole

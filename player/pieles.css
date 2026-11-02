@@ -1,0 +1,127 @@
+/* Oksigenia Hechauka: the skins of the screens. Made by pieles.py, not by hand. Goes after every other sheet; the centre's own
+ * colours come as variables on <html> and win over these. Fonts are SIL OFL 1.1: thirdpartylibs.xml. */
+@font-face { font-family: "Gabarito"; src: url("fuentes/Gabarito-600.woff2") format("woff2"); font-weight: 600; font-display: block; }
+@font-face { font-family: "Gabarito"; src: url("fuentes/Gabarito-700.woff2") format("woff2"); font-weight: 700; font-display: block; }
+@font-face { font-family: "Gabarito"; src: url("fuentes/Gabarito-800.woff2") format("woff2"); font-weight: 800; font-display: block; }
+:root,
+[data-piel="petroleo"] {
+    --hk-letra-titulos: "Gabarito", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --hk-letra-texto: "Gabarito", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --hk-fondo: #f4f1ea;
+    --hk-superficie: #ffffff;
+    --hk-texto: #14211f;
+    --hk-texto-suave: #46534f;
+    --hk-linea: #e4dfd3;
+    --hk-primario: #0e4f5c;
+    --hk-sobre-primario: #ffffff;
+    --hk-acento: #ff8a3d;
+    --hk-sobre-acento: #14211f;
+    --hk-acento-texto: #a8480a;
+    --hk-marca-1: #0e4f5c;
+    --hk-marca-2: #4f6b2d;
+    --hk-marca-3: #a8481a;
+    --hk-marca-4: #a4324a;
+    --hk-sobre-marca-1: #ffffff;
+    --hk-sobre-marca-2: #ffffff;
+    --hk-sobre-marca-3: #ffffff;
+    --hk-sobre-marca-4: #ffffff;
+}
+[data-tema="oscuro"],
+[data-piel="petroleo"][data-tema="oscuro"] {
+    --hk-fondo: #0c1718;
+    --hk-superficie: #162425;
+    --hk-texto: #f1efe8;
+    --hk-texto-suave: #a9b7b3;
+    --hk-linea: #2a3a3a;
+    --hk-primario: #17707f;
+    --hk-sobre-primario: #ffffff;
+    --hk-acento: #ff9a54;
+    --hk-sobre-acento: #14211f;
+    --hk-acento-texto: #ffa76a;
+    --hk-marca-1-oscuro: #6fb7c4;
+    --hk-marca-2-oscuro: #a9c47e;
+    --hk-marca-3-oscuro: #f0a06a;
+    --hk-marca-4-oscuro: #ef8fa2;
+}
+@font-face { font-family: "Schibsted"; src: url("fuentes/Schibsted-600.woff2") format("woff2"); font-weight: 600; font-display: block; }
+@font-face { font-family: "Schibsted"; src: url("fuentes/Schibsted-700.woff2") format("woff2"); font-weight: 700; font-display: block; }
+@font-face { font-family: "Schibsted"; src: url("fuentes/Schibsted-800.woff2") format("woff2"); font-weight: 800; font-display: block; }
+[data-piel="botella"] {
+    --hk-letra-titulos: "Schibsted", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --hk-letra-texto: "Schibsted", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --hk-fondo: #f3f2ec;
+    --hk-superficie: #ffffff;
+    --hk-texto: #161c19;
+    --hk-texto-suave: #4a524e;
+    --hk-linea: #e1e0d6;
+    --hk-primario: #123f33;
+    --hk-sobre-primario: #ffffff;
+    --hk-acento: #ffb48a;
+    --hk-sobre-acento: #161c19;
+    --hk-acento-texto: #a24f1f;
+    --hk-marca-1: #123f33;
+    --hk-marca-2: #a8461f;
+    --hk-marca-3: #1f5f8b;
+    --hk-marca-4: #8a2f52;
+    --hk-sobre-marca-1: #ffffff;
+    --hk-sobre-marca-2: #ffffff;
+    --hk-sobre-marca-3: #ffffff;
+    --hk-sobre-marca-4: #ffffff;
+}
+[data-piel="botella"][data-tema="oscuro"] {
+    --hk-fondo: #0d1412;
+    --hk-superficie: #17211d;
+    --hk-texto: #f0efe9;
+    --hk-texto-suave: #a7b2ac;
+    --hk-linea: #2a3631;
+    --hk-primario: #1d6a56;
+    --hk-sobre-primario: #ffffff;
+    --hk-acento: #ffbd97;
+    --hk-sobre-acento: #161c19;
+    --hk-acento-texto: #ffbd97;
+    --hk-marca-1-oscuro: #7fc7ae;
+    --hk-marca-2-oscuro: #f0a57f;
+    --hk-marca-3-oscuro: #7fb5dc;
+    --hk-marca-4-oscuro: #e79bb7;
+}
+@font-face { font-family: "Bricolage"; src: url("fuentes/Bricolage-600.woff2") format("woff2"); font-weight: 600; font-display: block; }
+@font-face { font-family: "Bricolage"; src: url("fuentes/Bricolage-700.woff2") format("woff2"); font-weight: 700; font-display: block; }
+@font-face { font-family: "Bricolage"; src: url("fuentes/Bricolage-800.woff2") format("woff2"); font-weight: 800; font-display: block; }
+[data-piel="berenjena"] {
+    --hk-letra-titulos: "Bricolage", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --hk-letra-texto: "Bricolage", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --hk-fondo: #f4f2f4;
+    --hk-superficie: #ffffff;
+    --hk-texto: #1b1620;
+    --hk-texto-suave: #524a58;
+    --hk-linea: #e3dfe5;
+    --hk-primario: #3f1f63;
+    --hk-sobre-primario: #ffffff;
+    --hk-acento: #f6d32d;
+    --hk-sobre-acento: #1b1620;
+    --hk-acento-texto: #7a6400;
+    --hk-marca-1: #3f1f63;
+    --hk-marca-2: #1d7a5f;
+    --hk-marca-3: #c2410c;
+    --hk-marca-4: #a4324a;
+    --hk-sobre-marca-1: #ffffff;
+    --hk-sobre-marca-2: #ffffff;
+    --hk-sobre-marca-3: #ffffff;
+    --hk-sobre-marca-4: #ffffff;
+}
+[data-piel="berenjena"][data-tema="oscuro"] {
+    --hk-fondo: #120e17;
+    --hk-superficie: #1f1927;
+    --hk-texto: #f3f0f5;
+    --hk-texto-suave: #b3a9bb;
+    --hk-linea: #352c3f;
+    --hk-primario: #5f3a8f;
+    --hk-sobre-primario: #ffffff;
+    --hk-acento: #f6d32d;
+    --hk-sobre-acento: #1b1620;
+    --hk-acento-texto: #f6d32d;
+    --hk-marca-1-oscuro: #b89be0;
+    --hk-marca-2-oscuro: #79cfb1;
+    --hk-marca-3-oscuro: #f79b6b;
+    --hk-marca-4-oscuro: #ef8fa2;
+}

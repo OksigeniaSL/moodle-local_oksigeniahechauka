@@ -4,6 +4,7 @@
 // - preview: inside the management panel, with the session of the person signed in and a clock of their choosing;
 // - demo: a static manifest and its media, for development and for testing a device without a server.
 
+import {menuKind, menuParts} from './lead.js';
 import {makeApi} from './api.js';
 import {realClock, simulatedClock} from './clock.js';
 import {MediaStore, mediaOf} from './media.js';
@@ -19,7 +20,7 @@ import {filesOf, isRaining, Surprises} from './surprises.js';
 import {countToday} from './today.js';
 import {weekOf} from './week.js';
 
-const VERSION = '0.7.14';
+const VERSION = '0.7.15';
 const COMING_DAYS = 7;
 const HEARTBEAT_MS = 60000;
 const REFRESH_MS = 15 * 60000;
@@ -35,6 +36,12 @@ function query() {
 function readBoot() {
     const node = document.getElementById('hechauka-boot');
     return node ? JSON.parse(node.textContent) : {};
+}
+
+// «2», «noviembre» and «Lunes» of a «YYYY-MM-DD».
+function dateWordsOf(date, s) {
+    const d = new Date(date + 'T12:00:00Z');
+    return {day: d.getUTCDate(), month: (s.months || [])[d.getUTCMonth()] || '', weekday: (s.days || [])[d.getUTCDay()] || ''};
 }
 
 class Player {
@@ -146,7 +153,8 @@ class Player {
                 }
                 if (ev.data.hkTheme) {
                     // «Tu centro»: the colours being chosen, and light or dark, before they are saved.
-                    self.screen.applyTheme({vars: ev.data.hkTheme.vars || {}});
+                    self.screen.applyTheme(Object.assign({}, (self.manifest && self.manifest.theme) || {},
+                        {vars: ev.data.hkTheme.vars || {}}, ev.data.hkTheme.skin ? {skin: ev.data.hkTheme.skin} : {}));
                     if (ev.data.hkTheme.mode) {
                         self.forcedTheme = ev.data.hkTheme.mode === 'dark';
                     }
@@ -289,23 +297,28 @@ class Player {
         });
     }
 
-    // The menu of the day as one block: a page per menu when there are several, one more at each slide.
+    // The menu of the day, one for all the slides: the first as the lead and the others in a line under it, «También: …», with
+    // their kind only when it says something (the kitchen's «Menú D» is said to nobody; «Vegetariano» is).
     menuOf(menus) {
-        const pages = [];
         const labels = this.manifest.labels || {};
         const s = this.strings;
-        menus.forEach(function (item) {
-            const label = item.label || labels.menu || s.menu || '';
-            if (item.closed || !item.menus || !item.menus.length) {
-                pages.push({label, closed: item.title || s.closed || ''});
-            } else {
-                item.menus.forEach(function (menu) {
-                    pages.push({label, name: item.menus.length > 1 ? menu.name : '', courses: menu.courses || [],
-                        note: item.note || ''});
-                });
+        const item = menus[0];
+        if (!item) {
+            return null;
+        }
+        const label = item.label || labels.menu || s.menu || '';
+        if (item.closed || !item.menus || !item.menus.length) {
+            return {label, closed: item.title || s.closed || ''};
+        }
+        const also = [];
+        item.menus.slice(1).forEach(function (menu) {
+            const main = menuParts(menu).main;
+            if (main) {
+                const kind = menuKind(menu.name);
+                also.push(kind ? main + ' (' + kind + ')' : main);
             }
         });
-        return pages.length ? pages[this.menuTurn % pages.length] : null;
+        return {label, courses: item.menus[0].courses || [], also, note: item.note || ''};
     }
 
     /**
@@ -356,6 +369,8 @@ class Player {
                 return !big || ev.id !== big.id;
             }), wall.date, COMING_DAYS, names, over ? 1 : 0),
             countdown: big,
+            // Today in words, for the sheet of a holiday.
+            dateWords: dateWordsOf(wall.date, this.strings),
             eventsLabel: over ? names.tomorrow : '',
             // Around midday the menu leads first.
             noon: wall.min >= 11 * 60 + 30 && wall.min < 14 * 60 + 30,
@@ -454,8 +469,11 @@ class Player {
             });
             const use = useOf(merged, wall);
             this.screen.setUse(use);
-            this.screen.show(draftChoice(this.draft.item, this.draft.focus || 'main', main, this.screen.horizontal, use),
-                today, week);
+            const choice = draftChoice(this.draft.item, this.draft.focus || 'main', main, this.screen.horizontal, use);
+            if (choice.comp === 'agenda') {
+                choice.extra = {data: this.agendaData(wall, merged)};
+            }
+            this.screen.show(choice, today, week);
         } finally {
             this.manifest = keep;
         }

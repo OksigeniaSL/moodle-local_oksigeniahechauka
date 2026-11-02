@@ -100,28 +100,24 @@ function buildMonth(m, s) {
 
 // --- The diary ---------------------------------------------------------------------------------------------------
 
+// One bar for every event, with or without an hour: the colour of whom it is for, or the centre's when it is for everyone.
 function buildEvent(e) {
-    if (e.time && !e.until) {
-        const d = el('div', 'hk-linea');
-        d.appendChild(el('b', 'hk-linea-cuando', e.time));
-        stage(d, e.color);
-        const t = el('span', 'hk-linea-texto');
-        t.appendChild(el('span', 'hk-linea-titulo', e.title));
-        if (e.group) {
-            t.appendChild(el('small', '', e.group));
-        }
-        d.appendChild(t);
-        return d;
-    }
-    const b = el('div', 'hk-agenda-banda');
+    const b = el('div', 'hk-agenda-ev');
     stage(b, e.color);
+    if (!e.color) {
+        b.style.setProperty('--hk-ev', 'var(--hk-primario)');
+        b.style.setProperty('--hk-sobre-ev', 'var(--hk-sobre-primario)');
+    }
     if (e.until) {
         b.setAttribute('data-sigue', '');
     }
-    b.appendChild(el('b', '', e.title));
+    if (e.time && !e.until) {
+        b.appendChild(el('b', 'hk-agenda-hora', e.time));
+    }
+    b.appendChild(el('span', 'hk-agenda-titulo', e.title));
     const said = [e.group, e.time && e.until ? e.time : '', e.until].filter(Boolean).join(' · ');
     if (said) {
-        b.appendChild(el('small', '', said));
+        b.appendChild(el('small', 'hk-agenda-quien', said));
     }
     return b;
 }
@@ -179,21 +175,6 @@ export function buildAgenda(c, data, s) {
     if (few) {
         c.setAttribute('data-densidad', 'poca');
     }
-    const panel = el('section', 'hk-agenda-mes');
-    const months = [data.today];
-    each(a.days, function (d) {
-        if (d.date.slice(0, 7) !== months[months.length - 1].slice(0, 7)) {
-            months.push(d.date);
-        }
-    });
-    each(months, function (m, i) {
-        const x = buildMonth(data.monthOf(m), s);
-        if (i === 0) {
-            x.classList.add('hk-mes-activo');
-        }
-        panel.appendChild(x);
-    });
-    c.appendChild(panel);
     const list = el('section', 'hk-agenda-lista');
     if (!a.days.length) {
         const none = el('div', 'hk-agenda-nada');
@@ -206,7 +187,7 @@ export function buildAgenda(c, data, s) {
     const track = el('div', 'hk-agenda-pista');
     each(a.days, function (d, i) {
         const b = el('div', 'hk-agenda-bloque');
-        // The first month is the calendar's title; a month's name only where it changes.
+        // A month's name only where it changes.
         if (d.month && i > 0) {
             b.appendChild(el('p', 'hk-agenda-cambio', capital(d.month)));
         }
@@ -265,7 +246,7 @@ function splitDays(track, high) {
 }
 
 function linesOfBlock(b) {
-    return b.querySelectorAll('.hk-linea, .hk-agenda-banda, .hk-agenda-rayas');
+    return b.querySelectorAll('.hk-agenda-ev, .hk-agenda-rayas');
 }
 
 // getBoundingClientRect is scaled when a screen is drawn smaller (the panel's preview); offsets are not.
@@ -455,10 +436,7 @@ function goToStop(c, n, animated) {
  */
 export function startAgenda(c, o) {
     const track = c.querySelector('.hk-agenda-pista');
-    const turns = o.distance === 8 || (o.distance === 5 && !!o.glass);
-    if (turns) {
-        c.setAttribute('data-vista', 'lista');
-    }
+    const turns = false;
     if (!track) {
         return 12;
     }
@@ -472,7 +450,7 @@ export function startAgenda(c, o) {
         calendarAtStop(c, {from: 0, to: track.children.length - 1 - foot});
         return 14;
     }
-    const byPage = o.distance === 8 || !!o.still;
+    const byPage = !!o.still;
     splitDays(track, list.clientHeight);
     const stops = stopsOf(track, list.clientHeight, byPage, o.distance);
     const A = {track, stops, byPage, firstList: 0, current: 0};

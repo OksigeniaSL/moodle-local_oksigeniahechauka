@@ -99,10 +99,15 @@
             out['--hk-sobre-marca-' + (i + 1)] = on(hex);
             out[name + '-oscuro'] = readable(hex, '#19212c');
         });
+        const skin = page.querySelector('input[name="skin"]:checked');
         page.querySelectorAll('[data-colour]').forEach((input) => {
             const setting = input.getAttribute('data-colour');
             const hex = input.value.toLowerCase();
             const name = names[setting];
+            // What the skin already gives stays with the skin, which also has its colours for the dark theme.
+            if (skin && hex === skin.getAttribute(setting === 'colouraccent' ? 'data-skin-accent' : 'data-skin-primary')) {
+                return;
+            }
             out[name] = hex;
             out[name.replace('--hk-', '--hk-sobre-')] = on(hex);
             if (setting === 'colouraccent') {
@@ -125,7 +130,9 @@
     };
     const send = (override) => {
         if (frame && frame.contentWindow) {
-            frame.contentWindow.postMessage({hkTheme: {vars: Object.assign(vars(), override || {}), mode}}, location.origin);
+            const skin = page.querySelector('input[name="skin"]:checked');
+            frame.contentWindow.postMessage({hkTheme: {vars: Object.assign(vars(), override || {}), mode,
+                skin: skin ? skin.getAttribute('data-skin') : ''}}, location.origin);
         }
     };
     // Passing over a sample, its colour blinks on the screen: where it goes, at a glance.
@@ -149,6 +156,19 @@
             page.querySelector('[data-hex="' + setting + '"]').textContent = input.value.toUpperCase();
             page.querySelector('[data-on="' + setting + '"]').textContent = on(input.value) === '#ffffff' ? words.white :
                 words.dark;
+            send();
+        });
+    });
+    // Choosing a skin brings its colours; touching them afterwards makes them the centre's own.
+    page.querySelectorAll('input[name="skin"]').forEach((radio) => {
+        radio.addEventListener('change', () => {
+            page.querySelectorAll('[data-colour]').forEach((input) => {
+                const setting = input.getAttribute('data-colour');
+                input.value = radio.getAttribute(setting === 'colouraccent' ? 'data-accent' : 'data-primary');
+                page.querySelector('[data-hex="' + setting + '"]').textContent = input.value.toUpperCase();
+                page.querySelector('[data-on="' + setting + '"]').textContent = on(input.value) === '#ffffff' ? words.white :
+                    words.dark;
+            });
             send();
         });
     });

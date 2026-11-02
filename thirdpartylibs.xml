@@ -22,4 +22,17 @@
             <copyright>2009 Kazuhiko Arase</copyright>
         </copyrights>
     </library>
+    <library>
+        <location>player/fuentes</location>
+        <name>Gabarito, Schibsted Grotesk, Bricolage Grotesque</name>
+        <description>The letters of the screens' skins, cut to Latin and made readable by Chrome 56.</description>
+        <version>2.0</version>
+        <license>SIL Open Font License 1.1</license>
+        <repository>https://github.com/google/fonts</repository>
+        <copyrights>
+            <copyright>2023 The Gabarito Project Authors (https://github.com/naipefoundry/gabarito)</copyright>
+            <copyright>2023 The Schibsted-Grotesk Project Authors (https://github.com/schibsted/schibsted-grotesk)</copyright>
+            <copyright>2022 The Bricolage Grotesque Project Authors (https://github.com/ateliertriay/bricolage)</copyright>
+        </copyrights>
+    </library>
 </libraries>

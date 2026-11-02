@@ -685,3 +685,59 @@ dialog.hkp-dialog > footer {
     white-space: nowrap;
 }
 
+/* The gallery of skins: each one as it would look, chosen with a ring. */
+.hkp-skins {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+    gap: .75rem;
+}
+.hkp-skin {
+    display: grid;
+    gap: .4rem;
+    margin: 0;
+    cursor: pointer;
+}
+.hkp-skin-art {
+    position: relative;
+    display: block;
+    height: 5.5rem;
+    overflow: hidden;
+    border-radius: var(--hkp-radius-sm);
+    box-shadow: inset 0 0 0 1px var(--hkp-line);
+}
+.hkp-skin-art b {
+    position: absolute;
+    top: .55rem;
+    left: .75rem;
+    font-size: 1.9rem;
+    font-weight: 700;
+    line-height: 1;
+}
+.hkp-skin-art i {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: 1.5rem;
+}
+.hkp-skin-art u {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 28%;
+}
+.hkp-skin input:checked + .hkp-skin-art {
+    outline: 3px solid var(--hkp-accent, currentColor);
+    outline-offset: 2px;
+}
+.hkp-skin input:focus-visible + .hkp-skin-art {
+    outline: 3px solid currentColor;
+    outline-offset: 2px;
+}
+.hkp-skin-name {
+    font-size: .875rem;
+    font-weight: 600;
+    line-height: 1.25;
+}
+

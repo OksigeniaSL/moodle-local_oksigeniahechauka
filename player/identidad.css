@@ -1,0 +1,99 @@
+/* Oksigenia Hechauka 0.8: what a screen wears before the centre has said anything (Gaudí, 2 November 2026). Goes after the other
+ * sheets and before the client's values (which come as variables on <html>). A screen that nobody has dressed must not look
+ * like a template: its own letter (the same on every device), a pair of colours with some character, and the centre's name
+ * as a mark where the logo would go. */
+
+/* --- The header without a logo: the centre's name as a mark ------------------------------------------------------- */
+.hk .hk-lugar {
+    margin-left: 0;
+    padding-left: 0;
+    border-left: 0;
+    color: var(--hk-texto);
+    font-family: var(--hk-letra-titulos);
+    font-size: calc(var(--hk-t-min) * 1.5);
+    font-weight: 800;
+    letter-spacing: -.015em;
+    line-height: 1;
+}
+.hk .hk-lugar i {
+    color: var(--hk-acento);
+    font-style: normal;
+}
+.hk .hk-lugar[data-largo="1"] {
+    font-size: calc(var(--hk-t-min) * 1.2);
+}
+.hk .hk-lugar[data-largo="2"] {
+    width: 34%;
+    font-size: var(--hk-t-min);
+    line-height: 1.04;
+}
+.hk.hk-vertical .hk-con-tiempo .hk-lugar {
+    position: static;
+    top: auto;
+    font-size: calc(var(--hk-t-min) * 1.5);
+}
+.hk.hk-vertical .hk-con-tiempo .hk-lugar[data-largo="1"] {
+    font-size: calc(var(--hk-t-min) * 1.2);
+}
+.hk.hk-vertical .hk-con-tiempo .hk-lugar[data-largo="2"] {
+    font-size: var(--hk-t-min);
+}
+.hk .hk-completa .hk-lugar {             /* over a photo */
+    color: #fff;
+}
+/* from 5 m it stays too: there it is the only thing that says whose screen it is */
+.hk[data-distancia="5"] .hk-lugar,
+.hk[data-distancia="8"] .hk-lugar {
+    display: block;
+}
+
+/* --- The «example data» pill: small, over the mark ---------------------------------------------------------------- */
+.hk .hk-muestra {
+    top: .6rem;
+    left: 4rem;
+    padding: .3rem 1.2rem;
+    border-radius: .8rem;
+    font-size: 2rem;
+}
+
+/* --- Figures in columns, the colon as a letter (some letters give it the width of a figure) ----------------------- */
+.hk .hk-reloj span,
+.hk .hk-talon-hora span {
+    font-variant-numeric: proportional-nums;
+}
+
+/* --- The third: a column of a newspaper, not another white card ---------------------------------------------------- */
+.hk .hk-resto {
+    padding: .4rem 0 0 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+}
+/* The important one fixed in it: the same sign as when it leads, small */
+.hk .hk-aviso-fijo {
+    margin-bottom: 3.2rem;
+    padding: 2.4rem 3rem 2.8rem;
+    border-radius: 2rem;
+    background: var(--hk-acento);
+    color: var(--hk-sobre-acento);
+}
+.hk .hk-aviso-fijo::before,
+.hk .hk-aviso-fijo::after {
+    display: none;
+}
+.hk .hk-aviso-fijo .hk-aviso-fijo-marca,
+[data-tema="oscuro"] .hk .hk-aviso-fijo .hk-aviso-fijo-marca {
+    color: inherit;
+}
+.hk .hk-resto-grupo {
+    padding-top: 1.6rem;
+    border-top: .5rem solid currentColor;
+}
+.hk .hk-resto-paginas {                   /* whoever passes does not need to know there are five pages */
+    visibility: hidden;
+}
+
+/* --- The ticker: nobody stays to count sentences ----------------------------------------------------------------- */
+.hk .hk-cinta-cuenta {
+    display: none;
+}

@@ -6,7 +6,7 @@ import {useOf} from '../src/rules.js';
 import {Composer, draftChoice} from '../src/compose.js';
 import {qrPath, shortWeb} from '../src/qr.js';
 import {agendaOf, monthOf} from '../src/agenda.js';
-import {leadsOf, menuLabel, menuParts, weekHeadline} from '../src/lead.js';
+import {leadOfTurn, leadsOf, menuLabel, menuParts, weekHeadline} from '../src/lead.js';
 import {albumsOf, oneOfEachAlbum} from '../src/photos.js';
 
 const at = (dow, hm) => ({dow, min: parseInt(hm.slice(0, 2), 10) * 60 + parseInt(hm.slice(3), 10)});
@@ -130,7 +130,7 @@ test('the month above the agenda: Monday first, today, the past, and the colours
     assert.equal(day(28).date, '2026-11-28');
 });
 
-test('by the distance: no week from 5 m; from 8 m no thirds, and the sentences as slides of their own', () => {
+test('by the distance: from 8 m no thirds, and the sentences as slides of their own', () => {
     const queue = [photo('a'), photo('b'), photo('c')];
     const week = {things: 9, weekday: 2};
     const run = (opts, n) => {
@@ -141,7 +141,7 @@ test('by the distance: no week from 5 m; from 8 m no thirds, and the sentences a
         }
         return out;
     };
-    assert.ok(run({distance: 3, week}, 16).some((x) => x.comp === 'semana'));
+    assert.ok(!run({distance: 3, week}, 16).some((x) => x.comp === 'semana'));
     assert.ok(!run({distance: 5, week}, 16).some((x) => x.comp === 'semana'));
     const far = run({distance: 8, week, phrases: ['Uno', 'Dos'], countdown: true}, 16);
     assert.ok(!far.some((x) => x.comp === 'semana' || x.comp === 'foto-hoy'));
@@ -187,7 +187,7 @@ test('what leads, in order; the main dish of a menu; what the week strip says', 
     assert.equal(weekHeadline({}, S.days), '');
 });
 
-test('the agenda takes the turn of the coming days: always from afar; from close, all but Mondays and Fridays', () => {
+test('the agenda takes the turn of the coming days, at every distance and any day', () => {
     const queue = [photo('a'), photo('b'), photo('c')];
     const run = (opts, n) => {
         const c = new Composer();
@@ -199,13 +199,13 @@ test('the agenda takes the turn of the coming days: always from afar; from close
     };
     const tuesday = {things: 9, weekday: 2};
     const friday = {things: 9, weekday: 5};
-    assert.ok(run({distance: 3, week: tuesday, agenda: true}, 16).includes('agenda'));
-    assert.ok(!run({distance: 3, week: tuesday, agenda: true}, 16).includes('semana'));
-    assert.ok(run({distance: 3, week: friday, agenda: true}, 16).includes('semana'));
-    assert.ok(!run({distance: 3, week: friday, agenda: true}, 16).includes('agenda'));
-    assert.ok(run({distance: 5, week: friday, agenda: true}, 16).includes('agenda'));
-    assert.ok(run({distance: 8, week: friday, agenda: true}, 16).includes('agenda'));
-    assert.ok(!run({distance: 8, week: friday, agenda: true}, 16).includes('semana'));
+    for (const distance of [3, 5, 8]) {
+        for (const week of [tuesday, friday]) {
+            const list = run({distance, week, agenda: true}, 16);
+            assert.ok(list.includes('agenda'));
+            assert.ok(!list.includes('semana'));
+        }
+    }
     // Nothing in thirty days: it does not come.
     assert.ok(!run({distance: 5, week: friday, agenda: false}, 16).includes('agenda'));
 });
@@ -254,3 +254,20 @@ test('an album takes the turn of one thing, gives the next photo each time and s
     // The third and the wall still have all of them.
     assert.equal(albumsOf(queue, (m) => m.url)[0].photos.length, 3);
 });
+
+test('the important notice, always in sight, leads only one turn in twelve', () => {
+    const important = {type: 'notice', notice: {tone: 'important'}};
+    const menu = {type: 'menu'};
+    const event = {type: 'event'};
+    const turns = [];
+    for (let turn = 1; turn <= 24; turn++) {
+        turns.push(leadOfTurn([important, menu, event], turn));
+    }
+    assert.equal(turns.filter((lead) => lead === important).length, 2);
+    assert.equal(turns[11], important);
+    assert.equal(turns[23], important);
+    // Alone, it leads; and with no important notice, they take turns.
+    assert.equal(leadOfTurn([important], 3), important);
+    assert.equal(leadOfTurn([menu, event], 2), event);
+});
+

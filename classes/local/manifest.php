@@ -169,16 +169,10 @@ class manifest {
             $theme['dark_from'] = schedule::is_hour($config->darkfrom ?? '') ? $config->darkfrom : '19:00';
             $theme['dark_until'] = schedule::is_hour($config->darkuntil ?? '') ? $config->darkuntil : '07:30';
         }
-        // The school's colours, each with the text that reads on it (colours::vars).
-        $set = [];
-        foreach (array_keys(colours::SETTINGS) as $setting) {
-            $set[$setting] = $config->$setting ?? '';
-        }
-        // Until the centre chooses, the main colour is its Moodle's: never the same blue on every site.
-        $primary = strtolower((string) $set['colourprimary']);
-        if (!colours::valid($primary) || $primary === centre::DEFAULTS['colourprimary']) {
-            $set['colourprimary'] = colours::site_brand() ?? $set['colourprimary'];
-        }
+        // The skin the centre chose and, over it, its own colours (each with the text that reads on it, colours::vars). With none
+        // chosen, the first skin with the main colour of its Moodle: never the same on every site.
+        $theme['skin'] = skins::chosen($config) ?: skins::first();
+        $set = skins::theme_colours($config);
         $theme['vars'] = colours::vars($set, categories::colours());
         if (!$theme['vars']) {
             unset($theme['vars']);

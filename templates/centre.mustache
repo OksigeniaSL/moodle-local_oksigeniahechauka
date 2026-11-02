@@ -28,7 +28,7 @@
         "query": "", "searched": false, "results": [], "hasresults": false, "resultsjson": "[]", "place": null,
         "tiles": [{"setting": "colourprimary", "value": "#1f5f8b", "name": "Principal", "use": "la cinta", "hex": "#1F5F8B", "on": "letra blanca"}],
         "defaults": true, "categories": [], "hascategories": false, "canadd": true, "canimport": false, "palette": "[]", "max": 6,
-        "logos": [{"area": "logo", "dark": false, "label": "Para fondo claro", "url": "", "alt": "Logotipo"}], "dayend": "16:00",
+        "skins": [{"id": "petroleo", "skin": "petroleo", "name": "Petróleo", "family": "Gabarito", "checked": true, "fondo": "#f4f1ea", "texto": "#14211f", "primary": "#0e4f5c", "accent": "#ff8a3d", "skinprimary": "#0e4f5c", "skinaccent": "#ff8a3d"}], "skinletters": "", "logos": [{"area": "logo", "dark": false, "label": "Para fondo claro", "url": "", "alt": "Logotipo"}], "dayend": "16:00",
         "surprises": {"on": false, "every": [{"value": 20, "label": "Cada 20 minutos", "checked": true}], "who": [{"id": "gusanito", "name": "Gusanito", "help": "Avanza, se para y se va", "picture": "https://example.com/retrato.webp", "atlas": "https://example.com/atlas.json", "checked": true, "see": "Verlo"}], "seasonal": [{"id": "nieve", "name": "Nieve", "help": "Una nevada", "picture": "https://example.com/retrato.webp", "atlas": "https://example.com/atlas.json", "checked": false, "see": "Verlo", "from": {"days": [{"value": 15, "selected": true}], "months": [{"value": 12, "label": "diciembre", "selected": true}]}, "until": {"days": [{"value": 6, "selected": true}], "months": [{"value": 1, "label": "enero", "selected": true}]} }], "weather": [{"id": "lluvia", "name": "Lluvia", "help": "Cuando llueve", "picture": "https://example.com/retrato.webp", "atlas": "https://example.com/atlas.json", "checked": false, "see": "Verlo"}], "noplace": false},
         "frame": "https://example.com/local/oksigeniahechauka/preview.php?frame=1", "placename": "", "admin": "",
         "icons": {"search": "", "pin": "", "out": "", "check": "", "link": "", "x": "", "plus": ""}, "strings": "{}"
@@ -78,9 +78,15 @@
                     <p class="hkp-hint hkp-section-hint">{{#str}}centre_logo_help, local_oksigeniahechauka{{/str}}{{#sitelogo}} <b>{{#str}}centre_logo_site, local_oksigeniahechauka{{/str}}</b>{{/sitelogo}}</p>
                     <div class="hkp-logos">{{#logos}}<div class="hkp-logo"><span class="hkp-logo-art{{#dark}} is-dark{{/dark}}">{{#url}}<img src="{{url}}" alt="{{alt}}">{{/url}}</span><b>{{label}}</b><label class="btn btn-sm btn-outline-secondary">{{#str}}compose_change, local_oksigeniahechauka{{/str}}<input class="visually-hidden sr-only" type="file" name="{{area}}" accept=".svg,.png,.jpg,.jpeg,.webp" data-logo="{{area}}"></label></div>{{/logos}}</div>
                 </section>
+                <section class="hkp-fs" aria-labelledby="hkp-skin-h">
+                    <h2 id="hkp-skin-h" class="hkp-label hkp-section-label">{{#str}}centre_skin, local_oksigeniahechauka{{/str}}</h2>
+                    <p class="hkp-hint hkp-section-hint">{{#str}}centre_skin_help, local_oksigeniahechauka{{/str}}</p>
+                    <style>{{{skinletters}}}</style>
+                    <div class="hkp-skins" role="radiogroup" aria-labelledby="hkp-skin-h">{{#skins}}<label class="hkp-skin"><input class="visually-hidden sr-only" type="radio" name="skin" value="{{id}}" data-skin="{{skin}}" data-primary="{{primary}}" data-accent="{{accent}}" data-skin-primary="{{skinprimary}}" data-skin-accent="{{skinaccent}}"{{#checked}} checked{{/checked}}><span class="hkp-skin-art" style="background:{{fondo}};color:{{texto}};font-family:'{{family}}',sans-serif" aria-hidden="true"><b>Aa</b><i style="background:{{primary}}"><u style="background:{{accent}}"></u></i></span><span class="hkp-skin-name">{{name}}</span></label>{{/skins}}</div>
+                </section>
                 <section class="hkp-fs" aria-labelledby="hkp-col-h">
                     <h2 id="hkp-col-h" class="hkp-label hkp-section-label">{{#str}}centre_colours, local_oksigeniahechauka{{/str}}</h2>
-                    <p class="hkp-hint hkp-section-hint">{{#str}}centre_colours_help, local_oksigeniahechauka{{/str}}{{#sitebrand}} <b>{{#str}}centre_colours_site, local_oksigeniahechauka{{/str}}</b>{{/sitebrand}}{{#defaults}} <b>{{#str}}centre_colours_defaults, local_oksigeniahechauka{{/str}}</b>{{/defaults}}</p>
+                    <p class="hkp-hint hkp-section-hint">{{#str}}centre_colours_help, local_oksigeniahechauka{{/str}}{{#defaults}} <b>{{#str}}centre_colours_defaults, local_oksigeniahechauka{{/str}}</b>{{/defaults}}</p>
                     <div class="hkp-colours">{{#tiles}}<label class="hkp-colour"><input type="color" name="{{setting}}" value="{{value}}" data-colour="{{setting}}" aria-describedby="hkp-c-{{setting}}"><b>{{name}}</b><span id="hkp-c-{{setting}}">{{use}} · <span data-hex="{{setting}}">{{hex}}</span>, <span data-on="{{setting}}">{{on}}</span></span></label>{{/tiles}}</div>
                 </section>
                 <section class="hkp-fs" aria-labelledby="hkp-cat-h">

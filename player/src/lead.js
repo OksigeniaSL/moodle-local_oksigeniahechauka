@@ -7,10 +7,26 @@
 import {dayNumber, weekdayOf} from './rules.js';
 import {stage} from './today.js';
 
-const MARK = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M12 1a11 11 0 1 0 0 22 ' +
+const IMPORTANT_EVERY = 12;
+
+export const MARK = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M12 1a11 11 0 1 0 0 22 ' +
     '11 11 0 0 0 0-22zm-1.7 4.6h3.4l-.6 9h-2.2zM12 16.3a2 2 0 1 1 0 4 2 2 0 0 1 0-4z"/></svg>';
 
 const MAX_PAGES = 6;
+
+// The plate of a menu: a plate seen from above, with its fork and knife on it (Gaudí, 2 November 2026). One geometry for
+// every centre; its colours come from the sheet (lideres.css).
+const PLATE = '<svg viewBox="0 0 200 200" aria-hidden="true">' +
+    '<circle class="hk-plato-sombra" cx="100" cy="104" r="96"/>' +
+    '<circle class="hk-plato-borde" cx="100" cy="100" r="96"/>' +
+    '<circle class="hk-plato-ala" cx="100" cy="100" r="68"/>' +
+    '<path class="hk-plato-cubierto" d="M67 42c2 0 3 1 3 3v22h4V45c0-2 1-3 3-3s3 1 3 3v22h4V45c0-2 1-3 3-3s3 1 3 3v30c0 ' +
+    '8-4 13-10 15v62c0 3-2 6-5 6s-5-3-5-6V90c-6-2-10-7-10-15V45c0-2 1-3 3-3z"/>' +
+    '<path class="hk-plato-cubierto" d="M128 42c9 5 15 21 15 42 0 12-3 21-9 24v46c0 3-2 5-5 5s-5-2-5-5V46c0-3 2-5 4-4z"/>' +
+    '</svg>';
+
+// The rings of a calendar's sheet.
+const RINGS = '<i></i><i></i>';
 
 function el(tag, cls, text) {
     const n = document.createElement(tag);
@@ -48,6 +64,30 @@ const ACCENT_DARK = 'acento-oscuro, var(--hk-acento)';
  * @param {boolean} [noon] the menu first
  * @returns {object[]} {type: notice|menu|event|countdown, notice?, event?}
  */
+/**
+ * What leads in a turn.
+ *
+ * @param {object[]} all from leadsOf()
+ * @param {number} turn from 1
+ * @returns {object}
+ */
+export function leadOfTurn(all, turn) {
+    const rest = all.filter(function (lead) {
+        return !(lead.type === 'notice' && lead.notice.tone === 'important');
+    });
+    if (!rest.length || rest.length === all.length) {
+        return all[(turn - 1) % all.length];
+    }
+    // The important one is always in sight, in the third or the ticker: it leads only now and then, which is what makes it count.
+    if (turn % IMPORTANT_EVERY === 0) {
+        const notices = all.filter(function (lead) {
+            return rest.indexOf(lead) === -1;
+        });
+        return notices[(turn / IMPORTANT_EVERY - 1) % notices.length];
+    }
+    return rest[(turn - 1) % rest.length];
+}
+
 export function leadsOf(today, noon) {
     const out = [];
     const notices = today.notices || [];
@@ -114,6 +154,22 @@ export function menuLabel(menu) {
 }
 
 /**
+ * The kind of a menu, when it says something: «Vegetariano» from «C (Vegetariano)»; nothing from «Menú D» or «2».
+ *
+ * @param {string} name
+ * @returns {string}
+ */
+export function menuKind(name) {
+    const n = String(name || '').replace(/^men[uú]\s*/i, '').trim();
+    const inside = /\(([^)]+)\)/.exec(n);
+    const kind = inside ? inside[1].trim() : n;
+    if (/^[\w.º°-]{1,2}$/.test(kind) || /^\d+$/.test(kind)) {
+        return '';
+    }
+    return kind === kind.toUpperCase() ? kind.toLowerCase() : kind.charAt(0).toLowerCase() + kind.slice(1);
+}
+
+/**
  * What the week's strip says: what comes next and matters, «Jueves 5: Día del deporte». A big event of the next days
  * (the countdown's) before the nearest one. Empty when nothing comes.
  *
@@ -147,15 +203,19 @@ export function buildLead(p, today, l) {
     s.setAttribute('data-tipo', p.type === 'notice' ? 'aviso' : (holiday ? 'festivo' : (p.type === 'event' ? 'evento' :
         (p.type === 'countdown' ? 'cuenta' : 'menu'))));
     s.setAttribute('data-ajuste', '0');
+    const b = el('div', 'hk-lider-cuerpo');
     if (p.type === 'menu') {
         const m = today.menu;
         colour(s, 'marca-2', 'marca-2-oscuro');
-        s.appendChild(el('p', 'hk-lider-etiqueta', menuLabel(m)));
+        stage(s, 2);
+        const table = el('div', 'hk-lider-pieza hk-mesa');
+        table.innerHTML = PLATE;
+        b.appendChild(el('p', 'hk-lider-etiqueta', m.label || ''));
         if (m.closed) {
-            s.appendChild(el('h2', 'hk-lider-titular', m.closed));
+            b.appendChild(el('h2', 'hk-lider-titular', m.closed));
         } else {
             const parts = menuParts(m);
-            s.appendChild(el('h2', 'hk-lider-titular', parts.main));
+            b.appendChild(el('h2', 'hk-lider-titular', parts.main));
             if (parts.others.length) {
                 const dishes = el('div', 'hk-lider-platos');
                 parts.others.forEach(function (o) {
@@ -164,56 +224,98 @@ export function buildLead(p, today, l) {
                     x.appendChild(document.createTextNode(o.text));
                     dishes.appendChild(x);
                 });
-                s.appendChild(dishes);
+                b.appendChild(dishes);
+            }
+            if (m.also && m.also.length) {
+                const also = el('p', 'hk-lider-tambien');
+                also.appendChild(el('small', '', l.also || ''));
+                also.appendChild(document.createTextNode(m.also.join(' · ')));
+                b.appendChild(also);
             }
         }
+        s.appendChild(b);
+        s.appendChild(table);
     } else if (p.type === 'notice') {
         const tag = el('p', 'hk-lider-etiqueta');
         if (p.notice.tone === 'important') {
             s.classList.add('hk-lider-importante');
-            tag.innerHTML = MARK;
-            tag.appendChild(document.createTextNode(l.important));
+            const sign = el('div', 'hk-lider-pieza hk-senal');
+            sign.innerHTML = MARK;
+            tag.textContent = l.important;
+            b.appendChild(tag);
+            b.appendChild(el('h2', 'hk-lider-titular', p.notice.title));
+            if (p.notice.body) {
+                b.appendChild(el('p', 'hk-lider-entrada', p.notice.body));
+            }
+            s.appendChild(b);
+            s.appendChild(sign);
         } else {
-            colour(s, 'acento-texto', ACCENT_DARK);
             tag.textContent = l.notice;
+            b.appendChild(tag);
+            b.appendChild(el('h2', 'hk-lider-titular', p.notice.title));
+            if (p.notice.body) {
+                b.appendChild(el('p', 'hk-lider-entrada', p.notice.body));
+            }
+            s.appendChild(b);
         }
-        s.appendChild(tag);
-        s.appendChild(el('h2', 'hk-lider-titular', p.notice.title));
-        if (p.notice.body) {
-            s.appendChild(el('p', 'hk-lider-entrada', p.notice.body));
-        }
+    } else if (holiday) {
+        // The sheet of a tear-off calendar: today's date, in the words of the screen.
+        const e = p.event;
+        const d = today.dateWords || {};
+        const sheet = el('div', 'hk-lider-pieza hk-hoja');
+        const rings = el('div', 'hk-hoja-anillas');
+        rings.innerHTML = RINGS;
+        sheet.appendChild(rings);
+        sheet.appendChild(el('p', 'hk-hoja-mes', d.month || ''));
+        sheet.appendChild(el('p', 'hk-hoja-dia', d.day ? String(d.day) : ''));
+        sheet.appendChild(el('p', 'hk-hoja-semana', d.weekday || ''));
+        s.appendChild(sheet);
+        b.appendChild(el('p', 'hk-lider-etiqueta', e.group || ''));
+        b.appendChild(el('h2', 'hk-lider-titular', e.title));
+        s.appendChild(b);
     } else if (p.type === 'event') {
         const e = p.event;
         const n = e.color || 0;
-        if (n) {
-            colour(s, 'marca-' + n, 'marca-' + n + '-oscuro');
-        } else {
-            colour(s, 'marca-3', 'marca-3-oscuro');
+        stage(s, n);
+        if (!n) {
+            s.setAttribute('data-sin-categoria', '');
         }
-        s.appendChild(el('p', 'hk-lider-etiqueta', today.eventsLabel || l.events));
+        const stub = el('div', 'hk-lider-pieza hk-talon');
+        stub.appendChild(el('p', 'hk-talon-cuando', today.eventsLabel || l.events));
         if (e.time && e.time !== '·') {
-            const hour = el('p', 'hk-lider-hora', e.time);
-            stage(hour, n);
-            s.appendChild(hour);
+            // The colon apart, like the clock's: some letters give it the width of a figure in tabular numbers.
+            const hour = el('p', 'hk-talon-hora');
+            const bits = e.time.split(':');
+            hour.appendChild(document.createTextNode(bits[0]));
+            hour.appendChild(el('span', '', ':'));
+            hour.appendChild(document.createTextNode(bits[1] || ''));
+            stub.appendChild(hour);
         }
-        s.appendChild(el('h2', 'hk-lider-titular', e.title));
+        s.appendChild(stub);
+        b.appendChild(el('h2', 'hk-lider-titular', e.title));
         if (e.group) {
-            s.appendChild(el('p', 'hk-lider-entrada', e.group));
+            b.appendChild(el('p', 'hk-lider-entrada', e.group));
         }
+        s.appendChild(b);
     } else {
         const c = today.countdown;
         const n = c.color || 0;
-        colour(s, n ? 'marca-' + n : 'primario', n ? 'marca-' + n + '-oscuro' : 'texto');
-        s.appendChild(el('p', 'hk-lider-etiqueta', l.countdown));
-        const count = el('div', 'hk-lider-cuenta');
-        count.appendChild(el('b', 'hk-lider-cifra', String(c.days)));
-        count.appendChild(el('small', '', l.daysfor));
-        s.appendChild(count);
-        s.appendChild(el('h2', 'hk-lider-titular', c.title));
+        stage(s, n);
+        const board = el('div', 'hk-lider-pieza hk-marcador');
+        board.appendChild(el('p', 'hk-marcador-faltan', l.countdown));
+        const flaps = el('div', 'hk-paletas');
+        String(c.days).split('').forEach(function (digit) {
+            flaps.appendChild(el('b', 'hk-paleta', digit));
+        });
+        board.appendChild(flaps);
+        s.appendChild(board);
+        b.appendChild(el('p', 'hk-lider-etiqueta', l.daysfor));
+        b.appendChild(el('h2', 'hk-lider-titular', c.title));
         const foot = [c.day, c.group].filter(Boolean).join(' · ');
         if (foot) {
-            s.appendChild(el('p', 'hk-lider-entrada', foot));
+            b.appendChild(el('p', 'hk-lider-entrada', foot));
         }
+        s.appendChild(b);
     }
     s.hkLead = p;
     return s;
@@ -276,7 +378,7 @@ export function buildRest(today, lead, l, turn) {
         const m = today.menu;
         const main = m.closed ? m.closed : menuParts(m).main;
         if (main) {
-            items.push({group: menuLabel(m), colour: ['marca-2', 'marca-2-oscuro'], make: function () {
+            items.push({group: m.label || '', colour: ['marca-2', 'marca-2-oscuro'], make: function () {
                 return line(null, main, null);
             }});
         }

@@ -88,16 +88,12 @@ class centre {
         $uses = ['colourprimary' => ['centre_primary', 'centre_primary_use'], 'colouraccent' => ['centre_accent',
             'centre_accent_use']];
         $chosen = false;
-        $sitebrand = false;
+        $auto = skins::colours($config);
         foreach (self::DEFAULTS as $setting => $default) {
-            $mine = colours::valid($config->$setting ?? '');
+            // The centre's own, or what the screens take without them: the skin's or, with none chosen, its Moodle's.
+            $mine = skins::own($config, $setting);
             $chosen = $chosen || $mine;
-            $value = $mine ? strtolower($config->$setting) : $default;
-            // The same that the screens take: the main one, from the site's theme, until the centre chooses another.
-            if ($setting === 'colourprimary' && $value === $default && colours::site_brand()) {
-                $value = colours::site_brand();
-                $sitebrand = true;
-            }
+            $value = $mine ?? $auto[$setting];
             $tiles[] = [
                 'setting' => $setting,
                 'value' => $value,
@@ -174,8 +170,9 @@ class centre {
             'resultsjson' => json_encode($results),
             'place' => $place,
             'tiles' => $tiles,
-            'defaults' => !$chosen && !$sitebrand,
-            'sitebrand' => $sitebrand,
+            'defaults' => !$chosen,
+            'skins' => skins::gallery($config),
+            'skinletters' => skins::gallery_letters(),
             'sitelogo' => !files::first(files::LOGO, 0) && files::site_logo(),
             'categories' => $cats,
             'hascategories' => (bool) $cats,
@@ -230,10 +227,16 @@ class centre {
     public static function save(): void {
         global $USER;
         $c = self::C;
+        // The skin first: a colour is the centre's own only if it is not what the skin already gives.
+        $skin = optional_param('skin', null, PARAM_ALPHANUMEXT);
+        if ($skin !== null) {
+            set_config('skin', skins::get($skin) ? $skin : '', $c);
+        }
+        $auto = skins::colours(get_config($c));
         foreach (array_keys(self::DEFAULTS) as $setting) {
-            $value = optional_param($setting, '', PARAM_RAW_TRIMMED);
+            $value = strtolower(optional_param($setting, '', PARAM_RAW_TRIMMED));
             if (colours::valid($value)) {
-                set_config($setting, strtolower($value), $c);
+                set_config($setting, $value === $auto[$setting] ? '' : $value, $c);
             }
         }
         // When the day ends: from then «Today» shows tomorrow.

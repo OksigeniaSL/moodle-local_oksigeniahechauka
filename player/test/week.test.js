@@ -1,5 +1,6 @@
 // «La semana» without a page: which days, holidays, bands and their lanes, stages.
 
+import {menuKind} from '../src/lead.js';
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {afterDayEnd, categoryOf, colourOf, eventsOn, upcoming} from '../src/agenda.js';
@@ -136,4 +137,12 @@ test('at the end of the day «Today» shows tomorrow, and the coming days start 
         ['09:00 Acampada', '20:00 Fiesta']);
     assert.deepEqual(eventsOn(camp, '2026-11-03', 2, L.categories).map((e) => e.time + ' ' + e.title), ['· Acampada']);
     assert.deepEqual(eventsOn(camp, '2026-11-03', 4, L.categories), []);
+});
+
+test('the kind of a menu, only when it says something', () => {
+    assert.equal(menuKind('Menú D'), '');
+    assert.equal(menuKind('2'), '');
+    assert.equal(menuKind('C (Vegetariano)'), 'vegetariano');
+    assert.equal(menuKind('Menú C (VEGETARIANO)'), 'vegetariano');
+    assert.equal(menuKind('Sin gluten'), 'sin gluten');
 });

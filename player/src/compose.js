@@ -4,6 +4,8 @@
 // foto-hoy        a landscape picture or video, and «Today» beside it (under it on a vertical screen)
 // vertical-hoy    a portrait one in a slot of its shape, and a wider «Today»
 // dos-verticales  two portrait pictures together, and «Today»
+// tres-verticales three portrait pictures in a row: with «Today» beside them when they are tall (9:16), over the whole
+//                 body when they are a phone's 3:4 or 2:3, so they lose nothing
 // foto-sola       the picture in the whole body
 // solo-hoy        «Today» alone, the menu big, the weather for today and tomorrow
 // foto-completa   the picture over the whole screen, with its caption
@@ -61,7 +63,6 @@ export function secondsOf(item) {
 }
 
 // How much the week has to have to come out, and to come out often.
-const WEEK_LEAST = 3;
 const WEEK_FULL = 4;
 
 export class Composer {
@@ -115,10 +116,8 @@ export class Composer {
         // The turn of the coming days. From 5 and 8 m, the agenda: «La semana» reads only from close, and there it keeps
         // Mondays and Fridays, when the week is what matters; the other turns are the agenda's.
         const flagDay = !!(o.week && (o.week.weekday === 1 || o.week.weekday === 5));
-        const close = !o.distance || o.distance === 3;
-        // With little in it, the week is a grid of empty days: what it has goes in «Today» and the coming days.
-        const useWeek = !!(o.week && !o.noToday && close && o.week.things >= WEEK_LEAST && (!o.agenda || flagDay));
-        const useAgenda = !!(o.agenda && !o.noToday && !useWeek);
+        // The coming days are always the agenda (Enrique, 2 November 2026: «prefiero el formato agenda»): there is no week table.
+        const useAgenda = !!(o.agenda && !o.noToday);
         const albumOf = (min) => {
             const list = (o.albums || []).filter((a) => a.count >= min);
             if (!list.length) {
@@ -131,10 +130,10 @@ export class Composer {
         // moment of «Today» or the full screen.
         const weekDue = (every, alternate) => {
             // Without pictures every slide is the moment of «Today»: then the two take turns.
-            if ((useWeek || useAgenda) && this.sinceWeek >= every && (alternate || this.last !== 'solo-hoy') &&
+            if (useAgenda && this.sinceWeek >= every && (alternate || this.last !== 'solo-hoy') &&
                     this.last !== 'foto-completa') {
                 this.sinceWeek = 0;
-                return useWeek ? pick('semana', [], o.week.things >= 8 ? 18 : 14) : pick('agenda', [], 70);
+                return pick('agenda', [], 70);
             }
             return null;
         };
@@ -225,9 +224,23 @@ export class Composer {
         if (!horizontal && a < 0.63) {
             return pick('foto-sola', [it], secondsOf(it));
         }
-        // Two portrait pictures in a row go together; a video never (one decoder).
-        if (isPortrait(it) && it.type === 'image' && next !== it && next.type === 'image' && isPortrait(next)) {
-            return pick('dos-verticales', [it, next], 12);
+        // Portrait pictures in a row go together, up to three: how many there are says how they load (one beside what leads,
+        // two as a pair, three as a row). A video never (one decoder).
+        if (isPortrait(it) && it.type === 'image') {
+            const run = [it];
+            for (let k = 1; k < 3 && k < queue.length; k++) {
+                const more = queue[(i + k) % queue.length];
+                if (more.type !== 'image' || !isPortrait(more)) {
+                    break;
+                }
+                run.push(more);
+            }
+            if (run.length === 3) {
+                return pick('tres-verticales', run, 14);
+            }
+            if (run.length === 2) {
+                return pick('dos-verticales', run, 12);
+            }
         }
         if (a < 1.2) {
             return pick('vertical-hoy', [it], secondsOf(it));
@@ -264,7 +277,7 @@ export function draftChoice(item, focus, main, horizontal, use) {
         return focus === 'full' ? {comp: 'foto-completa', items: [item], seconds: 0} : at(item);
     }
     if (focus === 'week') {
-        return {comp: 'semana', items: [], seconds: 0};
+        return {comp: 'agenda', items: [], seconds: 0};
     }
     if (focus === 'today' || !main.length) {
         return {comp: 'solo-hoy', items: [], seconds: 0};

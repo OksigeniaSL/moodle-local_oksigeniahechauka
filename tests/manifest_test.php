@@ -298,4 +298,54 @@ final class manifest_test extends \advanced_testcase {
         $DB->delete_records('local_oksigeniahechauka_item', ['id' => $item]);
         $this->assertArrayNotHasKey('sample', manifest::build($screen, $now));
     }
+
+    /**
+     * The skin: the first one if nothing is chosen, with the main colour of its Moodle; the chosen one with nothing over it; and
+     * the centre's own colours over any of them. Saving what the skin already gives does not make it the centre's own.
+     */
+    public function test_skins(): void {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        $screen = $this->screen('Hall');
+        $c = 'local_oksigeniahechauka';
+        set_config('brandcolor', '', 'theme_boost');
+        set_config('brandcolor', '', 'theme_' . $GLOBALS['CFG']->theme);
+        $theme = manifest::build($screen, time())['theme'];
+        $this->assertSame('petroleo', $theme['skin']);
+        $this->assertArrayNotHasKey('--hk-primario', $theme['vars'] ?? []);
+
+        set_config('brandcolor', '#123456', 'theme_boost');
+        $theme = manifest::build($screen, time())['theme'];
+        $this->assertSame('#123456', $theme['vars']['--hk-primario']);
+        $this->assertSame('#ff8a3d', $theme['vars']['--hk-acento']);
+        // A warm main colour does not get a warm second one.
+        $this->assertSame('#ffc933', \local_oksigeniahechauka\local\colours::accent_for('#7a1f1f'));
+
+        // Choosing a skin, with the colours it gives: nothing over it, not even its Moodle's.
+        $_POST = ['skin' => 'botella', 'colourprimary' => '#123f33', 'colouraccent' => '#ffb48a'];
+        \local_oksigeniahechauka\local\centre::save();
+        $theme = manifest::build($screen, time())['theme'];
+        $this->assertSame('botella', $theme['skin']);
+        $this->assertArrayNotHasKey('--hk-primario', $theme['vars'] ?? []);
+
+        // Its own colour goes over it.
+        $_POST = ['skin' => 'botella', 'colourprimary' => '#654321', 'colouraccent' => '#ffb48a'];
+        \local_oksigeniahechauka\local\centre::save();
+        $theme = manifest::build($screen, time())['theme'];
+        $this->assertSame('#654321', $theme['vars']['--hk-primario']);
+        $this->assertArrayNotHasKey('--hk-acento', $theme['vars']);
+
+        // What does not exist is no skin; and the colours saved by the first versions are nobody's choice.
+        $_POST = ['skin' => 'nothing'];
+        \local_oksigeniahechauka\local\centre::save();
+        $this->assertSame('', (string) get_config($c, 'skin'));
+        set_config('colourprimary', '#1f5f8b', $c);
+        $this->assertSame('#123456', manifest::build($screen, time())['theme']['vars']['--hk-primario']);
+
+        // The gallery: the card of its Moodle, and the three.
+        $cards = \local_oksigeniahechauka\local\skins::gallery(get_config($c));
+        $this->assertCount(4, $cards);
+        $this->assertSame('', $cards[0]['id']);
+        $this->assertTrue($cards[0]['checked']);
+    }
 }

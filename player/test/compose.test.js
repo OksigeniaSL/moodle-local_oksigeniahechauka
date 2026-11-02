@@ -173,53 +173,67 @@ test('no more than two portrait pictures with «Today» running, while «Today»
     }
 });
 
-test('«La semana» with little in it comes less often, and with almost nothing it does not come', () => {
-    const run = (things) => {
+test('the coming days are the agenda, with no week table, and it comes less often with little in the week', () => {
+    const run = (things, agenda) => {
         const c = new Composer();
         c.sinceFull = -100;
         const out = [];
         for (let i = 1; i <= 24; i++) {
-            out.push(c.next([wide('a'), wide('b')], 3, true, {week: {things, weekday: 1}}).comp);
+            out.push(c.next([wide('a'), wide('b')], 3, true, {week: {things, weekday: 1}, agenda}).comp);
         }
-        return out.filter((comp) => comp === 'semana').length;
+        return out;
     };
-    assert.equal(run(1), 0);
-    assert.equal(run(2), 0);
-    assert.ok(run(3) > 0 && run(3) < run(4));
+    const count = (list) => list.filter((comp) => comp === 'agenda').length;
+    assert.ok(count(run(1, true)) > 0 && count(run(1, true)) < count(run(9, true)));
+    assert.equal(count(run(9, false)), 0);
+    assert.ok(!run(9, true).includes('semana'));
 });
 
-test('«La semana» every 8 slides, every 5 on Mondays and Fridays, only with something beyond today', () => {
-    const run = (weekday, things, slides) => {
+test('the agenda every 8 slides, every 5 on Mondays and Fridays, only with something to come', () => {
+    const run = (weekday, slides, agenda) => {
         const c = new Composer();
         c.sinceFull = -100;
         const out = [];
         for (let i = 1; i <= slides; i++) {
-            out.push(c.next([wide('a'), wide('b')], 3, true, {week: {things, weekday}}).comp);
+            out.push(c.next([wide('a'), wide('b')], 3, true, {week: {things: 9, weekday}, agenda}).comp);
         }
         return out;
     };
-    const wed = run(3, 4, 16);
-    assert.equal(wed.indexOf('semana') + 1, 8);
-    const mon = run(1, 4, 16);
-    assert.equal(mon.indexOf('semana') + 1, 5);
-    assert.equal(run(3, 0, 20).indexOf('semana'), -1);
+    const wed = run(3, 16, true);
+    assert.equal(wed.indexOf('agenda') + 1, 8);
+    const mon = run(1, 16, true);
+    assert.equal(mon.indexOf('agenda') + 1, 5);
+    assert.equal(run(3, 20, false).indexOf('agenda'), -1);
     // Never right after the moment of «Today».
     for (const list of [wed, mon]) {
         for (let i = 1; i < list.length; i++) {
-            if (list[i] === 'semana') {
+            if (list[i] === 'agenda') {
                 assert.notEqual(list[i - 1], 'solo-hoy');
             }
         }
     }
 });
 
-test('without pictures, «Today» and the week take turns', () => {
+test('portrait pictures in a row go together, up to three; a video never', () => {
+    const portrait = (id, type) => ({id, type: type || 'image', media: {width: 576, height: 1024}});
+    const one = new Composer().next([portrait('a'), wide('w')], 3, true, {});
+    assert.equal(one.comp, 'vertical-hoy');
+    const two = new Composer().next([portrait('a'), portrait('b')], 3, true, {});
+    assert.equal(two.comp, 'dos-verticales');
+    const three = new Composer().next([portrait('a'), portrait('b'), portrait('c'), portrait('d')], 3, true, {});
+    assert.equal(three.comp, 'tres-verticales');
+    assert.deepEqual(three.items.map((x) => x.id), ['a', 'b', 'c']);
+    const video = new Composer().next([portrait('a'), portrait('b'), portrait('v', 'video')], 3, true, {});
+    assert.equal(video.comp, 'dos-verticales');
+});
+
+test('without pictures, «Today» and the agenda take turns', () => {
     const c = new Composer();
     const out = [];
     for (let i = 0; i < 6; i++) {
-        out.push(c.next([], 3, true, {week: {things: 5, weekday: 3}}).comp);
+        out.push(c.next([], 3, true, {week: {things: 5, weekday: 3}, agenda: true}).comp);
     }
-    assert.deepEqual(out, ['solo-hoy', 'solo-hoy', 'semana', 'solo-hoy', 'solo-hoy', 'semana']);
+    assert.deepEqual(out, ['solo-hoy', 'solo-hoy', 'agenda', 'solo-hoy', 'solo-hoy', 'agenda']);
 });
 
 
@@ -235,5 +249,5 @@ test('a draft in the preview stands where it would go', () => {
     assert.deepEqual(draftChoice(notice, 'main', [photo], true).items, [photo]);
     assert.equal(draftChoice(notice, 'main', [], true).comp, 'solo-hoy');
     assert.equal(draftChoice(notice, 'today', [photo], true).comp, 'solo-hoy');
-    assert.equal(draftChoice({id: 'draft', type: 'event'}, 'week', [photo], true).comp, 'semana');
+    assert.equal(draftChoice({id: 'draft', type: 'event'}, 'week', [photo], true).comp, 'agenda');
 });

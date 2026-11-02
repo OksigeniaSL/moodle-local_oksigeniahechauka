@@ -178,6 +178,8 @@ changed, or the manifest with its `ETag` header:
   degrees Celsius, `rain` the chance of rain in percent only where the source gives it, `text` the sky in words, and
   the `credit` the source asks to show. `now` is the current hour; `today` and `tomorrow`, days of the site's calendar. `days`: the next three days, each with its `date` (for the weather in a third).
 - `sample`: true when the manifest carries example data; the screen says so in a corner.
+- `theme.skin`: the skin of the screen (`player/pieles.css`, `pieles.json`), which sets its colours and its letter; `theme.vars` goes
+  over it. Without it, the first one.
 - `centre`: `{"name": "…"}`, what stands in for the logo while there is none. `screen.name` is for the panel, and the screen
   does not show it.
 - `power`: when the screen should be on. Outside these hours the player shows black and a device agent may turn the

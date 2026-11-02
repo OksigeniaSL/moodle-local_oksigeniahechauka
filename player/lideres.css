@@ -1,0 +1,670 @@
+/* Oksigenia Hechauka 0.8: each thing, its object (Gaudí, 2 November 2026). Goes after jerarquia.css.
+ *
+ * From a distance one reads the shape and the colour first, the label afterwards. All the leads were the same white card with
+ * a stripe, half empty, and from the corridor a menu could not be told from a notice. Now each kind is a real object anybody
+ * recognises without reading, anywhere in the world:
+ *
+ *   menu        a plate with its fork and knife, on the colour of the menu        data-tipo="menu"
+ *   notice      a speech bubble in the primary colour                            data-tipo="aviso"
+ *   important   a sign: a block of the accent with its mark                      data-tipo="aviso" .hk-lider-importante
+ *   event       a ticket: a stub with its hour, a tear line, its notches         data-tipo="evento"
+ *   countdown   a split-flap board, one flap a digit                             data-tipo="cuenta"
+ *   holiday     the sheet of a tear-off calendar, on the hatching of «La semana» data-tipo="festivo"
+ *
+ * The empty part of a block of colour reads as a poster; the empty part of a white card reads as something missing.
+ *
+ * Chromium 56: flexbox only, no gap, no clamp, no aspect-ratio, no inset; the notches are circles of the page's colour.
+ */
+
+/* --- What they all share ---------------------------------------------------------------------------------------- */
+.hk-lider {
+    flex-direction: row;
+    justify-content: flex-start;
+    padding: 0;
+    box-shadow: none;
+}
+.hk-lider::before {
+    display: none;
+}
+.hk .hk-lider > .hk-lider-cuerpo,
+.hk .hk-lider > .hk-lider-pieza {
+    position: relative;
+}
+.hk .hk-lider > .hk-lider-cuerpo {
+    display: flex;
+    flex: 1 1 0px;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 0;
+    min-height: 0;
+    padding: 4.4rem 5.6rem 4.8rem;
+}
+.hk-lider-cuerpo > * {
+    flex: none;
+}
+.hk .hk-lider-etiqueta {
+    margin-bottom: 2rem;
+    color: inherit;
+    letter-spacing: .06em;
+}
+[data-tema="oscuro"] .hk-lider-etiqueta {
+    color: inherit;
+}
+.hk .hk-lider-entrada {
+    color: inherit;
+}
+.hk .hk-lider .hk-lider-pieza {
+    --hk-pieza: 38rem;
+    flex: none;
+    width: var(--hk-pieza);
+}
+.hk[data-distancia="5"] .hk-lider .hk-lider-pieza {
+    --hk-pieza: 34rem;
+}
+.hk[data-distancia="8"] .hk-lider .hk-lider-pieza {
+    --hk-pieza: 58rem;
+}
+
+/* --- A notice: a speech bubble ------------------------------------------------------------------------------------ */
+.hk-lider[data-tipo="aviso"] {
+    overflow: visible;
+    border-radius: 4.4rem;
+    background: var(--hk-primario);
+    color: var(--hk-sobre-primario);
+}
+.hk-horizontal .hk-cuerpo > .hk-lider[data-tipo="aviso"],
+.hk-vertical .hk-cuerpo > .hk-lider[data-tipo="aviso"] {
+    margin-bottom: 7.6rem;                /* room for its tail, inside the body */
+}
+.hk-lider[data-tipo="aviso"]::after {    /* the tail */
+    content: "";
+    position: absolute;
+    left: 8rem;
+    bottom: -7.4rem;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 7.6rem 11rem 0 0;
+    border-color: var(--hk-primario) transparent transparent transparent;
+}
+
+/* --- The important one: a sign, not a bubble ------------------------------------------------------------------- */
+.hk .hk-lider.hk-lider-importante {
+    margin-bottom: 0;
+    border-radius: 2.8rem;
+    background: var(--hk-acento);
+    color: var(--hk-sobre-acento);
+}
+.hk-lider.hk-lider-importante::after {
+    display: none;
+}
+.hk .hk-senal {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-right: 5.6rem;
+}
+.hk .hk-senal svg {
+    display: block;
+    width: 100%;
+    fill: var(--hk-sobre-acento);
+}
+
+/* --- An event: a ticket ------------------------------------------------------------------------------------------ */
+.hk-lider[data-tipo="evento"] {
+    background: var(--hk-superficie);
+    color: var(--hk-texto);
+}
+.hk .hk-talon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2.4rem 3rem;
+    color: var(--hk-sobre-ev, #fff);
+    text-align: center;
+}
+.hk .hk-lider .hk-talon {
+    width: calc(var(--hk-t-cifra) * 3.7);  /* its hour always fits */
+}
+.hk-lider[data-tipo="evento"][data-sin-categoria] .hk-talon {
+    color: var(--hk-sobre-marca-3);
+}
+.hk .hk-talon-cuando {
+    margin-bottom: 1.2rem;
+    font-size: var(--hk-t-min);
+    font-weight: 800;
+    letter-spacing: .06em;
+    line-height: 1;
+    text-transform: uppercase;
+}
+.hk .hk-talon-cuando:last-child {        /* an event of all day: no hour, its word big */
+    margin-bottom: 0;
+    font-size: var(--hk-t-entrada);
+    letter-spacing: 0;
+    line-height: 1.08;
+    text-transform: none;
+}
+.hk .hk-talon-hora {
+    font-family: var(--hk-letra-titulos);
+    font-size: calc(var(--hk-t-cifra) * 1.16);
+    font-weight: 800;
+    letter-spacing: -.02em;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+}
+/* the tear line, and a notch at each end of it (the page's colour, drawn in each half's background: nothing hangs out of the
+   ticket, and the fit measures its words) */
+.hk .hk-lider[data-tipo="evento"] .hk-lider-cuerpo {
+    padding-left: 6.4rem;
+    background:
+        radial-gradient(circle at 0 0, var(--hk-fondo) 2.9rem, transparent 3rem),
+        radial-gradient(circle at 0 100%, var(--hk-fondo) 2.9rem, transparent 3rem);
+}
+.hk .hk-lider[data-tipo="evento"] .hk-talon {
+    background-color: var(--hk-ev, var(--hk-primario));
+    background-image:
+        radial-gradient(circle at 100% 0, var(--hk-fondo) 2.9rem, transparent 3rem),
+        radial-gradient(circle at 100% 100%, var(--hk-fondo) 2.9rem, transparent 3rem);
+}
+.hk .hk-lider[data-tipo="evento"][data-sin-categoria] .hk-talon {
+    background-color: var(--hk-marca-3);   /* not the bubble's colour: from afar they must not be the same stain */
+}
+.hk-lider[data-tipo="evento"] .hk-talon::after {
+    content: "";
+    position: absolute;
+    top: 4.6rem;
+    bottom: 4.6rem;
+    right: 0;
+    width: .8rem;
+    background: repeating-linear-gradient(to bottom, var(--hk-fondo) 0, var(--hk-fondo) 1.4rem, transparent 1.4rem, transparent 3.2rem);
+}
+
+/* --- A countdown: a split-flap board --------------------------------------------------------------------------- */
+.hk-lider[data-tipo="cuenta"] {
+    background: var(--hk-superficie);
+    color: var(--hk-texto);
+}
+.hk .hk-lider .hk-marcador {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: auto;
+    padding: 3.6rem 0 3.6rem 4.4rem;
+}
+.hk .hk-marcador-faltan {
+    margin-bottom: 1.6rem;
+    font-size: var(--hk-t-min);
+    font-weight: 800;
+    letter-spacing: .06em;
+    line-height: 1;
+    text-transform: uppercase;
+}
+.hk-paletas {
+    display: flex;
+    flex: 1 1 auto;
+    min-height: 0;
+}
+.hk .hk-paleta {
+    --hk-paleta-claro: #2c333c;
+    --hk-paleta-oscuro: #1b2027;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: calc(var(--hk-t-titular) * 2.75);
+    border-radius: 2.4rem;
+    background-color: var(--hk-paleta-oscuro);
+    background-image: linear-gradient(to bottom, var(--hk-paleta-claro) 50%, var(--hk-paleta-oscuro) 50%);
+    color: #fff;
+    font-family: var(--hk-letra-titulos);
+    font-size: calc(var(--hk-t-titular) * 3.2);
+    font-weight: 800;
+    letter-spacing: -.02em;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+}
+.hk .hk-paleta + .hk-paleta {
+    margin-left: 1.2rem;
+}
+.hk .hk-paleta::before {                 /* the seam of the flap, over the digit */
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: .7rem;
+    margin-top: -.35rem;
+    background: var(--hk-superficie);
+}
+.hk .hk-paleta::after {                  /* its two hinges */
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 1.4rem;
+    right: 1.4rem;
+    height: 2.8rem;
+    margin-top: -1.4rem;
+    border-left: 1.2rem solid var(--hk-paleta-claro);
+    border-right: 1.2rem solid var(--hk-paleta-claro);
+}
+/* from 8 m a whole digit has less height than its size would ask for */
+.hk[data-distancia="8"] .hk-paleta:only-child {
+    width: calc(var(--hk-t-titular) * 2.2);
+    font-size: calc(var(--hk-t-titular) * 2.5);
+}
+.hk[data-distancia="8"] .hk-paleta:first-child:not(:last-child),
+.hk[data-distancia="8"] .hk-paleta:last-child:not(:first-child) {
+    width: calc(var(--hk-t-titular) * 1.8);
+    font-size: calc(var(--hk-t-titular) * 2.1);
+}
+[data-tema="oscuro"] .hk-paleta {
+    --hk-paleta-claro: #3a4450;
+    --hk-paleta-oscuro: #2a323c;
+}
+/* two digits: narrower, so the words keep their room */
+.hk .hk-paleta:first-child:not(:last-child),
+.hk .hk-paleta:last-child:not(:first-child) {
+    width: calc(var(--hk-t-titular) * 2.2);
+    font-size: calc(var(--hk-t-titular) * 2.7);
+}
+.hk-lider[data-tipo="cuenta"] .hk-lider-titular {
+    font-size: var(--hk-t-titular);
+}
+.hk-lider[data-tipo="cuenta"] .hk-lider-etiqueta {
+    color: var(--hk-texto-suave);
+    font-size: var(--hk-t-entrada);
+    font-weight: 700;
+    letter-spacing: 0;
+    line-height: 1.1;
+    text-transform: none;
+}
+
+/* --- A holiday: the sheet of a tear-off calendar -------------------------------------------------------------- */
+.hk-lider[data-tipo="festivo"] {
+    overflow: hidden;
+    background: repeating-linear-gradient(135deg, var(--hk-superficie) 0, var(--hk-superficie) 2.6rem, var(--hk-linea) 2.6rem, var(--hk-linea) 4.4rem);
+    color: var(--hk-texto);
+}
+.hk .hk-hoja {
+    display: flex;
+    flex-direction: column;
+    align-self: center;
+    align-items: center;
+    margin: 5rem 0 3rem 5rem;
+    padding-bottom: 2.8rem;
+    border-radius: 1.6rem;
+    background: #fffdf8;
+    box-shadow: 0 .6rem 2rem rgba(0, 0, 0, .22);
+    -webkit-transform: rotate(-2.5deg);
+    transform: rotate(-2.5deg);
+}
+.hk .hk-hoja-anillas {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    height: 0;
+    padding: 0 22%;
+}
+.hk .hk-hoja-anillas i {
+    display: block;
+    width: 2.6rem;
+    height: 7.4rem;
+    margin-top: -3.4rem;
+    border-radius: 1.3rem;
+    background: #1b2027;
+}
+[data-tema="oscuro"] .hk-hoja-anillas i {
+    background: #c9ced6;
+}
+.hk .hk-hoja-mes {
+    width: 100%;
+    padding: 4.4rem 1.2rem 1.8rem;
+    border-radius: 1.6rem 1.6rem 0 0;
+    background: var(--hk-festivo, #c0352b);
+    color: #fff;
+    font-size: var(--hk-t-min);
+    font-weight: 800;
+    line-height: 1;
+    text-align: center;
+    text-transform: capitalize;
+}
+.hk .hk-hoja-dia {
+    margin-top: 1.2rem;
+    color: var(--hk-festivo, #c0352b);
+    font-family: var(--hk-letra-titulos);
+    font-size: calc(var(--hk-t-titular) * 1.9);
+    font-weight: 800;
+    letter-spacing: -.03em;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+}
+.hk .hk-hoja-semana {
+    color: #1b2027;
+    font-size: var(--hk-t-min);
+    font-weight: 800;
+    line-height: 1.1;
+}
+.hk-lider[data-tipo="festivo"] .hk-lider-cuerpo {
+    margin: 4rem 4rem 4rem 3.2rem;
+    border-radius: 2.4rem;
+    background: var(--hk-superficie);
+    align-self: center;
+}
+
+/* --- The menu: a plate on its table ---------------------------------------------------------------------------- */
+.hk-lider[data-tipo="menu"] {
+    background: var(--hk-ev, var(--hk-primario));
+    color: var(--hk-sobre-ev, #fff);
+}
+.hk .hk-mesa {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-right: 4.4rem;
+}
+.hk .hk-mesa svg {
+    display: block;
+    width: 100%;
+    overflow: visible;
+}
+.hk-plato-sombra {
+    fill: rgba(0, 0, 0, .2);
+}
+.hk-plato-borde {
+    fill: #fff;
+}
+.hk-plato-ala {
+    fill: #fff;
+    stroke: #d8dcd9;
+    stroke-width: 2.5;
+}
+.hk-plato-cubierto {
+    fill: #1b2027;
+}
+.hk .hk-lider[data-tipo="menu"] .hk-lider-plato {
+    margin-top: 1.2rem;
+    font-size: var(--hk-t-lista);
+}
+.hk .hk-lider[data-tipo="menu"] .hk-lider-plato small {
+    color: inherit;
+    opacity: .85;
+}
+.hk .hk-lider-tambien {
+    margin-top: 2.4rem;
+    padding-top: 2rem;
+    border-top: .4rem solid currentColor;
+    font-size: var(--hk-t-min);
+    font-weight: 700;
+    line-height: 1.1;
+}
+.hk .hk-lider-tambien small {
+    margin-right: .5em;
+    font-size: inherit;
+    font-weight: 800;
+    opacity: .85;
+}
+.hk .hk-lider.hk-lider-corto .hk-lider-tambien {
+    display: none;
+}
+
+/* --- From 5 m a title of one or two words beside an object takes the step that leaves it in two lines ------------- */
+.hk[data-distancia="5"] .hk-lider[data-tipo="cuenta"] .hk-lider-titular,
+.hk[data-distancia="5"] .hk-lider[data-tipo="festivo"] .hk-lider-titular,
+.hk[data-distancia="8"] .hk-lider[data-tipo="cuenta"] .hk-lider-titular,
+.hk[data-distancia="8"] .hk-lider[data-tipo="festivo"] .hk-lider-titular {
+    font-size: calc(var(--hk-t-titular) * .76);
+}
+.hk[data-distancia="5"] .hk-cuerpo[data-composicion="solo-hoy"] .hk-senal,
+.hk[data-distancia="5"] .hk-cuerpo[data-composicion="fotos-tercio"] .hk-senal {
+    display: none;                         /* the block of colour says it alone; the words need the width */
+}
+
+/* --- A vertical screen: the object over the words, the ticket torn across ----------------------------------------- */
+.hk-vertical .hk-lider[data-tipo="evento"],
+.hk-vertical .hk-lider[data-tipo="cuenta"],
+.hk-vertical .hk-lider[data-tipo="festivo"],
+.hk-vertical .hk-lider[data-tipo="menu"] {
+    flex-direction: column;
+}
+.hk.hk-vertical .hk-lider .hk-talon {
+    flex-direction: row;
+    align-items: baseline;
+    justify-content: center;
+    width: 100%;
+    padding: 3.2rem 4rem;
+}
+.hk.hk-vertical .hk-talon-cuando {
+    margin: 0 3rem 0 0;
+}
+.hk.hk-vertical .hk-lider[data-tipo="evento"] .hk-talon {
+    background-image:
+        radial-gradient(circle at 0 100%, var(--hk-fondo) 2.9rem, transparent 3rem),
+        radial-gradient(circle at 100% 100%, var(--hk-fondo) 2.9rem, transparent 3rem);
+}
+.hk.hk-vertical .hk-lider[data-tipo="evento"] .hk-lider-cuerpo {
+    padding-left: 5.6rem;
+    background:
+        radial-gradient(circle at 0 0, var(--hk-fondo) 2.9rem, transparent 3rem),
+        radial-gradient(circle at 100% 0, var(--hk-fondo) 2.9rem, transparent 3rem);
+}
+.hk.hk-vertical .hk-lider[data-tipo="evento"] .hk-talon::after {
+    top: auto;
+    bottom: 0;
+    left: 4.6rem;
+    right: 4.6rem;
+    width: auto;
+    height: .8rem;
+    background: repeating-linear-gradient(to right, var(--hk-fondo) 0, var(--hk-fondo) 1.4rem, transparent 1.4rem, transparent 3.2rem);
+}
+.hk.hk-vertical .hk-lider .hk-marcador {
+    flex: none;
+    height: 44%;
+    padding: 3.6rem 4.4rem 0;
+}
+.hk.hk-vertical .hk-hoja {
+    margin: 6rem auto 1rem;
+}
+.hk.hk-vertical .hk-lider[data-tipo="festivo"] .hk-lider-cuerpo {
+    flex: none;
+    align-self: stretch;
+    margin: 3rem 4rem 4rem;
+}
+.hk.hk-vertical .hk-lider[data-tipo="menu"] .hk-mesa {
+    order: -1;
+    align-self: center;
+    width: 30rem;
+    padding: 4rem 0 0;
+}
+/* a vertical screen read from afar, and the lead under a picture, have no room left for a plate or a sign */
+.hk-vertical[data-distancia="5"] .hk-lider .hk-mesa,
+.hk-vertical[data-distancia="8"] .hk-lider .hk-mesa,
+.hk-vertical[data-distancia="5"] .hk-lider .hk-senal,
+.hk-vertical[data-distancia="8"] .hk-lider .hk-senal,
+.hk-vertical .hk-cuerpo[data-composicion="vertical-hoy"] .hk-mesa,
+.hk-vertical .hk-cuerpo[data-composicion="vertical-hoy"] .hk-senal {
+    display: none;
+}
+
+/* --- A picture beside what leads goes on either side, a turn each ------------------------------------------------- */
+.hk-horizontal .hk-cuerpo[data-lado="derecha"] {
+    flex-direction: row-reverse;
+}
+.hk-horizontal .hk-cuerpo[data-lado="derecha"][data-composicion="vertical-hoy"] > .hk-lider {
+    margin-left: 0;
+    margin-right: var(--hk-hueco);
+}
+
+/* --- Three portrait pictures in a row ---------------------------------------------------------------------------- */
+.hk-horizontal .hk-cuerpo[data-composicion="tres-verticales"] > .hk-pareja {
+    flex: 2 1 0px;
+    min-width: 0;
+}
+.hk-horizontal .hk-cuerpo[data-composicion="tres-verticales"] > .hk-pareja:only-child {
+    flex: 1 1 auto;
+}
+.hk .hk-cuerpo[data-composicion="tres-verticales"] > .hk-pareja > .hk-medio {
+    flex: 1 1 0px;
+    width: auto;
+    min-width: 0;
+    height: auto;
+}
+.hk-vertical .hk-cuerpo[data-composicion="tres-verticales"] > .hk-pareja {
+    flex: 2 1 0px;
+    height: auto;
+}
+
+/* --- A picture of another shape in a wide zone: whole, its words on a block of the colour beside it, no blurred copy.
+   (The blurred copy stays for the full screen, where it fills everything and looks like a decision.) ---------------- */
+.hk .hk-cuerpo .hk-medio-contener {
+    background: var(--hk-primario);
+}
+.hk .hk-cuerpo .hk-medio-contener .hk-diapo-fondo {
+    display: none;
+}
+.hk-horizontal .hk-cuerpo[data-composicion="foto-hoy"] .hk-medio-contener .hk-diapo,
+.hk-horizontal .hk-cuerpo[data-composicion="foto-sola"] .hk-medio-contener .hk-diapo {
+    display: flex;
+}
+.hk-horizontal .hk-cuerpo[data-composicion="foto-hoy"] .hk-medio-contener .hk-diapo > img,
+.hk-horizontal .hk-cuerpo[data-composicion="foto-sola"] .hk-medio-contener .hk-diapo > img,
+.hk-horizontal .hk-cuerpo[data-composicion="foto-hoy"] .hk-medio-contener .hk-diapo > video,
+.hk-horizontal .hk-cuerpo[data-composicion="foto-sola"] .hk-medio-contener .hk-diapo > video {
+    position: static;
+    flex: none;
+    width: auto;
+    height: 100%;
+}
+.hk-horizontal .hk-cuerpo[data-composicion="foto-hoy"] .hk-medio-contener .hk-pie,
+.hk-horizontal .hk-cuerpo[data-composicion="foto-sola"] .hk-medio-contener .hk-pie {
+    position: static;
+    display: flex;
+    flex: 1 1 0px;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 0;
+    padding: 4rem 4.8rem;
+    background: none;
+    color: var(--hk-sobre-primario);
+}
+.hk-horizontal .hk-cuerpo[data-composicion="foto-hoy"] .hk-medio-contener .hk-pie h2,
+.hk-horizontal .hk-cuerpo[data-composicion="foto-sola"] .hk-medio-contener .hk-pie h2 {
+    font-size: calc(var(--hk-t-titular) * .64);
+}
+
+/* --- «La semana» with little in it: the next thing as a poster and the days as a strip, no empty columns ------------ */
+.hk .hk-cuerpo[data-composicion="semana"][data-poca] .hk-semana-titular {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    flex: 1 1 0px;
+    min-height: 0;
+    padding: 4.4rem 5.6rem;
+    border-radius: 2.8rem;
+}
+.hk .hk-cuerpo[data-composicion="semana"][data-poca] .hk-semana-titular small {
+    display: block;
+    margin: 0 0 2.4rem;
+    padding: 0;
+    border: 0;
+}
+.hk .hk-cuerpo[data-composicion="semana"][data-poca] .hk-semana-titular b {
+    display: block;
+    flex: none;
+    font-size: var(--hk-t-titular);
+    line-height: 1.02;
+    letter-spacing: -.015em;
+}
+.hk .hk-cuerpo[data-composicion="semana"][data-poca] > .hk-semana {
+    flex: none;
+    height: 42rem;
+}
+
+/* --- The important notice where there is no third: it takes the ticker, in its colour, still --------------------- */
+.hk .hk-cinta-rotulo,
+.hk .hk-cinta-aviso {
+    display: none;
+}
+.hk .hk-cinta.hk-cinta-importante {
+    position: relative;
+    z-index: 6;                            /* over the full-screen layer: it is on screen all the time */
+    background: var(--hk-acento);
+    color: var(--hk-sobre-acento);
+}
+/* its label takes the place of the sentences' one, inverted; a block of the accent would not stand out on the accent */
+.hk .hk-cinta.hk-cinta-importante > b:not(.hk-cinta-rotulo),
+.hk .hk-cinta.hk-cinta-importante > .hk-cinta-pista {
+    display: none;
+}
+.hk .hk-cinta.hk-cinta-importante > .hk-cinta-rotulo {
+    display: flex;
+    background: var(--hk-sobre-acento);
+    color: var(--hk-acento);
+}
+.hk .hk-cinta-rotulo svg {
+    flex: none;
+    width: 1.1em;
+    height: 1.1em;
+    margin-right: .4em;
+    fill: currentColor;
+}
+.hk .hk-cinta.hk-cinta-importante > .hk-cinta-aviso {
+    display: flex;
+    flex: 1 1 auto;
+    align-items: baseline;
+    min-width: 0;
+    padding: 0 4rem 0 3.6rem;
+    overflow: hidden;
+    font-size: var(--hk-t-lista);
+    font-weight: 800;
+    line-height: 1.08;
+    white-space: nowrap;
+}
+.hk .hk-cinta-aviso span {
+    flex: 0 1 auto;
+    min-width: 0;
+    margin-left: .7em;
+    overflow: hidden;
+    font-size: var(--hk-t-min);
+    font-weight: 700;
+    text-overflow: ellipsis;
+}
+/* The full-screen picture: the band stays, and its caption goes over it */
+.hk[data-composicion="foto-completa"] > .hk-cinta.hk-cinta-importante {
+    opacity: 1;
+    -webkit-transform: none;
+    transform: none;
+}
+.hk.hk-con-importante .hk-completa .hk-pie {
+    bottom: var(--hk-cinta-alto);
+}
+/* From 8 m there is no ticker, but the important one needs its band: thin, the rest of the screen is what is being read */
+.hk[data-distancia="8"] > .hk-cinta.hk-cinta-importante {
+    display: flex;
+    height: 12rem;
+}
+.hk.hk-con-importante[data-distancia="8"] .hk-completa .hk-pie {
+    bottom: 12rem;
+}
+/* With the band the body is lower: captions and the countdown's slide give up some air, not their words */
+.hk.hk-con-importante[data-distancia="8"] .hk-cuerpo .hk-pie {
+    padding-top: 6rem;
+}
+.hk.hk-con-importante[data-distancia="8"] .hk-tipografica {
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+}
+.hk.hk-con-importante[data-distancia="8"] .hk-tipografica-etiqueta {
+    margin-bottom: 2rem;
+}
+.hk.hk-con-importante[data-distancia="8"] .hk-tipografica-cuenta b {
+    font-size: calc(var(--hk-t-titular) * 1.7);
+}
+.hk.hk-con-importante[data-distancia="8"] .hk-tipografica-pie {
+    margin-top: 1.6rem;
+}
+/* A second line that does not fit does not go at all, never cut in half (the player adds the class) */
+.hk .hk-cinta-aviso.hk-solo-titulo span {
+    display: none;
+}

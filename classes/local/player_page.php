@@ -156,13 +156,16 @@ class player_page {
         $sheets = '';
         foreach (
             ['hechauka.css', 'composiciones.css', 'tiempo.css', 'semana.css', 'proximos-dias.css', 'urgente.css',
-            'distancia.css', 'jerarquia.css', 'tercios.css', 'cinta.css', 'usos.css', 'agenda.css', 'fotos.css'] as $file
+            'distancia.css', 'jerarquia.css', 'tercios.css', 'cinta.css', 'usos.css', 'agenda.css', 'fotos.css',
+            'lideres.css', 'agenda-lista.css', 'identidad.css', 'pieles.css'] as $file
         ) {
             $sheets .= '<link rel="stylesheet" href="' . $url($file) . '">';
         }
         $json = json_encode($boot, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP);
         return '<!doctype html>' . "\n" .
-            '<html lang="' . s($boot['lang']) . '" data-tema="claro">' .
+            // With the skin from the start, so that a screen does not ask for the letters of another one.
+            '<html lang="' . s($boot['lang']) . '" data-tema="claro" data-piel="' .
+            s(skins::chosen(get_config('local_oksigeniahechauka')) ?: skins::first()) . '">' .
             '<head><meta charset="utf-8">' .
             '<meta name="viewport" content="width=device-width, initial-scale=1">' .
             '<meta name="robots" content="noindex, nofollow">' .

@@ -58,6 +58,38 @@ class colours {
     }
 
     /**
+     * The second colour for a main colour that comes from the Moodle site: that of the first skin, unless the main one is warm
+     * too, and then one that stands out from it (the art direction's rule, tested with nine colours).
+     *
+     * @param string $primary «#rrggbb»
+     * @return string
+     */
+    public static function accent_for(string $primary): string {
+        [$r, $g, $b] = array_map(function ($x) {
+            return hexdec($x) / 255;
+        }, str_split(substr($primary, 1), 2));
+        $max = max($r, $g, $b);
+        $min = min($r, $g, $b);
+        $d = $max - $min;
+        $l = ($max + $min) / 2;
+        $s = $d == 0 ? 0 : ($l > .5 ? $d / (2 - $max - $min) : $d / ($max + $min));
+        if ($d == 0) {
+            $h = 0;
+        } else if ($max == $r) {
+            $h = fmod(($g - $b) / $d + 6, 6);
+        } else if ($max == $g) {
+            $h = ($b - $r) / $d + 2;
+        } else {
+            $h = ($r - $g) / $d + 4;
+        }
+        $deg = $h * 60;
+        if (!(($deg < 70 || $deg >= 330) && $s > .25)) {
+            return '#ff8a3d';
+        }
+        return self::luminance($primary) < .2 ? '#ffc933' : '#0e4f5c';
+    }
+
+    /**
      * Whether a text is a colour «#rrggbb».
      *
      * @param string|null $hex

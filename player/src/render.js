@@ -5,7 +5,7 @@
 
 import {shapeOf} from './compose.js';
 import {buildWeatherThird} from './today.js';
-import {buildLead, buildRest, fitHeadline, fitWord, leadsOf, linesOf, paginateRest, showRestPage, turnFixed, weekHeadline} from './lead.js';
+import {buildLead, buildRest, fitHeadline, fitWord, leadsOf, leadOfTurn, linesOf, MARK, paginateRest, showRestPage, turnFixed, weekHeadline} from './lead.js';
 import {qrPath, shortWeb} from './qr.js';
 import {even} from './balance.js';
 import {buildAgenda, startAgenda} from './agendaview.js';
@@ -97,6 +97,11 @@ export class Screen {
         this.ticker.appendChild(this.tickerLabel);
         this.ticker.appendChild(this.tickerTrack);
         this.ticker.appendChild(this.tickerCount);
+        // The important notice where there is no third (importantBand): its label and its line, in place of those above.
+        this.bandLabel = el('b', 'hk-cinta-rotulo');
+        this.bandLine = el('p', 'hk-cinta-aviso');
+        this.ticker.insertBefore(this.bandLabel, this.tickerTrack);
+        this.ticker.appendChild(this.bandLine);
         this.full = el('div', 'hk-completa hk-sobre-foto');
         this.credit = el('p', 'hk-credito-tiempo');
         this.sample = el('span', 'hk-muestra', this.s.sample || 'Sample data');
@@ -196,11 +201,24 @@ export class Screen {
 
     applyTheme(theme) {
         const style = document.documentElement.style;
+        // The skin the centre chose (pieles.css); with none, the sheet's first. Its own colours, in vars, go over it.
+        if (/^[a-z0-9-]+$/.test(theme.skin || '')) {
+            document.documentElement.setAttribute('data-piel', theme.skin);
+        } else {
+            document.documentElement.removeAttribute('data-piel');
+        }
         const vars = theme.vars || {};
-        Object.keys(vars).forEach(function (name) {
-            if (name.indexOf('--hk-') === 0 && safeValue(vars[name])) {
-                style.setProperty(name, vars[name]);
+        // What was set before and no longer is goes back to the skin.
+        (this.themeVars || []).forEach(function (name) {
+            if (vars[name] === undefined) {
+                style.removeProperty(name);
             }
+        });
+        this.themeVars = Object.keys(vars).filter(function (name) {
+            return name.indexOf('--hk-') === 0 && safeValue(vars[name]);
+        });
+        this.themeVars.forEach(function (name) {
+            style.setProperty(name, vars[name]);
         });
         this.identity = this.identity || {name: ''};
         this.identity.light = this.media.url(theme.logo);
@@ -208,13 +226,55 @@ export class Screen {
         this.frame.classList.toggle('hk-sin-logo', !this.identity.light);
         this.headers.forEach((p) => this.paintHeader(p));
         this.fonts(theme.fonts || []);
+        this.loadLetters();
+    }
+
+    // The letters of the skin, asked for at once: until they arrive everything is measured in the fallback letter, and a sentence
+    // that fitted there would end up in two lines at the size of one. When they are here, what was measured is measured again.
+    loadLetters() {
+        if (!document.fonts || !document.fonts.load) {
+            return;
+        }
+        const family = getComputedStyle(document.documentElement).getPropertyValue('--hk-letra-titulos').split(',')[0].trim();
+        if (!family || family === this.lettersFamily) {
+            return;
+        }
+        this.lettersFamily = family;
+        const self = this;
+        Promise.all(['600', '700', '800'].map(function (w) {
+            return document.fonts.load(w + ' 40px ' + family);
+        })).then(function () {
+            if (self.lettersFamily !== family) {
+                return;
+            }
+            self.fitHeaders();
+            if (self.tickerTexts && self.tickerTexts.length) {
+                self.phrasesStale = true;
+                if (self.tickerTrack.offsetWidth) {
+                    clearTimeout(self.phraseTimer);
+                    self.phraseAt = 0;
+                    self.nextPhrase();
+                }
+            }
+            if (self.layer) {
+                self.fitStrip(self.layer);
+                self.adjustLayer(self.layer);
+            }
+        }).catch(function () {
+            return null;
+        });
     }
 
     paintHeader(p) {
         const id = this.identity;
+        // Without a logo, the centre's name as a mark: its full stop in the accent, like the clock's colon.
         const name = id.light ? '' : id.name;
         p.place.textContent = name;
         p.place.style.display = name ? '' : 'none';
+        if (name) {
+            p.place.appendChild(el('i', '', '.'));
+            p.place.setAttribute('data-largo', name.length > 22 ? '2' : (name.length > 13 ? '1' : '0'));
+        }
         p.logo.style.display = id.light ? '' : 'none';
         if (id.light && p.logo.src !== id.light) {
             p.logo.src = id.light;
@@ -511,6 +571,9 @@ export class Screen {
                 strip.appendChild(el('b', '', said));
                 c.appendChild(strip);
             }
+            if (said && week.things < 4) {
+                c.setAttribute('data-poca', '');
+            }
             c.hkWeek = buildWeek(week, {today: l.today, tomorrow: l.tomorrow, none: this.s.week_none || '',
                 more: this.s.week_more || '+{n}'});
             c.appendChild(c.hkWeek);
@@ -543,7 +606,7 @@ export class Screen {
                 return null;
             }
             self.leadTurn = (self.leadTurn || 0) + 1;
-            return all[(self.leadTurn - 1) % all.length];
+            return leadOfTurn(all, self.leadTurn);
         };
         if (comp === 'titular') {
             c.appendChild(this.typographic(extra || {type: 'frase', text: ''}, today));
@@ -569,13 +632,18 @@ export class Screen {
             c.appendChild(buildCarousel(extra.albumData));
             return c;
         }
-        if (comp === 'dos-verticales') {
+        if (comp === 'dos-verticales' || comp === 'tres-verticales') {
             const pair = el('div', 'hk-pareja');
-            pair.setAttribute('data-forma', shapeOf(items[0]) || '2x3');
-            pair.appendChild(this.slot(items[0], comp));
-            pair.appendChild(this.slot(items[1], comp));
+            const shape = shapeOf(items[0]) || '2x3';
+            pair.setAttribute('data-forma', shape);
+            items.forEach(function (it) {
+                pair.appendChild(self.slot(it, comp));
+            });
             c.appendChild(pair);
-            withRest(null);
+            // Three tall ones leave room beside them; three of a phone's shape fill the body whole, and lose nothing.
+            if (comp === 'dos-verticales' || shape === '9x16') {
+                withRest(null);
+            }
             return c;
         }
         if (comp === 'solo-hoy') {
@@ -588,6 +656,8 @@ export class Screen {
         }
         c.appendChild(this.slot(items[0], comp));
         if (comp === 'vertical-hoy') {
+            this.sideTurn = (this.sideTurn || 0) + 1;
+            c.setAttribute('data-lado', this.sideTurn % 2 ? 'izquierda' : 'derecha');
             const p = nextLead();
             if (p) {
                 c.appendChild(buildLead(p, today, l));
@@ -608,6 +678,7 @@ export class Screen {
             events: l.events || s.events || '',
             countdown: s.countdown || '',
             daysfor: s.daysfor || '',
+            also: s.also || '',
             notices: l.notices || s.notices || '',
             upcoming: l.upcoming || s.upcoming || '',
         };
@@ -662,6 +733,37 @@ export class Screen {
         return s;
     }
 
+    /**
+     * The important notice where there is no third: it takes the ticker, in its colour, without moving; the sentences come
+     * back when the third or the lead shows it. Null to give the ticker back.
+     *
+     * @param {object|null} n the notice {title, body}
+     */
+    importantBand(n) {
+        const key = n ? n.title + '|' + (n.body || '') : '';
+        if (key === (this.bandKey || '')) {
+            return;
+        }
+        this.bandKey = key;
+        this.ticker.classList.toggle('hk-cinta-importante', !!n);
+        this.frame.classList.toggle('hk-con-importante', !!n);
+        clear(this.bandLine);
+        if (!n) {
+            return;
+        }
+        this.bandLabel.innerHTML = MARK;
+        this.bandLabel.appendChild(document.createTextNode(this.s.important || ''));
+        this.bandLine.appendChild(document.createTextNode(n.title));
+        if (n.body) {
+            const body = el('span', '', n.body);
+            this.bandLine.appendChild(body);
+            this.bandLine.classList.remove('hk-solo-titulo');
+            if (this.bandLine.scrollWidth > this.bandLine.clientWidth + 1 || body.scrollWidth > body.clientWidth + 1) {
+                this.bandLine.classList.add('hk-solo-titulo');
+            }
+        }
+    }
+
     /** The headline of each picture's caption, by steps and evened; in a band, one line or the smaller step. */
     fitCaptions(c, comp) {
         const vertical = !this.horizontal;
@@ -671,7 +773,7 @@ export class Screen {
             const pies = m.querySelectorAll('.hk-pie');
             const pie = pies[pies.length - 1];
             const h2 = pie && pie.querySelector('h2');
-            if (pie && comp === 'dos-verticales') {
+            if (pie && (comp === 'dos-verticales' || comp === 'tres-verticales')) {
                 // The pair's captions are small: from afar, or when long, without their second line, or none at all,
                 // rather than covering the picture.
                 pie.classList.remove('hk-pie-corto');
@@ -685,6 +787,12 @@ export class Screen {
                 continue;
             }
             if (!h2 || comp === 'vertical-hoy') {
+                continue;
+            }
+            // A picture of another shape has its words on a block beside it: they do not cover it, so nothing to shorten.
+            if (!vertical && m.classList.contains('hk-medio-contener') && (comp === 'foto-hoy' || comp === 'foto-sola')) {
+                pie.setAttribute('data-ajuste', '0');
+                even(h2);
                 continue;
             }
             if (comp === 'apaisado' || comp === 'tiempo-tercio') {
@@ -722,10 +830,16 @@ export class Screen {
         if (lead) {
             const t = lead.querySelector('.hk-lider-titular');
             lead.hkShort = 'hk-lider-corto';
+            // Measured on what holds the words: a bubble's tail hangs out of the lead on purpose.
+            const words = lead.querySelector('.hk-lider-cuerpo') || lead;
             fitHeadline(lead, t, comp === 'vertical-hoy' && vertical ? 2 : 3, function () {
-                return lead.scrollHeight > lead.clientHeight + 1 || lead.scrollWidth > lead.clientWidth + 1;
+                return words.scrollHeight > words.clientHeight + 1 || t.scrollWidth > t.clientWidth + 1;
             });
             even(t);
+            const second = lead.querySelector('.hk-lider-entrada');
+            if (second) {
+                even(second);
+            }
         }
         this.fitCaptions(c, comp);
         const type = c.querySelector('.hk-tipografica-texto');
@@ -1045,6 +1159,9 @@ export class Screen {
             clearTimeout(this.phraseTimer);
             this.nextPhrase();
         }
+        this.pendingBand = today && today.notices ? today.notices.filter(function (n) {
+            return n.tone === 'important';
+        })[0] || null : null;
         // Each slide turns the page of the rest and the important notice in the fixed place.
         this.turn = (this.turn || 0) + 1;
         const wasFull = !!FULL[this.frame.getAttribute('data-composicion')];
@@ -1067,6 +1184,7 @@ export class Screen {
                 this.fillFull(items[0]);
             }
             this.fitHeaders();
+            this.importantBand(comp === 'foto-completa' ? this.pendingBand : null);
             return seconds;
         }
         this.fitHeaders();
@@ -1104,6 +1222,9 @@ export class Screen {
         const old = this.layer;
         const layer = this.makeLayer(comp, items, today, week, choice.extra);
         this.stage.appendChild(layer);
+        // Where neither the third nor the lead shows the important notice, the ticker does.
+        const lead = layer.querySelector('.hk-lider-importante');
+        this.importantBand(layer.querySelector('.hk-resto') || lead ? null : this.pendingBand);
         this.fitStrip(layer);
         if (layer.hkWeek) {
             fitWeek(layer.hkWeek, this.horizontal);
@@ -1227,6 +1348,7 @@ export class Screen {
         this.phraseNode = null;
         this.phraseAt = 0;
         this.phrases = texts.length ? this.preparePhrases(texts) : [];
+        this.tickerTexts = texts;
         if (this.phrases.length) {
             this.nextPhrase();
         }
@@ -1234,6 +1356,8 @@ export class Screen {
 
     preparePhrases(texts) {
         const track = this.tickerTrack;
+        // Under a full-screen slide the ticker has no size: nothing can be measured until it is back (nextPhrase).
+        this.phrasesStale = !track.offsetWidth;
         const out = [];
         // Measured with the counter in place.
         this.tickerCount.textContent = '88/88';
@@ -1294,6 +1418,9 @@ export class Screen {
     }
 
     nextPhrase() {
+        if (this.phrasesStale && this.tickerTrack.offsetWidth && this.tickerTexts && this.tickerTexts.length) {
+            this.phrases = this.preparePhrases(this.tickerTexts);
+        }
         const list = this.phrases || [];
         if (!list.length) {
             return;

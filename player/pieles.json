@@ -1,0 +1,176 @@
+{
+ "default": "petroleo",
+ "skins": [
+  {
+   "id": "petroleo",
+   "name": {
+    "es": "Petróleo y mandarina",
+    "en": "Petrol and tangerine"
+   },
+   "family": "Gabarito",
+   "files": [
+    {
+     "weight": 600,
+     "file": "fuentes/Gabarito-600.woff2",
+     "kb": 21.2
+    },
+    {
+     "weight": 700,
+     "file": "fuentes/Gabarito-700.woff2",
+     "kb": 21.1
+    },
+    {
+     "weight": 800,
+     "file": "fuentes/Gabarito-800.woff2",
+     "kb": 21.2
+    }
+   ],
+   "light": {
+    "fondo": "#f4f1ea",
+    "superficie": "#ffffff",
+    "texto": "#14211f",
+    "texto-suave": "#46534f",
+    "linea": "#e4dfd3",
+    "primario": "#0e4f5c",
+    "sobre-primario": "#ffffff",
+    "acento": "#ff8a3d",
+    "sobre-acento": "#14211f",
+    "acento-texto": "#a8480a",
+    "marca-1": "#0e4f5c",
+    "marca-2": "#4f6b2d",
+    "marca-3": "#a8481a",
+    "marca-4": "#a4324a"
+   },
+   "dark": {
+    "fondo": "#0c1718",
+    "superficie": "#162425",
+    "texto": "#f1efe8",
+    "texto-suave": "#a9b7b3",
+    "linea": "#2a3a3a",
+    "primario": "#17707f",
+    "sobre-primario": "#ffffff",
+    "acento": "#ff9a54",
+    "sobre-acento": "#14211f",
+    "acento-texto": "#ffa76a",
+    "marca-1-oscuro": "#6fb7c4",
+    "marca-2-oscuro": "#a9c47e",
+    "marca-3-oscuro": "#f0a06a",
+    "marca-4-oscuro": "#ef8fa2"
+   }
+  },
+  {
+   "id": "botella",
+   "name": {
+    "es": "Verde botella y melocotón",
+    "en": "Bottle green and peach"
+   },
+   "family": "Schibsted",
+   "files": [
+    {
+     "weight": 600,
+     "file": "fuentes/Schibsted-600.woff2",
+     "kb": 24.9
+    },
+    {
+     "weight": 700,
+     "file": "fuentes/Schibsted-700.woff2",
+     "kb": 24.8
+    },
+    {
+     "weight": 800,
+     "file": "fuentes/Schibsted-800.woff2",
+     "kb": 24.8
+    }
+   ],
+   "light": {
+    "fondo": "#f3f2ec",
+    "superficie": "#ffffff",
+    "texto": "#161c19",
+    "texto-suave": "#4a524e",
+    "linea": "#e1e0d6",
+    "primario": "#123f33",
+    "sobre-primario": "#ffffff",
+    "acento": "#ffb48a",
+    "sobre-acento": "#161c19",
+    "acento-texto": "#a24f1f",
+    "marca-1": "#123f33",
+    "marca-2": "#a8461f",
+    "marca-3": "#1f5f8b",
+    "marca-4": "#8a2f52"
+   },
+   "dark": {
+    "fondo": "#0d1412",
+    "superficie": "#17211d",
+    "texto": "#f0efe9",
+    "texto-suave": "#a7b2ac",
+    "linea": "#2a3631",
+    "primario": "#1d6a56",
+    "sobre-primario": "#ffffff",
+    "acento": "#ffbd97",
+    "sobre-acento": "#161c19",
+    "acento-texto": "#ffbd97",
+    "marca-1-oscuro": "#7fc7ae",
+    "marca-2-oscuro": "#f0a57f",
+    "marca-3-oscuro": "#7fb5dc",
+    "marca-4-oscuro": "#e79bb7"
+   }
+  },
+  {
+   "id": "berenjena",
+   "name": {
+    "es": "Berenjena y limón",
+    "en": "Aubergine and lemon"
+   },
+   "family": "Bricolage",
+   "files": [
+    {
+     "weight": 600,
+     "file": "fuentes/Bricolage-600.woff2",
+     "kb": 23.4
+    },
+    {
+     "weight": 700,
+     "file": "fuentes/Bricolage-700.woff2",
+     "kb": 23.2
+    },
+    {
+     "weight": 800,
+     "file": "fuentes/Bricolage-800.woff2",
+     "kb": 23.0
+    }
+   ],
+   "light": {
+    "fondo": "#f4f2f4",
+    "superficie": "#ffffff",
+    "texto": "#1b1620",
+    "texto-suave": "#524a58",
+    "linea": "#e3dfe5",
+    "primario": "#3f1f63",
+    "sobre-primario": "#ffffff",
+    "acento": "#f6d32d",
+    "sobre-acento": "#1b1620",
+    "acento-texto": "#7a6400",
+    "marca-1": "#3f1f63",
+    "marca-2": "#1d7a5f",
+    "marca-3": "#c2410c",
+    "marca-4": "#a4324a"
+   },
+   "dark": {
+    "fondo": "#120e17",
+    "superficie": "#1f1927",
+    "texto": "#f3f0f5",
+    "texto-suave": "#b3a9bb",
+    "linea": "#352c3f",
+    "primario": "#5f3a8f",
+    "sobre-primario": "#ffffff",
+    "acento": "#f6d32d",
+    "sobre-acento": "#1b1620",
+    "acento-texto": "#f6d32d",
+    "marca-1-oscuro": "#b89be0",
+    "marca-2-oscuro": "#79cfb1",
+    "marca-3-oscuro": "#f79b6b",
+    "marca-4-oscuro": "#ef8fa2"
+   }
+  }
+ ]
+}

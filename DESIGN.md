@@ -311,6 +311,9 @@ Biblioteca, Secretaría y Comedor.» A teacher sees only their groups, already c
   a title or in «for whom», «×» to take it out, «+ Añadir una categoría», and «Traer las categorías de cursos de
   Moodle» (each linked to its course category, whose calendar events then show in its colour). Nothing in the product
   is one school's: Hechauka is installed by universities, academies and schools alike.
+- **The skin**: a gallery of cards, each drawn with its colours and its letter, chosen with a ring and seen at once on the screen beside
+  it. If the Moodle site has a brand colour, a first card, «La de tu Moodle». Choosing one brings its colours to «Los colores»; touching them
+  afterwards makes them the centre's own, which go over the skin.
 - **The logo**: one for light screens and one for dark ones, each on its own background, with «Cambiar».
 - **The surprises**: under the screen, with their own «Guardar», since the column of the form is long. Off by default. A switch, «Cada cuánto» as chips (cada 20 minutos, cada hora, cada tres horas) and
   «Quién sale», a row per character with its box, its portrait, what it does and «Verlo en la vista previa», which plays it on
