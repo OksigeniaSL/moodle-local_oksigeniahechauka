@@ -315,8 +315,12 @@ function alignPairs(list, s) {
         Array.prototype.forEach.call(names, function (n) {
             widest = Math.max(widest, Math.ceil(n.getBoundingClientRect().width));
         });
-        list.style.setProperty('--hk-tabla-nombre', Math.min(widest, Math.round(list.clientWidth * .3)) + 'px');
-        return;
+        if (widest <= list.clientWidth * .3) {
+            list.style.setProperty('--hk-tabla-nombre', widest + 'px');
+            return;
+        }
+        // A name too long to go beside its value would have to shrink under the least that is read: each name over its value.
+        s.setAttribute('data-ancha', 'no');
     }
     for (let k = 0; k < MAX_COLUMNS; k++) {
         const pairs = list.querySelectorAll('.hk-tabla-col-' + k);
@@ -432,8 +436,9 @@ export function fitTable(c) {
     const all = MAX_COLUMNS;
     s.setAttribute('data-modo', 'fichas');
     const tries = [['normal', 'dos'], ['justa', 'dos'], ['normal', 'una'], ['justa', 'una']];
-    s.setAttribute('data-ancha', t.room.clientWidth > t.room.clientHeight ? 'si' : 'no');
+    const wide = t.room.clientWidth > t.room.clientHeight ? 'si' : 'no';
     for (let k = 0; k < tries.length; k++) {
+        s.setAttribute('data-ancha', wide);
         s.setAttribute('data-letra', tries[k][0]);
         s.setAttribute('data-fichas', tries[k][1]);
         const list = drawCards(t, all);
@@ -446,6 +451,7 @@ export function fitTable(c) {
     // A card that does not fit on the sheet even so: from afar, its first columns, the ones a sheet puts first. Better a card read whole
     // than a row in pieces over many turns, or letters nobody can read from there.
     for (let n = t.shape.rows[0] ? t.shape.rows[0].length - 1 : 1; n >= 2; n--) {
+        s.setAttribute('data-ancha', wide);
         const list = drawCards(t, n);
         alignPairs(list, s);
         if (cardsFit(list, roomForCards(t, list)) || n === 2) {
