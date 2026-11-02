@@ -1551,14 +1551,37 @@ dialog.hkp-dialog > footer {
     border-radius: var(--hkp-radius);
 }
 
-.hkp-guide img.hk-side {
-    float: right;
-    margin: .25rem 0 1rem 1.5rem;
+/* A phone or a card beside the text it goes with (docs/guia/*.md, <div class="junto">), as in the printed guide. */
+.hkp-guide .junto {
+    display: flex;
+    gap: 1.5rem;
+    align-items: flex-start;
 }
 
-.hkp-guide h2,
-.hkp-guide h3 {
-    clear: both;
+.hkp-guide .junto-texto {
+    flex: 1 1 0%;
+    min-width: 0;
+}
+
+.hkp-guide .junto-imagen {
+    flex: none;
+    width: 13rem;
+}
+
+.hkp-guide .junto-imagen.ficha {
+    width: 16rem;
+}
+
+.hkp-guide .junto-imagen img {
+    width: 100%;
+    margin: 0;
+}
+
+/* The printed cover: here the panel has its own header, so the logotype and the foot line go; the heading, its line and the
+   screen stay. */
+.hkp-guide .portada-logo,
+.hkp-guide .portada-pie {
+    display: none;
 }
 
 .hkp-guide-pdf {
@@ -1568,8 +1591,13 @@ dialog.hkp-dialog > footer {
 }
 
 @media (max-width: 767.98px) {
-    .hkp-guide img.hk-side {
-        float: none;
+    .hkp-guide .junto {
+        display: block;
+    }
+
+    .hkp-guide .junto-imagen,
+    .hkp-guide .junto-imagen.ficha {
+        width: 60%;
         margin: 1rem auto;
     }
 }

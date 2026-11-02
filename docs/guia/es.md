@@ -1,8 +1,16 @@
-# Oksigenia Hechauka: guía de uso
+<div class="portada" markdown="1">
+
+<img class="portada-logo" src="img/hechauka-logotipo.svg" alt="Hechauka, por Oksigenia">
+
+# Guía de uso
 
 Las pantallas informativas de tu centro, llevadas desde Moodle.
 
 ![Una pantalla con una foto a pantalla completa.](img/tele-foto-completa.jpg)
+
+<p class="portada-pie"><span>Para quien lleva las pantallas y para quien publica en ellas. Con un centro de ejemplo y datos de ejemplo.</span><b>oksigenia.com</b></p>
+
+</div>
 
 <a id="que-es"></a>
 
@@ -61,6 +69,10 @@ Cuando empieces con lo tuyo, pulsa **Quitar el ejemplo** en el panel. Si cambias
 
 ## Poner una pantalla
 
+<div class="junto" markdown="1">
+
+<div class="junto-texto" markdown="1">
+
 1. Abre en la pantalla la dirección que da el panel (en «Empezar» o en «Pantallas y grupos», con **Añadir una
    pantalla**). La pantalla enseña un código y un QR.
 2. Escanea el QR con el móvil, o abre en el móvil la dirección que sale y escribe el código.
@@ -69,24 +81,42 @@ Cuando empieces con lo tuyo, pulsa **Quitar el ejemplo** en el panel. Si cambias
 
 En unos segundos la pantalla empieza a enseñar lo suyo. El código cambia cada pocos minutos: usa siempre el que se ve.
 
-![Lo que enseña una pantalla nueva.](img/alta-tele.jpg)
+</div>
 
-<img src="img/alta-movil.jpg" alt="Y lo que se ve en el móvil." width="200" class="hk-side">
+<div class="junto-imagen" markdown="1">
+
+![Lo que se ve en el móvil.](img/alta-movil.jpg)
+
+</div>
+</div>
+
+![Lo que enseña una pantalla nueva.](img/alta-tele.jpg)
 
 <a id="panel"></a>
 
 ## Lo que sale
 
+<div class="junto" markdown="1">
+
+<div class="junto-texto" markdown="1">
+
 La primera pestaña del panel enseña cada pantalla con lo que tiene ahora, si está en marcha y, debajo, todo lo publicado:
 cuándo sale y dónde. Desde ahí se cambia, se oculta, se duplica o se quita cada cosa.
+
+En el móvil, el mismo panel cabe en una columna.
+
+</div>
+
+<div class="junto-imagen" markdown="1">
+
+![El panel en el móvil.](img/movil-inicio.jpg)
+
+</div>
+</div>
 
 ![El panel, con cada pantalla y su estado.](img/inicio.jpg)
 
 ![Lo publicado, con cuándo sale y dónde.](img/contenido.jpg)
-
-En el móvil, el mismo panel cabe en una columna.
-
-<img src="img/movil-inicio.jpg" alt="El panel en el móvil." width="200" class="hk-side">
 
 <a id="anadir"></a>
 
@@ -182,6 +212,10 @@ Aquí están todas las pantallas, con su estado, y los grupos.
 
 ![Pantallas y grupos.](img/pantallas.jpg)
 
+<div class="junto" markdown="1">
+
+<div class="junto-texto" markdown="1">
+
 Un **grupo** junta pantallas para publicar en todas a la vez: las de una planta, las de un edificio, las de la cafetería.
 Una pantalla puede estar en varios grupos. Cada grupo puede:
 
@@ -190,7 +224,14 @@ Una pantalla puede estar en varios grupos. Cada grupo puede:
 - **ser una sede**, si sus pantallas están en otro sitio;
 - tener **quien publica en él**, y solo en él.
 
-<img src="img/grupo.jpg" alt="Un grupo que es una sede." width="260" class="hk-side">
+</div>
+
+<div class="junto-imagen ficha" markdown="1">
+
+![Un grupo que es una sede.](img/grupo.jpg)
+
+</div>
+</div>
 
 <a id="sedes"></a>
 
@@ -206,6 +247,10 @@ tarjeta del grupo, con **¿Está en otro sitio?**
 
 ### Quién hace qué
 
+<div class="junto" markdown="1">
+
+<div class="junto-texto" markdown="1">
+
 Nadie tiene que ser administrador de Moodle para llevar las pantallas. Todo se reparte en **Pantallas y grupos**, con un
 buscador de personas:
 
@@ -216,7 +261,14 @@ buscador de personas:
 - **Publican en un grupo**: solo en las pantallas de ese grupo, y solo ven esas pantallas y lo que publican ellos. Por
   ejemplo, quien lleva un club, un departamento o una sede.
 
-<img src="img/permisos.jpg" alt="Los permisos." width="260" class="hk-side">
+</div>
+
+<div class="junto-imagen ficha" markdown="1">
+
+![Los permisos.](img/permisos.jpg)
+
+</div>
+</div>
 
 <a id="ficha"></a>
 
@@ -289,4 +341,4 @@ Si la pantalla no tiene red un rato, sigue enseñando lo último que recibió.
 - Todo lo técnico, el contrato entre las pantallas y el servidor y la guía para los desarrolladores de cada centro están
   en el repositorio del plugin.
 
-Oksigenia Hechauka es software libre (GNU GPL v3), de Oksigenia SL.
+Oksigenia Hechauka es software libre (GNU GPL v3), de Oksigenia SL: oksigenia.com.
