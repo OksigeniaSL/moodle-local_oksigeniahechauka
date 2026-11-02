@@ -40,8 +40,8 @@ sites.
 - **The player** is one web page that every screen opens: a small computer with a browser in kiosk mode, a smart TV
   with a kiosk browser or a professional display that loads a web page. It keeps what it needs on the device and goes
   on without a network.
-- **The user's guide** (in Spanish) is in [docs/guia/es.md](docs/guia/es.md), with its printed version, and inside
-  the panel, in its «Guide» tab.
+- **The user's guide**, in English ([docs/guia/en.md](docs/guia/en.md)) and in Spanish
+  ([docs/guia/es.md](docs/guia/es.md)), each with its printed version, is also inside the panel, in its «Guide» tab.
 - **The contract** between the screen and the server is documented in [docs/contract.md](docs/contract.md). The
   player only knows the contract, so the same player can work with another server.
 - **In the Moodle app** there is nothing to open: the panel is a page for a computer, and a screen is claimed from

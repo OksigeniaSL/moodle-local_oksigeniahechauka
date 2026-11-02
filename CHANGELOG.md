@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.8.8
+
+- **The user's guide in English**, with its own pictures of the panel and the screens in English; other languages get it too, until they have their own.
+- The guide's layout: a cover with the logotype of Hechauka, each phone or card beside its text, and the pictures of the panel cut to what each section explains.
+- In English, the panel says «centre» where it said «school»: Hechauka is for any kind of centre.
+
 ## 0.8.7
 
 - **The user's guide**, in the panel and as a PDF: what the screens and the panel do, with pictures of an example centre. A «Guide» tab opens it where the page in use is explained; whoever only publishes has it beside the title. Its source is `docs/guia/`.

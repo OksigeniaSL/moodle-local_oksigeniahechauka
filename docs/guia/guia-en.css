@@ -1,0 +1,5 @@
+/* Oksigenia Hechauka: the printed user's guide in English. Goes after guia.css: only the words of the page foot change. */
+@page {
+  @bottom-left { content: "Hechauka · User's guide · oksigenia.com"; }
+}
+@page :first { @bottom-left { content: none; } }
