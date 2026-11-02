@@ -332,6 +332,10 @@ class access {
             return false;
         }
         $targets = items::targets($item);
+        // With its group gone it goes nowhere, and whoever wrote it can still take it out.
+        if (!$targets['all'] && !$targets['groups'] && !$targets['screens']) {
+            return true;
+        }
         return self::may_target($targets['all'], $targets['groups'], $targets['screens'], $userid);
     }
 }

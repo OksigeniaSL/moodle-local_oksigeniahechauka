@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.7.11 (2026-11-02)
+
+- **The screens look like the centre's from the first day**: until the centre sets its own, they take the logo and the brand
+  colour of its Moodle site; with no logo, the name of the centre stands in for it. The name of the screen is no longer shown
+  on it: it is for the panel.
+- **A calmer screen**: the sentence of the ticker changes with the slide, a slide leaves before the next one comes, the week
+  comes out only with at least three things and less often with few, and no shape comes out three times running.
+- Fixed: an urgent notice showing all night over a screen that is off; two sentences on top of each other in the ticker; a
+  slide that fails freezing the turns; a logo arriving while a video downloads not showing until the next change; a download
+  that hangs stopping the others; a screen that wakes up with no way out to the internet staying black for a minute or two; the
+  page of a site being updated being kept as the screen's; yesterday's slide for a moment on switching on.
+- Fixed in the panel: photos the screens cannot paint (HEIC, TIFF, BMP) are refused and no longer shown as videos; the example
+  notice goes when the examples do; whoever wrote something for a group that is gone can still take it out; a form too heavy
+  for the server says so; the privacy provider covers who created each thing; uninstalling takes out the roles; an unclaimed
+  key does not stay in the database.
+
 ## 0.7.10 (2026-11-02)
 
 - **The octopus**, a new character of the surprises: the screen fills with water up to 40 %, and it comes along the glass in

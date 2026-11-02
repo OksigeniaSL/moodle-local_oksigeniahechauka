@@ -52,6 +52,15 @@ if ($type === 'urgent') {
 if (!in_array($type, items::TYPES)) {
     throw new moodle_exception('invalidparameter', 'debug');
 }
+if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && empty($_POST) && !empty($_SERVER['CONTENT_LENGTH'])) {
+    // Heavier than the server takes: nothing has arrived, and it has to say so instead of showing the page empty.
+    redirect(
+        new moodle_url('/local/oksigeniahechauka/edit.php', ['id' => $id, 'type' => $type]),
+        get_string('compose_toolarge', 'local_oksigeniahechauka', display_size(get_max_upload_file_size())),
+        null,
+        \core\output\notification::NOTIFY_ERROR
+    );
+}
 if ($type === 'agenda') {
     // A calendar brings content for everyone: the office and who runs the screens.
     access::require_cap('publishall');

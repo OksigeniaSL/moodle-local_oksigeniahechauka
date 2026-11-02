@@ -260,4 +260,42 @@ final class manifest_test extends \advanced_testcase {
             $found[0]['title'], $found[0]['body']]);
         $this->assertArrayHasKey('ends', $found[0]);
     }
+
+    /**
+     * Until the centre sets its own, a screen takes the logo and the brand colour of the Moodle site, and has its name to stand
+     * in for a logo; the example notice goes when the examples do.
+     */
+    public function test_the_identity_of_the_site(): void {
+        global $DB;
+        $this->resetAfterTest();
+        $now = time();
+        $id = $DB->insert_record('local_oksigeniahechauka_screen', (object) ['name' => 'Hall', 'template' => 'zones',
+            'theme' => 'site', 'keyhash' => 'x', 'sortorder' => 0, 'timecreated' => $now, 'timemodified' => $now]);
+        $screen = $DB->get_record('local_oksigeniahechauka_screen', ['id' => $id]);
+        $m = manifest::build($screen, $now);
+        $this->assertNotEmpty($m['centre']['name']);
+        $this->assertArrayNotHasKey('logo', $m['theme']);
+
+        set_config('brandcolor', '#123456', 'theme_boost');
+        $fs = get_file_storage();
+        $fs->create_file_from_string(['contextid' => \context_system::instance()->id, 'component' => 'core_admin',
+            'filearea' => 'logo', 'itemid' => 0, 'filepath' => '/', 'filename' => 'site.svg'], '<svg/>');
+        $m = manifest::build($screen, $now);
+        $this->assertSame('#123456', $m['theme']['vars']['--hk-primario']);
+        $this->assertNotEmpty($m['theme']['logo']['url']);
+
+        // Its own, once it has chosen.
+        set_config('colourprimary', '#654321', 'local_oksigeniahechauka');
+        $this->assertSame('#654321', manifest::build($screen, $now)['theme']['vars']['--hk-primario']);
+
+        // The notice of example data: only while there is some left.
+        set_config('sampledata', 1, 'local_oksigeniahechauka');
+        $this->assertArrayNotHasKey('sample', manifest::build($screen, $now));
+        $item = $DB->insert_record('local_oksigeniahechauka_item', (object) ['type' => 'notice', 'title' => 'x', 'body' => '',
+            'data' => json_encode(['sample' => true]), 'visible' => 1, 'targetall' => 1, 'sortorder' => 1,
+            'timecreated' => $now, 'timemodified' => $now]);
+        $this->assertTrue(manifest::build($screen, $now)['sample']);
+        $DB->delete_records('local_oksigeniahechauka_item', ['id' => $item]);
+        $this->assertArrayNotHasKey('sample', manifest::build($screen, $now));
+    }
 }

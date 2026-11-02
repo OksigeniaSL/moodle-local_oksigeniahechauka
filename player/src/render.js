@@ -12,6 +12,7 @@ import {buildAgenda, startAgenda} from './agendaview.js';
 import {buildCarousel, buildWall, buildWallBand, startCarousel, startWall, wallCount} from './photos.js';
 import {buildWeek, fitWeek} from './weekview.js';
 
+const PHRASE_WAITS_MS = 25000;
 const CAPTION_MS = 2800;
 
 /** The compositions that are made anew each time, never only their pictures changed. */
@@ -186,7 +187,8 @@ export class Screen {
         } else if (this.sample.parentNode) {
             this.sample.parentNode.removeChild(this.sample);
         }
-        this.identity = {name: scr.name || ''};
+        // The name of the screen is for the panel: whoever passes knows where they are. The centre's stands in for a logo.
+        this.identity = {name: (manifest.centre && manifest.centre.name) || ''};
         this.applyTheme(manifest.theme || {});
         this.setWeather(manifest.weather || null);
         this.todayKey = '';
@@ -210,8 +212,9 @@ export class Screen {
 
     paintHeader(p) {
         const id = this.identity;
-        p.place.textContent = id.name;
-        p.place.style.display = id.name ? '' : 'none';
+        const name = id.light ? '' : id.name;
+        p.place.textContent = name;
+        p.place.style.display = name ? '' : 'none';
         p.logo.style.display = id.light ? '' : 'none';
         if (id.light && p.logo.src !== id.light) {
             p.logo.src = id.light;
@@ -797,7 +800,13 @@ export class Screen {
      */
     qrBox(url, wrap) {
         const box = el('div', 'hk-qr');
-        const q = qrPath(url);
+        let q;
+        try {
+            q = qrPath(url);
+        } catch (e) {
+            // An address too long for a code: the slide goes on without it.
+            return document.createDocumentFragment();
+        }
         const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
         svg.setAttribute('viewBox', '0 0 ' + q.size + ' ' + q.size);
         svg.setAttribute('shape-rendering', 'crispEdges');
@@ -1031,6 +1040,11 @@ export class Screen {
     show(choice, today, week) {
         const comp = choice.comp;
         const items = choice.items;
+        // One clock: the sentence of the ticker changes with the slide, in the same movement.
+        if (this.phrases && this.phrases.length > 1) {
+            clearTimeout(this.phraseTimer);
+            this.nextPhrase();
+        }
         // Each slide turns the page of the rest and the important notice in the fixed place.
         this.turn = (this.turn || 0) + 1;
         const wasFull = !!FULL[this.frame.getAttribute('data-composicion')];
@@ -1302,7 +1316,12 @@ export class Screen {
         if (f.lines === 2) {
             fresh.setAttribute('data-lineas', '2');
         }
+        const self = this;
         setTimeout(function () {
+            // The ticker may have changed in the meantime, and this phrase with it.
+            if (self.phraseNode !== fresh) {
+                return;
+            }
             track.appendChild(fresh);
             void fresh.offsetWidth;
             requestAnimationFrame(function () {
@@ -1317,12 +1336,10 @@ export class Screen {
         }
         this.phraseAt++;
         if (list.length > 1) {
-            const words = f.text.split(/\s+/).length;
-            const wait = Math.min(12, Math.max(6, 2 + 0.35 * words));
-            const self = this;
+            // Usually the next slide changes it; this is for the long ones.
             this.phraseTimer = setTimeout(function () {
                 self.nextPhrase();
-            }, wait * 1000);
+            }, PHRASE_WAITS_MS);
         }
     }
 

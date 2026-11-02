@@ -717,7 +717,7 @@ class home {
                 $size = $image->get_imageinfo();
                 $out['vertical'] = $size && $size['height'] > $size['width'];
             }
-            if ($media && !$media->is_valid_image()) {
+            if ($media && video::is_video($media)) {
                 $seconds = (int) round((float) ($data['videoduration'] ?? 0));
                 $out['video'] = $seconds ? floor($seconds / 60) . ':' . sprintf('%02d', $seconds % 60) : '▶';
                 if (!empty($data['videowidth']) && !empty($data['videoheight'])) {

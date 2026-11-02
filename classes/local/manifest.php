@@ -28,6 +28,9 @@ namespace local_oksigeniahechauka\local;
  * Everything a screen needs for the coming days, so it keeps going without a network.
  */
 class manifest {
+    /** @var string The table of the content. */
+    const ITEM = 'local_oksigeniahechauka_item';
+
     /** Days ahead the manifest has data for. */
     const HORIZON = 14;
 
@@ -48,6 +51,7 @@ class manifest {
      * @return array
      */
     public static function build(\stdClass $screen, int $now): array {
+        global $DB;
         $config = get_config('local_oksigeniahechauka');
         $info = json_decode((string) $screen->lastinfo, true) ?: [];
         $display = $info['display'] ?? [];
@@ -69,6 +73,7 @@ class manifest {
                 'glass' => !empty($screen->glass),
             ],
             'template' => uses::valid($screen->screenuse ?? null) === 'showcase' ? 'full' : 'zones',
+            'centre' => ['name' => self::centre_name()],
             'theme' => self::theme($screen, $config),
             'labels' => [
                 'menu' => get_string('label_menu', 'local_oksigeniahechauka'),
@@ -86,7 +91,9 @@ class manifest {
         if ($power) {
             $m['power'] = $power;
         }
-        if (!empty($config->sampledata)) {
+        // As long as there is something of the example left: taken out or rewritten from the panel, the notice goes with it.
+        $like = $DB->sql_like('data', ':sample');
+        if (!empty($config->sampledata) && $DB->record_exists_select(self::ITEM, $like, ['sample' => '%"sample":true%'])) {
             $m['sample'] = true;
         }
         if (!empty($config->sourceweather)) {
@@ -138,6 +145,17 @@ class manifest {
     }
 
     /**
+     * The name that stands in for a logo while there is none: the site's, short enough for a header.
+     *
+     * @return string
+     */
+    protected static function centre_name(): string {
+        global $SITE;
+        $full = items::plain(format_string($SITE->fullname));
+        return \core_text::strlen($full) <= 28 ? $full : items::plain(format_string($SITE->shortname));
+    }
+
+    /**
      * The colours, the logos and the light or dark theme.
      *
      * @param \stdClass $screen
@@ -156,11 +174,16 @@ class manifest {
         foreach (array_keys(colours::SETTINGS) as $setting) {
             $set[$setting] = $config->$setting ?? '';
         }
+        // Until the centre chooses, the main colour is its Moodle's: never the same blue on every site.
+        $primary = strtolower((string) $set['colourprimary']);
+        if (!colours::valid($primary) || $primary === centre::DEFAULTS['colourprimary']) {
+            $set['colourprimary'] = colours::site_brand() ?? $set['colourprimary'];
+        }
         $theme['vars'] = colours::vars($set, categories::colours());
         if (!$theme['vars']) {
             unset($theme['vars']);
         }
-        $logo = files::first(files::LOGO, 0);
+        $logo = files::first(files::LOGO, 0) ?: files::site_logo();
         if ($logo) {
             $theme['logo'] = files::media($logo);
         }

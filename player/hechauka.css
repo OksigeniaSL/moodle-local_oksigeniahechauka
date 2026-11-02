@@ -428,8 +428,8 @@ body {
 /* Only in the mock-ups: the «example data» mark. */
 .hk-muestra {
     position: absolute;
-    top: 2.4rem;
-    left: 2.4rem;
+    right: 2.4rem;
+    bottom: 12rem;
     padding: .8rem 1.6rem;
     border-radius: 1rem;
     background: rgba(0, 0, 0, .55);
@@ -487,11 +487,15 @@ body {
 .hk-sin-cinta.hk {
     padding-bottom: 3rem;
 }
-/* No logo: the name of the place opens the header, without the rule that would part it from the logo. */
+/* No logo: the name of the centre stands in for it, with the same mark as what leads. */
 .hk-sin-logo .hk-lugar {
     margin-left: 0;
-    padding-left: 0;
-    border-left: 0;
+    padding-left: 2rem;
+    border-left: 1.2rem solid var(--hk-primario);
+    color: var(--hk-texto);
+    font-size: calc(var(--hk-t-min) * 1.15);
+    font-weight: 800;
+    letter-spacing: -.01em;
 }
 .hk-aviso-importante h3 {
     color: var(--hk-acento-texto);
@@ -507,7 +511,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: 10;
+    z-index: 50;
     background: #000;
     cursor: none;
 }

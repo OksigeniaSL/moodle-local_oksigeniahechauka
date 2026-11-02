@@ -22,6 +22,8 @@ const BY_DISTANCE = {3: 1, 5: 1.25, 8: 1.5};
 const EDGE = 6;
 // Without news from the server for this long, it no longer knows what the sky is doing.
 const SKY_LASTS_MS = 3 * 3600000;
+// None takes this long: one that never ended would leave the screen without the others.
+const LONGEST_MS = 3 * 60000;
 // The thread of what hangs: one element, stretched from above the screen to where it holds on. Nothing to paint, whatever its length.
 const THREAD_WIDE = 7;
 const THREAD_ABOVE = 4;
@@ -120,7 +122,7 @@ export function cleanOf(meta, width, height, scale, gesture, slips) {
         {state: 'baja', times: 1},
         {state: 'cae', times: 0, leaves: height + below},
         {state: 'limpia', times: slips ? first : times, y: top + times * up, wait: v.espera, behind: false},
-    ].concat(slips ? [{state: 'resbala', times: 1}, {state: 'limpia', times: times - first}] : [], [
+    ].concat(slips ? [{state: 'resbala', times: 1}, {state: 'limpia', times: Math.max(1, times - first)}] : [], [
         {state: gesture, times: 1},
         {state: 'huye', times: 0, leaves: -below},
     ]);
@@ -977,6 +979,10 @@ export class Surprises {
             return;
         }
         if (this.walk) {
+            if (now - this.walkAt > LONGEST_MS) {
+                this.hooks.note('surprise: it did not end');
+                this.stop();
+            }
             return;
         }
         if (this.asked) {
@@ -1003,6 +1009,7 @@ export class Surprises {
         }
         const base = character.atlas.slice(0, character.atlas.lastIndexOf('/') + 1);
         const known = this.atlases[character.id];
+        this.walkAt = Date.now();
         // Holds the place while it is prepared: only one at a time.
         const holding = {remove: function () {
             holding.cut = true;

@@ -98,12 +98,42 @@ class files {
     }
 
     /**
+     * The logo of the Moodle site, which the screens use until the centre sets one of its own: the first day, they already
+     * look like the centre's.
+     *
+     * @return \stored_file|null
+     */
+    public static function site_logo(): ?\stored_file {
+        $fs = get_file_storage();
+        foreach (['logo', 'logocompact'] as $area) {
+            $found = $fs->get_area_files(self::context()->id, 'core_admin', $area, 0, 'itemid, filepath, filename', false);
+            if ($found) {
+                return reset($found);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Whether a file is a logo, which any screen may read.
+     *
+     * @param \stored_file $file
+     * @return bool
+     */
+    public static function is_logo(\stored_file $file): bool {
+        return $file->get_component() === 'core_admin' || in_array($file->get_filearea(), [self::LOGO, self::LOGODARK]);
+    }
+
+    /**
      * Whether a file is one of the screens', in an area a screen may read.
      *
      * @param \stored_file $file
      * @return bool
      */
     public static function readable(\stored_file $file): bool {
+        if ($file->get_component() === 'core_admin') {
+            return in_array($file->get_filearea(), ['logo', 'logocompact']) && !$file->is_directory();
+        }
         return $file->get_component() === self::COMPONENT
             && (int) $file->get_contextid() === (int) self::context()->id
             && in_array($file->get_filearea(), [self::MEDIA, self::VIDEO, self::POSTER, self::BACKDROP, self::LOGO,

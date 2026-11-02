@@ -84,7 +84,13 @@ export class MediaStore {
         });
         Object.keys(wanted).forEach(function (sha1) {
             chain = chain.then(function (cache) {
-                return self.bring(cache, wanted[sha1]).then(function () {
+                // A download that hangs (the network gone with no answer) must not keep the rest waiting.
+                const limit = Math.max(600000, (wanted[sha1].size || 0) / 100);
+                return Promise.race([self.bring(cache, wanted[sha1]), new Promise(function (resolve, reject) {
+                    setTimeout(function () {
+                        reject(new Error('it takes too long'));
+                    }, limit);
+                })]).then(function () {
                     return cache;
                 }, function (e) {
                     self.failed[sha1] = 'media ' + wanted[sha1].id + ': ' + (e && e.message || e);
@@ -98,6 +104,9 @@ export class MediaStore {
                 const next = self.pending;
                 self.pending = null;
                 return self.sync(next);
+            }
+            if (self.onSynced) {
+                self.onSynced();
             }
             return null;
         };

@@ -451,26 +451,26 @@
 
 /* --- From one composition to the next -----------------------------------------------------------------------------
  * The player adds the new layer with .hk-capa (hidden, a little low), and on the next frame adds .hk-dentro: it rises
- * and fades in, its parts one after the other. The old one takes .hk-fuera: it fades out rising a little, and leaves
- * the page after 1 s. When the composition stays the same, only the photo changes (the slides' fade, as before). */
+ * and fades in, its parts one after the other, once the old one has gone, so that two texts never mix. The old one takes
+ * .hk-fuera: it fades out rising a little, and leaves the page after 1 s. When the composition stays the same, only the photo changes (the slides' fade, as before). */
 .hk-capa {
     opacity: 0;
-    -webkit-transition: opacity .7s ease;
-    transition: opacity .7s ease;
+    -webkit-transition: opacity .5s ease .25s;
+    transition: opacity .5s ease .25s;
 }
 .hk-capa > * {
     -webkit-transform: translate3d(0, 2.4rem, 0);
     transform: translate3d(0, 2.4rem, 0);
-    -webkit-transition: -webkit-transform .9s cubic-bezier(.2, .7, .2, 1);
-    transition: transform .9s cubic-bezier(.2, .7, .2, 1);
+    -webkit-transition: -webkit-transform .9s cubic-bezier(.2, .7, .2, 1) .25s;
+    transition: transform .9s cubic-bezier(.2, .7, .2, 1) .25s;
 }
 .hk-capa > :nth-child(2) {
-    -webkit-transition-delay: .12s;
-    transition-delay: .12s;
+    -webkit-transition-delay: .37s;
+    transition-delay: .37s;
 }
 .hk-capa > :nth-child(3) {
-    -webkit-transition-delay: .24s;
-    transition-delay: .24s;
+    -webkit-transition-delay: .49s;
+    transition-delay: .49s;
 }
 .hk-capa.hk-dentro {
     opacity: 1;
@@ -481,16 +481,18 @@
 }
 .hk-capa.hk-fuera {
     opacity: 0;
-    -webkit-transition-duration: .5s;
-    transition-duration: .5s;
+    -webkit-transition-delay: 0s;
+    transition-delay: 0s;
+    -webkit-transition-duration: .25s;
+    transition-duration: .25s;
 }
 .hk-capa.hk-fuera > * {
     -webkit-transform: translate3d(0, -1.2rem, 0);
     transform: translate3d(0, -1.2rem, 0);
     -webkit-transition-delay: 0s;
     transition-delay: 0s;
-    -webkit-transition-duration: .5s;
-    transition-duration: .5s;
+    -webkit-transition-duration: .25s;
+    transition-duration: .25s;
 }
 
 /* Still: the same passes, without movement (only the fade). The player sets .hk-quieto on .hk when the screen asks

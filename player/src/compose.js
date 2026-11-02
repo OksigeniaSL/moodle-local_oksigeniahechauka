@@ -60,6 +60,10 @@ export function secondsOf(item) {
     return 10;
 }
 
+// How much the week has to have to come out, and to come out often.
+const WEEK_LEAST = 3;
+const WEEK_FULL = 4;
+
 export class Composer {
     constructor() {
         this.n = 0;
@@ -67,6 +71,7 @@ export class Composer {
         this.sinceWeek = 0;
         this.last = null;
         this.lastId = null;
+        this.sameRun = 0;
     }
 
     // Where the queue goes on: after the last item shown, wherever it is now (items come and go with their hours).
@@ -100,6 +105,7 @@ export class Composer {
         this.sinceWeek++;
         const far = o.distance === 8;
         const pick = (comp, items, seconds, extra) => {
+            this.sameRun = comp === this.last ? this.sameRun + 1 : 1;
             this.last = comp;
             if (items.length) {
                 this.lastId = items[items.length - 1].id;
@@ -110,7 +116,8 @@ export class Composer {
         // Mondays and Fridays, when the week is what matters; the other turns are the agenda's.
         const flagDay = !!(o.week && (o.week.weekday === 1 || o.week.weekday === 5));
         const close = !o.distance || o.distance === 3;
-        const useWeek = !!(o.week && !o.noToday && close && o.week.things > 0 && (!o.agenda || flagDay));
+        // With little in it, the week is a grid of empty days: what it has goes in «Today» and the coming days.
+        const useWeek = !!(o.week && !o.noToday && close && o.week.things >= WEEK_LEAST && (!o.agenda || flagDay));
         const useAgenda = !!(o.agenda && !o.noToday && !useWeek);
         const albumOf = (min) => {
             const list = (o.albums || []).filter((a) => a.count >= min);
@@ -179,7 +186,7 @@ export class Composer {
                 this.last !== 'agenda') {
             return pick('solo-hoy', [], o.menu ? 15 : 12);
         }
-        const theWeek = weekDue(flagDay ? 5 : 8);
+        const theWeek = weekDue(o.week && o.week.things < WEEK_FULL ? 10 : (flagDay ? 5 : 8));
         if (theWeek) {
             return theWeek;
         }
@@ -191,6 +198,10 @@ export class Composer {
                 this.sinceAlbum = 0;
                 return pick('fotos-tercio', [], 24, {album: third.id});
             }
+        }
+        // Portrait pictures are the same shape again and again: three running, with another text, would still look stuck.
+        if (this.sameRun >= 2 && h > 0 && this.last === 'vertical-hoy') {
+            return pick('solo-hoy', [], o.menu ? 15 : 12);
         }
         const i = this.position(queue);
         const it = queue[i];

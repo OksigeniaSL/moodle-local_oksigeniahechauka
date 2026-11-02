@@ -32,7 +32,6 @@ $capabilities = [
         'archetypes' => [
             'manager' => CAP_ALLOW,
         ],
-        'clonepermissionsfrom' => 'local/oksigeniahechauka:manage',
     ],
     // Add, change and remove one's own content, in the groups of screens where one publishes.
     'local/oksigeniahechauka:publish' => [
@@ -42,7 +41,6 @@ $capabilities = [
         'archetypes' => [
             'manager' => CAP_ALLOW,
         ],
-        'clonepermissionsfrom' => 'local/oksigeniahechauka:manage',
     ],
     // Publish on every screen and in any group, and touch the content of others.
     'local/oksigeniahechauka:publishall' => [
@@ -52,7 +50,6 @@ $capabilities = [
         'archetypes' => [
             'manager' => CAP_ALLOW,
         ],
-        'clonepermissionsfrom' => 'local/oksigeniahechauka:manage',
     ],
     // Add, set up, reload and remove screens; their groups, and who publishes in each; the warnings of a screen down.
     'local/oksigeniahechauka:managescreens' => [
@@ -62,6 +59,5 @@ $capabilities = [
         'archetypes' => [
             'manager' => CAP_ALLOW,
         ],
-        'clonepermissionsfrom' => 'local/oksigeniahechauka:manage',
     ],
 ];

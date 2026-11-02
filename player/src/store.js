@@ -30,6 +30,16 @@ function set(name, value) {
 }
 
 export const store = {
+    /** Whether what is written here survives a reload. */
+    works: function () {
+        try {
+            window.localStorage.setItem(PREFIX + 'probe', '1');
+            window.localStorage.removeItem(PREFIX + 'probe');
+            return true;
+        } catch (e) {
+            return false;
+        }
+    },
     key: function () {
         return get('key');
     },

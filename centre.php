@@ -32,6 +32,15 @@ use local_oksigeniahechauka\local\place;
 $c = 'local_oksigeniahechauka';
 $url = new moodle_url('/local/oksigeniahechauka/centre.php');
 $context = context_system::instance();
+if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && empty($_POST) && !empty($_SERVER['CONTENT_LENGTH'])) {
+    // Heavier than the server takes: nothing has arrived, and it has to say so instead of showing the page empty.
+    redirect(
+        $url,
+        get_string('compose_toolarge', 'local_oksigeniahechauka', display_size(get_max_upload_file_size())),
+        null,
+        \core\output\notification::NOTIFY_ERROR
+    );
+}
 require_login(null, false);
 access::require_cap('managescreens');
 $PAGE->set_context($context);

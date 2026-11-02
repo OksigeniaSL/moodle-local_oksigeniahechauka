@@ -46,7 +46,7 @@ class screens {
      */
     public static function start_pairing(array $device, int $now): array {
         global $DB;
-        $DB->delete_records_select('local_oksigeniahechauka_pair', 'timeexpires < :now', ['now' => $now]);
+        self::purge_pairings($now);
         if ($DB->count_records('local_oksigeniahechauka_pair') >= self::PAIR_MAX) {
             endpoint::fail(429, 'busy', 'Too many screens waiting to be paired');
         }
@@ -186,6 +186,33 @@ class screens {
     }
 
     /**
+     * Drops the codes that expired. A key that was claimed and never collected must not stay in the clear: that screen asks
+     * for a code again.
+     *
+     * @param int $now
+     * @return void
+     */
+    public static function purge_pairings(int $now): void {
+        global $DB;
+        $left = $DB->get_records_select(
+            'local_oksigeniahechauka_pair',
+            'timeexpires < :now AND screenid > 0 AND screenkey IS NOT NULL',
+            ['now' => $now],
+            '',
+            'id, screenid, screenkey'
+        );
+        foreach ($left as $pair) {
+            $DB->set_field(
+                'local_oksigeniahechauka_screen',
+                'keyhash',
+                null,
+                ['id' => $pair->screenid, 'keyhash' => keys::hash($pair->screenkey)]
+            );
+        }
+        $DB->delete_records_select('local_oksigeniahechauka_pair', 'timeexpires < :now', ['now' => $now]);
+    }
+
+    /**
      * Sets the groups of a screen.
      *
      * @param int $screenid
@@ -232,7 +259,7 @@ class screens {
         $DB->update_record('local_oksigeniahechauka_screen', (object) [
             'id' => $screen->id,
             'lastseen' => $now,
-            'lastinfo' => strlen($json) <= 8000 ? $json : json_encode(['version' => $keep['version'] ?? '']),
+            'lastinfo' => strlen($json) <= 8000 ? $json : '{}',
             'lastip' => substr(getremoteaddr(''), 0, 45),
         ]);
     }

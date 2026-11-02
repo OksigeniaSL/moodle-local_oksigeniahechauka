@@ -187,6 +187,8 @@ class player_page {
     public static function send(array $boot, bool $framed = false): void {
         header('Content-Type: text/html; charset=utf-8');
         header('Cache-Control: no-cache');
+        // What the worker of the screens looks for before keeping a page as theirs.
+        header('X-Hechauka-Player: 1');
         header('X-Content-Type-Options: nosniff');
         header('X-Frame-Options: ' . ($framed ? 'SAMEORIGIN' : 'DENY'));
         echo self::html($boot);

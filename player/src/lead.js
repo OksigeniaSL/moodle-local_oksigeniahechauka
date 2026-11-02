@@ -87,11 +87,11 @@ export function menuParts(menu) {
     const courses = (menu && menu.courses) || [];
     const main = courses[1] || courses[0];
     return {
-        main: main ? main.dishes.join(' · ') : '',
+        main: main ? (main.dishes || []).join(' · ') : '',
         others: courses.filter(function (c) {
             return c !== main;
         }).map(function (c) {
-            return {label: c.label, text: c.dishes.join(' · ')};
+            return {label: c.label, text: (c.dishes || []).join(' · ')};
         }),
     };
 }

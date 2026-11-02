@@ -151,6 +151,34 @@ test('one countdown, for the nearest event of more than a day, from two to fourt
     assert.equal(countdown(events, '2026-11-09', 14), null);
 });
 
+test('no more than two portrait pictures with «Today» running, while «Today» has something else to show', () => {
+    const tall = (id) => ({id, type: 'image', media: {width: 900, height: 1200}});
+    const c = new Composer();
+    c.sinceFull = -100;
+    const out = [];
+    for (let i = 0; i < 12; i++) {
+        out.push(c.next([tall('a'), wide('b'), tall('c'), tall('d')], 3, true).comp);
+    }
+    for (let i = 2; i < out.length; i++) {
+        assert.ok(!(out[i] === 'vertical-hoy' && out[i - 1] === 'vertical-hoy' && out[i - 2] === 'vertical-hoy'), out.join(' '));
+    }
+});
+
+test('«La semana» with little in it comes less often, and with almost nothing it does not come', () => {
+    const run = (things) => {
+        const c = new Composer();
+        c.sinceFull = -100;
+        const out = [];
+        for (let i = 1; i <= 24; i++) {
+            out.push(c.next([wide('a'), wide('b')], 3, true, {week: {things, weekday: 1}}).comp);
+        }
+        return out.filter((comp) => comp === 'semana').length;
+    };
+    assert.equal(run(1), 0);
+    assert.equal(run(2), 0);
+    assert.ok(run(3) > 0 && run(3) < run(4));
+});
+
 test('«La semana» every 8 slides, every 5 on Mondays and Fridays, only with something beyond today', () => {
     const run = (weekday, things, slides) => {
         const c = new Composer();

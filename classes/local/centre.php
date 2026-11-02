@@ -88,10 +88,16 @@ class centre {
         $uses = ['colourprimary' => ['centre_primary', 'centre_primary_use'], 'colouraccent' => ['centre_accent',
             'centre_accent_use']];
         $chosen = false;
+        $sitebrand = false;
         foreach (self::DEFAULTS as $setting => $default) {
             $mine = colours::valid($config->$setting ?? '');
             $chosen = $chosen || $mine;
             $value = $mine ? strtolower($config->$setting) : $default;
+            // The same that the screens take: the main one, from the site's theme, until the centre chooses another.
+            if ($setting === 'colourprimary' && $value === $default && colours::site_brand()) {
+                $value = colours::site_brand();
+                $sitebrand = true;
+            }
             $tiles[] = [
                 'setting' => $setting,
                 'value' => $value,
@@ -168,7 +174,9 @@ class centre {
             'resultsjson' => json_encode($results),
             'place' => $place,
             'tiles' => $tiles,
-            'defaults' => !$chosen,
+            'defaults' => !$chosen && !$sitebrand,
+            'sitebrand' => $sitebrand,
+            'sitelogo' => !files::first(files::LOGO, 0) && files::site_logo(),
             'categories' => $cats,
             'hascategories' => (bool) $cats,
             'canadd' => count($cats) < categories::MAX,
@@ -270,7 +278,7 @@ class centre {
             $name = clean_filename($upload['name']);
             $fs->delete_area_files($context->id, $c, $area, 0);
             $fs->create_file_from_pathname(['contextid' => $context->id, 'component' => $c, 'filearea' => $area,
-                'itemid' => 0, 'filepath' => '/', 'filename' => $name, 'userid' => $USER->id], $upload['tmp_name']);
+                'itemid' => 0, 'filepath' => '/', 'filename' => $name], $upload['tmp_name']);
             // The setting the administration keeps for the same file.
             set_config($setting, '/' . $name, $c);
         }

@@ -80,7 +80,7 @@
                 </section>
                 <section class="hkp-fs" aria-labelledby="hkp-col-h">
                     <h2 id="hkp-col-h" class="hkp-label hkp-section-label">{{#str}}centre_colours, local_oksigeniahechauka{{/str}}</h2>
-                    <p class="hkp-hint hkp-section-hint">{{#str}}centre_colours_help, local_oksigeniahechauka{{/str}}{{#defaults}} <b>{{#str}}centre_colours_defaults, local_oksigeniahechauka{{/str}}</b>{{/defaults}}</p>
+                    <p class="hkp-hint hkp-section-hint">{{#str}}centre_colours_help, local_oksigeniahechauka{{/str}}{{#sitebrand}} <b>{{#str}}centre_colours_site, local_oksigeniahechauka{{/str}}</b>{{/sitebrand}}{{#defaults}} <b>{{#str}}centre_colours_defaults, local_oksigeniahechauka{{/str}}</b>{{/defaults}}</p>
                     <div class="hkp-colours">{{#tiles}}<label class="hkp-colour"><input type="color" name="{{setting}}" value="{{value}}" data-colour="{{setting}}" aria-describedby="hkp-c-{{setting}}"><b>{{name}}</b><span id="hkp-c-{{setting}}">{{use}} · <span data-hex="{{setting}}">{{hex}}</span>, <span data-on="{{setting}}">{{on}}</span></span></label>{{/tiles}}</div>
                 </section>
                 <section class="hkp-fs" aria-labelledby="hkp-cat-h">
@@ -105,7 +105,7 @@
                 </section>
                 <section class="hkp-fs" aria-labelledby="hkp-logo-h">
                     <h2 id="hkp-logo-h" class="hkp-label hkp-section-label">{{#str}}centre_logo, local_oksigeniahechauka{{/str}}</h2>
-                    <p class="hkp-hint hkp-section-hint">{{#str}}centre_logo_help, local_oksigeniahechauka{{/str}}</p>
+                    <p class="hkp-hint hkp-section-hint">{{#str}}centre_logo_help, local_oksigeniahechauka{{/str}}{{#sitelogo}} <b>{{#str}}centre_logo_site, local_oksigeniahechauka{{/str}}</b>{{/sitelogo}}</p>
                     <div class="hkp-logos">{{#logos}}<div class="hkp-logo"><span class="hkp-logo-art{{#dark}} is-dark{{/dark}}">{{#url}}<img src="{{url}}" alt="{{alt}}">{{/url}}</span><b>{{label}}</b><label class="btn btn-sm btn-outline-secondary">{{#str}}compose_change, local_oksigeniahechauka{{/str}}<input class="visually-hidden sr-only" type="file" name="{{area}}" accept=".svg,.png,.jpg,.jpeg,.webp" data-logo="{{area}}"></label></div>{{/logos}}</div>
                 </section>
                 <div class="hkp-foot"><button type="submit" class="btn btn-primary btn-lg">{{#str}}centre_save, local_oksigeniahechauka{{/str}}</button><p class="hkp-hint">{{#str}}centre_technical, local_oksigeniahechauka{{/str}}{{#admin}} <a href="{{admin}}">{{#str}}centre_admin, local_oksigeniahechauka{{/str}}</a>{{/admin}}</p></div>

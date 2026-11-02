@@ -92,6 +92,7 @@ export function oneOfEachAlbum(queue, turns) {
         const photo = list[(turns[a.id] || 0) % list.length];
         out.push(Object.assign({}, photo, {
             id: 'album-' + a.id,
+            source: photo.id,
             caption: photo.caption || {title: a.headline || a.name, text: a.subtitle},
             web: photo.web || a.web,
         }));

@@ -25,6 +25,7 @@
 namespace local_oksigeniahechauka\task;
 
 use local_oksigeniahechauka\local\alerts;
+use local_oksigeniahechauka\local\screens;
 
 /**
  * Every few minutes, the screens that should be on and say nothing.
@@ -46,6 +47,7 @@ class check_screens extends \core\task\scheduled_task {
      */
     public function execute(): void {
         $done = alerts::check(time());
+        screens::purge_pairings(time());
         mtrace('Screens down: ' . $done['down'] . '; back: ' . $done['back']);
     }
 }

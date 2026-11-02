@@ -42,6 +42,22 @@ class colours {
     const DARK_SURFACE = '#19212c';
 
     /**
+     * The brand colour the Moodle site's theme has, if it has one.
+     *
+     * @return string|null
+     */
+    public static function site_brand(): ?string {
+        global $CFG;
+        foreach (['theme_' . $CFG->theme, 'theme_boost'] as $theme) {
+            $brand = get_config($theme, 'brandcolor');
+            if (is_string($brand) && self::valid($brand)) {
+                return strtolower($brand);
+            }
+        }
+        return null;
+    }
+
+    /**
      * Whether a text is a colour «#rrggbb».
      *
      * @param string|null $hex

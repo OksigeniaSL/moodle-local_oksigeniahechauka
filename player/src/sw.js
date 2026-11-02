@@ -4,6 +4,7 @@
 // the media do not pass through here, the player keeps them itself (media.js).
 
 const SHELL = 'hechauka-shell-1';
+const PAGE_WAITS_MS = 8000;
 
 self.addEventListener('install', function (event) {
     self.skipWaiting();
@@ -90,8 +91,9 @@ self.addEventListener('fetch', function (event) {
         return;
     }
     const page = req.mode === 'navigate';
-    event.respondWith(fetch(req).then(function (res) {
-        if (res.ok) {
+    const answer = fetch(req).then(function (res) {
+        // As a page, only ours: a site being updated answers with a page of its own, and that one must not stay as the screen's.
+        if (res.ok && (!page || res.headers.get('X-Hechauka-Player'))) {
             const copy = res.clone();
             event.waitUntil(caches.open(SHELL).then(function (c) {
                 // One copy of each file: the copies of other versions (?v=…) go.
@@ -116,5 +118,25 @@ self.addEventListener('fetch', function (event) {
         return fromCache(req).then(function (hit) {
             return hit || (page ? retryPage() : Response.error());
         });
+    });
+    event.waitUntil(answer.then(function () {
+        return null;
+    }, function () {
+        return null;
+    }));
+    if (!page) {
+        event.respondWith(answer);
+        return;
+    }
+    // A network that says nothing must not leave the screen in black: after a few seconds, its copy, if it has one.
+    event.respondWith(new Promise(function (resolve) {
+        answer.then(resolve);
+        setTimeout(function () {
+            fromCache(req).then(function (hit) {
+                if (hit) {
+                    resolve(hit);
+                }
+            });
+        }, PAGE_WAITS_MS);
     }));
 });

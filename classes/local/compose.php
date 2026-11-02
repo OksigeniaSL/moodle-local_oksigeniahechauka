@@ -238,7 +238,7 @@ class compose {
                 $height = (int) ($data['videoheight'] ?? ($size['height'] ?? 0));
                 $file = [
                     'name' => $media->get_filename(),
-                    'about' => self::file_about($width, $height, !$media->is_valid_image(), (float) ($data['videoduration'] ?? 0)),
+                    'about' => self::file_about($width, $height, video::is_video($media), (float) ($data['videoduration'] ?? 0)),
                     'thumb' => $image ? \moodle_url::make_pluginfile_url(
                         $image->get_contextid(),
                         $c,
@@ -255,7 +255,7 @@ class compose {
                         '/',
                         $media->get_filename()
                     )->out(false),
-                    'video' => !$media->is_valid_image(),
+                    'video' => video::is_video($media),
                     'vertical' => $height > $width,
                     'width' => $width,
                     'height' => $height,
@@ -564,7 +564,7 @@ class compose {
             $mime = mimeinfo('type', $upload['name']);
             if (!empty($upload['error']) || !is_uploaded_file($upload['tmp_name'])) {
                 $errors['file'] = get_string('compose_filefailed', $c);
-            } else if (strpos($mime, 'image/') !== 0 && strpos($mime, 'video/') !== 0) {
+            } else if (!file_mimetype_in_typegroup($mime, 'web_image') && strpos($mime, 'video/') !== 0) {
                 $errors['file'] = get_string('compose_filetype', $c);
             } else if ($upload['size'] > get_max_upload_file_size()) {
                 $errors['file'] = get_string('compose_filesize', $c, display_size(get_max_upload_file_size()));
@@ -583,7 +583,7 @@ class compose {
                 }
                 if (!empty($sent['error'][$i]) || !is_uploaded_file($sent['tmp_name'][$i])) {
                     $errors['file'] = get_string('compose_filefailed', $c);
-                } else if (strpos(mimeinfo('type', $sent['name'][$i]), 'image/') !== 0) {
+                } else if (!file_mimetype_in_typegroup(mimeinfo('type', $sent['name'][$i]), 'web_image')) {
                     $errors['file'] = get_string('compose_album_onlyphotos', $c);
                 } else if ($sent['size'][$i] > get_max_upload_file_size()) {
                     $errors['file'] = get_string('compose_filesize', $c, display_size(get_max_upload_file_size()));
@@ -619,6 +619,8 @@ class compose {
             'sortorder' => (int) $DB->get_field_sql('SELECT COALESCE(MAX(sortorder), 0) + 1
                                                        FROM {local_oksigeniahechauka_item}')];
         $extra = $item ? items::data($item) : [];
+        // Saved from the panel, it is the centre's, and no longer goes with the example when that is taken out.
+        unset($extra['sample']);
         $record->title = $in['title'];
         $record->body = $type === 'ticker' ? '' : $in['body'];
         $record->duration = $item->duration ?? 0;

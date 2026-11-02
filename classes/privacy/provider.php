@@ -32,8 +32,8 @@ use core_privacy\local\request\userlist;
 use core_privacy\local\request\writer;
 
 /**
- * The only thing about a person: who last changed each piece of content of the screens. Screens and their
- * heartbeats are about devices, not people.
+ * The only things about a person: who created each piece of content of the screens and who changed it last. Screens and
+ * their heartbeats are about devices, not people; the logos are the centre's, and keep nobody's name.
  */
 class provider implements
     \core_privacy\local\metadata\provider,
@@ -50,6 +50,7 @@ class provider implements
      */
     public static function get_metadata(collection $collection): collection {
         $collection->add_database_table(self::TABLE, [
+            'createdby' => 'privacy:metadata:item:createdby',
             'usermodified' => 'privacy:metadata:item:usermodified',
             'timemodified' => 'privacy:metadata:item:timemodified',
         ], 'privacy:metadata:item');
@@ -65,7 +66,7 @@ class provider implements
     public static function get_contexts_for_userid(int $userid): contextlist {
         global $DB;
         $list = new contextlist();
-        if ($DB->record_exists(self::TABLE, ['usermodified' => $userid])) {
+        if ($DB->record_exists_select(self::TABLE, 'usermodified = :a OR createdby = :b', ['a' => $userid, 'b' => $userid])) {
             $list->add_system_context();
         }
         return $list;
@@ -86,6 +87,11 @@ class provider implements
             'SELECT usermodified FROM {' . self::TABLE . '} WHERE usermodified > 0',
             []
         );
+        $userlist->add_from_sql(
+            'createdby',
+            'SELECT createdby FROM {' . self::TABLE . '} WHERE createdby > 0',
+            []
+        );
     }
 
     /**
@@ -100,9 +106,11 @@ class provider implements
             if ($context->contextlevel != CONTEXT_SYSTEM) {
                 continue;
             }
-            $items = $DB->get_records(
+            $id = $contextlist->get_user()->id;
+            $items = $DB->get_records_select(
                 self::TABLE,
-                ['usermodified' => $contextlist->get_user()->id],
+                'usermodified = :a OR createdby = :b',
+                ['a' => $id, 'b' => $id],
                 'id',
                 'id, type, title, timemodified'
             );
@@ -133,6 +141,7 @@ class provider implements
         global $DB;
         if ($context->contextlevel == CONTEXT_SYSTEM) {
             $DB->set_field_select(self::TABLE, 'usermodified', 0, 'usermodified > 0');
+            $DB->set_field_select(self::TABLE, 'createdby', 0, 'createdby > 0');
         }
     }
 
@@ -147,6 +156,7 @@ class provider implements
         foreach ($contextlist->get_contexts() as $context) {
             if ($context->contextlevel == CONTEXT_SYSTEM) {
                 $DB->set_field(self::TABLE, 'usermodified', 0, ['usermodified' => $contextlist->get_user()->id]);
+                $DB->set_field(self::TABLE, 'createdby', 0, ['createdby' => $contextlist->get_user()->id]);
             }
         }
     }
@@ -164,5 +174,6 @@ class provider implements
         }
         [$in, $params] = $DB->get_in_or_equal($userlist->get_userids(), SQL_PARAMS_NAMED);
         $DB->set_field_select(self::TABLE, 'usermodified', 0, 'usermodified ' . $in, $params);
+        $DB->set_field_select(self::TABLE, 'createdby', 0, 'createdby ' . $in, $params);
     }
 }

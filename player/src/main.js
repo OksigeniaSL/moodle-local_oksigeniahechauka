@@ -19,7 +19,7 @@ import {filesOf, isRaining, Surprises} from './surprises.js';
 import {countToday} from './today.js';
 import {weekOf} from './week.js';
 
-const VERSION = '0.7.10';
+const VERSION = '0.7.11';
 const COMING_DAYS = 7;
 const HEARTBEAT_MS = 60000;
 const REFRESH_MS = 15 * 60000;
@@ -45,6 +45,7 @@ class Player {
         this.root = document.getElementById('hechauka') || document.body;
         this.startedAt = Date.now();
         this.heardAt = 0;
+        this.turnDue = 0;
         this.errors = [];
         this.bad = {};
         this.albumTurns = {};
@@ -91,11 +92,21 @@ class Player {
                     self.note('item ' + item.id + ': the file does not play');
                 }
                 self.bad[item.id] = Date.now();
+                // A photo of an album goes by the album's name: the photo itself is what must not come back.
+                if (item.source) {
+                    self.bad[item.source] = self.bad[item.id];
+                }
                 if (self.isShowing(item)) {
                     self.next();
                 }
             },
         });
+        this.media.onSynced = function () {
+            if (self.themeWaits && self.manifest) {
+                self.themeWaits = false;
+                self.screen.applyTheme(self.manifest.theme || {});
+            }
+        };
         const screen = this.screen;
         this.surprises = new Surprises(screen.frame, {
             quiet: function () {
@@ -162,6 +173,12 @@ class Player {
         navigator.serviceWorker.register(this.boot.sw).catch(function () {
             return null;
         });
+        // That the browser does not empty what the screen keeps, its key among it, if the disk runs short.
+        if (navigator.storage && navigator.storage.persist) {
+            navigator.storage.persist().catch(function () {
+                return null;
+            });
+        }
         // The first visit does not go through the worker: the page keeps its own shell, so that the next start
         // without a network finds it. The same cache the worker reads (sw.js).
         if (window.caches) {
@@ -220,6 +237,8 @@ class Player {
             this.keepSurprises(m.surprises);
         }
         const self = this;
+        // While another list is being brought, its files come later: then the logo and the letter have to be looked at again.
+        this.themeWaits = this.media.busy;
         this.media.sync(mediaOf(m)).then(function () {
             if (self.manifest === m) {
                 self.screen.applyTheme(m.theme || {});
@@ -442,9 +461,24 @@ class Player {
         }
     }
 
-    /** The next slide: the composition the rules choose, shown, and the one after it in its seconds. */
+    /** The next slide. Whatever goes wrong with one, the turns go on: a slide that cannot be shown must not freeze the screen. */
     next() {
         clearTimeout(this.timer);
+        this.turnDue = 0;
+        try {
+            this.turn();
+        } catch (e) {
+            this.note('slide: ' + (e && e.message || e));
+            const self = this;
+            this.turnDue = Date.now() + 10000;
+            this.timer = setTimeout(function () {
+                self.next();
+            }, 10000);
+        }
+    }
+
+    /** The composition the rules choose, shown, and the one after it in its seconds. */
+    turn() {
         if (!this.manifest) {
             return;
         }
@@ -509,11 +543,13 @@ class Player {
         }
         // Some know how long they last only once they are in the page.
         const seconds = this.screen.show(choice, today, week) || choice.seconds;
+        const lasts = seconds * 1000 + (choice.items.some(function (it) {
+            return it.type === 'video';
+        }) ? 5000 : 0);
+        this.turnDue = Date.now() + lasts;
         this.timer = setTimeout(function () {
             self.next();
-        }, seconds * 1000 + (choice.items.some(function (it) {
-            return it.type === 'video';
-        }) ? 5000 : 0));
+        }, lasts);
     }
 
     tick() {
@@ -529,19 +565,21 @@ class Player {
         this.screen.setPower(on);
         const urgent = urgentOf(m.items, wall);
         this.surprises.tick(Date.now(), on && !urgent, this.mode === 'preview');
+        // An urgent notice covers everything until it is taken off; then the turns go on. With the screen off, the black goes
+        // over it, and it still comes off when it ends.
+        const was = this.urgentOn;
+        this.urgentOn = !!urgent;
+        this.screen.showUrgent(urgent);
+        const wasOn = this.wasOn;
+        this.wasOn = on;
         if (!on) {
             return;
         }
         this.screen.setDark(this.forcedTheme !== undefined ? this.forcedTheme : isDark(m.theme, wall));
         this.screen.setClock(this.clock.date());
-        // An urgent notice covers everything until it is taken off; then the turns go on.
-        const was = this.urgentOn;
-        this.urgentOn = !!urgent;
-        this.screen.showUrgent(urgent);
-        if (was && !urgent) {
-            this.next();
-        }
-        if (!this.screen.comp) {
+        // Just on, not with what it had yesterday; and a turn that never came is not waited for.
+        const lost = this.turnDue && Date.now() > this.turnDue + 60000;
+        if ((was && !urgent) || wasOn === false || lost || !this.screen.comp) {
             this.next();
         }
         if (this.reloadAt && Date.now() - this.reloadAt > 30000) {
@@ -555,7 +593,8 @@ class Player {
 
     // Once a day, in the small hours, a screen reloads itself: weeks of a page open wear any browser down.
     nightly(wall) {
-        if (this.mode === 'screen' && Date.now() - this.startedAt > 20 * 3600000 && wall.min >= 180 && wall.min < 240) {
+        // Where the browser keeps nothing, not even the key, a reload would leave the screen asking to be paired.
+        if (this.mode === 'screen' && store.works() && Date.now() - this.startedAt > 20 * 3600000 && wall.min >= 180 && wall.min < 240) {
             location.reload();
         }
     }
