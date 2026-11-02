@@ -218,9 +218,9 @@ class access {
         $strings = get_string_manager();
         $lang = $user->lang ?: null;
         $panel = new \moodle_url('/local/oksigeniahechauka/index.php');
+        $groupname = $groupid ? (string) $DB->get_field('local_oksigeniahechauka_group', 'name', ['id' => $groupid]) : '';
         $a = (object) [
-            'group' => $groupid ? items::plain((string) $DB->get_field('local_oksigeniahechauka_group', 'name',
-                ['id' => $groupid])) : '',
+            'group' => items::plain($groupname),
             'panel' => $panel->out(false),
             'guide' => (new \moodle_url('/local/oksigeniahechauka/guide.php', [], 'anadir'))->out(false),
         ];
