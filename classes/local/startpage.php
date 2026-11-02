@@ -56,14 +56,22 @@ class startpage {
         if (empty($config->lat) || empty($config->lon)) {
             $out[] = ['label' => get_string('start_missing_place', $c), 'url' => $start . '#hkp-loc-h'];
         }
-        if (!files::first(files::LOGO, 0) && !files::site_logo()) {
-            $out[] = ['label' => get_string('start_missing_logo', $c),
-                'url' => (new \moodle_url('/local/oksigeniahechauka/centre.php'))->out(false)];
-        }
         if (!$DB->record_exists_select('local_oksigeniahechauka_screen', 'keyhash IS NOT NULL')) {
             $out[] = ['label' => get_string('start_missing_screen', $c), 'url' => $start . '#hkp-st-screen'];
         }
         return $out;
+    }
+
+    /**
+     * How many there are of something, said as a sentence.
+     *
+     * @param string $what calendar, news, menu or books
+     * @param int $count
+     * @return string
+     */
+    protected static function figure(string $what, int $count): string {
+        $end = $count === 0 ? 'none' : ($count === 1 ? 'one' : 'some');
+        return get_string('start_source_' . $what . '_' . $end, 'local_oksigeniahechauka', $count);
     }
 
     /**
@@ -79,12 +87,11 @@ class startpage {
         $news = count(sources::news($now, 7));
         $rows = [
             ['setting' => 'sourcecalendar', 'name' => get_string('start_source_calendar', $c), 'available' => true,
-                'now' => $events ? get_string('start_source_calendar_some', $c, $events) :
-                    get_string('start_source_calendar_none', $c),
+                'now' => self::figure('calendar', $events),
                 'link' => $events ? '' : (new \moodle_url('/local/oksigeniahechauka/edit.php', ['type' => 'agenda']))->out(false),
                 'linklabel' => $events ? '' : get_string('start_source_calendar_ical', $c)],
             ['setting' => 'sourcenews', 'name' => get_string('start_source_news', $c), 'available' => true,
-                'now' => get_string('start_source_news_some', $c, $news)],
+                'now' => self::figure('news', $news)],
         ];
         $meals = sources::has_meals();
         $days = 0;
@@ -95,7 +102,7 @@ class startpage {
             }
         }
         $rows[] = ['setting' => 'sourcemenu', 'name' => get_string('start_source_menu', $c), 'available' => $meals,
-            'now' => $meals ? get_string('start_source_menu_some', $c, $days) : get_string('start_source_menu_missing', $c)];
+            'now' => $meals ? self::figure('menu', $days) : get_string('start_source_menu_missing', $c)];
         $hasbooks = sources::has_books();
         $books = 0;
         if ($hasbooks) {
@@ -103,7 +110,7 @@ class startpage {
             $books = $list ? count($list[0]['books']) : 0;
         }
         $rows[] = ['setting' => 'sourcebooks', 'name' => get_string('start_source_books', $c), 'available' => $hasbooks,
-            'now' => $hasbooks ? get_string('start_source_books_some', $c, $books) : get_string('start_source_books_missing', $c)];
+            'now' => $hasbooks ? self::figure('books', $books) : get_string('start_source_books_missing', $c)];
         foreach ($rows as &$row) {
             $row['checked'] = $row['available'] && !empty($config->{$row['setting']});
             $row['id'] = 'hkp-st-' . $row['setting'];
@@ -136,17 +143,26 @@ class startpage {
         $skin = array_values(array_filter($centre['skins'], function ($card) {
             return $card['checked'];
         }))[0] ?? null;
+        $rows = self::sources($config, $now);
+        $on = array_filter($rows, function ($row) {
+            return $row['checked'];
+        });
+        $state = function (bool $done) use ($c) {
+            return ['done' => $done, 'label' => get_string($done ? 'start_state_done' : 'start_state_todo', $c)];
+        };
         return [
             'tabs' => home::tabs('centre', true),
             'hastabs' => true,
             'action' => $action,
             'sesskey' => sesskey(),
             'frame' => $centre['frame'],
+            'strings' => $centre['strings'],
             'style' => $centre['style'],
             'kinds' => $kinds,
             'askcategories' => !$hascats,
             'brand' => [
                 'name' => manifest::centre_name(),
+                'logourl' => (new \moodle_url('/local/oksigeniahechauka/centre.php'))->out(false) . '#hkp-logo-h',
                 'logo' => $logo ? \moodle_url::make_pluginfile_url(
                     $logo->get_contextid(),
                     $logo->get_component(),
@@ -167,12 +183,36 @@ class startpage {
             'resultsjson' => $centre['resultsjson'],
             'place' => $centre['place'],
             'icons' => $centre['icons'],
-            'sources' => self::sources($config, $now),
+            'sources' => $rows,
+            'states' => [
+                'kind' => $state($chosen !== ''),
+                'brand' => $state(true),
+                'sources' => $state((bool) $on),
+                'place' => $state(!empty($config->lat) && !empty($config->lon)),
+                'screen' => $state($paired),
+            ],
+            'savedword' => get_string('start_saved', $c),
             'playerurl' => $CFG->wwwroot . '/local/oksigeniahechauka/player/',
             'paired' => $paired,
             'screensurl' => (new \moodle_url('/local/oksigeniahechauka/screens.php'))->out(false) . '#add',
             'home' => (new \moodle_url('/local/oksigeniahechauka/index.php'))->out(false),
         ];
+    }
+
+    /**
+     * How the first and third steps stand after touching them.
+     *
+     * @return array
+     */
+    public static function states(): array {
+        $c = 'local_oksigeniahechauka';
+        $config = get_config($c);
+        $on = false;
+        foreach (self::SOURCES as $setting) {
+            $on = $on || !empty($config->$setting);
+        }
+        return ['kind' => !empty($config->centrekind), 'sources' => $on, 'hascategories' => (bool) categories::all(),
+            'done' => get_string('start_state_done', $c), 'todo' => get_string('start_state_todo', $c)];
     }
 
     /**

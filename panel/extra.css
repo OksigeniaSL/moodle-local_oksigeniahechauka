@@ -984,6 +984,12 @@ dialog.hkp-dialog > footer {
     .hkp-with-band .hkp-preview > :not(.hkp-stage) {
         display: none;
     }
+    .hkp-with-band .hkp-step:first-child {
+        scroll-margin-top: 14rem;
+    }
+    #hkp-start-page.hkp-with-band > .hkp-head {
+        margin-top: 9.5rem;
+    }
     .hkp-with-band .hkp-preview .hkp-stage {
         width: 60%;
         margin: 0 auto;
@@ -1096,6 +1102,46 @@ dialog.hkp-dialog > footer {
 }
 
 /* «Empezar». */
+.hkp-step > .hkp-section-label {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: .75rem;
+}
+.hkp-step-state {
+    flex: none;
+    padding: .05rem .6rem;
+    border-radius: 999px;
+    border: 1px solid var(--hkp-edge);
+    color: var(--hkp-muted);
+    font-size: .8125rem;
+    font-weight: 600;
+}
+.hkp-step-state[data-done="1"] {
+    border-color: var(--hkp-ok-ink);
+    color: var(--hkp-ok-ink);
+}
+.hkp-start-cats {
+    margin-top: .9rem;
+}
+.hkp-start-cats[hidden],
+.hkp-start-saved[hidden] {
+    display: none;
+}
+.hkp-start-saved {
+    margin: 0;
+    color: var(--hkp-ok-ink);
+    font-weight: 600;
+}
+.hkp-start-nologo {
+    display: grid;
+    place-items: center;
+    width: 8rem;
+    height: 3.5rem;
+    border: 1px dashed var(--hkp-edge);
+    border-radius: var(--hkp-radius-sm);
+    font-size: .875rem;
+}
 .hkp-start-brand {
     display: flex;
     flex-wrap: wrap;
@@ -1121,7 +1167,7 @@ dialog.hkp-dialog > footer {
     width: 1.75rem;
     height: 1.75rem;
     border-radius: 50%;
-    box-shadow: inset 0 0 0 1px var(--hkp-line);
+    box-shadow: 0 0 0 2px var(--hkp-edge);
 }
 .hkp-start-sources {
     display: grid;

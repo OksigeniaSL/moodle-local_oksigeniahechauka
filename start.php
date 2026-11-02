@@ -61,8 +61,11 @@ if (data_submitted() && confirm_sesskey()) {
         redirect($url);
     }
     startpage::save();
-    if (optional_param('finish', 0, PARAM_BOOL)) {
-        redirect(new moodle_url('/local/oksigeniahechauka/index.php'));
+    if (optional_param('touched', 0, PARAM_BOOL)) {
+        // Saved as it is touched: the page goes on where it is.
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode(startpage::states());
+        die();
     }
     redirect($url, get_string('centre_saved', $c), null, notification::NOTIFY_SUCCESS);
 }

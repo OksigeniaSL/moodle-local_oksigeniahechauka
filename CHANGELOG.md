@@ -4,6 +4,7 @@
 
 - **«Empezar»**: the setting up on one page, with the screen beside it, the first time whoever runs the screens opens the panel: what kind of centre it is, its look, what
   comes by itself with the figures there are right now, where it is and its first screen. The panel then says what is still missing, until it is done.
+- Each step says whether it is done, what is touched is saved at once, and the page ends in the first screen. Beside it the screen stands on samples while the centre has nothing yet.
 - The sources can be turned on and off from the panel too, without going to the administration.
 - A long address under a QR says only where it goes.
 - The page of the birthdays no longer shows two stray characters at its top.

@@ -21,57 +21,60 @@
 
     Example context (json):
     {
-        "action": "#", "sesskey": "abc", "frame": "https://example.com/preview", "style": "", "hastabs": false, "tabs": [],
+        "action": "#", "sesskey": "abc", "strings": "{}", "frame": "https://example.com/preview", "style": "", "hastabs": false, "tabs": [],
         "kinds": [{"id": "school", "label": "Un colegio", "checked": true}], "askcategories": true,
-        "brand": {"name": "Centro", "logo": "", "skin": "Petróleo", "primary": "#0e4f5c", "accent": "#ff8a3d", "change": "#"},
+        "states": {"kind": {"done": true, "label": "Hecho"}, "brand": {"done": true, "label": "Hecho"}, "sources": {"done": true, "label": "Hecho"}, "place": {"done": false, "label": "Falta"}, "screen": {"done": false, "label": "Falta"} },
+        "brand": {"name": "Centro", "logo": "", "logourl": "#", "skin": "Petróleo", "primary": "#0e4f5c", "accent": "#ff8a3d", "change": "#"},
         "query": "", "searched": false, "results": [], "hasresults": false, "resultsjson": "[]", "place": null,
         "icons": {"search": "", "pin": "", "out": "", "check": ""},
         "sources": [{"id": "s1", "setting": "sourcecalendar", "name": "Calendario", "available": true, "checked": true, "now": "14 eventos", "link": "", "linklabel": ""}],
         "playerurl": "https://example.com/player/", "paired": false, "screensurl": "#", "home": "#"
     }
 }}
-<div class="hkp" id="hkp-start-page"{{#style}} style="{{style}}"{{/style}}>
+<div class="hkp" id="hkp-start-page"{{#style}} style="{{style}}"{{/style}} data-strings="{{strings}}">
     <header class="hkp-head"><div class="hkp-head-title"><h1>{{#str}}start_title, local_oksigeniahechauka{{/str}}</h1><p class="hkp-hint">{{#str}}start_help, local_oksigeniahechauka{{/str}}</p></div></header>
     <div class="hkp-centre">
         <div class="hkp-centre-form">
             <form method="post" action="{{action}}" id="hkp-start-form" class="hkp-centre-form">
                 <input type="hidden" name="sesskey" value="{{sesskey}}">
                 <section class="hkp-fs hkp-step" aria-labelledby="hkp-st-kind">
-                    <h2 id="hkp-st-kind" class="hkp-label hkp-section-label">1. {{#str}}start_kind, local_oksigeniahechauka{{/str}}</h2>
+                    <h2 id="hkp-st-kind" class="hkp-label hkp-section-label"><span>1. {{#str}}start_kind, local_oksigeniahechauka{{/str}}</span><span class="hkp-step-state" data-step="kind" data-done="{{#states.kind.done}}1{{/states.kind.done}}{{^states.kind.done}}0{{/states.kind.done}}">{{states.kind.label}}</span></h2>
                     <p class="hkp-hint hkp-section-hint">{{#str}}start_kind_help, local_oksigeniahechauka{{/str}}</p>
                     <div class="hkp-chips" role="radiogroup" aria-labelledby="hkp-st-kind">{{#kinds}}<label class="hkp-chip"><input type="radio" name="kind" value="{{id}}"{{#checked}} checked{{/checked}}>{{label}}</label>{{/kinds}}</div>
-                    {{#askcategories}}<div class="form-check hkp-field"><input class="form-check-input" type="checkbox" id="hkp-st-cats" name="categories" value="1" checked><label class="form-check-label" for="hkp-st-cats">{{#str}}start_categories, local_oksigeniahechauka{{/str}}</label></div>{{/askcategories}}
+                    {{#askcategories}}<div class="form-check hkp-field hkp-start-cats" id="hkp-st-cats-box"><input class="form-check-input" type="checkbox" id="hkp-st-cats" name="categories" value="1" checked><label class="form-check-label" for="hkp-st-cats">{{#str}}start_categories, local_oksigeniahechauka{{/str}}</label></div>{{/askcategories}}
                 </section>
                 <section class="hkp-fs hkp-step" aria-labelledby="hkp-st-brand">
-                    <h2 id="hkp-st-brand" class="hkp-label hkp-section-label">2. {{#str}}start_brand, local_oksigeniahechauka{{/str}}</h2>
+                    <h2 id="hkp-st-brand" class="hkp-label hkp-section-label"><span>2. {{#str}}start_brand, local_oksigeniahechauka{{/str}}</span><span class="hkp-step-state" data-step="brand" data-done="{{#states.brand.done}}1{{/states.brand.done}}{{^states.brand.done}}0{{/states.brand.done}}">{{states.brand.label}}</span></h2>
                     <p class="hkp-hint hkp-section-hint">{{#str}}start_brand_help, local_oksigeniahechauka{{/str}}</p>
                     <div class="hkp-start-brand">
                         {{#brand.logo}}<img src="{{brand.logo}}" alt="">{{/brand.logo}}
+                        {{^brand.logo}}<a class="hkp-start-nologo" href="{{brand.logourl}}">{{#str}}start_logo_add, local_oksigeniahechauka{{/str}}</a>{{/brand.logo}}
                         <div class="hkp-start-brand-text"><b>{{brand.name}}</b><small>{{brand.skin}}</small></div>
                         <span class="hkp-start-swatches" aria-hidden="true"><i style="background:{{brand.primary}}"></i><i style="background:{{brand.accent}}"></i></span>
                         <a class="btn btn-outline-secondary" href="{{brand.change}}">{{#str}}start_change, local_oksigeniahechauka{{/str}}</a>
                     </div>
                 </section>
                 <section class="hkp-fs hkp-step" aria-labelledby="hkp-st-sources">
-                    <h2 id="hkp-st-sources" class="hkp-label hkp-section-label">3. {{#str}}start_sources, local_oksigeniahechauka{{/str}}</h2>
+                    <h2 id="hkp-st-sources" class="hkp-label hkp-section-label"><span>3. {{#str}}start_sources, local_oksigeniahechauka{{/str}}</span><span class="hkp-step-state" data-step="sources" data-done="{{#states.sources.done}}1{{/states.sources.done}}{{^states.sources.done}}0{{/states.sources.done}}">{{states.sources.label}}</span></h2>
                     <p class="hkp-hint hkp-section-hint">{{#str}}start_sources_help, local_oksigeniahechauka{{/str}}</p>
                     <ul class="hkp-start-sources">{{#sources}}<li><div class="form-switch form-check"><input class="form-check-input" type="checkbox" role="switch" id="{{id}}" name="{{setting}}" value="1"{{#checked}} checked{{/checked}}{{^available}} disabled{{/available}}><label class="form-check-label" for="{{id}}"><b>{{name}}</b></label></div><small>{{now}}{{#link}} <a href="{{link}}">{{linklabel}}</a>{{/link}}</small></li>{{/sources}}</ul>
-                    <div class="hkp-foot"><button type="submit" class="btn btn-primary">{{#str}}centre_save, local_oksigeniahechauka{{/str}}</button></div>
+                    <p class="hkp-hint hkp-start-saved" id="hkp-start-saved" role="status" hidden>{{#str}}start_saved, local_oksigeniahechauka{{/str}}</p>
+                    <div class="hkp-foot" data-without-script><button type="submit" class="btn btn-outline-secondary">{{#str}}centre_save, local_oksigeniahechauka{{/str}}</button></div>
                 </section>
             </form>
             <section class="hkp-fs hkp-step" aria-labelledby="hkp-loc-h">
-                <h2 id="hkp-loc-h" class="hkp-label hkp-section-label">4. {{#str}}centre_where, local_oksigeniahechauka{{/str}}</h2>
+                <h2 id="hkp-loc-h" class="hkp-label hkp-section-label"><span>4. {{#str}}centre_where, local_oksigeniahechauka{{/str}}</span><span class="hkp-step-state" data-step="place" data-done="{{#states.place.done}}1{{/states.place.done}}{{^states.place.done}}0{{/states.place.done}}">{{states.place.label}}</span></h2>
                 <p class="hkp-hint hkp-section-hint">{{#str}}centre_where_help, local_oksigeniahechauka{{/str}}</p>
                 {{> local_oksigeniahechauka/place_finder }}
             </section>
             <section class="hkp-fs hkp-step" aria-labelledby="hkp-st-screen">
-                <h2 id="hkp-st-screen" class="hkp-label hkp-section-label">5. {{#str}}start_screen, local_oksigeniahechauka{{/str}}</h2>
+                <h2 id="hkp-st-screen" class="hkp-label hkp-section-label"><span>5. {{#str}}start_screen, local_oksigeniahechauka{{/str}}</span><span class="hkp-step-state" data-step="screen" data-done="{{#states.screen.done}}1{{/states.screen.done}}{{^states.screen.done}}0{{/states.screen.done}}">{{states.screen.label}}</span></h2>
                 {{^paired}}<p class="hkp-hint hkp-section-hint">{{#str}}start_screen_help, local_oksigeniahechauka{{/str}}</p>
                 <p class="hkp-start-url"><code>{{playerurl}}</code></p>
-                <div class="hkp-foot"><a class="btn btn-outline-secondary" href="{{screensurl}}">{{#str}}start_screen_more, local_oksigeniahechauka{{/str}}</a></div>{{/paired}}
-                {{#paired}}<p class="hkp-hint hkp-section-hint">{{#str}}start_screen_done, local_oksigeniahechauka{{/str}}</p>{{/paired}}
+                <div class="hkp-foot"><a class="btn btn-primary" href="{{screensurl}}">{{#str}}start_screen_add, local_oksigeniahechauka{{/str}}</a><a class="btn btn-outline-secondary" href="{{home}}">{{#str}}start_finish, local_oksigeniahechauka{{/str}}</a></div>{{/paired}}
+                {{#paired}}<p class="hkp-hint hkp-section-hint">{{#str}}start_screen_done, local_oksigeniahechauka{{/str}}</p>
+                <div class="hkp-foot"><a class="btn btn-primary" href="{{home}}">{{#str}}start_finish, local_oksigeniahechauka{{/str}}</a></div>{{/paired}}
             </section>
-            <div class="hkp-foot"><a class="btn btn-primary" href="{{home}}">{{#str}}start_finish, local_oksigeniahechauka{{/str}}</a></div>
         </div>
         <div class="hkp-centre-side">
             <aside class="hkp-preview" aria-labelledby="hkp-st-pv">
