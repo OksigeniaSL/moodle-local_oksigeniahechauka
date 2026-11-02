@@ -148,6 +148,9 @@ class items {
         $item['type'] = $isvideo ? 'video' : 'image';
         $item['zone'] = 'main';
         $item['fit'] = in_array($data['fit'] ?? '', ['cover', 'contain', 'blur']) ? $data['fit'] : 'cover';
+        if (($data['layout'] ?? '') === 'full') {
+            $item['layout'] = 'full';
+        }
         if ($isvideo) {
             $ready = files::first(files::VIDEO, (int) $record->id);
             $extra = !empty($data['videoduration']) ? ['duration' => (float) $data['videoduration']] : [];

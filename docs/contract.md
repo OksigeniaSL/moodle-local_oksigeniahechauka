@@ -214,6 +214,8 @@ length unless it has a duration.
 - A `menu` is the menu of one day: `menus` is `[{"name": "Menu A", "courses": [{"label": "First course", "dishes":
   ["…"]}]}]`, and every menu is a page of the block. `label` replaces the title of the block (the server can show
   tomorrow's menu in the afternoon, with its own `when` and «Tomorrow's menu»). With `closed`, `title` says why.
+- `layout: full`, on a picture or video: over the whole screen at its turn, whatever its shape. Without it, the player chooses by
+  its shape.
 - `fit: blur` shows the whole picture or video over a blurred copy of itself, the way a vertical video fills a
   horizontal screen. For videos the blurred copy is the still `backdrop`, never a second video.
 

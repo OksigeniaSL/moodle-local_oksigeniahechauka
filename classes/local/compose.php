@@ -26,6 +26,9 @@ namespace local_oksigeniahechauka\local;
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class compose {
+    /** @var string[] How a picture or a video comes out: by its shape, over the whole screen, or whole with no cut. */
+    const HOWS = ['auto', 'full', 'whole'];
+
     /** @var string */
     const C = 'local_oksigeniahechauka';
 
@@ -317,6 +320,10 @@ class compose {
             'hascategories' => count($stages) > 1,
             'centre' => access::can('managescreens') ? (new \moodle_url('/local/oksigeniahechauka/centre.php'))->out(false) : '',
             'file' => $file,
+            'hows' => array_map(function ($how) use ($c, $data) {
+                $now = ($data['layout'] ?? '') === 'full' ? 'full' : (($data['fit'] ?? '') === 'blur' ? 'whole' : 'auto');
+                return ['value' => $how, 'label' => get_string('compose_how_' . $how, $c), 'checked' => $how === $now];
+            }, self::HOWS),
             'photos' => $photos,
             'hasphotos' => (bool) $photos,
             'albummax' => items::ALBUM_MAX,
@@ -451,6 +458,7 @@ class compose {
             'body' => trim(optional_param('body', '', PARAM_TEXT)),
             'important' => optional_param('important', 0, PARAM_BOOL),
             'caption' => optional_param('caption', 0, PARAM_BOOL),
+            'how' => optional_param('how', 'auto', PARAM_ALPHA),
             'url' => trim(optional_param('url', '', PARAM_RAW_TRIMMED)),
             'web' => trim(optional_param('web', '', PARAM_RAW_TRIMMED)),
             'colour' => optional_param('colour', '', PARAM_ALPHANUM),
@@ -641,7 +649,13 @@ class compose {
             }
         } else if ($type === 'media') {
             $extra['caption'] = (bool) $in['caption'];
-            $extra['fit'] = $extra['fit'] ?? 'cover';
+            // Whole, over a blurred copy of itself, only if asked for: the margins are what nobody wants by default.
+            $extra['fit'] = $in['how'] === 'whole' ? 'blur' : 'cover';
+            if ($in['how'] === 'full') {
+                $extra['layout'] = 'full';
+            } else {
+                unset($extra['layout']);
+            }
             $extra['web'] = $in['web'];
             if ($extra['web'] === '') {
                 unset($extra['web']);

@@ -208,6 +208,11 @@ export class Composer {
         const next = queue[(i + 1) % queue.length];
         const a = ratio(it);
         this.sinceFull++;
+        // The centre has asked for it: over the whole screen, whatever its shape.
+        if (it.layout === 'full') {
+            this.sinceFull = 0;
+            return pick('foto-completa', [it], it.type === 'video' ? secondsOf(it) : 9);
+        }
         const fullDue = this.sinceFull > 3 && this.last !== 'solo-hoy' && this.last !== 'semana' && this.last !== 'agenda';
         if (fullDue && (horizontal ? a >= 1.45 : a < 0.63)) {
             this.sinceFull = 0;

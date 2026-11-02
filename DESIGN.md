@@ -272,6 +272,8 @@ Biblioteca, Secretaría y Comedor.» A teacher sees only their groups, already c
 - «Para qué es» (informativa, escaparate o mixta) and «Desde dónde se lee» (de cerca, a media distancia, de lejos): three
   small cards to choose from, each saying what it means, with the same shape. Under them, «Otro uso a ciertas horas»
   (its days, its hours and the use then) and «Detrás de un cristal».
+- A picture or video in «Añadir» has «Cómo sale»: «Automático» (by its shape, cropped a little to fill its place, with no margins),
+  «A pantalla completa» and «Entera» (nothing cropped, over a blurred copy of itself).
 - «Sorpresas»: the switch «Sorpresas en esta pantalla» and «Que salga una ahora», to see it on the screen itself. With the
   surprises off in «Tu centro», only a line that says so, with the way there.
 

@@ -198,7 +198,8 @@
                 if (!f.media || !f.media.url) {
                     return null;
                 }
-                const item = {id: 'draft', type: f.media.video ? 'video' : 'image', zone: 'main', fit: 'cover',
+                const item = {id: 'draft', type: f.media.video ? 'video' : 'image', zone: 'main',
+                    fit: f.how === 'whole' ? 'blur' : 'cover',
                     media: {url: f.media.url, width: f.media.width || 0, height: f.media.height || 0}};
                 if (f.caption && (title || body)) {
                     item.caption = {};
@@ -296,6 +297,7 @@
                 eventFrom: value('#hkp-ef'),
                 eventTo: value('#hkp-et'),
                 colour: colour ? colour.getAttribute('data-n') : 0,
+                how: q('input[name="how"]:checked') ? q('input[name="how"]:checked').value : 'auto',
                 media,
             }, s);
         };
@@ -306,7 +308,8 @@
             }
             const item = draft();
             frame.contentWindow.postMessage({hkDraft: item ? {item, replaces: cfg.id ? 'i' + cfg.id : null,
-                focus: cfg.type === 'event' ? 'week' : focus} : null}, location.origin);
+                focus: cfg.type === 'event' ? 'week' : (q('input[name="how"][value="full"]:checked') ? 'full' : focus)} : null},
+                location.origin);
         };
 
         const note = function () {

@@ -151,6 +151,15 @@ test('one countdown, for the nearest event of more than a day, from two to fourt
     assert.equal(countdown(events, '2026-11-09', 14), null);
 });
 
+test('what the centre asks of a picture goes before its shape: over the whole screen, at its turn', () => {
+    const c = new Composer();
+    c.sinceFull = -100;
+    const square = {id: 'a', type: 'image', layout: 'full', media: {width: 1000, height: 1000}};
+    assert.equal(c.next([square], 3, true).comp, 'foto-completa');
+    const same = {id: 'b', type: 'image', media: {width: 1000, height: 1000}};
+    assert.notEqual(new Composer().next([same], 3, true).comp, 'foto-completa');
+});
+
 test('no more than two portrait pictures with «Today» running, while «Today» has something else to show', () => {
     const tall = (id) => ({id, type: 'image', media: {width: 900, height: 1200}});
     const c = new Composer();

@@ -26,7 +26,7 @@
         "style": "", "id": 0, "type": "notice", "isnotice": true, "editing": false, "title": "Añadir a las pantallas",
         "back": "https://example.com/local/oksigeniahechauka/index.php", "backicon": "",
         "action": "https://example.com/local/oksigeniahechauka/edit.php", "sesskey": "abc",
-        "hastypes": true, "types": [{"type": "notice", "label": "Aviso", "icon": "", "checked": true, "url": "#"}],
+        "hows": [{"value": "auto", "label": "Automático", "checked": true}], "hastypes": true, "types": [{"type": "notice", "label": "Aviso", "icon": "", "checked": true, "url": "#"}],
         "values": {"title": "Salida temprana el viernes", "body": "", "important": false, "caption": true, "url": "", "web": "",
             "eventday": "2026-11-02", "eventfrom": "10:00", "eventto": ""},
         "stages": [], "hascategories": false, "centre": "", "file": null, "maxbytes": "100 MB",
@@ -76,6 +76,7 @@
             <div class="hkp-field"><label class="form-label" for="hkp-body">{{#str}}compose_secondline, local_oksigeniahechauka{{/str}}</label><input class="form-control" id="hkp-body" name="body" value="{{values.body}}" maxlength="120" autocomplete="off"></div>
             <div class="hkp-switch form-switch form-check"><input class="form-check-input" type="checkbox" role="switch" id="hkp-cap" name="caption" value="1"{{#values.caption}} checked{{/values.caption}}><div><label class="form-check-label" for="hkp-cap">{{#str}}compose_caption, local_oksigeniahechauka{{/str}}</label><p>{{#str}}compose_caption_help, local_oksigeniahechauka{{/str}}</p></div></div>
             <div class="hkp-field"><label class="form-label" for="hkp-web">{{#str}}compose_web, local_oksigeniahechauka{{/str}}</label><input class="form-control{{#errors.web}} is-invalid{{/errors.web}}" id="hkp-web" name="web" value="{{values.web}}" maxlength="200" inputmode="url" autocomplete="off" spellcheck="false" placeholder="{{#str}}compose_web_example, local_oksigeniahechauka{{/str}}"><p class="hkp-hint">{{#errors.web}}<b class="text-danger">{{errors.web}}</b> {{/errors.web}}{{#str}}compose_web_help, local_oksigeniahechauka{{/str}}</p></div>
+            <div class="hkp-field"><span class="hkp-label" id="hkp-how-l">{{#str}}compose_how, local_oksigeniahechauka{{/str}}</span><div class="hkp-chips" role="radiogroup" aria-labelledby="hkp-how-l">{{#hows}}<label class="hkp-chip is-small"><input type="radio" name="how" value="{{value}}"{{#checked}} checked{{/checked}}>{{label}}</label>{{/hows}}</div><p class="hkp-hint">{{#str}}compose_how_help, local_oksigeniahechauka{{/str}}</p></div>
             {{/ismedia}}
             {{#isalbum}}
             <legend>{{#str}}compose_album, local_oksigeniahechauka{{/str}}</legend>

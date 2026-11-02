@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.7.14 (2026-11-02)
+
+- **«How it comes out»** for a photo or a video: automatic (by its shape, cropped a little, with no margins), full screen, or whole
+  over a blurred copy of itself. Until now, the margins could not be taken off from the panel.
+
 ## 0.7.13 (2026-11-02)
 
 - **A frozen picture no longer goes unnoticed**: a screen that answers but paints nothing says «No picture» in the panel and warns

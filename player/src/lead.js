@@ -143,8 +143,9 @@ export function weekHeadline(today, days) {
  */
 export function buildLead(p, today, l) {
     const s = el('section', 'hk-lider');
-    s.setAttribute('data-tipo', p.type === 'notice' ? 'aviso' : (p.type === 'event' ? 'evento' :
-        (p.type === 'countdown' ? 'cuenta' : 'menu')));
+    const holiday = p.type === 'event' && (p.event.holiday === true || /^(festivo|no lectivo|vacaciones)$/i.test(p.event.group || ''));
+    s.setAttribute('data-tipo', p.type === 'notice' ? 'aviso' : (holiday ? 'festivo' : (p.type === 'event' ? 'evento' :
+        (p.type === 'countdown' ? 'cuenta' : 'menu'))));
     s.setAttribute('data-ajuste', '0');
     if (p.type === 'menu') {
         const m = today.menu;
