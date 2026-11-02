@@ -1,0 +1,1 @@
+{"meta":{"personaje":"lluvia","tipo":"capas","base":1080,"dura":45,"entra":4,"sale":4,"capas":[{"image":"spr.lluvia-1.webp","w":468,"h":2808,"velocidad":[120,720],"opacidad":1},{"image":"spr.lluvia-2.webp","w":600,"h":3400,"velocidad":[180,1020],"opacidad":1}],"peso":106040}}

@@ -37,6 +37,9 @@ class surprises {
     /** @var string[] Who comes only on the dates the centre sets, and only if it asks for them: nobody has them by default. */
     const SEASONAL = ['nieve'];
 
+    /** @var string[] Who comes only while it really rains where the centre is, and only if it asks for them. */
+    const WHEN_RAINING = ['lluvia'];
+
     /** @var int[] The days of each month, leap year included: the same dates are for every year. */
     const DAYS = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 
@@ -52,7 +55,16 @@ class surprises {
     }
 
     /**
-     * Who the centre has chosen. All of them until it chooses.
+     * All there is to choose from.
+     *
+     * @return string[]
+     */
+    public static function everyone(): array {
+        return array_merge(self::CHARACTERS, self::SEASONAL, self::WHEN_RAINING);
+    }
+
+    /**
+     * Who the centre has chosen. All of the characters until it chooses.
      *
      * @param \stdClass $config the plugin's
      * @return string[]
@@ -61,8 +73,7 @@ class surprises {
         if (!isset($config->surprisewho)) {
             return self::CHARACTERS;
         }
-        $all = array_merge(self::CHARACTERS, self::SEASONAL);
-        return array_values(array_intersect($all, explode(',', (string) $config->surprisewho)));
+        return array_values(array_intersect(self::everyone(), explode(',', (string) $config->surprisewho)));
     }
 
     /**
@@ -140,7 +151,13 @@ class surprises {
             'characters' => array_map(function ($id) use ($config) {
                 $one = ['id' => $id, 'atlas' => self::url($id, 'spr.' . $id . '.atlas.json')];
                 $season = self::season($id, $config);
-                return $season ? $one + ['season' => $season] : $one;
+                if ($season) {
+                    $one['season'] = $season;
+                }
+                if (in_array($id, self::WHEN_RAINING)) {
+                    $one['when'] = 'rain';
+                }
+                return $one;
             }, $chosen),
         ]];
     }
@@ -176,6 +193,8 @@ class surprises {
                     'until' => self::date_fields($season['until'] ?? $today->modify('+1 month')->format('m-d')),
                 ];
             }, self::SEASONAL),
+            'weather' => array_map($row, self::WHEN_RAINING),
+            'noplace' => !isset($config->lat) || $config->lat === '',
         ];
     }
 
@@ -193,7 +212,7 @@ class surprises {
         }
         // With the block closed, its boxes are still sent; a character without its box is one left out.
         $who = optional_param_array('surprisewho', [], PARAM_ALPHANUM);
-        set_config('surprisewho', implode(',', array_intersect(array_merge(self::CHARACTERS, self::SEASONAL), $who)), $c);
+        set_config('surprisewho', implode(',', array_intersect(self::everyone(), $who)), $c);
         foreach (self::SEASONAL as $id) {
             $from = self::sent_date($id, 'from');
             $until = self::sent_date($id, 'until');

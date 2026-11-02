@@ -144,12 +144,13 @@ changed, or the manifest with its `ETag` header:
   `every`: about how many minutes between one and the next (the player varies it, and never less than 15).
   `characters`: `[{"id": "gusanito", "atlas": "https://…/spr.gusanito.atlas.json"}]`, one of them each time. The atlas
   says its pages (beside it), states, frames per second, speed and shadow; what flies, a step per frame (`avance`), the
-  heights it goes at (`altura`) and no shadow. With `tipo: "capas"` (snow), no character: tiles that join on their four
+  heights it goes at (`altura`) and no shadow. With `tipo: "capas"` (snow, rain), no character: tiles that join on their four
   sides, over the whole screen for `dura` seconds, fades `entra` and `sale` included; by layer, `image`, `w`, `h`,
   `velocidad` `[dx, dy]` in px/s at base 1080 and `opacidad`. A tile down has to be a whole number of tiles across.
   `season`, only on what has dates: `{"from": "12-15", "until": "01-06"}`, month and day, every year; it may go over New
-  Year. The player looks at its own date, so that it also ends without a network; out of season it does not come out by
-  itself, and an order only brings it if nobody else is in season. Only an urgent notice takes it off; a screen
+  Year. The player looks at its own date, so that it also ends without a network. `when`, only on what depends on the sky:
+  `"rain"`, while `weather.now.symbol` says rain or sleet and the server has been heard in the last three hours. When its
+  time has not come it does not come out by itself, and an order only brings it if nobody else can. Only an urgent notice takes it off; a screen
   that is off or keeps still has none. The player keeps its files like the rest of the page, so they also come out
   without a network.
 - `screen.glass`: true behind glass: everything a bit bigger, and no secondary grey in what has to be read.

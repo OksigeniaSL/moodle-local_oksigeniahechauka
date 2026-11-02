@@ -36,7 +36,7 @@ sites.
   slide one thing leads; the rest gives way to a third or, from afar, comes one at a time. There is an agenda that goes up
   with the month beside it, and photo albums that show in a third or in a mosaic.
 - **Surprises**, if the centre wants them: now and then a 3D character crosses the screen, stops, looks at whoever is
-  passing, makes a gesture and runs away. Or, on the dates the centre sets, it snows.
+  passing, makes a gesture and runs away. Or, on the dates the centre sets, it snows, and it rains when it really rains.
 - **The player** is one web page that every screen opens: a small computer with a browser in kiosk mode, a smart TV
   with a kiosk browser or a professional display that loads a web page. It keeps what it needs on the device and goes
   on without a network.

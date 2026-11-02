@@ -37,7 +37,7 @@ pantallas. No es para sitios en producción.
   manda una cosa; lo demás cede a un tercio o, de lejos, llega de una en una. Hay agenda que sube con el mes al lado, y
   álbumes de fotos que salen en un tercio o en un mosaico.
 - **Sorpresas**, si el centro quiere: de vez en cuando, un personaje en 3D cruza la pantalla, se para, mira a quien pasa, hace
-  un gesto y se va corriendo. O, en las fechas que ponga el centro, nieva.
+  un gesto y se va corriendo. O, en las fechas que ponga el centro, nieva, y llueve cuando llueve de verdad.
 - **El reproductor** es una sola página web que abre cada pantalla: un ordenador pequeño con un navegador en modo
   quiosco, una tele inteligente con un navegador de quiosco o una pantalla profesional que carga una página web.
   Guarda en el aparato lo que necesita y sigue sin red.

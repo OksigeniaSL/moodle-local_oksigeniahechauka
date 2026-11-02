@@ -143,6 +143,32 @@ final class surprises_test extends \advanced_testcase {
     }
 
     /**
+     * Nobody has the rain until the centre chooses it; then the manifest says that it comes with the rain, with no dates.
+     */
+    public function test_when_raining(): void {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        set_config('surprises', 1, 'local_oksigeniahechauka');
+        $screen = $this->screen();
+        $this->assertNotContains('lluvia', array_column(manifest::build($screen, time())['surprises']['characters'], 'id'));
+
+        $_POST = ['surprises' => 1, 'surpriseevery' => 20, 'surprisewho' => ['lluvia']];
+        surprises::save_centre();
+        $people = manifest::build($screen, time())['surprises']['characters'];
+        $this->assertCount(1, $people);
+        $this->assertSame('lluvia', $people[0]['id']);
+        $this->assertSame('rain', $people[0]['when']);
+        $this->assertArrayNotHasKey('season', $people[0]);
+
+        // The centre's page says when it needs the place, and not when it has it.
+        $context = surprises::centre_context(get_config('local_oksigeniahechauka'));
+        $this->assertTrue($context['weather'][0]['checked']);
+        $this->assertTrue($context['noplace']);
+        set_config('lat', '28.4858', 'local_oksigeniahechauka');
+        $this->assertFalse(surprises::centre_context(get_config('local_oksigeniahechauka'))['noplace']);
+    }
+
+    /**
      * The order from a screen's sheet reaches the screen once.
      */
     public function test_asked_from_the_sheet(): void {
@@ -158,7 +184,7 @@ final class surprises_test extends \advanced_testcase {
      */
     public function test_files_are_there(): void {
         global $CFG;
-        foreach (array_merge(surprises::CHARACTERS, surprises::SEASONAL) as $id) {
+        foreach (surprises::everyone() as $id) {
             $folder = $CFG->dirroot . '/local/oksigeniahechauka/player/sorpresas/' . $id . '/';
             $atlas = json_decode(file_get_contents($folder . 'spr.' . $id . '.atlas.json'), true);
             $files = $atlas['meta']['pages'] ?? array_column($atlas['meta']['capas'], 'image');

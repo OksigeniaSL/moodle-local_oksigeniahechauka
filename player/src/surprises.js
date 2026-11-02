@@ -8,7 +8,7 @@
 // fps px at each change or, in what flies, the state's `avance`: a [dx, dy] per frame), never on a clock of its own: the sheet
 // is drawn in the frame that moves that way, so what is planted stays planted only if both change together.
 //
-// What falls over the whole screen (`tipo: capas`, snow) has no frames: tiles that join on their four sides, one element per
+// What falls over the whole screen (`tipo: capas`, snow and rain) has no frames: tiles that join on their four sides, one element per
 // layer, each moved by a CSS animation of `transform` on the compositor, with no code per frame.
 
 const LEAST_MINUTES = 15;
@@ -19,6 +19,8 @@ const STEP_BASE = 1080;
 const BY_DISTANCE = {3: 1, 5: 1.25, 8: 1.5};
 // Stands off the very edge of the screen.
 const EDGE = 6;
+// Without news from the server for this long, it no longer knows what the sky is doing.
+const SKY_LASTS_MS = 3 * 3600000;
 
 function css(node, styles) {
     Object.keys(styles).forEach(function (k) {
@@ -138,6 +140,17 @@ export function inSeason(season, date) {
     const two = (n) => (n < 10 ? '0' : '') + n;
     const day = two(date.getMonth() + 1) + '-' + two(date.getDate());
     return season.from <= season.until ? day >= season.from && day <= season.until : day >= season.from || day <= season.until;
+}
+
+/**
+ * Whether it is raining where the screen is, from the weather it already shows.
+ *
+ * @param {object|undefined} weather the manifest's
+ * @param {number} heard how many milliseconds ago the server was last heard
+ * @returns {boolean}
+ */
+export function isRaining(weather, heard) {
+    return !!(weather && weather.now && /rain|sleet/.test(weather.now.symbol || '')) && heard < SKY_LASTS_MS;
 }
 
 /**
@@ -403,7 +416,7 @@ export class Surprises {
     /**
      * @param {HTMLElement} frame what it walks over
      * @param {object} hooks {quiet: a screen that keeps still, floor: the height to walk on, or null for the bottom,
-     *     note: tells of what failed}
+     *     raining: whether it is raining right now, note: tells of what failed}
      */
     constructor(frame, hooks) {
         this.frame = frame;
@@ -423,7 +436,7 @@ export class Surprises {
     /**
      * What the manifest says.
      *
-     * @param {object|undefined} surprises {every: minutes, characters: [{id, atlas, season}]}, or nothing if off
+     * @param {object|undefined} surprises {every: minutes, characters: [{id, atlas, season, when}]}, or nothing if off
      * @param {number} distance
      * @param {number} now
      */
@@ -452,7 +465,8 @@ export class Surprises {
     }
 
     /**
-     * Who comes out: those in their season. With an order, and nobody in season, any of those chosen, so that it is not lost.
+     * Who comes out: those whose time it is, by their season or by the sky. With an order, and nobody else, any of those chosen,
+     * so that it is not lost.
      *
      * @param {number} now milliseconds
      * @param {boolean} [ordered]
@@ -460,10 +474,11 @@ export class Surprises {
      */
     pick(now, ordered) {
         const date = new Date(now);
-        const season = this.characters.filter(function (c) {
-            return inSeason(c.season, date);
+        const raining = this.hooks.raining();
+        const due = this.characters.filter(function (c) {
+            return inSeason(c.season, date) && (c.when !== 'rain' || raining);
         });
-        const from = season.length || !ordered ? season : this.characters;
+        const from = due.length || !ordered ? due : this.characters;
         return from.length ? from[Math.floor(Math.random() * from.length)] : null;
     }
 

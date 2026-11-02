@@ -15,11 +15,11 @@ import {Composer, draftChoice} from './compose.js';
 import {dayNumber, isDark, isLive, isPowerOn, liveItems, urgentOf, useOf, weekdayOf} from './rules.js';
 import {Screen} from './render.js';
 import {store} from './store.js';
-import {filesOf, Surprises} from './surprises.js';
+import {filesOf, isRaining, Surprises} from './surprises.js';
 import {countToday} from './today.js';
 import {weekOf} from './week.js';
 
-const VERSION = '0.7.7';
+const VERSION = '0.7.8';
 const COMING_DAYS = 7;
 const HEARTBEAT_MS = 60000;
 const REFRESH_MS = 15 * 60000;
@@ -44,6 +44,7 @@ class Player {
         this.strings = boot.strings || {};
         this.root = document.getElementById('hechauka') || document.body;
         this.startedAt = Date.now();
+        this.heardAt = 0;
         this.errors = [];
         this.bad = {};
         this.albumTurns = {};
@@ -102,6 +103,9 @@ class Player {
             },
             floor: function () {
                 return screen.tickerTop();
+            },
+            raining: function () {
+                return isRaining(self.manifest && self.manifest.weather, Date.now() - self.heardAt);
             },
             note: function (text) {
                 self.note(text);
@@ -186,6 +190,7 @@ class Player {
             request = this.api.manifest(this.manifest && this.mode === 'screen' ? this.manifest.etag : null);
         }
         return request.then(function (m) {
+            self.heardAt = Date.now();
             if (m) {
                 self.apply(m);
                 if (self.mode === 'screen') {
@@ -573,6 +578,7 @@ class Player {
         };
         const self = this;
         this.api.heartbeat(body).then(function (r) {
+            self.heardAt = Date.now();
             self.errors = [];
             if (r && r.manifest && (!m || r.manifest !== m.etag)) {
                 self.refresh();

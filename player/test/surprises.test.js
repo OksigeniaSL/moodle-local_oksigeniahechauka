@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {dueAfter, filesOf, heightOf, inSeason, pagesOf, scaleOf, Surprises, tileOf, walkOf} from '../src/surprises.js';
+import {dueAfter, filesOf, heightOf, inSeason, isRaining, pagesOf, scaleOf, Surprises, tileOf, walkOf} from '../src/surprises.js';
 
 const atlasOf = (id) => JSON.parse(readFileSync(new URL('../sorpresas/' + id + '/spr.' + id + '.atlas.json', import.meta.url), 'utf8'));
 const atlas = atlasOf('gusanito');
@@ -117,24 +117,26 @@ test('a flyer also starts out of sight and stops on the screen', () => {
 });
 
 test('what falls closes its loop: a tile down is a whole number of tiles across, in whole pixels at any size', () => {
-    const snow = atlasOf('nieve');
-    assert.equal(snow.meta.tipo, 'capas');
-    assert.deepEqual(filesOf(snow), ['spr.nieve-1.webp', 'spr.nieve-2.webp']);
     assert.deepEqual(filesOf(atlas), m.pages);
-    for (const capa of snow.meta.capas) {
-        const one = tileOf(capa, 1);
-        assert.equal(one.w, capa.w);
-        assert.equal(one.h, capa.h);
-        assert.ok(one.turns >= 1);
-        assert.ok(Math.abs(capa.velocidad[0] * one.seconds - one.turns * capa.w) < 0.5);
-        for (const scale of [1.25, 1.5, 2, 2.37]) {
-            const big = tileOf(capa, scale);
-            assert.ok(Number.isInteger(big.w) && Number.isInteger(big.h));
-            assert.equal(big.seconds, one.seconds);
-            assert.equal(big.turns, one.turns);
+    for (const id of ['nieve', 'lluvia']) {
+        const fall = atlasOf(id);
+        assert.equal(fall.meta.tipo, 'capas');
+        assert.deepEqual(filesOf(fall), ['spr.' + id + '-1.webp', 'spr.' + id + '-2.webp']);
+        for (const capa of fall.meta.capas) {
+            const one = tileOf(capa, 1);
+            assert.equal(one.w, capa.w);
+            assert.equal(one.h, capa.h);
+            assert.ok(one.turns >= 1);
+            assert.ok(Math.abs(capa.velocidad[0] * one.seconds - one.turns * capa.w) < 0.5);
+            for (const scale of [1.25, 1.5, 2, 2.37]) {
+                const big = tileOf(capa, scale);
+                assert.ok(Number.isInteger(big.w) && Number.isInteger(big.h));
+                assert.equal(big.seconds, one.seconds);
+                assert.equal(big.turns, one.turns);
+            }
         }
+        assert.ok(fall.meta.entra + fall.meta.sale < fall.meta.dura);
     }
-    assert.ok(snow.meta.entra + snow.meta.sale < snow.meta.dura);
 });
 
 test('its season, year after year, also over New Year', () => {
@@ -156,7 +158,8 @@ test('its season, year after year, also over New Year', () => {
 /** Surprises with nothing of a page: it says who would come out, and nothing moves. */
 function fakeSurprises() {
     globalThis.document = {createElement: () => ({style: {}})};
-    const s = new Surprises({}, {quiet: () => false, floor: () => null, note: () => null});
+    const s = new Surprises({}, {quiet: () => false, floor: () => null, raining: () => s.rain, note: () => null});
+    s.rain = false;
     s.gone = [];
     s.go = (who) => who && s.gone.push(who.id);
     return s;
@@ -232,6 +235,44 @@ test('out of season it does not come by itself, but an order with nobody else in
     s.askNow();
     s.tick(new Date(2026, 11, 20, 12).getTime(), true);
     assert.deepEqual(s.gone, ['nieve']);
+});
+
+test('it rains by the sky that is on the screen, for as long as the server has been heard', () => {
+    const sky = (symbol) => ({now: {symbol, temp: 15}});
+    for (const symbol of ['lightrain', 'rain', 'heavyrain', 'rainshowers_day', 'lightrainshowers_night', 'rainandthunder', 'sleet']) {
+        assert.equal(isRaining(sky(symbol), 0), true, symbol);
+    }
+    for (const symbol of ['clearsky_day', 'fair_night', 'partlycloudy_day', 'cloudy', 'fog', 'snow', 'lightsnowshowers_day']) {
+        assert.equal(isRaining(sky(symbol), 0), false, symbol);
+    }
+    assert.equal(isRaining(undefined, 0), false);
+    assert.equal(isRaining({}, 0), false);
+    assert.equal(isRaining(sky('rain'), 2 * 3600000), true);
+    assert.equal(isRaining(sky('rain'), 4 * 3600000), false);
+});
+
+test('what comes with the rain comes only when it rains, but an order with nobody else is not lost', () => {
+    const s = fakeSurprises();
+    const now = Date.now();
+    const rain = {id: 'lluvia', atlas: 'x', when: 'rain'};
+    s.configure({every: 20, characters: [rain]}, 3, now);
+    s.tick(now + 60 * 60000, true);
+    assert.deepEqual(s.gone, []);
+    s.rain = true;
+    s.tick(now + 2 * 60 * 60000, true);
+    assert.deepEqual(s.gone, ['lluvia']);
+
+    s.gone.length = 0;
+    s.rain = false;
+    s.askNow();
+    s.tick(now + 2 * 60 * 60000, true);
+    assert.deepEqual(s.gone, ['lluvia']);
+
+    s.gone.length = 0;
+    s.configure({every: 20, characters: [rain, WORM.characters[0]]}, 3, now);
+    s.askNow();
+    s.tick(now + 2 * 60 * 60000, true);
+    assert.deepEqual(s.gone, ['gusanito']);
 });
 
 test('the panel\'s preview only asked', () => {

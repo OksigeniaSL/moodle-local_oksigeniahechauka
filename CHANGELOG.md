@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.7.8 (2026-11-02)
+
+- **Rain**: 45 seconds of fine streaks over the whole screen. It is off by default and, if the centre chooses it, it takes
+  its turn only while it really rains where the centre is, by the weather the screen already shows. An entry of
+  `surprises.characters` may now bring `when: "rain"`.
+
 ## 0.7.7 (2026-11-01)
 
 - **Snow**, the first seasonal surprise: 45 seconds of snowfall over the whole screen, in two layers of tiles moved by the

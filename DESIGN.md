@@ -315,7 +315,8 @@ Biblioteca, Secretaría y Comedor.» A teacher sees only their groups, already c
   the screen above. A character crosses over whatever is there and does not stay, so nothing looks for a gap: it comes
   out now and then, and only an urgent notice takes it off. «De temporada», the same rows, none ticked by default; ticked,
   its dates open: «Desde» and «hasta», day and month, the same every year, with no names of festivities and valid in both
-  hemispheres. Until the centre sets them, from today and for a month.
+  hemispheres. Until the centre sets them, from today and for a month. «Según el tiempo», the same rows, none ticked by
+  default: the rain, only while it really rains where the centre is; without a place, a line says so.
 - Beside, the screen live with these colours, this logo and this weather, in «Claro» or «Oscuro».
 - Under «Guardar»: «Lo técnico, como la preparación de los vídeos, sigue en la administración del sitio.»
 
