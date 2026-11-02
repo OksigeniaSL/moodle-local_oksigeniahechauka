@@ -98,6 +98,15 @@ if ($hassiteconfig) {
         ));
         // The categories of the centre (their names, colours and words) are set in the panel, «Tu centro».
 
+        // The public demonstration screen.
+        $settings->add(new admin_setting_heading("$p/demoheading", get_string('demo_title', $p), ''));
+        $settings->add(new admin_setting_configcheckbox(
+            "$p/publicdemo",
+            get_string('publicdemo', $p),
+            get_string('publicdemo_desc', $p, (new moodle_url('/local/oksigeniahechauka/demo.php'))->out(false)),
+            0
+        ));
+
         // What reaches the screens by itself.
         $settings->add(new admin_setting_heading("$p/sources", get_string('sources', $p), ''));
         $hasmeals = \local_oksigeniahechauka\local\sources::has_meals();

@@ -21,7 +21,7 @@ import {filesOf, isRaining, Surprises} from './surprises.js';
 import {countToday} from './today.js';
 import {weekOf} from './week.js';
 
-const VERSION = '0.8.3';
+const VERSION = '0.9.1';
 const COMING_DAYS = 7;
 const HEARTBEAT_MS = 60000;
 const REFRESH_MS = 15 * 60000;
@@ -167,9 +167,10 @@ class Player {
         }
         this.refresh();
         if (this.mode !== 'preview') {
+            // The public demonstration screen asks more often: what is published is seen at once.
             setInterval(function () {
                 self.refresh();
-            }, REFRESH_MS);
+            }, this.mode === 'demo' && this.boot.refresh_ms ? this.boot.refresh_ms : REFRESH_MS);
         }
         setInterval(function () {
             self.tick();

@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.9.1
+
+- **A public demonstration screen** (`demo.php`): what goes to every screen, in the frame of a television, for anyone and without signing in, landscape or portrait, and refreshed every half minute so what is published shows at once. Off by default; a site turns it on in its settings. Never the birthdays.
+
 ## 0.9.0
 
 - **The screen's own device keeps itself up to date from its Moodle.** Its software (`device/`) is now part of the plugin: the guardian of each Raspberry Pi asks for it twice a day, installs only what Oksigenia signed, waits for the screen to be off by its hours, and undoes it by itself if the agent gives no sign of life. Installing a new version of the plugin updates the devices of all its screens. See `device/README.md`.
