@@ -99,17 +99,20 @@ echo html_writer::label(get_string('preview_at', $c), 'hk-at', true, ['class' =>
 echo html_writer::empty_tag('input', ['type' => 'datetime-local', 'name' => 'at', 'id' => 'hk-at', 'value' => $at,
     'class' => 'form-control']);
 echo html_writer::end_div();
-echo html_writer::start_div('me-3 mb-2');
-echo html_writer::label(get_string('preview_orientation', $c), 'hk-shape', true, ['class' => 'd-block']);
-echo html_writer::select(
-    ['horizontal' => get_string('preview_horizontal', $c),
-    'vertical' => get_string('preview_vertical', $c)],
-    'shape',
-    $height > $width ? 'vertical' : 'horizontal',
-    false,
-    ['id' => 'hk-shape', 'class' => 'form-select']
-);
-echo html_writer::end_div();
+// A screen knows its own shape.
+if (!$screenid) {
+    echo html_writer::start_div('me-3 mb-2');
+    echo html_writer::label(get_string('preview_orientation', $c), 'hk-shape', true, ['class' => 'd-block']);
+    echo html_writer::select(
+        ['horizontal' => get_string('preview_horizontal', $c),
+        'vertical' => get_string('preview_vertical', $c)],
+        'shape',
+        $height > $width ? 'vertical' : 'horizontal',
+        false,
+        ['id' => 'hk-shape', 'class' => 'form-select']
+    );
+    echo html_writer::end_div();
+}
 echo html_writer::tag('button', get_string('preview', $c), ['type' => 'submit', 'class' => 'btn btn-primary mb-2']);
 echo html_writer::end_tag('form');
 

@@ -428,8 +428,8 @@ body {
 /* Only in the mock-ups: the «example data» mark. */
 .hk-muestra {
     position: absolute;
-    right: 2.4rem;
-    bottom: 12rem;
+    top: 2.4rem;
+    left: 2.4rem;
     padding: .8rem 1.6rem;
     border-radius: 1rem;
     background: rgba(0, 0, 0, .55);

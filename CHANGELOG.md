@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.7.12 (2026-11-02)
+
+- **A first time with a path**: with no screen yet, the panel says so and offers only the step that comes first.
+- **The urgent notice does not publish anything by inertia**: nothing is chosen on opening, and the button waits for a text.
+- **A screen with no signal** says what it usually is and what to try, and no longer offers to reload what cannot answer. The
+  line of health tells apart what runs from what is off by its hours.
+- **«Tu centro»** goes in the order anyone looks for things, warns before losing what was changed, and both «Guardar» are the
+  same. The sheet of a screen leaves the surprises for the end, and bars of hours are not drawn for a screen that is always on.
+- Fixed: the row of an album had no picture and broke the columns; on a phone, the buttons of the screens were too small to
+  touch, the names of the categories were cut, and so were the states of the screens.
+- Words: «screen» and «device» all through, instead of TV or little box; changing the device no longer asks to remove the screen.
+
 ## 0.7.11 (2026-11-02)
 
 - **The screens look like the centre's from the first day**: until the centre sets its own, they take the logo and the brand

@@ -3084,3 +3084,63 @@ dialog.hkp-dialog > footer {
         position: static;
     }
 }
+
+/* --- From the review of 2 November -------------------------------------------------------------------------------- */
+/* A row keeps its columns whatever it carries. */
+.hkp-item > .hkp-thumb {
+    grid-column: 1;
+}
+/* On a phone, what is touched most is big enough to touch. */
+/* stylelint-disable-next-line csstree/validator */
+@container hkp (max-width: 36rem) {
+    .hkp-screen-actions .btn {
+        flex: 1 1 0;
+        width: auto;
+        min-width: 2.75rem;
+        height: 2.75rem;
+    }
+    .hkp-cat {
+        grid-template-columns: auto minmax(0, 1fr);
+    }
+    .hkp-cat > .btn {
+        grid-column: 2;
+        justify-self: end;
+    }
+    .hkp-screen .hkp-state .hkp-meta {
+        display: block;
+    }
+    .hkp-screen .hkp-state .hkp-meta::before {
+        content: none;
+    }
+    .hkp-dialog > footer .btn {
+        flex: 1 1 100%;
+    }
+}
+.hkp-state-word {
+    white-space: normal;
+}
+.hkp-state .hkp-meta::before {
+    content: "· ";
+}
+.hkp-row {
+    align-items: start;
+}
+.hkp-card > h2 {
+    font-weight: 700;
+    line-height: 1.25;
+}
+.hkp-count {
+    align-self: center;
+    background: var(--hkp-sunk);
+    box-shadow: inset 0 0 0 1px var(--hkp-line);
+}
+.hkp-groups {
+    align-items: start;
+}
+.hkp-date {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    white-space: nowrap;
+}
+

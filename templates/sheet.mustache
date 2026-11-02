@@ -25,7 +25,7 @@
         "style": "", "id": 3, "name": "Biblioteca", "rawname": "Biblioteca", "back": "#", "backlabel": "Pantallas y grupos",
         "backicon": "", "action": "#", "sesskey": "abc",
         "card": {"state": "on", "label": "En marcha", "meta": "señal hace 1 min"},
-        "reload": "", "reloadicon": "", "clockhint": "", "clockicon": "", "moment": "Ahora · lunes 2, 10:45", "frame": "#",
+        "downhelp": false, "reload": "", "reloadicon": "", "clockhint": "", "clockicon": "", "moment": "Ahora · lunes 2, 10:45", "frame": "#",
         "vertical": false, "shot": "", "shotwhen": "",
         "facts": [{"term": "Señal", "value": "Hace 1 min"}],
         "groups": [{"id": 1, "name": "Zonas comunes", "checked": true}], "hasgroups": true,
@@ -39,12 +39,13 @@
 <div class="hkp" id="hkp-sheet-page"{{#style}} style="{{style}}"{{/style}} data-strings="{{strings}}">
     <a class="hkp-back" href="{{back}}">{{{backicon}}}{{backlabel}}</a>
     <header class="hkp-head">
-        <div class="hkp-head-title"><h1>{{name}}</h1>{{#card}}<p class="hkp-head-sub"><span class="hkp-state" data-state="{{state}}"><span class="hkp-state-word"><span class="hkp-dot" aria-hidden="true"></span>{{label}}</span>{{#meta}} <span class="hkp-meta">· {{meta}}</span>{{/meta}}</span></p>{{/card}}{{#clockhint}}<p class="hkp-head-sub hkp-hint">{{clockhint}}</p>{{/clockhint}}</div>
+        <div class="hkp-head-title"><h1>{{name}}</h1>{{#card}}<p class="hkp-head-sub"><span class="hkp-state" data-state="{{state}}"><span class="hkp-state-word"><span class="hkp-dot" aria-hidden="true"></span>{{label}}</span>{{#meta}} <span class="hkp-meta">{{meta}}</span>{{/meta}}</span></p>{{/card}}{{#clockhint}}<p class="hkp-head-sub hkp-hint">{{clockhint}}</p>{{/clockhint}}</div>
         {{#reload}}<div class="hkp-head-actions"><a class="btn btn-outline-secondary" href="{{reload}}">{{{reloadicon}}}{{#str}}reload, local_oksigeniahechauka{{/str}}</a></div>{{/reload}}
     </header>
     {{#haserrors}}<div class="alert alert-danger" role="alert">{{#str}}compose_errors, local_oksigeniahechauka{{/str}}</div>{{/haserrors}}
     <form method="post" action="{{action}}" id="hkp-sheet-form">
         <input type="hidden" name="sesskey" value="{{sesskey}}">
+        {{#downhelp}}<div class="alert alert-warning" role="status"><b>{{#str}}sheet_down_title, local_oksigeniahechauka{{/str}}</b> {{#str}}sheet_down_help, local_oksigeniahechauka{{/str}}</div>{{/downhelp}}
         <div class="hkp-sheet">
             <section class="hkp-sheet-screen hkp-card" aria-label="{{#str}}sheet_screen, local_oksigeniahechauka{{/str}}">
                 <div class="hkp-preview-tools"><div class="hkp-seg" role="group" aria-label="{{#str}}sheet_see, local_oksigeniahechauka{{/str}}"><button type="button" aria-pressed="true" data-see="pv">{{#str}}preview, local_oksigeniahechauka{{/str}}</button><button type="button" aria-pressed="false" data-see="real">{{#str}}sheet_real, local_oksigeniahechauka{{/str}}</button></div><span class="hkp-clock">{{{clockicon}}}{{moment}}</span></div>
@@ -70,11 +71,6 @@
                         {{#errors.useplan}}<p class="hkp-hint"><b class="text-danger">{{errors.useplan}}</b></p>{{/errors.useplan}}
                     </div>
                 </section>
-                <section class="hkp-card"><h2>{{#str}}sheet_surprises, local_oksigeniahechauka{{/str}}</h2>
-                    {{#surprises.centreon}}<div class="form-switch form-check"><input class="form-check-input" type="checkbox" role="switch" id="hkp-surprises" name="surprises" value="1"{{#surprises.on}} checked{{/surprises.on}}><div><label class="form-check-label" for="hkp-surprises"><b>{{#str}}sheet_surprises_on, local_oksigeniahechauka{{/str}}</b></label><p class="hkp-hint">{{#str}}sheet_surprises_help, local_oksigeniahechauka, {{surprises.centre}}{{/str}}</p></div></div>
-                    {{#surprises.now}}<a class="btn btn-sm btn-outline-secondary" href="{{surprises.now}}">{{#str}}sheet_surprise_now, local_oksigeniahechauka{{/str}}</a>{{/surprises.now}}{{/surprises.centreon}}
-                    {{^surprises.centreon}}{{#surprises.on}}<input type="hidden" name="surprises" value="1">{{/surprises.on}}<p class="hkp-hint">{{#str}}sheet_surprises_off, local_oksigeniahechauka, {{surprises.centre}}{{/str}}</p>{{/surprises.centreon}}
-                </section>
                 <section class="hkp-card"><h2>{{#str}}sheet_distance, local_oksigeniahechauka{{/str}}</h2>
                     <div class="hkp-uses" role="radiogroup" aria-label="{{#str}}sheet_distance, local_oksigeniahechauka{{/str}}">{{#distances}}<label class="hkp-use"><input type="radio" name="distance" value="{{value}}"{{#checked}} checked{{/checked}}><span><b>{{label}}</b><small>{{help}}</small></span></label>{{/distances}}</div>
                     <div class="form-switch form-check"><input class="form-check-input" type="checkbox" role="switch" id="hkp-glass" name="glass" value="1"{{#glass}} checked{{/glass}}><div><label class="form-check-label" for="hkp-glass"><b>{{#str}}sheet_glass, local_oksigeniahechauka{{/str}}</b></label><p class="hkp-hint">{{#str}}sheet_glass_help, local_oksigeniahechauka{{/str}}</p></div></div>
@@ -87,7 +83,7 @@
                         <div class="hkp-time"><label for="hkp-on">{{#str}}compose_hour_from, local_oksigeniahechauka{{/str}}</label><input class="form-control" type="time" id="hkp-on" name="on" value="{{on}}"><label for="hkp-off">{{#str}}compose_hour_to, local_oksigeniahechauka{{/str}}</label><input class="form-control" type="time" id="hkp-off" name="off" value="{{off}}"></div>
                         {{#errors.power}}<p class="hkp-hint"><b class="text-danger">{{errors.power}}</b></p>{{/errors.power}}
                     </div>
-                    <div class="hkp-power" aria-hidden="true">{{#bars}}<b>{{letter}}</b><span>{{#segments}}<i style="left:{{left}}%;right:{{right}}%"></i>{{/segments}}</span>{{/bars}}<div class="hkp-power-scale"><span>0</span><span>6</span><span>12</span><span>18</span><span>24</span></div></div>
+                    <div class="hkp-power" id="hkp-power-bars" aria-hidden="true"{{#always}} hidden{{/always}}>{{#bars}}<b>{{letter}}</b><span>{{#segments}}<i style="left:{{left}}%;right:{{right}}%"></i>{{/segments}}</span>{{/bars}}<div class="hkp-power-scale"><span>0</span><span>6</span><span>12</span><span>18</span><span>24</span></div></div>
                     <p class="hkp-hint" id="hkp-power-sentence" aria-live="polite">{{sentence}}</p>
                 </section>
                 <section class="hkp-card"><h2>{{#str}}sheet_ifdown, local_oksigeniahechauka{{/str}}</h2>
@@ -97,6 +93,11 @@
                     <div class="form-switch form-check"><input class="form-check-input" type="checkbox" role="switch" id="hkp-snd" name="sound" value="1"{{#sound}} checked{{/sound}}><div><label class="form-check-label" for="hkp-snd"><b>{{#str}}sheet_sound, local_oksigeniahechauka{{/str}}</b></label><p class="hkp-hint">{{#str}}sheet_sound_help, local_oksigeniahechauka{{/str}}</p></div></div>
                 </section>
                 <section class="hkp-card"><h2>{{#str}}sheet_theme, local_oksigeniahechauka{{/str}}</h2><div class="hkp-chips" role="radiogroup" aria-label="{{#str}}sheet_theme, local_oksigeniahechauka{{/str}}">{{#themes}}<label class="hkp-chip is-small"><input type="radio" name="theme" value="{{value}}"{{#checked}} checked{{/checked}}>{{label}}</label>{{/themes}}</div></section>
+                <section class="hkp-card"><h2>{{#str}}sheet_surprises, local_oksigeniahechauka{{/str}}</h2>
+                    {{#surprises.centreon}}<div class="form-switch form-check"><input class="form-check-input" type="checkbox" role="switch" id="hkp-surprises" name="surprises" value="1"{{#surprises.on}} checked{{/surprises.on}}><div><label class="form-check-label" for="hkp-surprises"><b>{{#str}}sheet_surprises_on, local_oksigeniahechauka{{/str}}</b></label><p class="hkp-hint">{{#str}}sheet_surprises_help, local_oksigeniahechauka, {{surprises.centre}}{{/str}}</p></div></div>
+                    {{#surprises.now}}<a class="btn btn-sm btn-outline-secondary" href="{{surprises.now}}">{{#str}}sheet_surprise_now, local_oksigeniahechauka{{/str}}</a>{{/surprises.now}}{{/surprises.centreon}}
+                    {{^surprises.centreon}}{{#surprises.on}}<input type="hidden" name="surprises" value="1">{{/surprises.on}}<p class="hkp-hint">{{#str}}sheet_surprises_off, local_oksigeniahechauka, {{surprises.centre}}{{/str}}</p>{{/surprises.centreon}}
+                </section>
                 <section class="hkp-card"><h2>{{#str}}sheet_device, local_oksigeniahechauka{{/str}}</h2><p>{{#str}}sheet_device_help, local_oksigeniahechauka, {{name}}{{/str}}</p></section>
                 <section class="hkp-card is-danger"><h2>{{#str}}sheet_remove, local_oksigeniahechauka{{/str}}</h2><p>{{#str}}sheet_remove_help, local_oksigeniahechauka{{/str}}</p><p><a class="btn btn-outline-danger" href="{{remove}}">{{#str}}sheet_remove_button, local_oksigeniahechauka, {{name}}{{/str}}</a></p></section>
             </div>
@@ -172,6 +173,7 @@
         });
     });
     page.querySelector('#hkp-always').addEventListener('change', function() {
+        page.querySelector('#hkp-power-bars').hidden = this.checked;
         page.querySelector('#hkp-power-hours').hidden = this.checked;
     });
     // Another use at some hours: its days, kept in hidden inputs as the power's.

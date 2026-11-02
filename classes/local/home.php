@@ -188,7 +188,8 @@ class home {
         }
         $kinds = [];
         foreach (['drill', 'rain', 'early', 'other'] as $i => $kind) {
-            $kinds[] = ['kind' => $kind, 'label' => get_string('urgent_kind_' . $kind, $c), 'checked' => $i === 0,
+            // Nothing chosen on opening: two clicks, but both decisions, and not the gravest one by default.
+            $kinds[] = ['kind' => $kind, 'label' => get_string('urgent_kind_' . $kind, $c), 'checked' => false,
                 'title' => $kind === 'other' ? '' : get_string('urgent_' . $kind . '_title', $c),
                 'body' => $kind === 'other' ? '' : get_string('urgent_' . $kind . '_body', $c)];
         }
@@ -202,8 +203,8 @@ class home {
             'action' => (new \moodle_url('/local/oksigeniahechauka/urgent.php'))->out(false),
             'sesskey' => sesskey(),
             'kinds' => $kinds,
-            'title' => $kinds[0]['title'],
-            'body' => $kinds[0]['body'],
+            'title' => '',
+            'body' => '',
             'groups' => $groups,
             'all' => count($screens),
             'until' => $until,
@@ -324,7 +325,8 @@ class home {
             'now' => $state['key'] !== 'off' && $showing !== '' ? $showing : '',
             'preview' => (new \moodle_url('/local/oksigeniahechauka/preview.php', ['screen' => $s->id]))->out(false),
             'previewicon' => icons::svg('eye'),
-            'reload' => $managescreens && $state['key'] !== 'off' ? (new \moodle_url(
+            // Only what can answer: a screen with no signal would never hear it.
+            'reload' => $managescreens && !in_array($state['key'], ['off', 'down', 'new']) ? (new \moodle_url(
                 '/local/oksigeniahechauka/index.php',
                 ['action' => 'reload', 'id' => $s->id, 'sesskey' => sesskey()]
             ))->out(false) : '',
@@ -420,8 +422,11 @@ class home {
         foreach ($warn as $w) {
             $extra[] = get_string('health_clock', $c, (object) ['name' => $w['name'], 'min' => abs($w['drift'])]);
         }
-        if (count($cards) > count($down) + count($warn)) {
+        if (count($cards) > count($down) + count($warn) + $off) {
             $extra[] = get_string('health_rest', $c);
+        }
+        if ($off) {
+            $extra[] = $off === 1 ? get_string('health_rest_off_one', $c) : get_string('health_rest_off', $c, $off);
         }
         if (!$managescreens) {
             $who = self::who_runs();
@@ -738,7 +743,10 @@ class home {
                 $out['agenda'][] = ['stage' => $stage ? 's' . $stage : ''];
             }
         }
-        $out['is' . ($item->type === 'urgent' ? 'notice' : $item->type)] = true;
+        $out['is' . ($item->type === 'urgent' ? 'notice' : ($item->type === 'album' ? 'media' : $item->type))] = true;
+        if ($item->type === 'album') {
+            $out['photos'] = count(items::album_files((int) $item->id));
+        }
         return $out;
     }
 
@@ -788,9 +796,18 @@ class home {
      * @return array
      */
     protected static function empty_state(bool $limited, array $groups, bool $canadd): array {
-        global $USER;
+        global $USER, $DB;
         $c = self::C;
         $config = get_config($c);
+        // With no screen yet, the only step is the first one: what is added would go nowhere.
+        if (!$DB->record_exists_select('local_oksigeniahechauka_screen', 'keyhash IS NOT NULL')) {
+            $runs = access::can('managescreens');
+            $first = $runs ? [['url' => (new \moodle_url('/local/oksigeniahechauka/screens.php'))->out(false) . '#add',
+                'label' => get_string('addscreen_card', $c), 'icon' => icons::svg('plus'), 'primary' => true]] : [];
+            return ['title' => get_string('empty_noscreens_title', $c),
+                'text' => get_string($runs ? 'empty_noscreens_text' : 'empty_noscreens_wait', $c),
+                'add' => $first, 'hasadd' => (bool) $first, 'section' => get_string('content_title', $c)];
+        }
         $add = [];
         if ($canadd) {
             $add[] = ['url' => (new \moodle_url('/local/oksigeniahechauka/edit.php', ['type' => 'notice']))->out(false),
@@ -816,8 +833,9 @@ class home {
         if (!empty($config->sourceweather) && !empty($config->lat)) {
             $alone[] = get_string('alone_weather', $c);
         }
+        $text = !$alone ? 'empty_text_none' : (count($alone) === 1 ? 'empty_text_one' : 'empty_text');
         return ['title' => $alone ? get_string('empty_title', $c, phrases::join($alone)) :
-            get_string('empty_title_none', $c), 'text' => get_string('empty_text', $c), 'add' => $add,
+            get_string('empty_title_none', $c), 'text' => get_string($text, $c), 'add' => $add,
             'hasadd' => (bool) $add, 'section' => get_string('content_title', $c)];
     }
 }

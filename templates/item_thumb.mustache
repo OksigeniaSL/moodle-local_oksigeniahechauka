@@ -29,7 +29,7 @@
         "stage": 2
     }
 }}
-{{#ismedia}}<span class="hkp-thumb{{#vertical}} is-v{{/vertical}}" data-type="media">{{#image}}<img src="{{image}}" alt="" loading="lazy">{{/image}}{{#video}}<span class="hkp-play"><svg viewBox="0 0 10 10" aria-hidden="true" focusable="false"><path d="M2 1l7 4-7 4z"/></svg>{{video}}</span>{{/video}}</span>{{/ismedia}}
+{{#ismedia}}<span class="hkp-thumb{{#vertical}} is-v{{/vertical}}" data-type="media">{{#image}}<img src="{{image}}" alt="" loading="lazy">{{/image}}{{#video}}<span class="hkp-play"><svg viewBox="0 0 10 10" aria-hidden="true" focusable="false"><path d="M2 1l7 4-7 4z"/></svg>{{video}}</span>{{/video}}{{#photos}}<span class="hkp-play">{{photos}}</span>{{/photos}}</span>{{/ismedia}}
 {{#isnotice}}<span class="hkp-thumb{{#important}} is-important{{/important}}" data-type="notice" aria-hidden="true"><i></i><i></i></span>{{/isnotice}}
 {{#isevent}}<span class="hkp-thumb" data-type="event" data-stage="{{stage}}" aria-hidden="true"><b>{{day}}<br>{{num}}</b><i></i><i></i></span>{{/isevent}}
 {{#isticker}}<span class="hkp-thumb" data-type="ticker" aria-hidden="true"><span><i></i><i></i></span></span>{{/isticker}}

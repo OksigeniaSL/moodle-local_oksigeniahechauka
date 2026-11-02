@@ -161,7 +161,7 @@
                 });
             }
             go.textContent = n === 1 ? words.one : words.n.replace('{$a}', n);
-            dialog.querySelector('#hkp-urgent-go').disabled = !n;
+            dialog.querySelector('#hkp-urgent-go').disabled = !n || !title.value.trim();
         };
         root.querySelectorAll('[data-hkp-open]').forEach(function(button) {
             button.addEventListener('click', function() {
@@ -177,6 +177,7 @@
                 dialog.close();
             });
         });
+        title.addEventListener('input', count);
         dialog.querySelectorAll('input[name="kind"]').forEach(function(kind) {
             kind.addEventListener('change', function() {
                 title.value = kind.getAttribute('data-title');
@@ -184,6 +185,7 @@
                 if (!title.value) {
                     title.focus();
                 }
+                count();
                 send();
             });
         });

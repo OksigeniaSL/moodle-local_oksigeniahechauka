@@ -18,6 +18,27 @@
     window.addEventListener('resize', fit);
     new ResizeObserver(fit).observe(side);
 
+    // What was changed is not lost by searching for a place or by going away.
+    const form = document.getElementById('hkp-centre-form');
+    let dirty = false;
+    page.addEventListener('input', (ev) => {
+        dirty = dirty || ev.target.form === form;
+    });
+    page.addEventListener('change', (ev) => {
+        dirty = dirty || ev.target.form === form;
+    });
+    if (form) {
+        form.addEventListener('submit', () => {
+            dirty = false;
+        });
+    }
+    window.addEventListener('beforeunload', (ev) => {
+        if (dirty) {
+            ev.preventDefault();
+            ev.returnValue = '';
+        }
+    });
+
     const surprises = document.getElementById('hkp-surprises');
     if (surprises) {
         surprises.addEventListener('change', () => {
