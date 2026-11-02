@@ -62,18 +62,14 @@ if ($action !== '' && confirm_sesskey()) {
         }
         $table = $action === 'removescreen' ? 'local_oksigeniahechauka_screen' : 'local_oksigeniahechauka_group';
         $record = $DB->get_record($table, ['id' => $id], '*', MUST_EXIST);
-        echo $OUTPUT->header();
-        echo $OUTPUT->confirm(
-            get_string(
-                $action === 'removescreen' ? 'confirmdeletescreen' : 'groups_confirmdelete',
-                $c,
-                format_string($record->name)
-            ),
-            new moodle_url($url, ['action' => $action, 'id' => $id, 'confirm' => 1, 'sesskey' => sesskey()]),
-            $url
+        $screen = $action === 'removescreen';
+        \local_oksigeniahechauka\local\confirm::ask(
+            get_string($screen ? 'confirmdeletescreen' : 'groups_confirmdelete', $c, format_string($record->name)),
+            new moodle_url($url, ['action' => $action, 'id' => $id]),
+            get_string($screen ? 'confirm_screen' : 'confirm_group', $c),
+            $url,
+            get_string($screen ? 'confirm_keep_screen' : 'confirm_keep', $c)
         );
-        echo $OUTPUT->footer();
-        die();
     }
     $message = groupspage::act($action, $now);
     redirect(

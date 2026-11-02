@@ -165,6 +165,7 @@ class reportpage {
      * @return array
      */
     public static function context(string $month, int $now): array {
+        global $DB;
         $c = 'local_oksigeniahechauka';
         $data = report::month($month, $now);
         $decsep = get_string('decsep', 'langconfig');
@@ -230,6 +231,9 @@ class reportpage {
             'nextname' => self::month_alone($next),
             'downloadurl' => (new \moodle_url($base, ['month' => $month, 'download' => 1]))->out(false),
             'hasdata' => $data['hasdata'],
+            // With no screen yet, the empty month says how to start.
+            'addscreen' => !$data['hasdata'] && !$DB->record_exists_select('local_oksigeniahechauka_screen',
+                'keyhash IS NOT NULL') ? (new \moodle_url('/local/oksigeniahechauka/screens.php'))->out(false) : '',
             'summary' => $summary,
             'summarymore' => $summarymore,
             'screens' => $screens,

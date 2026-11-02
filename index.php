@@ -65,6 +65,15 @@ if ($action !== '' && confirm_sesskey()) {
     }
     switch ($action) {
         case 'removesample':
+            if (!optional_param('confirm', 0, PARAM_BOOL)) {
+                \local_oksigeniahechauka\local\confirm::ask(
+                    get_string('sample_confirm', $c, count(\local_oksigeniahechauka\local\sample::items())),
+                    new moodle_url($url, ['action' => 'removesample']),
+                    get_string('sample_remove', $c),
+                    $url,
+                    get_string('sample_keep', $c)
+                );
+            }
             $gone = \local_oksigeniahechauka\local\sample::remove();
             redirect($url, get_string('sample_removed', $c, $gone), null, \core\output\notification::NOTIFY_SUCCESS);
             break;
@@ -104,14 +113,13 @@ if ($action !== '' && confirm_sesskey()) {
             if (optional_param('confirm', 0, PARAM_BOOL)) {
                 items::delete($id);
             } else {
-                echo $OUTPUT->header();
-                echo $OUTPUT->confirm(
+                \local_oksigeniahechauka\local\confirm::ask(
                     get_string('confirmdelete', $c, format_string($item->title)),
-                    new moodle_url($url, ['action' => 'delete', 'id' => $id, 'confirm' => 1, 'sesskey' => sesskey()]),
-                    $url
+                    new moodle_url($url, ['action' => 'delete', 'id' => $id]),
+                    get_string('confirm_delete', $c),
+                    $url,
+                    get_string('confirm_keep', $c)
                 );
-                echo $OUTPUT->footer();
-                die();
             }
             break;
         case 'reload':

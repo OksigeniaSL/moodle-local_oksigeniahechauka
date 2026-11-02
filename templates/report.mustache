@@ -32,6 +32,7 @@
         "nextname": "Noviembre",
         "downloadurl": "https://example.com/report.php?download=1",
         "hasdata": true,
+        "addscreen": "",
         "summary": "Las 2 pantallas han estado en marcha el 99,6 % de su horario.",
         "summarymore": "Ningún corte de más de 10 minutos.",
         "screens": [{"name": "Entrada", "url": "https://example.com/screen.php?id=1", "hours": true, "percent": "99,6", "low": false,
@@ -73,7 +74,8 @@
         {{#tabs}}<a href="{{url}}"{{#current}} aria-current="page"{{/current}}>{{{icon}}}{{label}}</a>{{/tabs}}
     </nav>
     {{/hastabs}}
-    {{^hasdata}}<p class="hkp-rep-summary">{{#str}}report_empty, local_oksigeniahechauka{{/str}}</p>{{/hasdata}}
+    {{^hasdata}}<p class="hkp-rep-summary">{{#str}}report_empty, local_oksigeniahechauka{{/str}}</p>
+    {{#addscreen}}<p class="hkp-hint">{{#str}}report_empty_noscreen, local_oksigeniahechauka{{/str}}</p><a class="btn btn-primary" href="{{addscreen}}">{{#str}}addscreen, local_oksigeniahechauka{{/str}}</a>{{/addscreen}}{{/hasdata}}
     {{#hasdata}}
     <p class="hkp-rep-summary">{{summary}} {{summarymore}}</p>
     <div class="hkp-rep-legend">

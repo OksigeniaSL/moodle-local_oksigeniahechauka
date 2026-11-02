@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.8.9
+
+- **What deletes asks first, and its buttons say what they do**: deleting content, a screen or a group, taking the example out, taking someone off the birthdays list and a site that stops being one. Never «OK» or «Cancel».
+- The report of a centre with no screen yet says how to start, with the button to add one.
+
 ## 0.8.8
 
 - **The user's guide in English**, with its own pictures of the panel and the screens in English; other languages get it too, until they have their own.

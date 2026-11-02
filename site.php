@@ -60,6 +60,15 @@ if (data_submitted() && confirm_sesskey()) {
         redirect($url);
     }
     if (optional_param('forget', 0, PARAM_BOOL)) {
+        if (!optional_param('confirm', 0, PARAM_BOOL)) {
+            \local_oksigeniahechauka\local\confirm::ask(
+                get_string('site_confirm', $c, format_string($group->name)),
+                new moodle_url($url, ['forget' => 1]),
+                get_string('site_forget', $c),
+                $url,
+                get_string('site_keep', $c)
+            );
+        }
         sites::forget($groupid);
         redirect($back, get_string('site_forgotten', $c, format_string($group->name)), null, notification::NOTIFY_SUCCESS);
     }

@@ -110,7 +110,19 @@ if ($action !== '' && confirm_sesskey()) {
         $message = get_string('birthdays_photos_done', $c, (object) ['ok' => $ok, 'nobody' => $nobody]);
         $kind = $nobody ? notification::NOTIFY_WARNING : notification::NOTIFY_SUCCESS;
     } else if ($action === 'delete') {
-        birthdays::delete(required_param('id', PARAM_INT));
+        $id = required_param('id', PARAM_INT);
+        if (!optional_param('confirm', 0, PARAM_BOOL)) {
+            $who = $DB->get_field(birthdays::TABLE, 'name', ['id' => $id], MUST_EXIST);
+            \local_oksigeniahechauka\local\confirm::ask(
+                get_string('birthdays_confirm', $c, s($who)),
+                new moodle_url($url, ['action' => 'delete', 'id' => $id]),
+                get_string('birthdays_confirm_yes', $c),
+                $url,
+                get_string('birthdays_confirm_no', $c)
+            );
+        }
+        birthdays::delete($id);
+        $message = get_string('birthdays_deleted', $c);
     }
     redirect($url, $message, null, $kind);
 }
