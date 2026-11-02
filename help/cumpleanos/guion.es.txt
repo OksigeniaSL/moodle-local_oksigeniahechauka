@@ -1,0 +1,5 @@
+En «Cumpleaños», enciéndelos: las pantallas felicitan con el nombre, el grupo y la foto.
+Quien está en Moodle sale con la fecha de su perfil; para los demás está la lista.
+Descarga el modelo, rellénalo en tu hoja de cálculo y súbelo.
+Las fotos, todas de una vez: con el nombre de cada uno o con su número de ID.
+Nunca sale la edad: se guardan el día y el mes.

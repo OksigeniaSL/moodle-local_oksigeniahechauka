@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.9.3
+
+- **«How it works»**: six short pieces, of half a minute to a minute, with real frames of the panel, a pointer that goes to each control and a subtitle per step (and a voice per step, where there is one): how to publish, setting up a screen, the urgent notice, who publishes where, your centre and the birthdays, in English and Spanish. A button beside what each one explains opens it in a dialog, and the «Guide» tab lists them all with the printed guide to download, instead of the whole guide on one page. Their files are in `help/`.
+- The public demonstration screen keeps the whole television in sight, the band at its foot too, whatever the height of the window.
+- A group's card no longer goes wider than its column on a phone.
+- The plugin's package leaves out the player's development demo and the sources of the printed guide (`.gitattributes`); the example's photos move to `pix/sample/`.
+
 ## 0.9.2
 
 - **Whoever gets a permission hears about it**: publishing in a group, publishing everywhere or running the screens, with the way to the panel and to the guide.

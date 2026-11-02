@@ -17,12 +17,13 @@
 {{!
     @template local_oksigeniahechauka/guide
 
-    The user's guide inside the panel.
+    The guide inside the panel: the «How it works» pieces, each opening in a dialog, and the printed guide to download.
 
     Example context (json):
     {
         "tabs": [], "hastabs": false, "back": "#", "backicon": "", "pdf": "#", "pdficon": "",
-        "body": "<h2>Qué es Hechauka</h2><p>Las pantallas informativas de un centro.</p>"
+        "pieces": [{"piece": "publicar", "title": "Cómo se publica", "desc": "Un aviso o una foto, cuándo y dónde.",
+            "thumb": "", "base": "#", "lang": "es", "ui": "{}", "length": "≈ 40 s", "icon": ""}]
     }
 }}
 <div class="hkp hkp-guide-page">
@@ -39,5 +40,16 @@
         {{#tabs}}<a href="{{url}}"{{#current}} aria-current="page"{{/current}}>{{{icon}}}{{label}}</a>{{/tabs}}
     </nav>
     {{/hastabs}}
-    <article class="hkp-guide">{{{body}}}</article>
+    <ul class="hkp-howto-list">
+        {{#pieces}}
+        <li id="{{piece}}">
+            <button type="button" class="hkp-howto-card" data-hkp-howto="{{piece}}" data-title="{{title}}" data-base="{{base}}" data-lang="{{lang}}" data-ui="{{ui}}">
+                <span class="hkp-howto-thumb"><img src="{{thumb}}" alt="" loading="lazy"><span class="hkp-howto-play">{{{icon}}}</span></span>
+                <b>{{title}}</b>
+                <span>{{desc}}</span>
+                <small>{{length}}</small>
+            </button>
+        </li>
+        {{/pieces}}
+    </ul>
 </div>

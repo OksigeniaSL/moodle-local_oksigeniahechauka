@@ -1601,3 +1601,335 @@ dialog.hkp-dialog > footer {
         margin: 1rem auto;
     }
 }
+
+/* «How it works»: the button beside what it explains, and the piece in its dialog (panel/ayuda.js). */
+.hkp-head-help {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem 1rem;
+    align-items: center;
+    margin-top: .4rem;
+}
+
+.hkp-howto {
+    display: inline-flex;
+    gap: .4rem;
+    align-items: center;
+    padding: .3rem .8rem .3rem .45rem;
+    border: 1px solid var(--hkp-line);
+    border-radius: 999px;
+    background: var(--hkp-card);
+    color: var(--hkp-accent-ink);
+    font-size: .9rem;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+.hkp-howto svg {
+    width: 1.35rem;
+    height: 1.35rem;
+    padding: .25rem;
+    border-radius: 50%;
+    background: var(--hkp-accent);
+    color: #fff;
+    fill: currentColor;
+}
+
+.hkp-howto small {
+    color: var(--hkp-muted);
+    font-weight: 400;
+}
+
+.hkp-howto:focus-visible,
+.hkp-howto-card:focus-visible {
+    outline: 3px solid var(--bs-focus-ring-color, rgba(15, 108, 191, .75));
+    outline-offset: 2px;
+}
+
+@media (hover: hover) {
+    .hkp-howto:hover {
+        border-color: var(--hkp-accent);
+    }
+
+    .hkp-howto-card:hover .hkp-howto-play {
+        transform: scale(1.08);
+    }
+}
+
+.hkp-dialog header .hkp-howto {
+    margin-left: auto;
+}
+
+.hkp-howto-dialog {
+    width: min(1100px, 96vw);
+    padding: 0;
+    border: 0;
+    border-radius: 12px;
+    background: var(--hkp-card);
+    color: var(--hkp-ink);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, .35);
+}
+
+.hkp-howto-dialog::backdrop {
+    background: rgba(10, 14, 18, .62);
+}
+
+.hkp-howto-dialog header {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    justify-content: space-between;
+    padding: .7rem 1rem;
+}
+
+.hkp-howto-dialog h2 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.hkp-howto-dialog button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.4rem;
+    height: 2.4rem;
+    padding: 0;
+    border: 1px solid var(--hkp-line);
+    border-radius: 50%;
+    background: transparent;
+    color: var(--hkp-ink);
+}
+
+.hkp-howto-dialog button svg {
+    width: 1.1rem;
+    height: 1.1rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.hkp-howto-dialog button svg .f {
+    fill: currentColor;
+    stroke: none;
+}
+
+.hkp-howto-stage {
+    position: relative;
+    aspect-ratio: 1280 / 800;
+    overflow: hidden;
+    background: #eef0f2;
+}
+
+.hkp-howto-stage img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity .35s ease;
+}
+
+.hkp-howto-stage img.is-on {
+    opacity: 1;
+}
+
+.hkp-howto-cursor {
+    position: absolute;
+    z-index: 2;
+    width: 30px;
+    height: 30px;
+    margin: -3px 0 0 -5px;
+    transition: left .7s cubic-bezier(.22, .8, .24, 1), top .7s cubic-bezier(.22, .8, .24, 1), opacity .3s;
+    pointer-events: none;
+}
+
+.hkp-howto-cursor::before {
+    content: "";
+    position: absolute;
+    top: -16px;
+    left: -14px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--hkp-accent) 30%, transparent);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--hkp-accent) 70%, transparent);
+}
+
+.hkp-howto-cursor svg {
+    position: relative;
+    width: 30px;
+    height: 30px;
+    filter: drop-shadow(0 2px 5px rgba(0, 0, 0, .45));
+    transition: transform .12s;
+}
+
+.hkp-howto-cursor.is-press svg {
+    transform: scale(.85);
+}
+
+.hkp-howto-cursor.is-hidden {
+    opacity: 0;
+}
+
+.hkp-howto-wave {
+    position: absolute;
+    z-index: 1;
+    width: 18px;
+    height: 18px;
+    margin: -9px 0 0 -9px;
+    border: 3px solid var(--hkp-accent);
+    border-radius: 50%;
+    pointer-events: none;
+    animation: hkp-howto-wave .7s ease-out forwards;
+}
+
+@keyframes hkp-howto-wave {
+    to {
+        opacity: 0;
+        transform: scale(3.4);
+    }
+}
+
+.hkp-howto-dialog footer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .6rem 1rem;
+    align-items: center;
+    padding: .55rem 1rem .9rem;
+}
+
+.hkp-howto-segs {
+    display: flex;
+    flex: 1 1 100%;
+    gap: 4px;
+}
+
+.hkp-howto-segs i {
+    flex: 1;
+    height: 3px;
+    overflow: hidden;
+    border-radius: 2px;
+    background: var(--hkp-line);
+}
+
+.hkp-howto-segs b {
+    display: block;
+    width: 0;
+    height: 100%;
+    background: var(--hkp-accent);
+}
+
+.hkp-howto-text {
+    flex: 1 1 20rem;
+    min-height: 2.8em;
+    margin: 0;
+    font-size: 1.05rem;
+    line-height: 1.4;
+}
+
+.hkp-howto-buttons {
+    display: flex;
+    gap: .4rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .hkp-howto-cursor,
+    .hkp-howto-stage img {
+        transition: none;
+    }
+
+    .hkp-howto-wave {
+        animation: none;
+        display: none;
+    }
+}
+
+.hkp-howto-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+    gap: 1rem;
+    margin: 1rem 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.hkp-howto-card {
+    display: grid;
+    gap: .35rem;
+    width: 100%;
+    height: 100%;
+    padding: 0 0 1rem;
+    overflow: hidden;
+    border: 1px solid var(--hkp-line);
+    border-radius: var(--hkp-radius);
+    background: var(--hkp-card);
+    color: var(--hkp-ink);
+    text-align: left;
+}
+
+.hkp-howto-card > b,
+.hkp-howto-card > span:not(.hkp-howto-thumb),
+.hkp-howto-card > small {
+    padding: 0 1rem;
+}
+
+.hkp-howto-card > b {
+    margin-top: .4rem;
+    font-size: 1.05rem;
+}
+
+.hkp-howto-card > small {
+    color: var(--hkp-muted);
+}
+
+.hkp-howto-thumb {
+    position: relative;
+    display: block;
+    aspect-ratio: 1280 / 800;
+    background: #eef0f2;
+}
+
+.hkp-howto-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.hkp-howto-play {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    display: grid;
+    width: 3.2rem;
+    height: 3.2rem;
+    margin: -1.6rem 0 0 -1.6rem;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--hkp-accent);
+    color: #fff;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, .3);
+    transition: transform .15s;
+}
+
+.hkp-howto-play svg {
+    width: 1.4rem;
+    height: 1.4rem;
+    fill: currentColor;
+}
+
+/* A group's card never wider than its column: the category's row wraps on a phone. */
+.hkp-group {
+    min-width: 0;
+}
+
+.hkp-group form.hkp-find {
+    flex-wrap: wrap;
+}
+
+.hkp-group form.hkp-find .form-select {
+    flex: 1 1 12rem;
+    min-width: 0;
+}

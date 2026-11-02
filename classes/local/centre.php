@@ -125,6 +125,7 @@ class centre {
             'style' => home::stages(),
             'title' => get_string('panel_title', $c),
             'tabs' => home::tabs('centre', true),
+            'howto' => howto::button('centro'),
             'hastabs' => true,
             'action' => (new \moodle_url('/local/oksigeniahechauka/centre.php'))->out(false),
             'sesskey' => sesskey(),

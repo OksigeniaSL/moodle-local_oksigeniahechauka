@@ -1,0 +1,78 @@
+{
+ "size": [
+  1280,
+  800
+ ],
+ "steps": [
+  {
+   "frame": "f01.webp",
+   "points": [
+    [
+     0.3633,
+     0.5553
+    ]
+   ],
+   "click": false,
+   "text": "En la tele, abre la dirección de las pantallas: enseña un código y un QR."
+  },
+  {
+   "frame": "f02.webp",
+   "points": [
+    [
+     0.5,
+     0.3428
+    ]
+   ],
+   "click": false,
+   "text": "Escanea el QR con el móvil, o abre la dirección en el móvil y escribe el código."
+  },
+  {
+   "frame": "f03.webp",
+   "points": [
+    [
+     0.5,
+     0.4997
+    ]
+   ],
+   "click": true,
+   "text": "Di si es una pantalla nueva o si sustituye a otra que ya tenías."
+  },
+  {
+   "frame": "f04.webp",
+   "points": [
+    [
+     0.5,
+     0.5388
+    ]
+   ],
+   "click": true,
+   "text": "Ponle un nombre que diga dónde está y, si quieres, sus grupos."
+  },
+  {
+   "frame": "f05.webp",
+   "points": [
+    [
+     0.5,
+     0.5918
+    ]
+   ],
+   "click": true,
+   "text": "Pulsa «Empezar»: en unos segundos la pantalla enseña lo suyo."
+  },
+  {
+   "frame": "f06.webp",
+   "points": [
+    [
+     0.3281,
+     0.4434
+    ],
+    [
+     0.5612,
+     0.4434
+    ]
+   ],
+   "click": true,
+   "text": "En «Pantallas y grupos» la ves con su estado, y desde su ficha ajustas su horario."
+  }
+ ]
+}

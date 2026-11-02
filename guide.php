@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * The user's guide inside the panel, in the language of the user when there is one, with the printed version to download.
+ * The guide inside the panel: the «How it works» pieces, each in a dialog, and the printed guide to download.
  *
  * @package    local_oksigeniahechauka
  * @copyright  2026 Oksigenia SL <dev@oksigenia.cc>
@@ -42,16 +42,11 @@ $PAGE->set_heading('');
 $PAGE->set_primary_active_tab('local_oksigeniahechauka');
 
 $dir = __DIR__ . '/docs/guia/';
-$lang = substr(current_language(), 0, 2);
-if (!is_readable($dir . $lang . '.md')) {
-    $lang = is_readable($dir . 'en.md') && $lang !== 'es' ? 'en' : 'es';
-}
-// The guide is a file of the plugin: its pictures and links point inside the plugin.
+$lang = \local_oksigeniahechauka\local\howto::lang();
 $base = (new moodle_url('/local/oksigeniahechauka/docs/guia/'))->out(false);
-$text = (string) file_get_contents($dir . $lang . '.md');
-$text = preg_replace('~(\]\(|src=")img/~', '$1' . $base . 'img/', $text);
 $pdf = is_readable($dir . 'hechauka-guia-' . $lang . '.pdf') ? $base . 'hechauka-guia-' . $lang . '.pdf' : '';
 $managescreens = access::can('managescreens');
+$pieces = \local_oksigeniahechauka\local\howto::all();
 
 echo $OUTPUT->header();
 echo $OUTPUT->render_from_template('local_oksigeniahechauka/guide', [
@@ -61,7 +56,6 @@ echo $OUTPUT->render_from_template('local_oksigeniahechauka/guide', [
     'backicon' => icons::svg('back'),
     'pdf' => $pdf,
     'pdficon' => icons::svg('out'),
-    // A file of the plugin itself, not anything a user wrote.
-    'body' => markdown_to_html($text),
+    'pieces' => $pieces,
 ]);
 echo $OUTPUT->footer();

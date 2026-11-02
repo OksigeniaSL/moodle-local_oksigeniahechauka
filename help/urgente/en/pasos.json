@@ -1,0 +1,71 @@
+{
+ "size": [
+  1280,
+  800
+ ],
+ "steps": [
+  {
+   "frame": "f01.webp",
+   "points": [
+    [
+     0.8157,
+     0.2052
+    ]
+   ],
+   "click": true,
+   "text": "For what cannot wait, press «Urgent notice»."
+  },
+  {
+   "frame": "f02.webp",
+   "points": [
+    [
+     0.1637,
+     0.2641
+    ]
+   ],
+   "click": true,
+   "text": "Choose what is happening: a drill, the weather, closing early or something else."
+  },
+  {
+   "frame": "f03.webp",
+   "points": [
+    [
+     0.3248,
+     0.4381
+    ],
+    [
+     0.692,
+     0.3605
+    ]
+   ],
+   "click": true,
+   "text": "Write what it says. On the right you see how it looks."
+  },
+  {
+   "frame": "f04.webp",
+   "points": [
+    [
+     0.3248,
+     0.8131
+    ],
+    [
+     0.3248,
+     0.8131
+    ]
+   ],
+   "click": true,
+   "text": "Choose where it shows and until when: until you take it off, an hour or the rest of the day."
+  },
+  {
+   "frame": "f05.webp",
+   "points": [
+    [
+     0.2524,
+     0.9118
+    ]
+   ],
+   "click": true,
+   "text": "Press the red button to put it on: it takes the whole screen at once."
+  }
+ ]
+}

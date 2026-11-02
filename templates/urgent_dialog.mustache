@@ -33,7 +33,7 @@
 }}
 <dialog class="hkp-dialog is-urgent" id="hkp-urgent-dialog" aria-labelledby="hkp-urg-h" data-strings="{{strings}}">
     <form method="post" action="{{action}}" id="hkp-urgent-form"><input type="hidden" name="sesskey" value="{{sesskey}}"></form>
-    <header>{{{icons.urgent}}}<h2 id="hkp-urg-h">{{#str}}urgent_label, local_oksigeniahechauka{{/str}}</h2><button type="button" class="btn btn-icon" data-hkp-close aria-label="{{#str}}closebuttontitle{{/str}}">{{{icons.x}}}</button></header>
+    <header>{{{icons.urgent}}}<h2 id="hkp-urg-h">{{#str}}urgent_label, local_oksigeniahechauka{{/str}}</h2>{{#howtourgent}}{{> local_oksigeniahechauka/howto_button }}{{/howtourgent}}<button type="button" class="btn btn-icon" data-hkp-close aria-label="{{#str}}closebuttontitle{{/str}}">{{{icons.x}}}</button></header>
     <div class="hkp-dialog-body">
         <p class="hkp-lead">{{#str}}urgent_lead, local_oksigeniahechauka{{/str}}</p>
         <div class="hkp-two">

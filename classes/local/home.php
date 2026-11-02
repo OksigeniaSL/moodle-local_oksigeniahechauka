@@ -120,7 +120,8 @@ class home {
             'tabs' => self::tabs('home', $managescreens),
             'hastabs' => $managescreens,
             'missing' => $managescreens ? startpage::missing() : [],
-            'help' => $managescreens ? '' : self::guide('panel'),
+            'help' => $managescreens ? '' : self::guide(),
+            'howto' => howto::button('publicar'),
             'helpicon' => icons::svg('help'),
             'sample' => $publishall && sample::exists() ? ['remove' => self::remove_sample_url()] : null,
             'style' => self::stages(),
@@ -215,6 +216,7 @@ class home {
             'frame' => (new \moodle_url('/local/oksigeniahechauka/preview.php', ['frame' => 1,
                 'screen' => $first ? $first->id : 0]))->out(false),
             'vertical' => ($info['display']['height'] ?? 0) > ($info['display']['width'] ?? 1),
+            'howtourgent' => howto::button('urgente'),
             'icons' => ['urgent' => icons::svg('urgent'), 'x' => icons::svg('x'), 'screens' => icons::svg('screens')],
             'strings' => json_encode(['n' => get_string('urgent_go_n', $c), 'one' => get_string('urgent_go_one', $c),
                 'label' => get_string('urgent_label', $c)], JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP),
@@ -275,7 +277,7 @@ class home {
                 'label' => get_string($t[2], self::C), 'icon' => icons::svg($t[3]), 'current' => $t[0] === $active];
         }
         // The guide, open where this page is explained.
-        $parts = ['home' => 'panel', 'screens' => 'grupos', 'centre' => 'centro', 'report' => 'informe'];
+        $parts = ['home' => 'publicar', 'screens' => 'pantalla', 'centre' => 'centro'];
         $part = $help !== '' ? $help : ($parts[$active] ?? '');
         $tabs[] = ['url' => self::guide($part), 'label' => get_string('tab_guide', self::C), 'icon' => icons::svg('help'),
             'current' => $active === 'guide'];

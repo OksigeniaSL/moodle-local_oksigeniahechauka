@@ -92,7 +92,7 @@ class sample {
         $picture = function (int $itemid, string $name) use ($fs) {
             $where = ['contextid' => files::context()->id, 'component' => files::COMPONENT, 'filearea' => files::MEDIA,
                 'itemid' => $itemid, 'filepath' => '/', 'filename' => $name];
-            $fs->create_file_from_pathname($where, __DIR__ . '/../../player/demo/media/' . $name);
+            $fs->create_file_from_pathname($where, __DIR__ . '/../../pix/sample/' . $name);
         };
         $count = 0;
         $add('notice', $s('important'), $s('important_body'), ['important' => true]);

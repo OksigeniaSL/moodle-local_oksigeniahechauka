@@ -35,7 +35,7 @@
     <div class="hkp-gp">
     <div class="hkp-gp-main">
     <section aria-labelledby="hkp-h-scr">
-        <div class="hkp-sec-head"><h2 id="hkp-h-scr">{{#str}}screens, local_oksigeniahechauka{{/str}}</h2><span class="hkp-count">{{count}}</span><div class="hkp-sec-tools"><button type="button" class="btn btn-primary" data-hkp-open="hkp-new-dialog">{{{icons.qr}}}{{#str}}addscreen_card, local_oksigeniahechauka{{/str}}</button></div></div>
+        <div class="hkp-sec-head"><h2 id="hkp-h-scr">{{#str}}screens, local_oksigeniahechauka{{/str}}</h2><span class="hkp-count">{{count}}</span><div class="hkp-sec-tools">{{#howtoscreen}}{{> local_oksigeniahechauka/howto_button }}{{/howtoscreen}}<button type="button" class="btn btn-primary" data-hkp-open="hkp-new-dialog">{{{icons.qr}}}{{#str}}addscreen_card, local_oksigeniahechauka{{/str}}</button></div></div>
         <ul class="hkp-glist">
             {{#rows}}<li><span class="hkp-mini"><span class="hkp-bezel{{#vertical}} is-v{{/vertical}}" data-state="{{state}}">{{#image}}<img src="{{image}}" alt="" loading="lazy">{{/image}}{{^image}}<span class="hkp-bezel-off hkp-mini-icon" aria-hidden="true">{{{shapeicon}}}</span>{{/image}}<span class="hkp-led" aria-hidden="true"></span></span></span><span><b>{{name}}</b><span class="hkp-state" data-state="{{state}}"><span class="hkp-state-word"><span class="hkp-dot" aria-hidden="true"></span>{{label}}</span>{{#meta}} <span class="hkp-meta">{{meta}}</span>{{/meta}}</span></span><span class="hkp-chips">{{#groupnames}}<span class="hkp-chip is-small hkp-static">{{name}}</span>{{/groupnames}}</span><a class="btn btn-sm btn-outline-secondary" href="{{sheet}}">{{{icons.sliders}}}{{#str}}groups_sheet, local_oksigeniahechauka{{/str}}</a></li>{{/rows}}
         </ul>
@@ -77,7 +77,7 @@
     </section>
     </div>
     <aside class="hkp-gp-side" aria-labelledby="hkp-h-perms">
-        <div class="hkp-sec-head"><h2 id="hkp-h-perms">{{#str}}groups_permissions, local_oksigeniahechauka{{/str}}</h2><p class="hkp-hint hkp-sec-hint">{{#str}}groups_permissions_help, local_oksigeniahechauka{{/str}}</p></div>
+        <div class="hkp-sec-head"><h2 id="hkp-h-perms">{{#str}}groups_permissions, local_oksigeniahechauka{{/str}}</h2>{{#howtoperms}}{{> local_oksigeniahechauka/howto_button }}{{/howtoperms}}<p class="hkp-hint hkp-sec-hint">{{#str}}groups_permissions_help, local_oksigeniahechauka{{/str}}</p></div>
         <article class="hkp-group is-perm" id="hkp-all" data-list="everywhere" data-group="0">
             <header class="is-stacked"><h3>{{#str}}groups_everywhere, local_oksigeniahechauka{{/str}}</h3><p class="hkp-hint">{{#str}}groups_everywhere_help, local_oksigeniahechauka{{/str}}</p></header>
             <ul class="hkp-people">

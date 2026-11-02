@@ -1,0 +1,7 @@
+# What stays in the repository but does not travel in the plugin's package (git archive): the player's development demo,
+# and the sources of the printed guide (its PDFs do travel).
+/player/demo export-ignore
+/player/test export-ignore
+/docs/guia/img export-ignore
+/docs/guia/*.md export-ignore
+/docs/guia/*.css export-ignore

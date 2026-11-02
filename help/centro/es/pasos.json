@@ -1,0 +1,63 @@
+{
+ "size": [
+  1280,
+  800
+ ],
+ "steps": [
+  {
+   "frame": "f01.webp",
+   "points": [
+    [
+     0.2434,
+     0.4964
+    ]
+   ],
+   "click": true,
+   "text": "En «Tu centro», di dónde está, para el tiempo de las pantallas."
+  },
+  {
+   "frame": "f02.webp",
+   "points": [
+    [
+     0.1721,
+     0.4999
+    ]
+   ],
+   "click": true,
+   "text": "Sube el logotipo: uno para fondo claro y otro para oscuro."
+  },
+  {
+   "frame": "f03.webp",
+   "points": [
+    [
+     0.1371,
+     0.5001
+    ]
+   ],
+   "click": true,
+   "text": "Elige la piel: los colores y la letra de todas las pantallas."
+  },
+  {
+   "frame": "f04.webp",
+   "points": [
+    [
+     0.1258,
+     0.4997
+    ]
+   ],
+   "click": true,
+   "text": "Con «Personalizar» la adaptas a tu centro, siempre con combinaciones que se leen de lejos."
+  },
+  {
+   "frame": "f05.webp",
+   "points": [
+    [
+     0.734,
+     0.5001
+    ]
+   ],
+   "click": false,
+   "text": "A la derecha ves la pantalla con tus cambios antes de guardar."
+  }
+ ]
+}

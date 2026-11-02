@@ -1,0 +1,71 @@
+{
+ "size": [
+  1280,
+  800
+ ],
+ "steps": [
+  {
+   "frame": "f01.webp",
+   "points": [
+    [
+     0.7982,
+     0.2052
+    ]
+   ],
+   "click": true,
+   "text": "Para lo que no puede esperar, pulsa «Aviso urgente»."
+  },
+  {
+   "frame": "f02.webp",
+   "points": [
+    [
+     0.1817,
+     0.2641
+    ]
+   ],
+   "click": true,
+   "text": "Elige qué pasa: un simulacro, el tiempo, un cierre anticipado u otra cosa."
+  },
+  {
+   "frame": "f03.webp",
+   "points": [
+    [
+     0.3248,
+     0.4381
+    ],
+    [
+     0.692,
+     0.3605
+    ]
+   ],
+   "click": true,
+   "text": "Escribe lo que dice. A la derecha ves cómo sale."
+  },
+  {
+   "frame": "f04.webp",
+   "points": [
+    [
+     0.3248,
+     0.8131
+    ],
+    [
+     0.3248,
+     0.8131
+    ]
+   ],
+   "click": true,
+   "text": "Elige dónde sale y hasta cuándo: hasta que lo quites, una hora o el resto del día."
+  },
+  {
+   "frame": "f05.webp",
+   "points": [
+    [
+     0.2719,
+     0.9118
+    ]
+   ],
+   "click": true,
+   "text": "Pulsa el botón rojo para ponerlo: ocupa la pantalla entera en seguida."
+  }
+ ]
+}

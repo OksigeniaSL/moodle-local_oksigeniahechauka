@@ -1,0 +1,5 @@
+Un grupo junta pantallas: las de un edificio, las de un club, las de otra sede.
+En su tarjeta están sus pantallas y quién publica en él.
+Quien publica en un grupo solo ve esas pantallas y lo que publica él.
+A la derecha, quién publica en todas las pantallas y quién las lleva.
+Si el grupo está en otro sitio, hazlo sede: su nombre, su tiempo y su logotipo.

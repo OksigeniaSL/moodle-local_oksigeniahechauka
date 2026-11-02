@@ -1,0 +1,5 @@
+A group puts screens together: those of a building, of a club, of another site.
+Its card shows its screens and who publishes on it.
+Whoever publishes in a group only sees those screens and what they publish.
+On the right, who publishes on every screen and who runs them.
+If the group is somewhere else, make it a site: its own name, weather and logo.

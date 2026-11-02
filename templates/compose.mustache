@@ -46,7 +46,7 @@
 }}
 <div class="hkp" id="hkp-compose-page"{{#style}} style="{{style}}"{{/style}}>
     <a class="hkp-back" href="{{back}}">{{{backicon}}}{{#str}}panel_title, local_oksigeniahechauka{{/str}}</a>
-    <header class="hkp-head"><div class="hkp-head-title"><h1>{{title}}</h1><a class="hkp-help-link" href="{{help}}">{{{helpicon}}}{{#str}}tab_guide, local_oksigeniahechauka{{/str}}</a></div></header>
+    <header class="hkp-head"><div class="hkp-head-title"><h1>{{title}}</h1>{{#howto}}{{> local_oksigeniahechauka/howto_button }}{{/howto}}</div></header>
     {{#haserrors}}<div class="alert alert-danger" role="alert">{{#str}}compose_errors, local_oksigeniahechauka{{/str}}</div>{{/haserrors}}
     <form class="hkp-compose" method="post" action="{{action}}" enctype="multipart/form-data" data-config="{{config}}" novalidate>
         <input type="hidden" name="sesskey" value="{{sesskey}}">

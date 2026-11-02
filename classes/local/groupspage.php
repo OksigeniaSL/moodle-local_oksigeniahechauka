@@ -141,6 +141,8 @@ class groupspage {
             'style' => home::stages(),
             'title' => get_string('panel_title', $c),
             'tabs' => home::tabs('screens', true),
+            'howtoscreen' => howto::button('pantalla'),
+            'howtoperms' => howto::button('permisos'),
             'hastabs' => true,
             'action' => $url->out(false),
             'sesskey' => sesskey(),

@@ -1,0 +1,5 @@
+In «Birthdays», switch them on: the screens congratulate with the name, the group and the photo.
+Whoever is in Moodle comes out with the date of their profile; for everyone else, the list.
+Download the model, fill it in your spreadsheet and upload it.
+The photos, all at once: named after each person or after their ID number.
+The age never shows: the day and the month are kept.

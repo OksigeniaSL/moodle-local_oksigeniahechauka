@@ -1,0 +1,63 @@
+{
+ "size": [
+  1280,
+  800
+ ],
+ "steps": [
+  {
+   "frame": "f01.webp",
+   "points": [
+    [
+     0.3281,
+     0.4997
+    ]
+   ],
+   "click": false,
+   "text": "Un grupo junta pantallas: las de un edificio, las de un club, las de otra sede."
+  },
+  {
+   "frame": "f02.webp",
+   "points": [
+    [
+     0.3281,
+     0.5003
+    ]
+   ],
+   "click": true,
+   "text": "En su tarjeta están sus pantallas y quién publica en él."
+  },
+  {
+   "frame": "f03.webp",
+   "points": [
+    [
+     0.3281,
+     0.5003
+    ]
+   ],
+   "click": false,
+   "text": "Quien publica en un grupo solo ve esas pantallas y lo que publica él."
+  },
+  {
+   "frame": "f04.webp",
+   "points": [
+    [
+     0.7883,
+     0.4994
+    ]
+   ],
+   "click": false,
+   "text": "A la derecha, quién publica en todas las pantallas y quién las lleva."
+  },
+  {
+   "frame": "f05.webp",
+   "points": [
+    [
+     0.1,
+     0.5003
+    ]
+   ],
+   "click": true,
+   "text": "Si el grupo está en otro sitio, hazlo sede: su nombre, su tiempo y su logotipo."
+  }
+ ]
+}

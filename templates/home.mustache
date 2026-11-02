@@ -48,7 +48,7 @@
         <div class="hkp-head-title">
             <h1>{{title}}</h1>
             {{#sub}}<p class="hkp-head-sub">{{sub}}</p>{{/sub}}
-            {{#help}}<a class="hkp-help-link" href="{{help}}">{{{helpicon}}}{{#str}}tab_guide, local_oksigeniahechauka{{/str}}</a>{{/help}}
+            <div class="hkp-head-help">{{#howto}}{{> local_oksigeniahechauka/howto_button }}{{/howto}}{{#help}}<a class="hkp-help-link" href="{{help}}">{{{helpicon}}}{{#str}}tab_guide, local_oksigeniahechauka{{/str}}</a>{{/help}}</div>
         </div>
         {{#hasactions}}
         <div class="hkp-head-actions">

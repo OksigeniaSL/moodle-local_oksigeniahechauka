@@ -1,0 +1,63 @@
+{
+ "size": [
+  1280,
+  800
+ ],
+ "steps": [
+  {
+   "frame": "f01.webp",
+   "points": [
+    [
+     0.3281,
+     0.5004
+    ]
+   ],
+   "click": false,
+   "text": "A group puts screens together: those of a building, of a club, of another site."
+  },
+  {
+   "frame": "f02.webp",
+   "points": [
+    [
+     0.3281,
+     0.8398
+    ]
+   ],
+   "click": true,
+   "text": "Its card shows its screens and who publishes on it."
+  },
+  {
+   "frame": "f03.webp",
+   "points": [
+    [
+     0.3281,
+     0.7086
+    ]
+   ],
+   "click": false,
+   "text": "Whoever publishes in a group only sees those screens and what they publish."
+  },
+  {
+   "frame": "f04.webp",
+   "points": [
+    [
+     0.7883,
+     0.5
+    ]
+   ],
+   "click": false,
+   "text": "On the right, who publishes on every screen and who runs them."
+  },
+  {
+   "frame": "f05.webp",
+   "points": [
+    [
+     0.098,
+     0.4998
+    ]
+   ],
+   "click": true,
+   "text": "If the group is somewhere else, make it a site: its own name, weather and logo."
+  }
+ ]
+}

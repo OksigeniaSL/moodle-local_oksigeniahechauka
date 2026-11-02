@@ -1,0 +1,78 @@
+{
+ "size": [
+  1280,
+  800
+ ],
+ "steps": [
+  {
+   "frame": "f01.webp",
+   "points": [
+    [
+     0.9049,
+     0.2052
+    ]
+   ],
+   "click": true,
+   "text": "Para publicar algo en las pantallas, pulsa «Añadir»."
+  },
+  {
+   "frame": "f02.webp",
+   "points": [
+    [
+     0.0946,
+     0.3495
+    ]
+   ],
+   "click": true,
+   "text": "Arriba eliges qué es: un aviso, una foto o un vídeo, un evento, una línea de la cinta…"
+  },
+  {
+   "frame": "f03.webp",
+   "points": [
+    [
+     0.277,
+     0.4994
+    ]
+   ],
+   "click": true,
+   "text": "Escribe el aviso. Corto se lee mejor de lejos."
+  },
+  {
+   "frame": "f04.webp",
+   "points": [
+    [
+     0.734,
+     0.4994
+    ]
+   ],
+   "click": false,
+   "text": "A la derecha ves cómo saldrá en la pantalla mientras escribes."
+  },
+  {
+   "frame": "f05.webp",
+   "points": [
+    [
+     0.1087,
+     0.5001
+    ],
+    [
+     0.1656,
+     1.0036
+    ]
+   ],
+   "click": true,
+   "text": "Elige cuándo sale y en qué pantallas: en todas, en un grupo o en una sola."
+  },
+  {
+   "frame": "f06.webp",
+   "points": [
+    [
+     0.1641,
+     0.8445
+    ]
+   ],
+   "click": true,
+   "text": "Pulsa «Publicar en…» y en menos de un minuto está en las pantallas."
+  }
+ ]
+}

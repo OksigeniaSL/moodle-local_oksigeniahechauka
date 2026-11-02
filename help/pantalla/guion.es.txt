@@ -1,0 +1,6 @@
+En la tele, abre la dirección de las pantallas: enseña un código y un QR.
+Escanea el QR con el móvil, o abre la dirección en el móvil y escribe el código.
+Di si es una pantalla nueva o si sustituye a otra que ya tenías.
+Ponle un nombre que diga dónde está y, si quieres, sus grupos.
+Pulsa «Empezar»: en unos segundos la pantalla enseña lo suyo.
+En «Pantallas y grupos» la ves con su estado, y desde su ficha ajustas su horario.

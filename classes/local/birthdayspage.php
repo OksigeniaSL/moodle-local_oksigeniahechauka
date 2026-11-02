@@ -68,6 +68,7 @@ class birthdayspage {
         }, birthdays::on($config, schedule::day($now)));
         return [
             'tabs' => home::tabs('centre', true, 'cumpleanos'),
+            'howto' => howto::button('cumpleanos'),
             'hastabs' => true,
             'centre' => (new \moodle_url('/local/oksigeniahechauka/centre.php'))->out(false),
             'action' => (new \moodle_url('/local/oksigeniahechauka/birthdays.php'))->out(false),

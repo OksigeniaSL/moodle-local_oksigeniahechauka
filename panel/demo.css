@@ -57,7 +57,8 @@ body {
 }
 
 .hkd-tv {
-    width: 100%;
+    /* The whole television in sight, the band at its foot too: as wide as the window lets it be in height. */
+    width: min(100%, calc((100vh - 15rem) * 16 / 9));
     padding: 1.1%;
     border-radius: 14px;
     background: var(--bezel);
@@ -65,7 +66,7 @@ body {
 }
 
 .hkd-tv.is-vertical {
-    width: min(100%, 520px);
+    width: min(100%, 520px, calc((100vh - 15rem) * 9 / 16));
 }
 
 .hkd-glass {

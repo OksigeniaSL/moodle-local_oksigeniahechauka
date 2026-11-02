@@ -1,0 +1,78 @@
+{
+ "size": [
+  1280,
+  800
+ ],
+ "steps": [
+  {
+   "frame": "f01.webp",
+   "points": [
+    [
+     0.3633,
+     0.5553
+    ]
+   ],
+   "click": false,
+   "text": "On the television, open the address of the screens: it shows a code and a QR."
+  },
+  {
+   "frame": "f02.webp",
+   "points": [
+    [
+     0.5,
+     0.3428
+    ]
+   ],
+   "click": false,
+   "text": "Scan the QR with your phone, or open the address on your phone and type the code."
+  },
+  {
+   "frame": "f03.webp",
+   "points": [
+    [
+     0.5,
+     0.5001
+    ]
+   ],
+   "click": true,
+   "text": "Say whether it is a new screen or whether it replaces one you had."
+  },
+  {
+   "frame": "f04.webp",
+   "points": [
+    [
+     0.5,
+     0.5381
+    ]
+   ],
+   "click": true,
+   "text": "Give it a name that says where it is and, if you like, its groups."
+  },
+  {
+   "frame": "f05.webp",
+   "points": [
+    [
+     0.5,
+     0.6185
+    ]
+   ],
+   "click": true,
+   "text": "Press «Start»: in a few seconds the screen shows what is its."
+  },
+  {
+   "frame": "f06.webp",
+   "points": [
+    [
+     0.3281,
+     0.4575
+    ],
+    [
+     0.5597,
+     0.4575
+    ]
+   ],
+   "click": true,
+   "text": "In «Screens and groups» you see it with its state, and its sheet sets its hours."
+  }
+ ]
+}

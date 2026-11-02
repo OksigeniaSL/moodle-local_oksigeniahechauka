@@ -99,7 +99,8 @@ foreach ([false, true] as $dark) {
 }
 $config = get_config($c);
 $template = place::view($query, $now, $suffix) + [
-    'tabs' => home::tabs('screens', true, 'sedes'),
+    'tabs' => home::tabs('screens', true, 'permisos'),
+    'howto' => \local_oksigeniahechauka\local\howto::button('permisos'),
     'hastabs' => true,
     'back' => $back->out(false),
     'backicon' => icons::svg('back'),

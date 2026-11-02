@@ -1,0 +1,78 @@
+{
+ "size": [
+  1280,
+  800
+ ],
+ "steps": [
+  {
+   "frame": "f01.webp",
+   "points": [
+    [
+     0.9134,
+     0.2052
+    ]
+   ],
+   "click": true,
+   "text": "To publish something on the screens, press «Add»."
+  },
+  {
+   "frame": "f02.webp",
+   "points": [
+    [
+     0.0946,
+     0.3495
+    ]
+   ],
+   "click": true,
+   "text": "At the top you choose what it is: a notice, a photo or a video, an event, a ticker line…"
+  },
+  {
+   "frame": "f03.webp",
+   "points": [
+    [
+     0.277,
+     0.4994
+    ]
+   ],
+   "click": true,
+   "text": "Write the notice. Short reads better from afar."
+  },
+  {
+   "frame": "f04.webp",
+   "points": [
+    [
+     0.734,
+     0.4994
+    ]
+   ],
+   "click": false,
+   "text": "On the right you see how it will look on the screen as you type."
+  },
+  {
+   "frame": "f05.webp",
+   "points": [
+    [
+     0.1157,
+     0.5001
+    ],
+    [
+     0.1515,
+     0.9742
+    ]
+   ],
+   "click": true,
+   "text": "Choose when it comes out and on which screens: all of them, a group or just one."
+  },
+  {
+   "frame": "f06.webp",
+   "points": [
+    [
+     0.1559,
+     0.8151
+    ]
+   ],
+   "click": true,
+   "text": "Press «Publish on…» and within a minute it is on the screens."
+  }
+ ]
+}

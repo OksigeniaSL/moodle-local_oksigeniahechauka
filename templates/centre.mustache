@@ -37,7 +37,7 @@
     }
 }}
 <div class="hkp" id="hkp-centre-page"{{#style}} style="{{style}}"{{/style}} data-strings="{{strings}}">
-    <header class="hkp-head"><div class="hkp-head-title"><h1>{{title}}</h1></div></header>
+    <header class="hkp-head"><div class="hkp-head-title"><h1>{{title}}</h1>{{#howto}}{{> local_oksigeniahechauka/howto_button }}{{/howto}}</div></header>
     {{#hastabs}}<nav class="hkp-tabs" aria-label="{{#str}}tabs_label, local_oksigeniahechauka{{/str}}">{{#tabs}}<a href="{{url}}"{{#current}} aria-current="page"{{/current}}>{{{icon}}}{{label}}</a>{{/tabs}}</nav>{{/hastabs}}
     <div class="hkp-centre">
         <div class="hkp-centre-form">
