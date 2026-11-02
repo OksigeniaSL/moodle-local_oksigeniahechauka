@@ -243,7 +243,6 @@
         swatch('[data-ground-skin]', tones);
         swatch('[data-ground-tint]', tint);
         page.querySelector('.hkp-grounds').style.setProperty('--hkp-g-texto', tones.texto);
-        page.querySelector('[data-ground-skin-name]').textContent = skin.getAttribute('data-skin-name');
         page.querySelector('[data-letter-skin]').style.fontFamily = skin.getAttribute('data-stack');
         page.querySelector('[data-letter-skin-name]').textContent = skin.getAttribute('data-letter-name');
         const changed = picked('skinletter').value || picked('skinground').value || picked('skincorners').value !== 'round' ||

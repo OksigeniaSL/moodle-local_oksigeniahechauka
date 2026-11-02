@@ -418,17 +418,14 @@ class skins {
         $c = 'local_oksigeniahechauka';
         $chosen = self::chosen($config);
         $first = self::get(self::first());
-        $word = function (array $names) {
-            return $names[substr(current_language(), 0, 2)] ?? $names['en'] ?? '';
-        };
-        $card = function (array $skin, string $id, string $name, string $primary, string $accent, bool $checked) use ($word) {
+        $card = function (array $skin, string $id, string $name, string $primary, string $accent, bool $checked) {
             return ['id' => $id, 'skin' => $skin['id'], 'name' => $name, 'family' => $skin['family'], 'checked' => $checked,
                 'fondo' => $skin['light']['fondo'], 'texto' => $skin['light']['texto'], 'primary' => $primary, 'accent' => $accent,
                 'skinprimary' => $skin['light']['primario'], 'skinaccent' => $skin['light']['acento'],
                 'stack' => '"' . $skin['family'] . '", sans-serif', 'tones' => json_encode([
                     'light' => array_intersect_key($skin['light'], array_flip(['fondo', 'superficie', 'texto'])),
                     'dark' => array_intersect_key($skin['dark'], array_flip(['fondo', 'superficie', 'texto'])),
-                ]), 'skinname' => $word($skin['name']), 'lettername' => self::letter_name($skin['family'])];
+                ]), 'lettername' => self::letter_name($skin['family'])];
         };
         $cards = [];
         $lang = substr(current_language(), 0, 2);
