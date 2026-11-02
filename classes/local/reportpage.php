@@ -168,6 +168,8 @@ class reportpage {
         global $DB;
         $c = 'local_oksigeniahechauka';
         $data = report::month($month, $now);
+        $paired = $DB->record_exists_select('local_oksigeniahechauka_screen', 'keyhash IS NOT NULL');
+        $addscreen = !$data['hasdata'] && !$paired ? (new \moodle_url('/local/oksigeniahechauka/screens.php'))->out(false) : '';
         $decsep = get_string('decsep', 'langconfig');
         $today = schedule::day($now);
         $current = substr($today, 0, 7);
@@ -232,8 +234,7 @@ class reportpage {
             'downloadurl' => (new \moodle_url($base, ['month' => $month, 'download' => 1]))->out(false),
             'hasdata' => $data['hasdata'],
             // With no screen yet, the empty month says how to start.
-            'addscreen' => !$data['hasdata'] && !$DB->record_exists_select('local_oksigeniahechauka_screen',
-                'keyhash IS NOT NULL') ? (new \moodle_url('/local/oksigeniahechauka/screens.php'))->out(false) : '',
+            'addscreen' => $addscreen,
             'summary' => $summary,
             'summarymore' => $summarymore,
             'screens' => $screens,
