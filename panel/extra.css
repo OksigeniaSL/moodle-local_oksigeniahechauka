@@ -799,7 +799,6 @@ dialog.hkp-dialog > footer {
     margin-top: 1rem;
 }
 .hkp .hkp-custom-toggle,
-.hkp .hkp-custom-toggle:hover,
 .hkp .hkp-custom-toggle:focus,
 .hkp .hkp-custom-toggle:active {
     display: inline-flex;
@@ -810,7 +809,17 @@ dialog.hkp-dialog > footer {
     color: var(--hkp-ink);
     font-weight: 600;
 }
-.hkp .hkp-custom-toggle:hover {
+@media (hover: hover) {
+    .hkp .hkp-custom-toggle:hover {
+        border-color: var(--hkp-accent-edge);
+        background: var(--hkp-accent-tint);
+    }
+    .hkp-ground:hover .hkp-tile,
+    .hkp-letter:hover .hkp-tile {
+        border-color: var(--hkp-accent-edge);
+    }
+}
+.hkp .hkp-custom-toggle:focus-visible {
     border-color: var(--hkp-accent-edge);
     background: var(--hkp-accent-tint);
 }
@@ -879,10 +888,6 @@ dialog.hkp-dialog > footer {
     border: 1px solid var(--hkp-edge);
     border-radius: var(--hkp-radius-sm);
     background: var(--hkp-card);
-}
-.hkp-ground:hover .hkp-tile,
-.hkp-letter:hover .hkp-tile {
-    border-color: var(--hkp-accent-edge);
 }
 .hkp-ground input:checked + .hkp-tile,
 .hkp-letter input:checked + .hkp-tile {

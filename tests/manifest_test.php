@@ -118,7 +118,11 @@ final class manifest_test extends \advanced_testcase {
         }
         $screen = $this->screen('Library');
         $now = time();
+        // With nothing at all put by the centre the manifest says where to start, which is another change: see below.
+        $this->assertNotEmpty(manifest::build($screen, $now)['idle']['qr']);
+        $this->notice('Hidden from the start', ['visible' => 0]);
         $first = manifest::build($screen, $now);
+        $this->assertArrayNotHasKey('idle', $first);
         $this->assertSame($first['etag'], manifest::build($screen, $now)['etag']);
         $this->assertSame(1, $first['contract']);
         $id = $this->notice('New');

@@ -282,7 +282,7 @@ class sources {
      *
      * @param int $now
      * @param int $days
-     * @param int[] $scope the course categories of the screen, whose events and those of their courses it shows too; empty, the site's
+     * @param int[] $scope the course categories of the screen, whose events and those of their courses it shows too
      * @return array items of the contract
      */
     public static function events(int $now, int $days, array $scope = []): array {
