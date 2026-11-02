@@ -8,12 +8,14 @@
    "frame": "f01.webp",
    "points": [
     [
-     0.9049,
+     0.905,
      0.2052
     ]
    ],
+   "dark": "f01-dark.webp",
    "click": true,
-   "text": "Para publicar algo en las pantallas, pulsa «Añadir»."
+   "text": "Para publicar algo en las pantallas, pulsa «Añadir».",
+   "ms": 3369
   },
   {
    "frame": "f02.webp",
@@ -23,8 +25,10 @@
      0.3495
     ]
    ],
+   "dark": "f02-dark.webp",
    "click": true,
-   "text": "Arriba eliges qué es: un aviso, una foto o un vídeo, un evento, una línea de la cinta…"
+   "text": "Arriba eliges qué es: un aviso, una foto o un vídeo, un evento, una línea de la cinta…",
+   "ms": 7157
   },
   {
    "frame": "f03.webp",
@@ -34,8 +38,10 @@
      0.4994
     ]
    ],
+   "dark": "f03-dark.webp",
    "click": true,
-   "text": "Escribe el aviso. Corto se lee mejor de lejos."
+   "text": "Escribe el aviso. Corto se lee mejor de lejos.",
+   "ms": 3918
   },
   {
    "frame": "f04.webp",
@@ -45,34 +51,40 @@
      0.4994
     ]
    ],
+   "dark": "f04-dark.webp",
    "click": false,
-   "text": "A la derecha ves cómo saldrá en la pantalla mientras escribes."
+   "text": "A la derecha ves cómo saldrá en la pantalla mientras escribes.",
+   "ms": 3813
   },
   {
    "frame": "f05.webp",
    "points": [
     [
-     0.1087,
+     0.1086,
      0.5001
     ],
     [
-     0.1656,
+     0.164,
      1.0036
     ]
    ],
+   "dark": "f05-dark.webp",
    "click": true,
-   "text": "Elige cuándo sale y en qué pantallas: en todas, en un grupo o en una sola."
+   "text": "Elige cuándo sale y en qué pantallas: en todas, en un grupo o en una sola.",
+   "ms": 6060
   },
   {
    "frame": "f06.webp",
    "points": [
     [
-     0.1641,
+     0.1618,
      0.8445
     ]
    ],
+   "dark": "f06-dark.webp",
    "click": true,
-   "text": "Pulsa «Publicar en…» y en menos de un minuto está en las pantallas."
+   "text": "Pulsa «Publicar en…» y en menos de un minuto está en las pantallas.",
+   "ms": 5355
   }
  ]
 }

@@ -22,7 +22,7 @@
     Example context (json):
     {
         "lang": "es", "title": "Pantalla de demostración", "centre": "Centro de ejemplo", "frame": "#", "width": 1920,
-        "height": 1080, "vertical": false, "other": "#", "css": "#", "js": "#"
+        "height": 1080, "vertical": false, "other": "#", "css": "#", "js": "#", "home": "#", "back": "Volver a Centro de ejemplo"
     }
 }}
 <!doctype html>
@@ -37,7 +37,10 @@
 <body>
 <main class="hkd">
     <header class="hkd-head">
-        <p class="hkd-centre">{{centre}}</p>
+        <div class="hkd-top">
+            <p class="hkd-centre">{{centre}}</p>
+            <a class="hkd-back" href="{{home}}">{{back}} <span aria-hidden="true">→</span></a>
+        </div>
         <h1>{{title}}</h1>
         <p>{{#str}}demo_help, local_oksigeniahechauka{{/str}}</p>
     </header>

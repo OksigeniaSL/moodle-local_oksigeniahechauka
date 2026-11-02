@@ -8,12 +8,14 @@
    "frame": "f01.webp",
    "points": [
     [
-     0.7982,
+     0.7985,
      0.2052
     ]
    ],
+   "dark": "f01-dark.webp",
    "click": true,
-   "text": "Para lo que no puede esperar, pulsa «Aviso urgente»."
+   "text": "Para lo que no puede esperar, pulsa «Aviso urgente».",
+   "ms": 3500
   },
   {
    "frame": "f02.webp",
@@ -23,8 +25,10 @@
      0.2641
     ]
    ],
+   "dark": "f02-dark.webp",
    "click": true,
-   "text": "Elige qué pasa: un simulacro, el tiempo, un cierre anticipado u otra cosa."
+   "text": "Elige qué pasa: un simulacro, el tiempo, un cierre anticipado u otra cosa.",
+   "ms": 5694
   },
   {
    "frame": "f03.webp",
@@ -38,8 +42,10 @@
      0.3605
     ]
    ],
+   "dark": "f03-dark.webp",
    "click": true,
-   "text": "Escribe lo que dice. A la derecha ves cómo sale."
+   "text": "Escribe lo que dice. A la derecha ves cómo sale.",
+   "ms": 3552
   },
   {
    "frame": "f04.webp",
@@ -53,19 +59,23 @@
      0.8131
     ]
    ],
+   "dark": "f04-dark.webp",
    "click": true,
-   "text": "Elige dónde sale y hasta cuándo: hasta que lo quites, una hora o el resto del día."
+   "text": "Elige dónde sale y hasta cuándo: hasta que lo quites, una hora o el resto del día.",
+   "ms": 5903
   },
   {
    "frame": "f05.webp",
    "points": [
     [
-     0.2719,
+     0.2701,
      0.9118
     ]
    ],
+   "dark": "f05-dark.webp",
    "click": true,
-   "text": "Pulsa el botón rojo para ponerlo: ocupa la pantalla entera en seguida."
+   "text": "Pulsa el botón rojo para ponerlo: ocupa la pantalla entera en seguida.",
+   "ms": 5146
   }
  ]
 }

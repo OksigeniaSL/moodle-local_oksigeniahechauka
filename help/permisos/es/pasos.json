@@ -12,8 +12,10 @@
      0.4997
     ]
    ],
+   "dark": "f01-dark.webp",
    "click": false,
-   "text": "Un grupo junta pantallas: las de un edificio, las de un club, las de otra sede."
+   "text": "Un grupo junta pantallas: las de un edificio, las de un club, las de otra sede.",
+   "ms": 5198
   },
   {
    "frame": "f02.webp",
@@ -23,8 +25,10 @@
      0.5003
     ]
    ],
+   "dark": "f02-dark.webp",
    "click": true,
-   "text": "En su tarjeta están sus pantallas y quién publica en él."
+   "text": "En su tarjeta están sus pantallas y quién publica en él.",
+   "ms": 3683
   },
   {
    "frame": "f03.webp",
@@ -34,8 +38,10 @@
      0.5003
     ]
    ],
+   "dark": "f03-dark.webp",
    "click": false,
-   "text": "Quien publica en un grupo solo ve esas pantallas y lo que publica él."
+   "text": "Quien publica en un grupo solo ve esas pantallas y lo que publica él.",
+   "ms": 4284
   },
   {
    "frame": "f04.webp",
@@ -45,19 +51,23 @@
      0.4994
     ]
    ],
+   "dark": "f04-dark.webp",
    "click": false,
-   "text": "A la derecha, quién publica en todas las pantallas y quién las lleva."
+   "text": "A la derecha, quién publica en todas las pantallas y quién las lleva.",
+   "ms": 4493
   },
   {
    "frame": "f05.webp",
    "points": [
     [
-     0.1,
+     0.1006,
      0.5003
     ]
    ],
+   "dark": "f05-dark.webp",
    "click": true,
-   "text": "Si el grupo está en otro sitio, hazlo sede: su nombre, su tiempo y su logotipo."
+   "text": "Si el grupo está en otro sitio, hazlo sede: su nombre, su tiempo y su logotipo.",
+   "ms": 5773
   }
  ]
 }

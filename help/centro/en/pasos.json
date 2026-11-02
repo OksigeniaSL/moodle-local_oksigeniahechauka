@@ -8,12 +8,14 @@
    "frame": "f01.webp",
    "points": [
     [
-     0.2438,
+     0.244,
      0.4964
     ]
    ],
+   "dark": "f01-dark.webp",
    "click": true,
-   "text": "In «Your centre», say where it is, for the weather on the screens."
+   "text": "In «Your centre», say where it is, for the weather on the screens.",
+   "ms": 4493
   },
   {
    "frame": "f02.webp",
@@ -23,30 +25,36 @@
      0.4998
     ]
    ],
+   "dark": "f02-dark.webp",
    "click": true,
-   "text": "Upload the logo: one for a light background and one for a dark one."
+   "text": "Upload the logo: one for a light background and one for a dark one.",
+   "ms": 5250
   },
   {
    "frame": "f03.webp",
    "points": [
     [
      0.1371,
-     0.5
+     0.5003
     ]
    ],
+   "dark": "f03-dark.webp",
    "click": true,
-   "text": "Choose the skin: the colours and the letter of all the screens."
+   "text": "Choose the skin: the colours and the typeface of every screen.",
+   "ms": 5015
   },
   {
    "frame": "f04.webp",
    "points": [
     [
-     0.1203,
-     0.4996
+     0.1202,
+     0.5002
     ]
    ],
+   "dark": "f04-dark.webp",
    "click": true,
-   "text": "«Customise» adapts it to your centre, always with combinations that read from afar."
+   "text": "«Customise» adapts it to your centre, always with combinations that read from afar.",
+   "ms": 5825
   },
   {
    "frame": "f05.webp",
@@ -56,8 +64,10 @@
      0.5001
     ]
    ],
+   "dark": "f05-dark.webp",
    "click": false,
-   "text": "On the right you see the screen with your changes before saving."
+   "text": "On the right you see the screen with your changes before saving.",
+   "ms": 4205
   }
  ]
 }

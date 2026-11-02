@@ -12,8 +12,10 @@
      0.4614
     ]
    ],
+   "dark": "f01-dark.webp",
    "click": true,
-   "text": "In «Birthdays», switch them on: the screens congratulate with the name, the group and the photo."
+   "text": "In «Birthdays», switch them on: the screens congratulate with the name, the group and the photo.",
+   "ms": 6817
   },
   {
    "frame": "f02.webp",
@@ -23,14 +25,16 @@
      0.4998
     ]
    ],
+   "dark": "f02-dark.webp",
    "click": false,
-   "text": "Whoever is in Moodle comes out with the date of their profile; for everyone else, the list."
+   "text": "People in Moodle appear with the date in their profile; for everyone else, there is the list.",
+   "ms": 6217
   },
   {
    "frame": "f03.webp",
    "points": [
     [
-     0.2727,
+     0.3194,
      0.5006
     ],
     [
@@ -38,8 +42,10 @@
      0.4305
     ]
    ],
+   "dark": "f03-dark.webp",
    "click": true,
-   "text": "Download the model, fill it in your spreadsheet and upload it."
+   "text": "Download the template, fill it in with your spreadsheet and upload it.",
+   "ms": 4780
   },
   {
    "frame": "f04.webp",
@@ -49,19 +55,23 @@
      0.4995
     ]
    ],
+   "dark": "f04-dark.webp",
    "click": true,
-   "text": "The photos, all at once: named after each person or after their ID number."
+   "text": "The photos, all at once: named after each person or after their ID number.",
+   "ms": 6138
   },
   {
    "frame": "f05.webp",
    "points": [
     [
-     0.8676,
+     0.8675,
      0.6831
     ]
    ],
+   "dark": "f05-dark.webp",
    "click": false,
-   "text": "The age never shows: the day and the month are kept."
+   "text": "The age never shows: the day and the month are kept.",
+   "ms": 4362
   }
  ]
 }

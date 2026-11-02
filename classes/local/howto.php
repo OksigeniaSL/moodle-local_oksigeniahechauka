@@ -48,7 +48,8 @@ class howto {
         $data = is_readable($file) ? json_decode((string) file_get_contents($file), true) : null;
         $ms = 0;
         foreach ($data['steps'] ?? [] as $step) {
-            $ms += max(3500, count(preg_split('/\s+/', trim($step['text']))) * 380 + 1200) + 700;
+            // The voice's own length, where there is one; else, the time it takes to read the subtitle.
+            $ms += ($step['ms'] ?? max(3500, count(preg_split('/\s+/', trim($step['text']))) * 380 + 1200)) + 700;
         }
         return get_string('howto_length', 'local_oksigeniahechauka', (int) round($ms / 5000) * 5);
     }
@@ -84,12 +85,17 @@ class howto {
      * @return array
      */
     public static function all(): array {
+        global $CFG;
         $c = 'local_oksigeniahechauka';
         $out = [];
         foreach (self::PIECES as $piece) {
+            $dir = '/local/oksigeniahechauka/help/' . $piece . '/' . self::lang() . '/';
+            // A piece whose picture is the television itself has no dark one: the same picture in both themes.
+            $dark = file_exists($CFG->dirroot . $dir . 'portada-dark.webp') ? 'portada-dark.webp' : 'portada.webp';
             $out[] = self::button($piece) + [
                 'desc' => get_string('howto_' . $piece . '_desc', $c),
-                'thumb' => (new \moodle_url('/local/oksigeniahechauka/help/' . $piece . '/' . self::lang() . '/f01.webp'))->out(false),
+                'thumb' => (new \moodle_url($dir . 'portada.webp'))->out(false),
+                'thumbdark' => (new \moodle_url($dir . $dark))->out(false),
             ];
         }
         return $out;

@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.9.4
+
+- **«How it works» speaks**: each piece has its voice, in English and Spanish, and the voice sets the pace of the steps. The frames follow the panel's theme, light or dark, and so do the pictures of the «Guide» tab. The arrow keys change step and the space bar pauses.
+- The dialog of a piece fits in the height of a laptop's window.
+- In English, «template» for the files to download and fill in.
+- The weather of a site shows its icon on the site's page, as it does in «Your centre».
+- **The demonstration screen has its way back to the site**: «Back to» and the site's name, at the top, beside the centre's name.
+
 ## 0.9.3
 
 - **«How it works»**: six short pieces, of half a minute to a minute, with real frames of the panel, a pointer that goes to each control and a subtitle per step (and a voice per step, where there is one): how to publish, setting up a screen, the urgent notice, who publishes where, your centre and the birthdays, in English and Spanish. A button beside what each one explains opens it in a dialog, and the «Guide» tab lists them all with the printed guide to download, instead of the whole guide on one page. Their files are in `help/`.

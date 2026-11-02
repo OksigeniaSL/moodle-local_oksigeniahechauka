@@ -73,10 +73,13 @@ $other = (new moodle_url('/local/oksigeniahechauka/demo.php', ['shape' => $shape
     ->out(false);
 header('Content-Type: text/html; charset=utf-8');
 header('X-Frame-Options: SAMEORIGIN');
+$sitename = format_string($SITE->fullname, true, ['context' => context_system::instance()]);
 echo $OUTPUT->render_from_template('local_oksigeniahechauka/demo', [
     'lang' => current_language(),
     'title' => get_string('demo_title', $c),
-    'centre' => format_string($SITE->fullname, true, ['context' => context_system::instance()]),
+    'centre' => $sitename,
+    'home' => (new moodle_url('/'))->out(false),
+    'back' => get_string('demo_back', $c, $sitename),
     'frame' => $frame,
     'width' => $width,
     'height' => $height,

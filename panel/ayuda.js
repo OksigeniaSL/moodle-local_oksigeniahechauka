@@ -80,7 +80,25 @@
                 self.go(self.n, true);
             }
         });
+        // Keys: the arrows change step, the space bar pauses.
+        d.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowRight') {
+                e.preventDefault();
+                d.querySelector('[data-do="next"]').click();
+            } else if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                d.querySelector('[data-do="prev"]').click();
+            } else if (e.key === ' ' && !(e.target.closest && e.target.closest('button'))) {
+                e.preventDefault();
+                d.querySelector('[data-do="play"]').click();
+            }
+        });
         d.showModal();
+        // The voice starts within the click itself: Safari would not let it start later, after the steps arrive.
+        this.audio.src = this.url('01.mp3');
+        this.audio.play().catch(function() {
+            return null;
+        });
         fetch(this.base + this.name + '/' + this.lang + '/pasos.json', {credentials: 'same-origin'}).then(function(r) {
             return r.json();
         }).then(function(data) {
@@ -90,10 +108,16 @@
             }).join('');
             // The frames ahead of time: a step should not wait for its picture.
             self.steps.forEach(function(s) {
-                (new Image()).src = self.url(s.frame);
+                (new Image()).src = self.url(self.frameOf(s));
             });
             self.go(0, true);
         });
+    };
+
+    /** The frame of a step in the panel's theme: the dark one in dark, where there is one. */
+    Piece.prototype.frameOf = function(step) {
+        var dark = document.documentElement.getAttribute('data-bs-theme') === 'dark';
+        return dark && step.dark ? step.dark : step.frame;
     };
 
     Piece.prototype.url = function(file) {
@@ -155,7 +179,7 @@
         this.setPlay(play);
         // The picture, crossfaded.
         var back = this.imgs[1 - this.front];
-        back.src = this.url(step.frame);
+        back.src = this.url(this.frameOf(step));
         back.classList.add('is-on');
         this.imgs[this.front].classList.remove('is-on');
         this.front = 1 - this.front;
@@ -203,7 +227,7 @@
             self.later(700, next);
         };
         this.audio.play().then(function() {
-            var ms = isFinite(self.audio.duration) ? self.audio.duration * 1000 : reading;
+            var ms = step.ms || (isFinite(self.audio.duration) ? self.audio.duration * 1000 : reading);
             finish(ms);
         }, function() {
             finish(reading);

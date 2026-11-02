@@ -116,6 +116,7 @@ $template = place::view($query, $now, $suffix) + [
         'check' => icons::svg('check')],
 ];
 $PAGE->requires->js(new moodle_url('/local/oksigeniahechauka/player/tiempo-iconos.js', ['v' => get_config($c, 'version')]));
+$PAGE->requires->js(new moodle_url('/local/oksigeniahechauka/panel/sky.js', ['v' => get_config($c, 'version')]));
 echo $OUTPUT->header();
 echo $OUTPUT->render_from_template('local_oksigeniahechauka/site', $template);
 echo $OUTPUT->footer();

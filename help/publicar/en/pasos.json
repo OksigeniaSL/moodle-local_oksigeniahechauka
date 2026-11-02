@@ -8,12 +8,14 @@
    "frame": "f01.webp",
    "points": [
     [
-     0.9134,
+     0.9127,
      0.2052
     ]
    ],
+   "dark": "f01-dark.webp",
    "click": true,
-   "text": "To publish something on the screens, press «Add»."
+   "text": "To publish something on the screens, press «Add».",
+   "ms": 3213
   },
   {
    "frame": "f02.webp",
@@ -23,8 +25,10 @@
      0.3495
     ]
    ],
+   "dark": "f02-dark.webp",
    "click": true,
-   "text": "At the top you choose what it is: a notice, a photo or a video, an event, a ticker line…"
+   "text": "At the top you choose what it is: a notice, a photo or a video, an event, a ticker line…",
+   "ms": 7601
   },
   {
    "frame": "f03.webp",
@@ -34,8 +38,10 @@
      0.4994
     ]
    ],
+   "dark": "f03-dark.webp",
    "click": true,
-   "text": "Write the notice. Short reads better from afar."
+   "text": "Write the notice. Short reads better from afar.",
+   "ms": 3970
   },
   {
    "frame": "f04.webp",
@@ -45,34 +51,40 @@
      0.4994
     ]
    ],
+   "dark": "f04-dark.webp",
    "click": false,
-   "text": "On the right you see how it will look on the screen as you type."
+   "text": "On the right you see how it will look on the screen as you type.",
+   "ms": 3944
   },
   {
    "frame": "f05.webp",
    "points": [
     [
-     0.1157,
+     0.1153,
      0.5001
     ],
     [
-     0.1515,
+     0.1507,
      0.9742
     ]
    ],
+   "dark": "f05-dark.webp",
    "click": true,
-   "text": "Choose when it comes out and on which screens: all of them, a group or just one."
+   "text": "Choose when it comes out and on which screens: all of them, a group or just one.",
+   "ms": 6112
   },
   {
    "frame": "f06.webp",
    "points": [
     [
-     0.1559,
+     0.1539,
      0.8151
     ]
    ],
+   "dark": "f06-dark.webp",
    "click": true,
-   "text": "Press «Publish on…» and within a minute it is on the screens."
+   "text": "Press «Publish on…» and within a minute it is on the screens.",
+   "ms": 4440
   }
  ]
 }

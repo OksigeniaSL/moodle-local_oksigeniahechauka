@@ -12,8 +12,10 @@
      0.4614
     ]
    ],
+   "dark": "f01-dark.webp",
    "click": true,
-   "text": "En «Cumpleaños», enciéndelos: las pantallas felicitan con el nombre, el grupo y la foto."
+   "text": "En «Cumpleaños», enciéndelos: las pantallas felicitan con el nombre, el grupo y la foto.",
+   "ms": 6086
   },
   {
    "frame": "f02.webp",
@@ -23,14 +25,16 @@
      0.4998
     ]
    ],
+   "dark": "f02-dark.webp",
    "click": false,
-   "text": "Quien está en Moodle sale con la fecha de su perfil; para los demás está la lista."
+   "text": "Quien está en Moodle sale con la fecha de su perfil; para los demás está la lista.",
+   "ms": 5616
   },
   {
    "frame": "f03.webp",
    "points": [
     [
-     0.2594,
+     0.2606,
      0.5006
     ],
     [
@@ -38,8 +42,10 @@
      0.4305
     ]
    ],
+   "dark": "f03-dark.webp",
    "click": true,
-   "text": "Descarga el modelo, rellénalo en tu hoja de cálculo y súbelo."
+   "text": "Descarga el modelo, rellénalo en tu hoja de cálculo y súbelo.",
+   "ms": 4127
   },
   {
    "frame": "f04.webp",
@@ -49,19 +55,23 @@
      0.4995
     ]
    ],
+   "dark": "f04-dark.webp",
    "click": true,
-   "text": "Las fotos, todas de una vez: con el nombre de cada uno o con su número de ID."
+   "text": "Las fotos, todas de una vez: con el nombre de cada uno o con su número de ID.",
+   "ms": 5668
   },
   {
    "frame": "f05.webp",
    "points": [
     [
-     0.8672,
+     0.8674,
      0.6831
     ]
    ],
+   "dark": "f05-dark.webp",
    "click": false,
-   "text": "Nunca sale la edad: se guardan el día y el mes."
+   "text": "Nunca sale la edad: se guardan el día y el mes.",
+   "ms": 3683
   }
  ]
 }

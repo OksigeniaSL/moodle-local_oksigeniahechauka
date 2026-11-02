@@ -1,5 +1,5 @@
 In «Your centre», say where it is, for the weather on the screens.
 Upload the logo: one for a light background and one for a dark one.
-Choose the skin: the colours and the letter of all the screens.
+Choose the skin: the colours and the typeface of every screen.
 «Customise» adapts it to your centre, always with combinations that read from afar.
 On the right you see the screen with your changes before saving.

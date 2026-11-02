@@ -2,5 +2,5 @@ On the television, open the address of the screens: it shows a code and a QR.
 Scan the QR with your phone, or open the address on your phone and type the code.
 Say whether it is a new screen or whether it replaces one you had.
 Give it a name that says where it is and, if you like, its groups.
-Press «Start»: in a few seconds the screen shows what is its.
-In «Screens and groups» you see it with its state, and its sheet sets its hours.
+Press «Start»: in a few seconds the screen starts showing its content.
+In «Screens and groups» you see it and how it is doing, and on its page you set its hours.

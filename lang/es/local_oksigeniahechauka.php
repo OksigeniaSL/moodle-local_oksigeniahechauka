@@ -465,6 +465,7 @@ $string['daysmode_all'] = 'Todos los días';
 $string['daysmode_some'] = 'Solo estos días';
 $string['deadlinesdays'] = 'Entregas de los próximos días';
 $string['deadlinesdays_desc'] = 'Cuántos días por delante miran las pantallas.';
+$string['demo_back'] = 'Volver a {$a}';
 $string['demo_full'] = 'A pantalla completa';
 $string['demo_help'] = 'Así ve una pantalla de este centro lo que se publica en todas. Lo que se publica en el panel sale aquí en menos de un minuto.';
 $string['demo_off'] = 'Este sitio no enseña una pantalla de demostración.';

@@ -8,23 +8,27 @@
    "frame": "f01.webp",
    "points": [
     [
-     0.8157,
+     0.8142,
      0.2052
     ]
    ],
+   "dark": "f01-dark.webp",
    "click": true,
-   "text": "For what cannot wait, press «Urgent notice»."
+   "text": "For what cannot wait, press «Urgent notice».",
+   "ms": 3186
   },
   {
    "frame": "f02.webp",
    "points": [
     [
-     0.1637,
+     0.1643,
      0.2641
     ]
    ],
+   "dark": "f02-dark.webp",
    "click": true,
-   "text": "Choose what is happening: a drill, the weather, closing early or something else."
+   "text": "Choose what is happening: a drill, the weather, closing early or something else.",
+   "ms": 5825
   },
   {
    "frame": "f03.webp",
@@ -38,8 +42,10 @@
      0.3605
     ]
    ],
+   "dark": "f03-dark.webp",
    "click": true,
-   "text": "Write what it says. On the right you see how it looks."
+   "text": "Write what it says. On the right you see how it looks.",
+   "ms": 4336
   },
   {
    "frame": "f04.webp",
@@ -53,19 +59,23 @@
      0.8131
     ]
    ],
+   "dark": "f04-dark.webp",
    "click": true,
-   "text": "Choose where it shows and until when: until you take it off, an hour or the rest of the day."
+   "text": "Choose where it shows and until when: until you take it off, an hour or the rest of the day.",
+   "ms": 6713
   },
   {
    "frame": "f05.webp",
    "points": [
     [
-     0.2524,
+     0.2506,
      0.9118
     ]
    ],
+   "dark": "f05-dark.webp",
    "click": true,
-   "text": "Press the red button to put it on: it takes the whole screen at once."
+   "text": "Press the red button to put it on: it takes the whole screen at once.",
+   "ms": 4963
   }
  ]
 }

@@ -23,7 +23,7 @@
     {
         "tabs": [], "hastabs": false, "back": "#", "backicon": "", "pdf": "#", "pdficon": "",
         "pieces": [{"piece": "publicar", "title": "Cómo se publica", "desc": "Un aviso o una foto, cuándo y dónde.",
-            "thumb": "https://example.com/help/publicar/es/f01.webp", "base": "#", "lang": "es", "ui": "{}", "length": "≈ 40 s", "icon": ""}]
+            "thumb": "https://example.com/help/publicar/es/portada.webp", "thumbdark": "https://example.com/help/publicar/es/portada-dark.webp", "base": "#", "lang": "es", "ui": "{}", "length": "≈ 40 s", "icon": ""}]
     }
 }}
 <div class="hkp hkp-guide-page">
@@ -44,7 +44,7 @@
         {{#pieces}}
         <li id="{{piece}}">
             <button type="button" class="hkp-howto-card" data-hkp-howto="{{piece}}" data-title="{{title}}" data-base="{{base}}" data-lang="{{lang}}" data-ui="{{ui}}">
-                <span class="hkp-howto-thumb"><img src="{{thumb}}" alt="" loading="lazy"><span class="hkp-howto-play">{{{icon}}}</span></span>
+                <span class="hkp-howto-thumb"><img class="is-light" src="{{thumb}}" alt="" loading="lazy"><img class="is-dark" src="{{thumbdark}}" alt="" loading="lazy"><span class="hkp-howto-play">{{{icon}}}</span></span>
                 <b>{{title}}</b>
                 <span>{{desc}}</span>
                 <small>{{length}}</small>

@@ -13,7 +13,8 @@
     ]
    ],
    "click": false,
-   "text": "En la tele, abre la dirección de las pantallas: enseña un código y un QR."
+   "text": "En la tele, abre la dirección de las pantallas: enseña un código y un QR.",
+   "ms": 5746
   },
   {
    "frame": "f02.webp",
@@ -23,8 +24,10 @@
      0.3428
     ]
    ],
+   "dark": "f02-dark.webp",
    "click": false,
-   "text": "Escanea el QR con el móvil, o abre la dirección en el móvil y escribe el código."
+   "text": "Escanea el QR con el móvil, o abre la dirección en el móvil y escribe el código.",
+   "ms": 6086
   },
   {
    "frame": "f03.webp",
@@ -34,8 +37,10 @@
      0.4997
     ]
    ],
+   "dark": "f03-dark.webp",
    "click": true,
-   "text": "Di si es una pantalla nueva o si sustituye a otra que ya tenías."
+   "text": "Di si es una pantalla nueva o si sustituye a otra que ya tenías.",
+   "ms": 4597
   },
   {
    "frame": "f04.webp",
@@ -45,8 +50,10 @@
      0.5388
     ]
    ],
+   "dark": "f04-dark.webp",
    "click": true,
-   "text": "Ponle un nombre que diga dónde está y, si quieres, sus grupos."
+   "text": "Ponle un nombre que diga dónde está y, si quieres, sus grupos.",
+   "ms": 4101
   },
   {
    "frame": "f05.webp",
@@ -56,8 +63,10 @@
      0.5918
     ]
    ],
+   "dark": "f05-dark.webp",
    "click": true,
-   "text": "Pulsa «Empezar»: en unos segundos la pantalla enseña lo suyo."
+   "text": "Pulsa «Empezar»: en unos segundos la pantalla enseña lo suyo.",
+   "ms": 5459
   },
   {
    "frame": "f06.webp",
@@ -71,8 +80,10 @@
      0.4434
     ]
    ],
+   "dark": "f06-dark.webp",
    "click": true,
-   "text": "En «Pantallas y grupos» la ves con su estado, y desde su ficha ajustas su horario."
+   "text": "En «Pantallas y grupos» la ves con su estado, y desde su ficha ajustas su horario.",
+   "ms": 5564
   }
  ]
 }

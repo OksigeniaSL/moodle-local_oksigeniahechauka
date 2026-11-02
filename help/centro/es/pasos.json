@@ -8,12 +8,14 @@
    "frame": "f01.webp",
    "points": [
     [
-     0.2434,
+     0.2437,
      0.4964
     ]
    ],
+   "dark": "f01-dark.webp",
    "click": true,
-   "text": "En «Tu centro», di dónde está, para el tiempo de las pantallas."
+   "text": "En «Tu centro», di dónde está, para el tiempo de las pantallas.",
+   "ms": 3866
   },
   {
    "frame": "f02.webp",
@@ -23,8 +25,10 @@
      0.4999
     ]
    ],
+   "dark": "f02-dark.webp",
    "click": true,
-   "text": "Sube el logotipo: uno para fondo claro y otro para oscuro."
+   "text": "Sube el logotipo: uno para fondo claro y otro para oscuro.",
+   "ms": 4702
   },
   {
    "frame": "f03.webp",
@@ -34,19 +38,23 @@
      0.5001
     ]
    ],
+   "dark": "f03-dark.webp",
    "click": true,
-   "text": "Elige la piel: los colores y la letra de todas las pantallas."
+   "text": "Elige la piel: los colores y la letra de todas las pantallas.",
+   "ms": 4466
   },
   {
    "frame": "f04.webp",
    "points": [
     [
-     0.1258,
+     0.126,
      0.4997
     ]
    ],
+   "dark": "f04-dark.webp",
    "click": true,
-   "text": "Con «Personalizar» la adaptas a tu centro, siempre con combinaciones que se leen de lejos."
+   "text": "Con «Personalizar» la adaptas a tu centro, siempre con combinaciones que se leen de lejos.",
+   "ms": 5851
   },
   {
    "frame": "f05.webp",
@@ -56,8 +64,10 @@
      0.5001
     ]
    ],
+   "dark": "f05-dark.webp",
    "click": false,
-   "text": "A la derecha ves la pantalla con tus cambios antes de guardar."
+   "text": "A la derecha ves la pantalla con tus cambios antes de guardar.",
+   "ms": 3761
   }
  ]
 }

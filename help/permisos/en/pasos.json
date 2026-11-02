@@ -12,8 +12,10 @@
      0.5004
     ]
    ],
+   "dark": "f01-dark.webp",
    "click": false,
-   "text": "A group puts screens together: those of a building, of a club, of another site."
+   "text": "A group puts screens together: those of a building, of a club, of another site.",
+   "ms": 5799
   },
   {
    "frame": "f02.webp",
@@ -23,8 +25,10 @@
      0.8398
     ]
    ],
+   "dark": "f02-dark.webp",
    "click": true,
-   "text": "Its card shows its screens and who publishes on it."
+   "text": "Its card shows its screens and who publishes on it.",
+   "ms": 3683
   },
   {
    "frame": "f03.webp",
@@ -34,8 +38,10 @@
      0.7086
     ]
    ],
+   "dark": "f03-dark.webp",
    "click": false,
-   "text": "Whoever publishes in a group only sees those screens and what they publish."
+   "text": "Whoever publishes in a group only sees those screens and what they publish.",
+   "ms": 5146
   },
   {
    "frame": "f04.webp",
@@ -45,19 +51,23 @@
      0.5
     ]
    ],
+   "dark": "f04-dark.webp",
    "click": false,
-   "text": "On the right, who publishes on every screen and who runs them."
+   "text": "On the right, who publishes on every screen and who runs them.",
+   "ms": 4571
   },
   {
    "frame": "f05.webp",
    "points": [
     [
-     0.098,
+     0.0986,
      0.4998
     ]
    ],
+   "dark": "f05-dark.webp",
    "click": true,
-   "text": "If the group is somewhere else, make it a site: its own name, weather and logo."
+   "text": "If the group is somewhere else, make it a site: its own name, weather and logo.",
+   "ms": 5773
   }
  ]
 }

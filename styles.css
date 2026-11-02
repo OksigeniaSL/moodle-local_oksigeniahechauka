@@ -4126,8 +4126,9 @@ dialog.hkp-dialog > footer {
 }
 
 .hkp-howto-dialog {
+    /* Whole in a laptop of 1366 × 768 too: the stage follows the height left for it. */
     /* stylelint-disable-next-line csstree/validator */
-    width: min(1100px, 96vw);
+    width: min(1100px, 96vw, calc((100dvh - 12rem) * 1.6));
     padding: 0;
     border: 0;
     border-radius: 12px;
@@ -4324,6 +4325,7 @@ dialog.hkp-dialog > footer {
 
 .hkp-howto-card {
     display: grid;
+    grid-template-rows: auto auto 1fr auto;
     gap: .35rem;
     width: 100%;
     height: 100%;
@@ -4398,4 +4400,13 @@ dialog.hkp-dialog > footer {
 .hkp-group form.hkp-find .form-select {
     flex: 1 1 12rem;
     min-width: 0;
+}
+
+.hkp-howto-thumb .is-dark,
+[data-bs-theme="dark"] .hkp-howto-thumb .is-light {
+    display: none;
+}
+
+[data-bs-theme="dark"] .hkp-howto-thumb .is-dark {
+    display: block;
 }
