@@ -318,7 +318,9 @@ Biblioteca, Secretaría y Comedor.» A teacher sees only their groups, already c
   colour, a card in its surface and a line in its text), a letter (cards in their own letter, by family) and corners. Starts from the skin; another
   skin undoes it. A tick besides the colour marks what is chosen, and the name goes inside the card. «Volver a la piel tal como viene» only when there is
   a change. Beside it, the screen shows «Today» with its third, where what is chosen can be seen.
-- **The screen in «Tu centro»** stays in sight going down the page, and what is under it passes behind. Under 60rem, while «Personalizar» is in sight, it goes
+- **The screen in «Tu centro»** stays in sight going down the page, at no more than 38 % of the window's height. The column fits the window, and the surprises
+  scroll in the room left under it, with their «Guardar» in sight: nothing goes over anything (Enrique, 2 November: «Se me monta la pantalla encima de las
+  opciones»). Under 60rem, while «Personalizar» is in sight, it goes
   in a band under the bar of the site, at 60 % of the width and with nothing else; when it is out of sight, it goes back to its place. The frame is not moved.
 - **The logo**: one for light screens and one for dark ones, each on its own background, with «Cambiar».
 - **The surprises**: under the screen, with their own «Guardar», since the column of the form is long. Off by default. A switch, «Cada cuánto» as chips (cada 20 minutos, cada hora, cada tres horas) and

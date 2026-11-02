@@ -609,24 +609,70 @@ dialog.hkp-dialog > footer {
     width: auto;
 }
 
-/* The screen stays in sight all the way down, whatever is being changed, and what is under it passes behind it. */
+/* The screen stays in sight all the way down, and nothing goes over anything: the column fits the window, the screen
+   takes what it needs, and what is under it scrolls in the room left, with its button in sight. */
 .hkp-centre-side {
+    position: sticky;
+    top: calc(61px + 1rem);
     display: flex;
     flex-direction: column;
     gap: 1rem;
-    align-self: stretch;
+    align-self: start;
     min-width: 0;
+    max-height: calc(100vh - 61px - 2rem);
 }
 .hkp-centre-side > .hkp-preview {
+    flex: none;
+    gap: .5rem;
+    padding: .75rem;
+}
+.hkp-centre-side .hkp-stage {
+    padding: .5rem;
+}
+.hkp-centre-side .hkp-stage .hkp-bezel {
+    width: min(100%, calc(38vh * 16 / 9));
+}
+.hkp-centre-side > .hkp-fs {
+    flex: 1 1 auto;
+    min-height: 0;
+    padding-bottom: 0;
+    overflow-y: auto;
+}
+.hkp-centre-side > .hkp-fs > .hkp-foot {
     position: sticky;
-    top: calc(61px + 1rem);
-    z-index: 2;
-    box-shadow: 0 0 0 .5rem var(--hkp-page);
+    z-index: 1;
+    bottom: 0;
+    padding: .6rem 0;
+    background: var(--hkp-card);
+}
+@media (max-height: 56rem) {
+    .hkp-centre-side .hkp-preview-note {
+        display: none;
+    }
+}
+/* A window too short for both: one under the other, as on a phone. */
+@media (max-height: 36rem) {
+    .hkp-centre-side {
+        position: static;
+        max-height: none;
+    }
+    .hkp-centre-side > .hkp-fs {
+        overflow-y: visible;
+    }
 }
 @container hkp (max-width: 60rem) {
-    .hkp-centre-side > .hkp-preview {
+    .hkp-centre-side {
         position: static;
-        box-shadow: none;
+        max-height: none;
+    }
+    .hkp-centre-side > .hkp-fs {
+        overflow-y: visible;
+    }
+    .hkp-centre-side .hkp-stage .hkp-bezel {
+        width: 100%;
+    }
+    .hkp-centre-side > .hkp-fs > .hkp-foot {
+        position: static;
     }
 }
 

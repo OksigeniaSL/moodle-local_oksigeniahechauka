@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.7.19 (2026-11-02)
+
+- In «Tu centro», the screen no longer covers the options when going down the page: it stays above, a little smaller, and the surprises scroll under it.
+
 ## 0.7.18 (2026-11-02)
 
 - **The previews of the panel had been getting an error instead of the screen's data since 0.7.11**, so they came without the centre's name, its logo, its
