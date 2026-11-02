@@ -52,6 +52,7 @@ class icons {
         'agenda' => '<rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/>' .
             '<path d="M8.6 15.6a3.4 3.4 0 0 0 6.2 1M15.4 14.4a3.4 3.4 0 0 0-6.2-1"/>',
         'urgent' => '<path d="M12 3.6 2.6 19.8h18.8L12 3.6z"/><path d="M12 10v4.4M12 17.1v.1"/>',
+        'chart' => '<path d="M5.5 20v-8M12 20V4.5M18.5 20v-5.5"/>',
         'clock' => '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
         'check' => '<path d="M5 12.5l4.5 4.5L19 7.5"/>',
         'x' => '<path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/>',

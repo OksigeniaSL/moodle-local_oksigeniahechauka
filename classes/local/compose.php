@@ -316,6 +316,10 @@ class compose {
             if (($t === 'agenda' || $t === 'table') && !access::can('publishall')) {
                 continue;
             }
+            if ($t === 'table' && $type !== 'table') {
+                // Offered once its slide is in the player.
+                continue;
+            }
             $types[] = ['type' => $t, 'label' => get_string('add_' . $t, $c), 'icon' => icons::svg($icon),
                 'checked' => $t === $type,
                 'url' => (new \moodle_url('/local/oksigeniahechauka/edit.php', ['type' => $t]))->out(false)];

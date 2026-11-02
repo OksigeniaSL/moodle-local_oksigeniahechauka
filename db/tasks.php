@@ -35,6 +35,15 @@ $tasks = [
         'dayofweek' => '*',
     ],
     [
+        'classname' => 'local_oksigeniahechauka\task\send_report',
+        'blocking' => 0,
+        'minute' => 'R',
+        'hour' => '8',
+        'day' => '1',
+        'month' => '*',
+        'dayofweek' => '*',
+    ],
+    [
         'classname' => 'local_oksigeniahechauka\task\fetch_weather',
         'blocking' => 0,
         'minute' => '*/15',

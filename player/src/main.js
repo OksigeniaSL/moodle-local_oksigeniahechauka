@@ -8,6 +8,7 @@ import {menuKind, menuParts, isHoliday} from './lead.js';
 import {makeApi} from './api.js';
 import {realClock, simulatedClock} from './clock.js';
 import {MediaStore, mediaOf} from './media.js';
+import {Played} from './played.js';
 import {pair} from './pairing.js';
 import {afterDayEnd, agendaOf, countdown, dayLabel, eventsOn, monthOf, upcoming} from './agenda.js';
 import {AGENDA_DAYS, AGENDA_TOP} from './agendaview.js';
@@ -20,7 +21,7 @@ import {filesOf, isRaining, Surprises} from './surprises.js';
 import {countToday} from './today.js';
 import {weekOf} from './week.js';
 
-const VERSION = '0.8.2';
+const VERSION = '0.8.3';
 const COMING_DAYS = 7;
 const HEARTBEAT_MS = 60000;
 const REFRESH_MS = 15 * 60000;
@@ -51,6 +52,7 @@ class Player {
         this.strings = boot.strings || {};
         this.root = document.getElementById('hechauka') || document.body;
         this.startedAt = Date.now();
+        this.played = new Played();
         this.heardAt = 0;
         this.turnDue = 0;
         this.errors = [];
@@ -363,7 +365,7 @@ class Player {
             // The important ones first.
             return (b.tone === 'important') - (a.tone === 'important') || byOrder(a, b);
         }).map(function (n) {
-            return {title: n.title || '', body: n.body || '', tone: n.tone || 'normal'};
+            return {id: n.id, title: n.title || '', body: n.body || '', tone: n.tone || 'normal'};
         });
         const cats = this.manifest.categories || [];
         const all = items.filter(function (it) {
@@ -599,6 +601,9 @@ class Player {
         }
         // Some know how long they last only once they are in the page.
         const seconds = this.screen.show(choice, today, week) || choice.seconds;
+        if (this.mode === 'screen') {
+            this.played.add(this.screen.shownIds(choice), seconds);
+        }
         const lasts = seconds * 1000 + (choice.items.some(function (it) {
             return it.type === 'video';
         }) ? 5000 : 0);
@@ -735,10 +740,15 @@ class Player {
             cache: this.media ? this.media.usage() : {files: 0, bytes: 0},
             errors: this.errors.concat(this.media ? this.media.errors() : []).slice(-5),
         };
+        const played = this.played.take();
+        if (played) {
+            body.played = played;
+        }
         const self = this;
         this.api.heartbeat(body).then(function (r) {
             self.heardAt = Date.now();
             self.errors = [];
+            self.played.sent();
             if (r && r.manifest && (!m || r.manifest !== m.etag)) {
                 self.refresh();
             }
@@ -752,6 +762,7 @@ class Player {
                 self.reloadAt = Date.now();
             }
         }, function (e) {
+            self.played.failed();
             if (e && e.revoked) {
                 store.forget();
                 location.reload();

@@ -598,6 +598,7 @@ export class Screen {
     // --- The compositions -------------------------------------------------------------------------------------------
 
     makeLayer(comp, items, today, week, extra) {
+        this.led = null;
         const c = el('div', 'hk-cuerpo hk-capa');
         c.setAttribute('data-composicion', comp);
         const self0 = this;
@@ -667,7 +668,9 @@ export class Screen {
                 return null;
             }
             self.leadTurn = (self.leadTurn || 0) + 1;
-            return leadOfTurn(all, self.leadTurn);
+            const led = leadOfTurn(all, self.leadTurn);
+            self.led = led.type === 'menu' ? 'menu' : ((led.notice || led.event || {}).id || null);
+            return led;
         };
         if (comp === 'titular') {
             c.appendChild(this.typographic(extra || {type: 'frase', text: ''}, today));
@@ -1716,6 +1719,34 @@ export class Screen {
         if (this.frame.getAttribute('data-uso') !== use) {
             this.frame.setAttribute('data-uso', use);
         }
+    }
+
+    /**
+     * What a slide brings in large, for the count of what came out.
+     *
+     * @param {object} choice the slide
+     * @returns {string[]}
+     */
+    shownIds(choice) {
+        const out = choice.items.map(function (it) {
+            return it.id;
+        });
+        const extra = choice.extra || {};
+        if (extra.item && extra.item.id) {
+            out.push(extra.item.id);
+        }
+        if (extra.album) {
+            out.push(extra.album);
+        }
+        if (choice.comp === 'agenda') {
+            out.push('agenda');
+        }
+        if (!FULL[choice.comp] && this.led) {
+            out.push(this.led);
+        }
+        return out.filter(function (id, i) {
+            return id && out.indexOf(id) === i;
+        });
     }
 
     /** What is on the screen now, for the heartbeat. */

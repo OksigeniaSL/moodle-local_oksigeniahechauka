@@ -276,6 +276,7 @@ All fields are optional; an item without `when` is always on.
 
 - `tz_offset`: minutes east of UTC on the device, now.
 - `errors`: the last few, short.
+- `played`, every ten heartbeats and only if there is anything: what came out large since the last one, `{"i12": [times, seconds]}`. The server adds it up for the monthly report and tells nothing back.
 
 Answer:
 

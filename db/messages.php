@@ -25,6 +25,14 @@
 defined('MOODLE_INTERNAL') || die();
 
 $messageproviders = [
+    // How the screens did last month.
+    'monthlyreport' => [
+        'capability' => 'local/oksigeniahechauka:managescreens',
+        'defaults' => [
+            'popup' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_ENABLED,
+            'email' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_ENABLED,
+        ],
+    ],
     // A screen that should be on has stopped giving signs of life, or has come back.
     'screendown' => [
         'capability' => 'local/oksigeniahechauka:managescreens',

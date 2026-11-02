@@ -245,7 +245,7 @@ class home {
         $tabs = [];
         foreach (
             [['home', 'index.php', 'tab_home', 'tv'], ['screens', 'screens.php', 'tab_screens', 'screens'],
-            ['centre', 'centre.php', 'tab_centre', 'palette']] as $t
+            ['centre', 'centre.php', 'tab_centre', 'palette'], ['report', 'report.php', 'tab_report', 'chart']] as $t
         ) {
             $tabs[] = ['url' => (new \moodle_url('/local/oksigeniahechauka/' . $t[1]))->out(false),
                 'label' => get_string($t[2], self::C), 'icon' => icons::svg($t[3]), 'current' => $t[0] === $active];

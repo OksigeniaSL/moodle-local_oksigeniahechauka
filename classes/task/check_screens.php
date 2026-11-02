@@ -25,6 +25,7 @@
 namespace local_oksigeniahechauka\task;
 
 use local_oksigeniahechauka\local\alerts;
+use local_oksigeniahechauka\local\report;
 use local_oksigeniahechauka\local\screens;
 
 /**
@@ -47,6 +48,7 @@ class check_screens extends \core\task\scheduled_task {
      */
     public function execute(): void {
         $done = alerts::check(time());
+        report::sample(time());
         screens::purge_pairings(time());
         mtrace('Screens down: ' . $done['down'] . '; back: ' . $done['back']);
     }

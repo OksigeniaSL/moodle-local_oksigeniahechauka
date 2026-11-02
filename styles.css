@@ -3684,3 +3684,159 @@ dialog.hkp-dialog > footer {
     font-size: 1.1rem;
     font-weight: 700;
 }
+
+/* The monthly report. */
+.hkp-rep-summary {
+    margin: 0 0 .35rem;
+    font-size: 1.35rem;
+    font-weight: 700;
+    line-height: 1.3;
+}
+
+.hkp-rep-legend {
+    margin: 0 0 1rem;
+}
+
+.hkp-rep-screens,
+.hkp-rep-lines {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.hkp-rep-screens {
+    display: grid;
+    gap: .6rem;
+    margin-bottom: 1rem;
+}
+
+.hkp-rep-screen {
+    display: grid;
+    grid-template-columns: minmax(12rem, 1fr) 6.5rem minmax(16rem, 2fr);
+    gap: .5rem 1.25rem;
+    align-items: center;
+    padding: .9rem 1.25rem;
+    border: 1px solid var(--hkp-line);
+    border-radius: var(--hkp-radius);
+    background: var(--hkp-card);
+}
+
+.hkp-rep-name a {
+    color: var(--hkp-ink);
+    font-weight: 700;
+}
+
+.hkp-rep-name small,
+.hkp-rep-lines small {
+    display: block;
+    color: var(--hkp-muted);
+    font-size: .875rem;
+}
+
+.hkp-rep-percent {
+    font-size: 1.5rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+}
+
+.hkp-rep-percent small {
+    display: block;
+    color: var(--hkp-muted);
+    font-size: .8125rem;
+    font-weight: 400;
+    text-align: left;
+}
+
+.hkp-rep-percent.is-low,
+.hkp-rep-lines b.is-open {
+    color: var(--hkp-bad-ink);
+}
+
+.hkp-rep-bars {
+    display: grid;
+    grid-auto-columns: minmax(0, 1fr);
+    grid-auto-flow: column;
+    gap: 2px;
+    align-items: end;
+    height: 2.75rem;
+}
+
+.hkp-rep-bars i {
+    display: block;
+    min-height: 3px;
+    border-radius: 2px 2px 0 0;
+    background: var(--hkp-ok-dot);
+}
+
+.hkp-rep-bars i.is-some {
+    background: var(--hkp-warn-dot);
+}
+
+.hkp-rep-bars i.is-low {
+    background: var(--hkp-bad-dot);
+}
+
+.hkp-rep-bars i.is-none {
+    height: 3px;
+    background: var(--hkp-line);
+}
+
+.hkp-rep-axis {
+    display: flex;
+    justify-content: space-between;
+    margin-top: .15rem;
+    color: var(--hkp-muted);
+    font-size: .75rem;
+    font-variant-numeric: tabular-nums;
+}
+
+.hkp-rep-cuts {
+    margin-bottom: 1rem;
+}
+
+.hkp-rep-two {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+    gap: 1rem;
+}
+
+.hkp-rep-lines li {
+    display: flex;
+    gap: 1rem;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: .55rem 0;
+    border-top: 1px solid var(--hkp-line);
+}
+
+.hkp-rep-lines b {
+    flex: none;
+    font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 767.98px) {
+    .hkp-rep-screen {
+        grid-template-columns: minmax(0, 1fr) auto;
+    }
+
+    .hkp-rep-month {
+        grid-column: 1 / -1;
+    }
+
+    .hkp-rep-two {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+@media print {
+    .hkp-rep-actions,
+    .hkp-page .hkp-tabs {
+        display: none;
+    }
+
+    .hkp-rep-screen,
+    .hkp-rep-lines li {
+        break-inside: avoid;
+    }
+}

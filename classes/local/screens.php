@@ -423,6 +423,7 @@ class screens {
     public static function delete(int $screenid): void {
         global $DB;
         get_file_storage()->delete_area_files(files::context()->id, files::COMPONENT, files::SHOT, $screenid);
+        report::forget($screenid);
         $DB->delete_records('local_oksigeniahechauka_member', ['screenid' => $screenid]);
         $DB->delete_records('local_oksigeniahechauka_target', ['screenid' => $screenid]);
         $DB->delete_records('local_oksigeniahechauka_screen', ['id' => $screenid]);
