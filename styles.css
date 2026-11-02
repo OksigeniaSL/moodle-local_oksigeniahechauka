@@ -3969,3 +3969,72 @@ dialog.hkp-dialog > footer {
     flex: 1 1 20rem;
     margin: 0;
 }
+
+/* The guide: a link beside the title where there are no tabs, and the page itself. */
+.hkp-help-link {
+    display: inline-flex;
+    gap: .3rem;
+    align-items: center;
+    margin-top: .35rem;
+    font-weight: 600;
+}
+
+.hkp-help-link svg {
+    width: 1.1rem;
+    height: 1.1rem;
+}
+
+.hkp-guide {
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+.hkp-guide h1 {
+    display: none;
+}
+
+.hkp-guide h2 {
+    margin: 2.25rem 0 .6rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--hkp-line);
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.hkp-guide h3 {
+    margin: 1.5rem 0 .5rem;
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
+.hkp-guide img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin: 1rem 0;
+    border: 1px solid var(--hkp-line);
+    border-radius: var(--hkp-radius);
+}
+
+.hkp-guide img.hk-side {
+    float: right;
+    margin: .25rem 0 1rem 1.5rem;
+}
+
+.hkp-guide h2,
+.hkp-guide h3 {
+    clear: both;
+}
+
+.hkp-guide-pdf {
+    display: inline-flex;
+    gap: .4rem;
+    align-items: center;
+}
+
+@media (max-width: 767.98px) {
+    .hkp-guide img.hk-side {
+        float: none;
+        margin: 1rem auto;
+    }
+}

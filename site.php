@@ -90,7 +90,7 @@ foreach ([false, true] as $dark) {
 }
 $config = get_config($c);
 $template = place::view($query, $now, $suffix) + [
-    'tabs' => home::tabs('screens', true),
+    'tabs' => home::tabs('screens', true, 'sedes'),
     'hastabs' => true,
     'back' => $back->out(false),
     'backicon' => icons::svg('back'),

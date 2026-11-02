@@ -335,6 +335,8 @@ class compose {
             'is' . $type => true,
             'isfeed' => $type === 'agenda' || $type === 'table',
             'tablemodel' => (new \moodle_url('/local/oksigeniahechauka/model.php', ['kind' => 'table']))->out(false),
+            'help' => home::guide('anadir'),
+            'helpicon' => icons::svg('help'),
             'editing' => (bool) $item,
             'title' => get_string($item ? 'compose_edit' : 'compose_add', $c),
             'back' => (new \moodle_url('/local/oksigeniahechauka/index.php'))->out(false),

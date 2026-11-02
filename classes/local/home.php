@@ -120,6 +120,8 @@ class home {
             'tabs' => self::tabs('home', $managescreens),
             'hastabs' => $managescreens,
             'missing' => $managescreens ? startpage::missing() : [],
+            'help' => $managescreens ? '' : self::guide('panel'),
+            'helpicon' => icons::svg('help'),
             'sample' => $publishall && sample::exists() ? ['remove' => self::remove_sample_url()] : null,
             'style' => self::stages(),
             'health' => $urgents ? [] : self::health($states, $now, $managescreens),
@@ -233,12 +235,23 @@ class home {
     }
 
     /**
+     * The guide, at one of its parts.
+     *
+     * @param string $part
+     * @return string
+     */
+    public static function guide(string $part = ''): string {
+        return (new \moodle_url('/local/oksigeniahechauka/guide.php', [], $part !== '' ? $part : null))->out(false);
+    }
+
+    /**
      * Where the button that takes the example out goes.
      *
      * @return string
      */
     protected static function remove_sample_url(): string {
-        return (new \moodle_url('/local/oksigeniahechauka/index.php', ['action' => 'removesample', 'sesskey' => sesskey()]))->out(false);
+        $params = ['action' => 'removesample', 'sesskey' => sesskey()];
+        return (new \moodle_url('/local/oksigeniahechauka/index.php', $params))->out(false);
     }
 
     /**
@@ -246,9 +259,10 @@ class home {
      *
      * @param string $active
      * @param bool $managescreens
+     * @param string $help the part of the guide for this page, if not the one of its tab
      * @return array
      */
-    public static function tabs(string $active, bool $managescreens): array {
+    public static function tabs(string $active, bool $managescreens, string $help = ''): array {
         if (!$managescreens) {
             return [];
         }
@@ -260,6 +274,11 @@ class home {
             $tabs[] = ['url' => (new \moodle_url('/local/oksigeniahechauka/' . $t[1]))->out(false),
                 'label' => get_string($t[2], self::C), 'icon' => icons::svg($t[3]), 'current' => $t[0] === $active];
         }
+        // The guide, open where this page is explained.
+        $parts = ['home' => 'panel', 'screens' => 'grupos', 'centre' => 'centro', 'report' => 'informe'];
+        $part = $help !== '' ? $help : ($parts[$active] ?? '');
+        $tabs[] = ['url' => self::guide($part), 'label' => get_string('tab_guide', self::C), 'icon' => icons::svg('help'),
+            'current' => $active === 'guide'];
         return $tabs;
     }
 

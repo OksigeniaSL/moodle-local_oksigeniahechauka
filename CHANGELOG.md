@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.8.7
+
+- **The user's guide**, in the panel and as a PDF: what the screens and the panel do, with pictures of an example centre. A «Guide» tab opens it where the page in use is explained; whoever only publishes has it beside the title. Its source is `docs/guia/`.
+- The example's event says what it is in fewer words, so it fits.
+
 ## 0.8.6
 
 - **An example the first time:** a new installation starts with a piece of each kind (an important notice, notices, photos, an event, a table and the ticker), each one saying what it does, in the language of the site, so neither the panel nor the first screen starts empty. The screens say «Example data» while any of it is left; the panel takes it all out with one button, and anything of it changed in the panel becomes the centre's. Its event moves ahead by itself.

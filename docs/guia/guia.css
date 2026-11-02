@@ -1,0 +1,35 @@
+/* Oksigenia Hechauka: the printed user's guide (A4). The colours are those of the first skin of the screens. */
+@font-face { font-family: "Gabarito"; src: url("../../player/fuentes/Gabarito-700.woff2") format("woff2"); font-weight: 700; }
+@font-face { font-family: "Gabarito"; src: url("../../player/fuentes/Gabarito-800.woff2") format("woff2"); font-weight: 800; }
+:root { --petrol: #0e4f5c; --tangerine: #ff8a3d; --ink: #14211f; --soft: #46534f; --line: #e4dfd3; --paper: #f4f1ea; }
+@page {
+  size: A4;
+  margin: 16mm 17mm 18mm;
+  @bottom-left { content: "Oksigenia Hechauka · Guía de uso"; font: 7.5pt "DejaVu Sans", sans-serif; color: #7a847f; }
+  @bottom-right { content: counter(page) " / " counter(pages); font: 7.5pt "DejaVu Sans", sans-serif; color: #7a847f; }
+}
+@page :first { @bottom-left { content: none; } @bottom-right { content: none; } }
+html { font-family: "DejaVu Sans", "Liberation Sans", sans-serif; font-size: 9.6pt; line-height: 1.5; color: var(--ink); }
+body { margin: 0; }
+h1, h2, h3 { font-family: "Gabarito", "DejaVu Sans", sans-serif; color: var(--petrol); line-height: 1.15; }
+h1 { font-size: 30pt; font-weight: 800; margin: 30mm 0 6pt; }
+h1 + p { font-size: 13pt; color: var(--soft); margin: 0 0 14pt; padding-bottom: 14pt; border-bottom: 3pt solid var(--tangerine); }
+h2 { font-size: 17pt; font-weight: 800; margin: 20pt 0 6pt; padding-top: 8pt; border-top: 1pt solid var(--line); break-after: avoid; }
+/* The cover: the title, a line and a screen; the guide starts on the next page. */
+h1 + p + figure { margin-bottom: 0; }
+h1 + p + figure + p + h2, h1 + p + figure + h2, h1 + p + figure ~ a:first-of-type + h2 { break-before: page; border-top: 0; margin-top: 0; padding-top: 0; }
+h3 { font-size: 12pt; font-weight: 700; margin: 12pt 0 4pt; break-after: avoid; }
+p { margin: 3pt 0 6pt; }
+ul, ol { margin: 3pt 0 8pt; padding-left: 14pt; }
+li { margin: 2pt 0; }
+li::marker { color: var(--tangerine); }
+strong { color: var(--ink); }
+a { color: var(--petrol); text-decoration: none; }
+code { font-family: "DejaVu Sans Mono", monospace; font-size: 8.4pt; background: var(--paper); padding: 0 2pt; border-radius: 2pt; }
+figure { margin: 8pt 0 12pt; break-inside: avoid; }
+figure img, p > img, img { display: block; max-width: 100%; margin: 6pt auto; border: 0.6pt solid var(--line); border-radius: 4pt; }
+/* A phone or a card: beside the text, not a page of its own. */
+img.hk-side { float: right; width: 52mm; margin: 2pt 0 8pt 12pt; }
+img.hk-side[width="200"] { width: 44mm; }
+h2, h3 { clear: both; }
+figcaption { font-size: 8pt; color: var(--soft); text-align: center; margin-top: 3pt; }

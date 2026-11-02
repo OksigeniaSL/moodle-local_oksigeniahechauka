@@ -23,6 +23,7 @@
 
     Example context (json):
     {
+        "help": "", "helpicon": "",
         "sample": {"remove": "#"},
         "style": "",
         "title": "Pantallas",
@@ -47,6 +48,7 @@
         <div class="hkp-head-title">
             <h1>{{title}}</h1>
             {{#sub}}<p class="hkp-head-sub">{{sub}}</p>{{/sub}}
+            {{#help}}<a class="hkp-help-link" href="{{help}}">{{{helpicon}}}{{#str}}tab_guide, local_oksigeniahechauka{{/str}}</a>{{/help}}
         </div>
         {{#hasactions}}
         <div class="hkp-head-actions">

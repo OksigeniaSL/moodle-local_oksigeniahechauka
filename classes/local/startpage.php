@@ -158,7 +158,7 @@ class startpage {
             return ['done' => $done, 'label' => get_string($done ? 'start_state_done' : 'start_state_todo', $c)];
         };
         return [
-            'tabs' => home::tabs('centre', true),
+            'tabs' => home::tabs('centre', true, 'empezar'),
             'hastabs' => true,
             'action' => $action,
             'sesskey' => sesskey(),
