@@ -19,6 +19,12 @@
 
     Where the centre is: the search, the places found and the one chosen, with its map and its weather. It goes inside
     «Tu centro» and «Empezar», which give it its context.
+
+    Example context (json):
+    {
+        "action": "#", "sesskey": "abc", "query": "", "searched": false, "results": [], "hasresults": false, "resultsjson": "[]",
+        "place": null, "icons": {"search": "", "pin": "", "out": "", "check": ""}
+    }
 }}
                 {{#searched}}<form method="post" action="{{action}}" id="hkp-pick-form"><input type="hidden" name="sesskey" value="{{sesskey}}"><input type="hidden" name="results" value="{{resultsjson}}"></form>{{/searched}}
                 <form method="get" action="{{action}}" class="hkp-find" role="search">
