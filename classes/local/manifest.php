@@ -107,6 +107,10 @@ class manifest {
         $m['categories'] = categories::contract();
         $scope = screens::scope((int) $screen->id);
         $m['items'] = self::unique(array_merge(self::own_items($screen, $now), self::source_items($config, $now, $scope)));
+        // A centre that has put nothing yet: the screen says where to start, and stops saying it with the first thing.
+        if (!$DB->record_exists('local_oksigeniahechauka_item', [])) {
+            $m['idle'] = ['qr' => (new \moodle_url('/local/oksigeniahechauka/edit.php', ['type' => 'notice']))->out(false)];
+        }
         $m['etag'] = self::etag($m);
         return $m;
     }

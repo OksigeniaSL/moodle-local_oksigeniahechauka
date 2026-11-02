@@ -567,6 +567,7 @@ $string['label_deadline_due'] = 'Entrega';
 $string['label_deadline_quiz'] = 'Cuestionario';
 $string['label_deadlines'] = 'Entregas de esta semana';
 $string['label_events'] = 'Hoy';
+$string['label_idle_qr'] = 'Añade lo primero desde el móvil';
 $string['label_important'] = 'Importante';
 $string['label_menu'] = 'Menú de hoy';
 $string['label_menu_tomorrow'] = 'Menú de mañana';

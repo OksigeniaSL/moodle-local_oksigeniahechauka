@@ -7,6 +7,7 @@ import {ratio, shapeOf} from './compose.js';
 import {buildWeatherThird} from './today.js';
 import {MARK, buildLead, buildRest, fitAlso, fitHeadline, fitWord, leadOfTurn, leadsOf, linesOf, paginateRest, showRestPage, turnFixed, weekHeadline, wordsCramped} from './lead.js';
 import {buildBirthdays, fitBirthdays} from './cumple.js';
+import {buildIdle} from './reposo.js';
 import {buildBooks, fitBooks} from './biblioteca.js';
 import {qrPath, shortWeb} from './qr.js';
 import {even} from './balance.js';
@@ -23,7 +24,7 @@ const CAPTION_MS = 2800;
 const NEW_EACH = {'solo-hoy': true, semana: true, titular: true, agenda: true, muro: true, 'fotos-tercio': true, cumple: true, biblioteca: true};
 
 /** The compositions over the whole screen, in their own layer. */
-const FULL = {'foto-completa': true, 'escaparate': true};
+const FULL = {'foto-completa': true, 'escaparate': true, 'reposo': true};
 const PASS_MS = 1000;
 
 function el(tag, cls, text) {
@@ -338,6 +339,7 @@ export class Screen {
     setWeather(w) {
         this.weather = w && w.now && w.today && this.sky ? w : null;
         this.headers.forEach((p) => this.paintWeather(p));
+        this.tickIdle();
         this.credit.textContent = this.weather ? (this.weather.credit || 'MET Norway') : '';
         if (this.weather && !this.credit.parentNode) {
             this.frame.appendChild(this.credit);
@@ -399,8 +401,14 @@ export class Screen {
             return;
         }
         this.minute = key;
+        const first = !this.lastDate;
         this.lastDate = d;
         this.headers.forEach((p) => this.paintClock(p, d));
+        if (first) {
+            this.fitIdle();
+        } else {
+            this.tickIdle();
+        }
         if (this.urgentClock) {
             this.urgentClock.textContent = two(d.getHours()) + ':' + two(d.getMinutes());
         }
@@ -560,8 +568,10 @@ export class Screen {
         this.full.removeAttribute('data-muro');
         this.stopSlides(this.full);
         clear(this.full);
+        this.idle = null;
+        const root = this.root;
         this.headers = this.headers.filter(function (p) {
-            return p.node.parentNode !== null;
+            return root.contains(p.node);
         });
     }
 
@@ -976,6 +986,81 @@ export class Screen {
     }
 
     // The picture at full screen: its slide, a veil, a header of its own, its caption and the weather's credit.
+    /**
+     * The screen with nothing to show: it stays as it is from turn to turn, or it would blink. The code to add the first thing comes
+     * and goes with extra.qr.
+     *
+     * @param {object} [extra] {qr: url or null}
+     */
+    fillIdle(extra) {
+        const qr = (extra && extra.qr) || '';
+        if (this.idle && this.idle.qr === qr) {
+            return;
+        }
+        this.clearFull();
+        const head = this.header();
+        const box = qr ? this.qrBox(qr, false) : null;
+        // Each of the centre's two colours, as they end up: a theme, a skin or its own.
+        const full = this.full;
+        const colour = function (name) {
+            const probe = el('i');
+            probe.style.color = 'var(' + name + ')';
+            full.appendChild(probe);
+            const c = getComputedStyle(probe).color;
+            full.removeChild(probe);
+            return c;
+        };
+        this.idle = buildIdle(this.full, head, {
+            qr: box && box.nodeType === 1 ? box : null,
+            qrLabel: this.s.idle_qr || '',
+            credit: this.weather ? this.credit.textContent : '',
+            still: this.keepsStill(),
+            primary: colour('--hk-primario'),
+            accent: colour('--hk-acento'),
+        });
+        this.idle.qr = qr;
+        this.fitIdle();
+    }
+
+    /**
+     * Measured with what is on it: the first time the screen may not have a clock yet, and then the name would have more room than it has.
+     */
+    fitIdle() {
+        if (!this.idle) {
+            return;
+        }
+        const node = this.idle.node;
+        const place = node.querySelector('.hk-lugar');
+        const ground = node.querySelector('.hk-reposo-tierra');
+        const head = ground.querySelector('.hk-cabecera');
+        const pads = getComputedStyle(ground);
+        const clock = node.querySelector('.hk-reloj');
+        // On a vertical screen the clock takes the width of the ground, whatever the centre's letter: it is what that half is for.
+        clock.style.fontSize = '';
+        if (!this.horizontal && clock.textContent) {
+            const room = ground.clientWidth - parseFloat(pads.paddingLeft) - parseFloat(pads.paddingRight);
+            clock.style.display = 'inline-block';
+            const size = parseFloat(getComputedStyle(clock).fontSize);
+            const wanted = size * room / clock.offsetWidth;
+            clock.style.display = '';
+            clock.style.fontSize = Math.floor(Math.min(wanted * .98, size * 1.5)) + 'px';
+        }
+        if (place && place.style.display !== 'none') {
+            const room = ground.clientHeight - parseFloat(pads.paddingBottom);
+            place.hkSteps = 3;
+            fitHeadline(place, place, this.horizontal ? 2 : 3, function () {
+                return place.scrollWidth > place.clientWidth + 1 || head.offsetHeight > room;
+            });
+        }
+        this.tickIdle();
+    }
+
+    tickIdle() {
+        if (this.idle && this.lastDate) {
+            this.idle.tick(this.lastDate, this.weather ? this.weather.now.symbol : '');
+        }
+    }
+
     fillFull(item) {
         this.clearFull();
         const d = this.slide(item);
@@ -1288,6 +1373,8 @@ export class Screen {
                 seconds = this.fillPoster(choice.extra.albumData);
             } else if (comp === 'escaparate') {
                 this.fillShowcase(items[0]);
+            } else if (comp === 'reposo') {
+                this.fillIdle(choice.extra);
             } else {
                 this.fillFull(items[0]);
             }
@@ -1530,6 +1617,7 @@ export class Screen {
     /** The letters have arrived, wider as a rule: what stays on the screen is measured again with them. */
     remeasureFixed() {
         this.fitHeaders();
+        this.fitIdle();
         if (this.ticker.classList.contains('hk-cinta-importante')) {
             this.bandKey = null;
             this.importantBand(this.pendingBand);

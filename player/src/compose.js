@@ -20,6 +20,7 @@
 // cumple          whose birthday it is today, with their pictures, by pages
 // biblioteca      what has come to the library: a book at a time with its QR, the next ones on the shelf
 // plazos          what falls due in the courses in the coming days, by days and by pages
+// reposo          nothing at all to show: the centre, the hour, the date and the weather, under a sky that goes by
 //
 // By the distance it is read from (the art direction's 0.7.0): at 3 m, all; at 5 m, all but «semana»; at 8 m, no
 // thirds (foto-hoy is foto-sola, a landscape video is foto-completa, «Today» comes one thing at a time) and the
@@ -196,7 +197,15 @@ export class Composer {
             }
         }
         if (!queue.length) {
-            return weekDue(3, true) || pick('solo-hoy', [], o.menu ? 15 : 12);
+            const due = weekDue(3, true);
+            if (due) {
+                return due;
+            }
+            // Nothing at all to show: a screen at rest, not an empty «Today». Its own QR only until the centre has put anything.
+            if (!h && !(o.phrases || []).length) {
+                return pick('reposo', [], 60, {qr: o.idleQr || null});
+            }
+            return pick('solo-hoy', [], o.menu ? 15 : 12);
         }
         // Mixed: one slide in ten, the wall of an album, from any distance.
         if (o.use === 'mixed' && this.n % 10 === 0) {

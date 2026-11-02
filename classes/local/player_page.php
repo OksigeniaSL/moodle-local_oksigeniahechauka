@@ -66,6 +66,7 @@ class player_page {
             'allergens' => get_string('label_allergens', $c),
             'also' => get_string('label_also', $c),
             'also_more' => get_string('label_also_more', $c),
+            'idle_qr' => get_string('label_idle_qr', $c),
             'also_others' => get_string('label_also_others', $c),
             'important' => get_string('label_important', $c),
             'notice' => get_string('label_notice', $c),
@@ -163,7 +164,7 @@ class player_page {
         foreach (
             ['hechauka.css', 'composiciones.css', 'tiempo.css', 'semana.css', 'proximos-dias.css', 'urgente.css',
             'distancia.css', 'jerarquia.css', 'tercios.css', 'cinta.css', 'usos.css', 'agenda.css', 'fotos.css',
-            'lideres.css', 'agenda-lista.css', 'cumple.css', 'biblioteca.css', 'alergenos.css', 'identidad.css',
+            'lideres.css', 'agenda-lista.css', 'cumple.css', 'reposo.css', 'biblioteca.css', 'alergenos.css', 'identidad.css',
             'pieles.css', 'fondos.css', 'letras.css', 'actividad.css'] as $file
         ) {
             $sheets .= '<link rel="stylesheet" href="' . $url($file) . '">';

@@ -291,3 +291,14 @@ test('what falls due has its slide, the next page each time, one in twelve', () 
     assert.equal(plazos[0].extra.page, 0);
     assert.equal(plazos[1].extra.page, 1);
 });
+
+test('with nothing at all to show, a screen at rest, with its code only while the centre has put nothing', () => {
+    const c = new Composer();
+    const one = c.next([], 0, true, {distance: 3, idleQr: 'https://example.org/panel'});
+    assert.equal(one.comp, 'reposo');
+    assert.deepEqual(one.extra, {qr: 'https://example.org/panel'});
+    assert.equal(new Composer().next([], 0, true, {distance: 3}).extra.qr, null);
+    // A sentence for the ticker, or anything for «Today», and it is no longer at rest.
+    assert.equal(new Composer().next([], 0, true, {distance: 3, phrases: ['Hola']}).comp, 'solo-hoy');
+    assert.equal(new Composer().next([], 1, true, {distance: 3}).comp, 'solo-hoy');
+});

@@ -564,6 +564,7 @@ class Player {
                 distance: (m.screen && m.screen.distance) || 3,
                 countdown: !!today.countdown,
                 agenda: agenda.count > 0,
+                idleQr: (m.idle && m.idle.qr) || null,
                 birthdays: liveItems(m.items || [], 'extra', wall).filter(function (it) {
                     return it.type === 'birthdays';
                 })[0] || null,

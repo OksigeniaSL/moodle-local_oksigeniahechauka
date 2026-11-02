@@ -177,6 +177,7 @@ changed, or the manifest with its `ETag` header:
 - `weather`: optional. The sky as a `symbol_code` of MET Norway (the player has an icon for each), temperatures in
   degrees Celsius, `rain` the chance of rain in percent only where the source gives it, `text` the sky in words, and
   the `credit` the source asks to show. `now` is the current hour; `today` and `tomorrow`, days of the site's calendar. `days`: the next three days, each with its `date` (for the weather in a third).
+- `idle`: `{"qr": "https://…"}`, only while the centre has put nothing at all: where to start, for the corner of a screen at rest.
 - Items of `zone: "extra"`, which have slides of their own and no place in «Today»:
   - `{"type": "birthdays", "date": "YYYY-MM-DD", "when": {…}, "people": [{"name": "…", "group": "…", "photo": {media}}]}`: `group` and `photo` may be missing. Never an age or a year.
   - `{"type": "books", "label": "…", "books": [{"title": "…", "subtitle": "…", "authors": ["…"], "cover": {media}, "colour": {"bg": "#rrggbb", "ink": "#rrggbb"}, "library": "…", "web": "https://…"}]}`: without `cover`, a drawn cover in `colour`.

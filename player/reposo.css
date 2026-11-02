@@ -1,0 +1,510 @@
+/* Oksigenia Hechauka 0.8: the screen with nothing to show yet (Gaudí, 2 November 2026). Goes after composiciones.css and identidad.css.
+ *
+ * It uses the full-screen layer, and it may be up for days: a sky in the centre's main colour, its accent as a sun that crosses it
+ * along a dotted way, once a day, one step a minute; clouds so slow nobody looks at them; and the ground, in the colour of the page,
+ * with the name or the logo (never on a coloured field, where a logo may not read) and the time. The words drift a few pixels over
+ * the hours: that is the rest a panel needs.
+ *
+ *   <section class="hk-reposo" data-noche data-cubierto>
+ *     <div class="hk-reposo-cielo"><i class="hk-reposo-estrellas"></i><svg class="hk-reposo-camino">…</svg><i class="hk-reposo-astro"></i>
+ *       <i class="hk-reposo-nube hk-reposo-nube-a"></i>…</div>
+ *     <div class="hk-reposo-tierra"><header class="hk-cabecera">…</header></div>
+ *     <aside class="hk-reposo-qr">…</aside>
+ *   </section>
+ *
+ * Chromium 56: flexbox only, margins instead of gap, transform and opacity for what moves. */
+
+/* --- The layer in its place, and the rest stepping back as under a full-screen picture --------------------------------- */
+.hk[data-composicion="reposo"] .hk-completa {
+    background: var(--hk-fondo);
+    color: var(--hk-texto);
+    opacity: 1;
+}
+.hk[data-composicion="reposo"] > .hk-cabecera,
+.hk[data-composicion="reposo"] > .hk-escena,
+.hk[data-composicion="reposo"] > .hk-credito-tiempo {
+    opacity: 0;
+}
+.hk[data-composicion="reposo"] > .hk-cinta {
+    opacity: 0;
+    -webkit-transform: translate3d(0, 100%, 0);
+    transform: translate3d(0, 100%, 0);
+}
+.hk-reposo {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+/* --- The sky, and what crosses it ----------------------------------------------------------------------------------- */
+.hk-reposo-cielo {
+    position: absolute;
+    z-index: 0;                            /* all it holds stays under the ground */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: var(--hk-primario);
+    background-image: linear-gradient(to bottom, rgba(0, 0, 0, .14), rgba(255, 255, 255, .16) 62%);
+}
+.hk-reposo-astro {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 34rem;
+    height: 34rem;
+    z-index: 2;                            /* over the sky's darkening: at night and on a dark theme only the sky goes down */
+    border-radius: 50%;
+    background: var(--hk-acento);
+    will-change: transform;
+    -webkit-transition: -webkit-transform 60s linear, background-color 4s ease, opacity 4s ease;
+    transition: transform 60s linear, background-color 4s ease, opacity 4s ease;
+}
+/* Its light: one soft glow, in white, since the accent thinned over the sky would go muddy on some colours */
+.hk-reposo-astro::before {
+    content: "";
+    position: absolute;
+    top: -16rem;
+    right: -16rem;
+    bottom: -16rem;
+    left: -16rem;
+    z-index: -1;
+    border-radius: 50%;
+    background: radial-gradient(circle closest-side, rgba(255, 255, 255, .26), rgba(255, 255, 255, .1) 60%, rgba(255, 255, 255, 0));
+}
+.hk-reposo[data-sol-claro] .hk-reposo-astro {
+    background: var(--hk-sobre-primario);
+}
+/* The day's way */
+.hk-reposo-camino {
+    position: absolute;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+.hk-reposo-camino ellipse {
+    fill: none;
+    stroke: #fff;
+    stroke-width: .7rem;
+    stroke-linecap: round;
+    stroke-dasharray: 0 3rem;
+    opacity: .32;
+}
+/* The clouds: long thin bands, not drawings of clouds, so slow nobody looks at them; and what says, at a glance, that this screen is
+   alive */
+.hk-reposo-nube {
+    position: absolute;
+    z-index: 3;
+    left: 0;
+    width: 96rem;
+    height: 2.2rem;
+    border-radius: 1.1rem;
+    background: linear-gradient(to right, rgba(255, 255, 255, 0), #fff 22%, #fff 78%, rgba(255, 255, 255, 0));
+    opacity: .16;
+    will-change: transform;
+    -webkit-animation: hk-reposo-pasa 620s linear infinite;
+    animation: hk-reposo-pasa 620s linear infinite;
+}
+.hk-reposo-nube-a {
+    top: 14%;
+    -webkit-animation-delay: -80s;
+    animation-delay: -80s;
+}
+.hk-reposo-nube-b {
+    top: 17%;
+    width: 58rem;
+    height: 1.5rem;
+    opacity: .12;
+    -webkit-animation-duration: 840s;
+    animation-duration: 840s;
+    -webkit-animation-delay: -640s;
+    animation-delay: -640s;
+}
+.hk-reposo-nube-c {
+    top: 31%;
+    width: 74rem;
+    height: 1.8rem;
+    opacity: .1;
+    -webkit-animation-duration: 720s;
+    animation-duration: 720s;
+    -webkit-animation-delay: -330s;
+    animation-delay: -330s;
+}
+@-webkit-keyframes hk-reposo-pasa {
+    from { -webkit-transform: translate3d(-100rem, 0, 0); transform: translate3d(-100rem, 0, 0); }
+    to { -webkit-transform: translate3d(200rem, 0, 0); transform: translate3d(200rem, 0, 0); }
+}
+@keyframes hk-reposo-pasa {
+    from { -webkit-transform: translate3d(-100rem, 0, 0); transform: translate3d(-100rem, 0, 0); }
+    to { -webkit-transform: translate3d(200rem, 0, 0); transform: translate3d(200rem, 0, 0); }
+}
+.hk-reposo[data-cubierto] .hk-reposo-nube {
+    opacity: .34;
+}
+.hk-reposo[data-noche] .hk-reposo-nube {
+    opacity: .05;
+}
+/* A covered sky: the sun behind the clouds */
+.hk-reposo[data-cubierto] .hk-reposo-astro {
+    background: var(--hk-sobre-primario);
+    opacity: .34;
+}
+/* Night: the same sky gone dark, stars, and the moon on the same arc */
+.hk-reposo-cielo::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, #060a16, #10162a 70%);
+    opacity: 0;
+    -webkit-transition: opacity 8s ease;
+    transition: opacity 8s ease;
+}
+.hk-reposo[data-noche] .hk-reposo-cielo::after {
+    opacity: .62;
+}
+/* On a screen in its dark theme, by day, the sky a little lower too: the main colour there is a lighter one */
+[data-tema="oscuro"] .hk-reposo-cielo::after {
+    opacity: .3;
+}
+[data-tema="oscuro"] .hk-reposo[data-noche] .hk-reposo-cielo::after {
+    opacity: .62;
+}
+.hk-reposo-estrellas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    width: .5rem;
+    height: .5rem;
+    border-radius: 50%;
+    background: transparent;
+    opacity: 0;
+    box-shadow:
+        12rem 9rem 0 0 #fff, 31rem 22rem 0 -.05rem #fff, 47rem 7rem 0 0 #fff, 63rem 27rem 0 .05rem #fff, 78rem 12rem 0 -.05rem #fff,
+        96rem 31rem 0 0 #fff, 112rem 6rem 0 0 #fff, 128rem 24rem 0 -.05rem #fff, 143rem 13rem 0 .05rem #fff, 161rem 29rem 0 0 #fff,
+        178rem 10rem 0 -.05rem #fff, 22rem 38rem 0 -.05rem #fff, 55rem 42rem 0 0 #fff, 87rem 46rem 0 -.05rem #fff, 121rem 40rem 0 0 #fff,
+        154rem 44rem 0 -.05rem #fff, 8rem 26rem 0 0 #fff, 72rem 35rem 0 -.05rem #fff, 104rem 19rem 0 .05rem #fff, 136rem 33rem 0 -.05rem #fff;
+    -webkit-transition: opacity 8s ease;
+    transition: opacity 8s ease;
+}
+.hk-reposo[data-noche] .hk-reposo-estrellas {
+    opacity: .75;
+}
+.hk-reposo[data-noche] .hk-reposo-astro {
+    background: transparent;
+    box-shadow: inset 7rem -2rem 0 0 #fff4d6;
+}
+.hk-reposo[data-noche] .hk-reposo-astro::before {
+    display: none;
+}
+
+/* --- The ground: the colour of the page, with a curve for a horizon --------------------------------------------------- */
+.hk-reposo-tierra {
+    position: absolute;
+    z-index: 1;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    align-items: flex-end;
+    width: 100%;
+    height: 42%;
+    padding: 0 7rem 5.6rem;
+    background: var(--hk-fondo);
+}
+.hk-reposo-tierra::before {
+    content: "";
+    position: absolute;
+    left: -14%;
+    right: -14%;
+    top: -9rem;
+    height: 34rem;
+    border-radius: 50%;
+    background: var(--hk-fondo);
+}
+.hk .hk-reposo .hk-cabecera {
+    position: relative;
+    top: auto;
+    left: auto;
+    right: auto;
+    display: flex;
+    flex: 1 1 auto;
+    align-items: flex-end;
+    min-width: 0;
+    height: auto;
+    margin: 0;
+    padding: 0;
+    -webkit-transition: -webkit-transform 60s linear;
+    transition: transform 60s linear;
+}
+.hk-reposo-marca {
+    display: flex;
+    flex: 1 1 0px;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: flex-start;
+    min-width: 0;
+    margin-right: 6rem;
+}
+.hk.hk .hk-reposo .hk-lugar {
+    position: static;
+    width: auto;
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    color: var(--hk-texto);
+    font-family: var(--hk-letra-titulos);
+    font-size: calc(var(--hk-t-titular) * 1.4);    /* whose screen it is: the second thing read, after the time */
+    font-weight: 800;
+    letter-spacing: -.02em;
+    line-height: 1;
+}
+.hk.hk .hk-reposo .hk-lugar[data-ajuste="1"] {
+    font-size: calc(var(--hk-t-titular) * 1.1);
+}
+.hk.hk .hk-reposo .hk-lugar[data-ajuste="2"] {
+    font-size: calc(var(--hk-t-titular) * .8);
+}
+.hk.hk .hk-reposo .hk-lugar[data-ajuste="3"] {
+    font-size: var(--hk-t-entrada);
+}
+/* The logo, as large as it is comfortable: on the page's colour, so it reads as it does everywhere */
+.hk .hk-reposo .hk-logo-claro,
+.hk .hk-reposo .hk-logo-oscuro {
+    position: static;
+    width: auto;
+    height: calc(var(--hk-t-titular) * 1.9);
+    max-width: 100%;
+    margin: 0;
+    object-fit: contain;
+    object-position: left bottom;
+}
+.hk .hk-reposo .hk-logo-claro {
+    display: block;
+}
+.hk .hk-reposo .hk-logo-oscuro {
+    display: none;
+}
+[data-tema="oscuro"] .hk .hk-reposo .hk-logo-claro {
+    display: none;
+}
+[data-tema="oscuro"] .hk .hk-reposo .hk-logo-oscuro {
+    display: block;
+}
+
+/* --- The time: the clock under the date and the weather ---------------------------------------------------------------- */
+.hk .hk-reposo .hk-hora {
+    display: flex;
+    flex: none;
+    flex-direction: column;
+    align-items: flex-end;
+    margin: 0;
+    text-align: right;
+}
+.hk-reposo-sobre {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    margin-bottom: 1.6rem;
+}
+.hk.hk .hk-reposo .hk-reloj {
+    color: var(--hk-texto);
+    font-size: calc(var(--hk-t-cifra) * 2.4);
+    line-height: .86;
+}
+.hk.hk .hk-reposo .hk-reloj span {
+    color: var(--hk-acento);
+}
+.hk.hk .hk-reposo .hk-fecha {
+    margin: 0;
+    color: var(--hk-texto-suave);
+    font-size: var(--hk-t-min);
+    white-space: nowrap;
+}
+.hk.hk .hk-reposo .hk-fecha b,
+.hk.hk .hk-reposo .hk-fecha span {
+    display: inline;
+}
+.hk.hk .hk-reposo .hk-fecha b {
+    margin-right: 0;
+    color: var(--hk-texto);
+}
+.hk.hk .hk-reposo .hk-tiempo {
+    display: flex;
+    align-items: center;
+    height: auto;
+    margin: 0 3.2rem 0 0;
+    padding: 0;
+    border: 0;
+}
+.hk.hk .hk-reposo .hk-tiempo-icono {
+    width: calc(var(--hk-t-min) * 1.5);
+    height: calc(var(--hk-t-min) * 1.5);
+    margin-right: 1rem;
+}
+.hk.hk .hk-reposo .hk-tiempo-grados {
+    color: var(--hk-texto);
+    font-size: calc(var(--hk-t-min) * 1.1);
+}
+.hk.hk .hk-reposo .hk-tiempo-extremos,
+.hk.hk .hk-reposo .hk-tiempo-lluvia {
+    display: none;
+}
+.hk.hk .hk-reposo .hk-credito-tiempo {
+    position: absolute;
+    z-index: 2;
+    top: auto;
+    right: 7rem;
+    bottom: 1.6rem;
+    left: auto;
+    color: var(--hk-texto-suave);
+}
+
+/* --- The code to add the first thing, in a corner: in the sky's own colour, so it is the last thing read ------------------- */
+.hk-reposo-qr {
+    position: absolute;
+    z-index: 2;
+    top: 3rem;
+    right: 3rem;
+    display: flex;
+    align-items: center;
+    padding: 1.2rem 2.4rem 1.2rem 1.2rem;
+    border-radius: calc(1.8rem * var(--hk-esquina));
+    background: var(--hk-primario);
+    color: var(--hk-sobre-primario);
+}
+.hk.hk .hk-reposo-qr .hk-qr {
+    position: static;
+    top: auto;
+    right: auto;
+    bottom: auto;
+    left: auto;
+    display: block;
+    flex: none;
+    box-sizing: content-box;
+    width: 14rem;
+    height: 14rem;
+    margin: 0 2rem 0 0;
+    padding: .8rem;
+    border-radius: calc(1rem * var(--hk-esquina));
+    background: #fff;
+    box-shadow: none;
+    -webkit-transform: none;
+    transform: none;
+    opacity: 1;
+}
+.hk .hk-reposo-qr .hk-qr svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+.hk .hk-reposo-qr .hk-qr path {
+    fill: #000;
+}
+.hk .hk-reposo-qr .hk-qr-web,
+.hk .hk-reposo-qr .hk-qr-llamada {
+    display: none;
+}
+.hk-reposo-qr-texto {
+    width: calc(var(--hk-t-min) * 9.2);    /* two lines, at any distance */
+    margin: 0;
+    font-size: var(--hk-t-min);
+    font-weight: 700;
+    line-height: 1.12;
+}
+
+/* From afar the words are larger: the horizon goes up for them */
+.hk[data-distancia="8"] .hk-reposo-tierra {
+    height: 50%;
+}
+
+/* --- A vertical screen: more sky, the ground stacked ------------------------------------------------------------------- */
+.hk-vertical .hk-reposo-tierra {
+    height: 46%;
+    padding: 0 6rem 8rem;
+}
+.hk-vertical .hk-reposo-tierra::before {
+    left: -30%;
+    right: -30%;
+    top: -7rem;
+    height: 26rem;
+}
+.hk.hk-vertical .hk-reposo .hk-cabecera {
+    flex-direction: column;
+    align-items: flex-start;
+}
+.hk.hk-vertical .hk-reposo .hk-cabecera {
+    width: 100%;
+    flex: 1 1 0px;
+}
+.hk-vertical .hk-reposo-marca {
+    flex: none;
+    width: 100%;
+    margin: 0 0 4rem;
+}
+.hk.hk-vertical .hk-reposo .hk-hora {
+    align-items: flex-start;
+    width: 100%;
+    text-align: left;
+}
+.hk-vertical .hk-reposo-sobre {
+    justify-content: flex-start;
+}
+.hk-vertical .hk-reposo-astro {
+    width: 28rem;
+    height: 28rem;
+}
+.hk.hk-vertical .hk-reposo .hk-credito-tiempo {
+    right: 6rem;
+}
+
+/* --- A television that crops its edges: what is read stays inside ------------------------------------------------------ */
+.hk[data-zona-segura] .hk-reposo-tierra {
+    padding: 0 10rem 7rem;
+}
+.hk[data-zona-segura] .hk-reposo-qr {
+    top: 6rem;
+    right: 10rem;
+}
+.hk.hk[data-zona-segura] .hk-reposo .hk-credito-tiempo {
+    right: 10rem;
+    bottom: 4.6rem;
+}
+
+/* --- What keeps still: no sun sliding, no clouds passing and no words drifting; the sun jumps to its place, once a minute --- */
+.hk-quieto .hk-reposo-astro,
+.hk.hk-quieto .hk-reposo .hk-cabecera {
+    -webkit-transition: none;
+    transition: none;
+}
+.hk-quieto .hk-reposo-nube {
+    -webkit-animation: none;
+    animation: none;
+}
+.hk-quieto .hk-reposo-nube-a { left: 12%; }
+.hk-quieto .hk-reposo-nube-b { left: 58%; }
+.hk-quieto .hk-reposo-nube-c { left: 72%; }
+@media (prefers-reduced-motion: reduce) {
+    .hk .hk-reposo-astro,
+    .hk.hk .hk-reposo .hk-cabecera {
+        -webkit-transition: none;
+        transition: none;
+    }
+    .hk .hk-reposo-nube {
+        -webkit-animation: none;
+        animation: none;
+    }
+    .hk .hk-reposo-nube-a { left: 12%; }
+    .hk .hk-reposo-nube-b { left: 58%; }
+    .hk .hk-reposo-nube-c { left: 72%; }
+}

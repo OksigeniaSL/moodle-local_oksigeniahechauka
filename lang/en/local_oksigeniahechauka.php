@@ -567,6 +567,7 @@ $string['label_deadline_due'] = 'Due';
 $string['label_deadline_quiz'] = 'Quiz';
 $string['label_deadlines'] = 'Due this week';
 $string['label_events'] = 'Today';
+$string['label_idle_qr'] = 'Add the first thing from your phone';
 $string['label_important'] = 'Important';
 $string['label_menu'] = 'Today\'s menu';
 $string['label_menu_tomorrow'] = 'Tomorrow\'s menu';
