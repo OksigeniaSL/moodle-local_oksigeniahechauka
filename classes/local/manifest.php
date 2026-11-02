@@ -105,7 +105,8 @@ class manifest {
         $m += uses::contract($screen);
         $m += surprises::contract($screen, $config);
         $m['categories'] = categories::contract();
-        $m['items'] = self::unique(array_merge(self::own_items($screen, $now), self::source_items($config, $now)));
+        $scope = screens::scope((int) $screen->id);
+        $m['items'] = self::unique(array_merge(self::own_items($screen, $now), self::source_items($config, $now, $scope)));
         $m['etag'] = self::etag($m);
         return $m;
     }
@@ -250,16 +251,17 @@ class manifest {
      *
      * @param \stdClass $config
      * @param int $now
+     * @param int[] $scope the course categories of the screen
      * @return array items of the contract
      */
-    protected static function source_items(\stdClass $config, int $now): array {
+    protected static function source_items(\stdClass $config, int $now, array $scope): array {
         $items = [];
         if (!empty($config->sourcemenu)) {
             $centre = (int) ($config->menucentre ?? 0);
             $items = array_merge($items, sources::menus($now, self::MENU_DAYS, $centre ?: null));
         }
         if (!empty($config->sourcecalendar)) {
-            $items = array_merge($items, sources::events($now, self::AGENDA_DAYS));
+            $items = array_merge($items, sources::events($now, self::AGENDA_DAYS, $scope));
         }
         if (!empty($config->sourcenews)) {
             $items = array_merge($items, sources::news($now, (int) ($config->newsdays ?? 7) ?: 7));
@@ -268,7 +270,7 @@ class manifest {
             $items = array_merge($items, sources::books($now, (int) ($config->booksdays ?? 14) ?: 14));
         }
         if (!empty($config->sourcedeadlines)) {
-            $items = array_merge($items, sources::deadlines($now, (int) ($config->deadlinesdays ?? 7) ?: 7));
+            $items = array_merge($items, sources::deadlines($now, (int) ($config->deadlinesdays ?? 7) ?: 7, $scope));
         }
         return array_merge($items, birthdays::items($config, $now));
     }

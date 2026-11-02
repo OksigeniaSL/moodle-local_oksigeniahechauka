@@ -57,8 +57,14 @@ class groupspage {
                     ['id' => $s->id]
                 ))->out(false)];
         }
+        $linked = $DB->get_records_menu('local_oksigeniahechauka_group', null, '', 'id, coursecat');
+        $categorylist = \core_course_category::make_categories_list();
         $cards = [];
         foreach ($groups as $id => $name) {
+            $coursecats = [['value' => 0, 'label' => get_string('groups_category_none', $c), 'selected' => empty($linked[$id])]];
+            foreach ($categorylist as $catid => $catname) {
+                $coursecats[] = ['value' => $catid, 'label' => $catname, 'selected' => (int) ($linked[$id] ?? 0) === (int) $catid];
+            }
             $in = $members[$id] ?? [];
             $mine = [];
             $other = [];
@@ -88,6 +94,8 @@ class groupspage {
                 'id' => (int) $id,
                 'name' => format_string($name),
                 'screens' => $mine,
+                'coursecats' => $coursecats,
+                'hascoursecats' => (bool) $categorylist,
                 'others' => $other,
                 'hasothers' => (bool) $other,
                 'people' => $people,
@@ -182,6 +190,13 @@ class groupspage {
                     $DB->insert_record('local_oksigeniahechauka_group', (object) ['name' => $name, 'sortorder' => 0,
                         'timecreated' => $now, 'timemodified' => $now]);
                     return get_string('groups_made', $c, $name);
+                }
+                return null;
+            case 'groupcategory':
+                $cat = optional_param('coursecat', 0, PARAM_INT);
+                if ($exists && (!$cat || $DB->record_exists('course_categories', ['id' => $cat]))) {
+                    $DB->set_field('local_oksigeniahechauka_group', 'coursecat', $cat, ['id' => $group]);
+                    return get_string('groups_category_saved', $c);
                 }
                 return null;
             case 'addmember':

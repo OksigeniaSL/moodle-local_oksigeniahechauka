@@ -55,6 +55,10 @@
                         </details>{{/hasothers}}
                     </div>
                 </div>
+                {{#hascoursecats}}<div><label class="hkp-k" for="hkp-gc-{{id}}">{{#str}}groups_category, local_oksigeniahechauka{{/str}}</label>
+                    <form method="post" action="{{action}}" class="hkp-find"><input type="hidden" name="sesskey" value="{{sesskey}}"><input type="hidden" name="action" value="groupcategory"><input type="hidden" name="group" value="{{id}}"><select class="form-select" id="hkp-gc-{{id}}" name="coursecat">{{#coursecats}}<option value="{{value}}"{{#selected}} selected{{/selected}}>{{label}}</option>{{/coursecats}}</select><button type="submit" class="btn btn-outline-secondary">{{#str}}centre_save, local_oksigeniahechauka{{/str}}</button></form>
+                    <p class="hkp-hint">{{#str}}groups_category_help, local_oksigeniahechauka{{/str}}</p>
+                </div>{{/hascoursecats}}
                 <div><span class="hkp-k">{{#str}}groups_people, local_oksigeniahechauka{{/str}}</span>
                     <ul class="hkp-people">
                         {{#people}}<li class="hkp-person"><span class="hkp-av" aria-hidden="true">{{initials}}</span><span>{{name}}{{#detail}}<small>{{detail}}</small>{{/detail}}</span><a class="btn btn-sm btn-outline-secondary btn-icon" href="#" data-remove-user="{{userid}}" aria-label="{{label}}">{{{icons.x}}}</a></li>{{/people}}

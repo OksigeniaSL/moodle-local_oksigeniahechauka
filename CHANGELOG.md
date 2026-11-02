@@ -6,6 +6,8 @@
   comes by itself with the figures there are right now, where it is and its first screen. The panel then says what is still missing, until it is done.
 - Each step says whether it is done, what is touched is saved at once, and the page ends in the first screen. Beside it the screen stands on samples while the centre has nothing yet.
 - The sources can be turned on and off from the panel too, without going to the administration.
+- **What falls due in the courses**: a source, off by default, with the assignments, workshops and quizzes of the coming days.
+- **A group of screens can be tied to a course category**: its screens show the events and deadlines of that category and its courses, as well as what is for the whole site.
 - A long address under a QR says only where it goes.
 - The page of the birthdays no longer shows two stray characters at its top.
 

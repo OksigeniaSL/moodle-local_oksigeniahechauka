@@ -173,9 +173,10 @@ class sources {
      *
      * @param int $now
      * @param int $days how far ahead
+     * @param int[] $scope the course categories of the screen; empty, all of the site
      * @return array items of the contract
      */
-    public static function deadlines(int $now, int $days): array {
+    public static function deadlines(int $now, int $days, array $scope = []): array {
         global $DB;
         $c = 'local_oksigeniahechauka';
         $from = $now;
@@ -200,7 +201,8 @@ class sources {
         $byday = [];
         foreach ($records as $record) {
             $colour = categories::of_coursecat((int) $record->category);
-            if ($linked && !$colour) {
+            // A screen linked to a category shows what is under it; otherwise, what the centre has linked, if it has.
+            if ($scope ? !in_array((int) $record->category, $scope, true) : ($linked && !$colour)) {
                 continue;
             }
             $name = $DB->get_field($record->modulename, 'name', ['id' => $record->instance]);
@@ -280,19 +282,26 @@ class sources {
      *
      * @param int $now
      * @param int $days
+     * @param int[] $scope the course categories of the screen, whose events and those of their courses it shows too; empty, the site's
      * @return array items of the contract
      */
-    public static function events(int $now, int $days): array {
+    public static function events(int $now, int $days, array $scope = []): array {
         global $DB;
         $from = usergetmidnight($now, \core_date::get_server_timezone());
         $until = $from + ($days + 1) * DAYSECS;
+        $courses = $scope ? $DB->get_fieldset_select(
+            'course',
+            'id',
+            'visible = 1 AND category IN (' . implode(',', array_map('intval', $scope)) . ')'
+        ) : [];
+        $own = $courses ? " OR (eventtype = 'course' AND courseid IN (" . implode(',', array_map('intval', $courses)) . '))' : '';
         $records = $DB->get_records_select(
             'event',
-            "(eventtype = 'site' OR eventtype = 'category') AND visible = 1 AND timestart < :until
+            "(eventtype = 'site' OR eventtype = 'category'$own) AND visible = 1 AND timestart < :until
              AND timestart + timeduration >= :from",
             ['from' => $from, 'until' => $until],
             'timestart',
-            'id, name, location, timestart, timeduration, eventtype, categoryid',
+            'id, name, location, timestart, timeduration, eventtype, categoryid, courseid',
             0,
             200
         );
@@ -317,10 +326,16 @@ class sources {
             if ($allday) {
                 $item['allday'] = true;
             }
-            if ($ev->eventtype === 'category') {
-                // An event of a course category: only when the centre has linked that category, in its colour.
+            if ($ev->eventtype === 'course') {
+                $n = categories::of_coursecat((int) $DB->get_field('course', 'category', ['id' => $ev->courseid]));
+                if ($n) {
+                    $item['color'] = $n;
+                }
+            } else if ($ev->eventtype === 'category') {
+                // An event of a course category: of the categories of this screen or, if it has none, only when the centre has
+                // linked that category, in its colour.
                 $n = categories::of_coursecat((int) $ev->categoryid);
-                if (!$n) {
+                if ($scope ? !in_array((int) $ev->categoryid, $scope, true) : !$n) {
                     continue;
                 }
                 $item['color'] = $n;

@@ -241,6 +241,38 @@ class screens {
     }
 
     /**
+     * The course categories a screen shows, through the groups it is in, each with those under it. Empty: all of the site.
+     *
+     * @param int $screenid
+     * @return int[]
+     */
+    public static function scope(int $screenid): array {
+        global $DB;
+        if (!$screenid) {
+            return [];
+        }
+        $linked = $DB->get_fieldset_sql(
+            "SELECT DISTINCT g.coursecat
+               FROM {local_oksigeniahechauka_group} g
+               JOIN {local_oksigeniahechauka_member} m ON m.groupid = g.id
+              WHERE m.screenid = :screen AND g.coursecat > 0",
+            ['screen' => $screenid]
+        );
+        $out = [];
+        foreach ($linked as $id) {
+            $path = $DB->get_field('course_categories', 'path', ['id' => $id]);
+            if ($path === false) {
+                continue;
+            }
+            $out[] = (int) $id;
+            $like = $DB->sql_like('path', ':path');
+            $under = $DB->get_fieldset_select('course_categories', 'id', $like, ['path' => $path . '/%']);
+            $out = array_merge($out, array_map('intval', $under));
+        }
+        return array_values(array_unique($out));
+    }
+
+    /**
      * The groups of a screen.
      *
      * @param int $screenid

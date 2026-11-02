@@ -17,6 +17,7 @@
 namespace local_oksigeniahechauka;
 
 use local_oksigeniahechauka\local\categories;
+use local_oksigeniahechauka\local\screens;
 use local_oksigeniahechauka\local\sources;
 
 /**
@@ -120,5 +121,51 @@ final class sources_test extends \advanced_testcase {
 
         // Nothing falling due: no item at all, so no empty slide.
         $this->assertSame([], sources::deadlines($now - 10 * DAYSECS, 1));
+    }
+
+    /**
+     * A screen in a group linked to a category shows the events and deadlines of it and what is under it, not of the others; a
+     * screen with no link, what it always did.
+     */
+    public function test_screens_tied_to_a_category(): void {
+        global $DB;
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        $now = time();
+        $gen = $this->getDataGenerator();
+        $faculty = $gen->create_category(['name' => 'Facultad']);
+        $degree = $gen->create_category(['name' => 'Grado', 'parent' => $faculty->id]);
+        $other = $gen->create_category(['name' => 'Otra']);
+        $mine = $gen->create_course(['fullname' => 'Mío', 'category' => $degree->id]);
+        $theirs = $gen->create_course(['fullname' => 'Suyo', 'category' => $other->id]);
+        $gen->create_module('assign', ['course' => $mine->id, 'name' => 'Mi tarea', 'duedate' => $now + DAYSECS]);
+        $gen->create_module('assign', ['course' => $theirs->id, 'name' => 'Su tarea', 'duedate' => $now + DAYSECS]);
+        $event = function (string $name, array $extra) use ($now, $DB) {
+            $DB->insert_record('event', (object) ($extra + ['name' => $name, 'description' => '', 'format' => 1, 'courseid' => 0,
+                'groupid' => 0, 'userid' => 2, 'modulename' => '0', 'instance' => 0, 'timestart' => $now + DAYSECS,
+                'timeduration' => 0, 'visible' => 1, 'timemodified' => $now, 'categoryid' => 0]));
+        };
+        $event('Del sitio', ['eventtype' => 'site']);
+        $event('De la facultad', ['eventtype' => 'category', 'categoryid' => $faculty->id]);
+        $event('De la otra', ['eventtype' => 'category', 'categoryid' => $other->id]);
+        $event('Del curso', ['eventtype' => 'course', 'courseid' => $mine->id]);
+        $event('Del suyo', ['eventtype' => 'course', 'courseid' => $theirs->id]);
+
+        $screen = $DB->insert_record('local_oksigeniahechauka_screen', (object) ['name' => 'Facultad', 'keyhash' => 'x',
+            'template' => 'zones', 'theme' => 'site', 'sortorder' => 0, 'timecreated' => $now, 'timemodified' => $now]);
+        $this->assertSame([], screens::scope($screen));
+        $titles = array_column(sources::events($now, 7, screens::scope($screen)), 'title');
+        $this->assertSame(['Del sitio'], $titles);
+
+        $group = $DB->insert_record('local_oksigeniahechauka_group', (object) ['name' => 'G', 'coursecat' => $faculty->id,
+            'sortorder' => 0, 'timecreated' => $now, 'timemodified' => $now]);
+        $DB->insert_record('local_oksigeniahechauka_member', (object) ['groupid' => $group, 'screenid' => $screen]);
+        $scope = screens::scope($screen);
+        $this->assertEqualsCanonicalizing([(int) $faculty->id, (int) $degree->id], $scope);
+        $titles = array_column(sources::events($now, 7, $scope), 'title');
+        sort($titles);
+        $this->assertSame(['De la facultad', 'Del curso', 'Del sitio'], $titles);
+        $all = array_merge(...array_column(sources::deadlines($now, 7, $scope)[0]['days'], 'items'));
+        $this->assertSame(['Mi tarea'], array_column($all, 'activity'));
     }
 }

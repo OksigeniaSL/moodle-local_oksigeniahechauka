@@ -323,6 +323,7 @@ Biblioteca, Secretaría y Comedor.» A teacher sees only their groups, already c
   opciones»). Under 60rem, while «Personalizar» is in sight, it goes
   in a band under the bar of the site, at 60 % of the width and with nothing else; when it is out of sight, it goes back to its place. The frame is not moved.
 - **The logo**: one for light screens and one for dark ones, each on its own background, with «Cambiar».
+- **A group tied to a course category** (in «Pantallas y grupos», on its card): a faculty, a stage or a branch sees its own by a link, with nobody publishing.
 - **«Empezar»** (`start.php`): the first time, with no screen yet, instead of an empty panel; five numbered steps beside the screen. The kind of centre changes only what is proposed
   (its first categories, when its day ends), never what the product does. What comes by itself says what there is right now, in figures. Afterwards, a line on the panel says what is still
   missing, each thing with its link, and goes away by itself.
