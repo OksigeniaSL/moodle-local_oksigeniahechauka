@@ -182,8 +182,11 @@
     font-weight: 500;
     text-decoration: none;
 }
-.hkp-back:hover {
-    text-decoration: underline;
+
+@media (hover: hover) {
+    .hkp-back:hover {
+        text-decoration: underline;
+    }
 }
 
 /* The sections of the panel, for whoever has more than one: a row of tabs as Moodle's tertiary navigation. */
@@ -206,8 +209,11 @@
     font-weight: 500;
     text-decoration: none;
 }
-.hkp-tabs a:hover {
-    background: var(--hkp-chip);
+
+@media (hover: hover) {
+    .hkp-tabs a:hover {
+        background: var(--hkp-chip);
+    }
 }
 .hkp-tabs a[aria-current="page"] {
     background: var(--hkp-accent-tint);
@@ -299,8 +305,11 @@
     color: #7a150f;
     font-weight: 700;
 }
-.hkp-urgent-on .btn:hover {
-    background: #ffe3e0;
+
+@media (hover: hover) {
+    .hkp-urgent-on .btn:hover {
+        background: #ffe3e0;
+    }
 }
 
 /* --- The wall: what each screen shows now ------------------------------------------------------------------------- */
@@ -356,9 +365,12 @@
     overflow: hidden;
     transition: transform .2s var(--hkp-ease), border-color .2s;
 }
-.hkp-screen:hover {
-    border-color: var(--hkp-edge);
-    transform: translateY(-2px);
+
+@media (hover: hover) {
+    .hkp-screen:hover {
+        border-color: var(--hkp-edge);
+        transform: translateY(-2px);
+    }
 }
 .hkp-screen[data-state="down"] {
     border-color: var(--hkp-bad-line);
@@ -479,8 +491,11 @@
     color: var(--hkp-ink);
     text-decoration: none;
 }
-.hkp-screen h3 a:hover {
-    text-decoration: underline;
+
+@media (hover: hover) {
+    .hkp-screen h3 a:hover {
+        text-decoration: underline;
+    }
 }
 /* A link that covers the card, for whoever opens a screen's sheet; the buttons stay above it. */
 .hkp-screen h3 a::after {
@@ -609,9 +624,12 @@
     color: var(--hkp-ink);
     cursor: pointer;
 }
-.hkp-screen.is-add:hover {
-    border-color: var(--hkp-accent);
-    background: var(--hkp-accent-tint);
+
+@media (hover: hover) {
+    .hkp-screen.is-add:hover {
+        border-color: var(--hkp-accent);
+        background: var(--hkp-accent-tint);
+    }
 }
 .hkp-screen.is-add .hkp-i {
     width: 2.2rem;
@@ -667,8 +685,11 @@
     border-radius: var(--hkp-radius);
     background: var(--hkp-card);
 }
-.hkp-item:hover {
-    border-color: var(--hkp-edge);
+
+@media (hover: hover) {
+    .hkp-item:hover {
+        border-color: var(--hkp-edge);
+    }
 }
 .hkp-item-main {
     min-width: 0;
@@ -683,8 +704,11 @@
     color: var(--hkp-ink);
     text-decoration: none;
 }
-.hkp-item-title a:hover {
-    text-decoration: underline;
+
+@media (hover: hover) {
+    .hkp-item-title a:hover {
+        text-decoration: underline;
+    }
 }
 .hkp-item-meta {
     display: flex;
@@ -967,9 +991,12 @@
     touch-action: manipulation;
     transition: background-color .15s, border-color .15s;
 }
-.hkp-chip:hover {
-    border-color: var(--hkp-accent-edge);
-    background: var(--hkp-accent-tint);
+
+@media (hover: hover) {
+    .hkp-chip:hover {
+        border-color: var(--hkp-accent-edge);
+        background: var(--hkp-accent-tint);
+    }
 }
 .hkp-chip input {
     position: absolute;
@@ -1107,8 +1134,11 @@
     width: 1.4rem;
     height: 1.4rem;
 }
-.hkp-types span:hover {
-    background: var(--hkp-chip);
+
+@media (hover: hover) {
+    .hkp-types span:hover {
+        background: var(--hkp-chip);
+    }
 }
 .hkp-types input:checked + span {
     background: var(--hkp-card);
@@ -1709,8 +1739,11 @@
     padding: .2rem .25rem .2rem .3rem;
     border-radius: var(--hkp-radius-sm);
 }
-.hkp-person:hover {
-    background: var(--hkp-chip);
+
+@media (hover: hover) {
+    .hkp-person:hover {
+        background: var(--hkp-chip);
+    }
 }
 .hkp-person small {
     display: block;
@@ -1766,9 +1799,14 @@
     border-radius: calc(var(--hkp-radius-sm) - .1rem);
     cursor: pointer;
 }
-.hkp-listbox li[aria-selected="true"],
-.hkp-listbox li:hover {
+.hkp-listbox li[aria-selected="true"] {
     background: var(--hkp-accent-tint);
+}
+
+@media (hover: hover) {
+    .hkp-listbox li:hover {
+        background: var(--hkp-accent-tint);
+    }
 }
 .hkp-listbox li[aria-disabled="true"] {
     cursor: default;
@@ -2447,8 +2485,10 @@
         /* stylelint-disable-next-line declaration-no-important */
         transition: none !important;
     }
-    .hkp-screen:hover {
-        transform: none;
+    @media (hover: hover) {
+        .hkp-screen:hover {
+            transform: none;
+        }
     }
 }
 
@@ -2490,17 +2530,25 @@ body.hkp-page #page.drawers .main-inner {
     text-decoration: none;
 }
 
-.hkp .hkp-screen .hkp-screen-body h3 a:hover,
 .hkp .hkp-screen .hkp-screen-body h3 a:focus-visible {
     text-decoration: underline;
 }
 
+@media (hover: hover) {
+
+    .hkp .hkp-screen .hkp-screen-body h3 a:hover {
+        text-decoration: underline;
+    }
+}
+
 /* Moodle's dark mode underlines every link of the page's content; the links the panel draws as pieces (the names of
    the screens, the tabs, the card to add a screen) keep the design's look, underlined only on hover or focus. */
-[data-bs-theme] body.hkp-page #region-main .hkp .hkp-screen-body h3 a:not(.btn):not(:hover):not(:focus-visible),
-[data-bs-theme] body.hkp-page #region-main .hkp .hkp-tabs a:not(.btn):not(:hover):not(:focus-visible),
-[data-bs-theme] body.hkp-page #region-main .hkp .hkp-screen.is-add a:not(.btn):not(:hover):not(:focus-visible) {
-    text-decoration: none;
+@media (hover: hover) {
+    [data-bs-theme] body.hkp-page #region-main .hkp .hkp-screen-body h3 a:not(.btn):not(:hover):not(:focus-visible),
+    [data-bs-theme] body.hkp-page #region-main .hkp .hkp-tabs a:not(.btn):not(:hover):not(:focus-visible),
+    [data-bs-theme] body.hkp-page #region-main .hkp .hkp-screen.is-add a:not(.btn):not(:hover):not(:focus-visible) {
+        text-decoration: none;
+    }
 }
 
 /* The form: the two fields of the hours of an event take their size, and the strip leaves a gap between its weeks. */
@@ -2572,9 +2620,12 @@ dialog.hkp-dialog > footer {
     cursor: default;
 }
 
-.hkp-chip.hkp-static:hover {
-    border-color: var(--hkp-edge);
-    background: var(--hkp-chip);
+@media (hover: hover) {
+
+    .hkp-chip.hkp-static:hover {
+        border-color: var(--hkp-edge);
+        background: var(--hkp-chip);
+    }
 }
 
 .hkp-chip-x {
@@ -2587,10 +2638,17 @@ dialog.hkp-dialog > footer {
     color: var(--hkp-muted);
 }
 
-.hkp-chip-x:hover,
 .hkp-chip-x:focus-visible {
     background: var(--hkp-bad-tint);
     color: var(--hkp-bad-ink);
+}
+
+@media (hover: hover) {
+
+    .hkp-chip-x:hover {
+        background: var(--hkp-bad-tint);
+        color: var(--hkp-bad-ink);
+    }
 }
 
 .hkp-chip-x .hkp-i {
@@ -2735,10 +2793,17 @@ dialog.hkp-dialog > footer {
     font-weight: 700;
 }
 
-.hkp .hkp-cat-name:hover,
 .hkp .hkp-cat-name:focus {
     border-color: var(--hkp-edge);
     background: var(--hkp-card);
+}
+
+@media (hover: hover) {
+
+    .hkp .hkp-cat-name:hover {
+        border-color: var(--hkp-edge);
+        background: var(--hkp-card);
+    }
 }
 
 .hkp-cat-link {
@@ -2789,10 +2854,17 @@ dialog.hkp-dialog > footer {
     color: inherit;
 }
 
-.hkp-word button:hover,
 .hkp-word button:focus-visible {
     background: var(--hkp-bad-tint);
     color: var(--hkp-bad-ink);
+}
+
+@media (hover: hover) {
+
+    .hkp-word button:hover {
+        background: var(--hkp-bad-tint);
+        color: var(--hkp-bad-ink);
+    }
 }
 
 .hkp-word button .hkp-i,
@@ -2807,9 +2879,12 @@ dialog.hkp-dialog > footer {
     color: var(--hkp-muted);
 }
 
-.hkp .hkp-word-add:hover {
-    border-color: var(--hkp-accent-edge);
-    color: var(--hkp-accent-ink);
+@media (hover: hover) {
+
+    .hkp .hkp-word-add:hover {
+        border-color: var(--hkp-accent-edge);
+        color: var(--hkp-accent-ink);
+    }
 }
 
 .hkp .hkp-word-input {
@@ -4409,4 +4484,55 @@ dialog.hkp-dialog > footer {
 
 [data-bs-theme="dark"] .hkp-howto-thumb .is-dark {
     display: block;
+}
+/* A Raspberry Pi for the screen (prepare.php): the steps one under the other, and the two ways of telling the card its
+   Moodle side by side when they fit. */
+.hkp-prepare {
+    display: grid;
+    gap: 1rem;
+}
+.hkp-prepare-list {
+    margin: 0 0 1rem;
+    padding-left: 1.25rem;
+}
+.hkp-prepare-list li + li {
+    margin-top: .35rem;
+}
+.hkp-prepare-ways {
+    display: grid;
+    /* stylelint-disable-next-line csstree/validator */
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+    gap: 1rem;
+}
+.hkp-prepare-way {
+    min-width: 0;
+    padding: 1rem 1.1rem;
+    border: 1px solid var(--hkp-line);
+    border-radius: var(--hkp-radius-sm);
+    background: var(--hkp-sunk);
+}
+.hkp-prepare-way h3 {
+    margin: 0 0 .25rem;
+    font-size: 1.05rem;
+    font-weight: 700;
+}
+.hkp-prepare-way > .hkp-hint {
+    margin-bottom: 1rem;
+}
+.hkp-prepare-way label,
+.hkp-prepare-way summary {
+    display: block;
+    margin-bottom: .35rem;
+    font-weight: 600;
+}
+.hkp-prepare-way summary {
+    display: list-item;
+    cursor: pointer;
+}
+.hkp-prepare-way .hkp-field small {
+    display: block;
+}
+.hkp-hint.is-error {
+    color: var(--hkp-bad-ink);
+    font-weight: 600;
 }

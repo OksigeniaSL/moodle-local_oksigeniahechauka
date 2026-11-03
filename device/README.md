@@ -8,8 +8,28 @@ frozen picture or a hung browser recovers by itself.
 
 - `raiz/` is what goes into the device's file system, as it is.
 - `instala.sh` installs it on the first boot of a fresh Raspberry Pi OS (cloud-init runs it from the boot partition).
+- `imagen/` builds the card: `bash device/imagen/construye.sh WORK_FOLDER --xz` makes the card for every centre, the one
+  published with the plugin's releases; its options make a card for one screen.
+- `test/` tests where a screen finds its Moodle: `python3 -B -m unittest discover -s device/test`.
 - `manifest.json` lists every file of `raiz/` with its SHA-256; `manifest.sig` is Oksigenia's Ed25519 signature of it.
   `python3 -B device/manifest.py` makes the manifest; the signature is made apart, with a private key that is not here.
+
+## One card for every centre
+
+The card knows no Moodle. A centre that has installed the plugin prepares its screens by itself, from the panel page
+«A Raspberry Pi for the screen» (`prepare.php`): it writes the image with Raspberry Pi Imager («Use custom», which offers no
+customisation for an image of its own, so nothing overwrites the installation) and tells it its Moodle in one of two ways:
+
+- **a file on the card**: the panel's `hechauka.conf`, copied to the `bootfs` drive, with the address of the player, the
+  name of the screen on the network, its time zone and, if wanted, the SSH keys of whoever looks after it. `instala.sh`
+  reads it (it never runs it) and takes it off the card;
+- **on the screen**: with no address, or one that does not answer, the screen asks for it (`hechauka-ajuste`, port 8080):
+  typed with a keyboard, or from a phone on the same network through the QR it shows, which carries a PIN. It checks that
+  a Moodle with Hechauka answers there (`api/device.php?f=hola`), keeps the address, takes the Moodle's time zone and
+  starts the player, which shows its code to be added from the phone.
+
+A screen that worked once never goes back to asking by itself: without a network it shows what it has. To move it to
+another Moodle, by SSH: `sudo hechauka-direccion aula.example.org`.
 
 ## How a screen keeps itself up to date
 

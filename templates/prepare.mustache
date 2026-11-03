@@ -1,0 +1,85 @@
+{{!
+    This file is part of Moodle - https://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_oksigeniahechauka/prepare
+
+    A Raspberry Pi for a screen: what it needs, writing the card that is the same for every centre, telling it this
+    Moodle's address (a file for the card, or typed on the screen) and switching it on.
+
+    Example context (json):
+    {
+        "action": "#", "sesskey": "abc", "image": "https://example.com/hechauka.img.xz", "imagesize": "1.4 GB",
+        "imager": "https://www.raspberrypi.com/software/", "typed": "moodle.example.org", "name": "", "keys": "",
+        "bad": false, "add": "#", "example": "hechauka-recepcion"
+    }
+}}
+<div class="hkp" id="hkp-prepare-page">
+    <header class="hkp-head"><div class="hkp-head-title"><h1>{{#str}}prepare_title, local_oksigeniahechauka{{/str}}</h1><p class="hkp-hint">{{#str}}prepare_help, local_oksigeniahechauka{{/str}}</p></div></header>
+    <div class="hkp-prepare">
+        <section class="hkp-fs hkp-step" aria-labelledby="hkp-pr-need">
+            <h2 id="hkp-pr-need" class="hkp-label hkp-section-label"><span>1. {{#str}}prepare_need, local_oksigeniahechauka{{/str}}</span></h2>
+            <ul class="hkp-prepare-list">
+                <li>{{#str}}prepare_need_pi, local_oksigeniahechauka{{/str}}</li>
+                <li>{{#str}}prepare_need_card, local_oksigeniahechauka{{/str}}</li>
+                <li>{{#str}}prepare_need_cables, local_oksigeniahechauka{{/str}}</li>
+                <li>{{#str}}prepare_need_computer, local_oksigeniahechauka{{/str}}</li>
+            </ul>
+        </section>
+        <section class="hkp-fs hkp-step" aria-labelledby="hkp-pr-write">
+            <h2 id="hkp-pr-write" class="hkp-label hkp-section-label"><span>2. {{#str}}prepare_write, local_oksigeniahechauka{{/str}}</span></h2>
+            <p class="hkp-hint hkp-section-hint">{{#str}}prepare_write_help, local_oksigeniahechauka{{/str}}</p>
+            <ol class="hkp-prepare-list">
+                <li>{{#str}}prepare_write_image, local_oksigeniahechauka{{/str}}</li>
+                <li>{{#str}}prepare_write_imager, local_oksigeniahechauka{{/str}}</li>
+                <li>{{#str}}prepare_write_steps, local_oksigeniahechauka{{/str}}</li>
+            </ol>
+            <div class="hkp-foot"><a class="btn btn-primary" href="{{image}}">{{#str}}prepare_download, local_oksigeniahechauka, {{imagesize}}{{/str}}</a><a class="btn btn-outline-secondary" href="{{imager}}" target="_blank" rel="noopener">{{#str}}prepare_imager, local_oksigeniahechauka{{/str}}</a></div>
+        </section>
+        <section class="hkp-fs hkp-step" aria-labelledby="hkp-pr-where">
+            <h2 id="hkp-pr-where" class="hkp-label hkp-section-label"><span>3. {{#str}}prepare_where, local_oksigeniahechauka{{/str}}</span></h2>
+            <p class="hkp-hint hkp-section-hint">{{#str}}prepare_where_help, local_oksigeniahechauka{{/str}}</p>
+            <div class="hkp-prepare-ways">
+                <form method="post" action="{{action}}" class="hkp-prepare-way">
+                    <input type="hidden" name="sesskey" value="{{sesskey}}">
+                    <h3>{{#str}}prepare_file, local_oksigeniahechauka{{/str}}</h3>
+                    <p class="hkp-hint">{{#str}}prepare_file_help, local_oksigeniahechauka{{/str}}</p>
+                    <div class="hkp-field">
+                        <label for="hkp-pr-name">{{#str}}prepare_name, local_oksigeniahechauka{{/str}}</label>
+                        <input class="form-control" id="hkp-pr-name" name="name" value="{{name}}" maxlength="40" autocomplete="off" aria-describedby="hkp-pr-name-help">
+                        <small class="hkp-hint" id="hkp-pr-name-help">{{#str}}prepare_name_help, local_oksigeniahechauka, {{example}}{{/str}}</small>
+                    </div>
+                    <details class="hkp-field"{{#bad}} open{{/bad}}{{#keys}} open{{/keys}}>
+                        <summary>{{#str}}prepare_keys, local_oksigeniahechauka{{/str}}</summary>
+                        <textarea class="form-control hkp-mono" id="hkp-pr-keys" name="keys" rows="3" spellcheck="false" aria-label="{{#str}}prepare_keys, local_oksigeniahechauka{{/str}}" aria-describedby="hkp-pr-keys-help"{{#bad}} aria-invalid="true"{{/bad}}>{{keys}}</textarea>
+                        <small class="hkp-hint{{#bad}} is-error{{/bad}}" id="hkp-pr-keys-help">{{#bad}}{{#str}}prepare_keys_bad, local_oksigeniahechauka{{/str}}{{/bad}}{{^bad}}{{#str}}prepare_keys_help, local_oksigeniahechauka{{/str}}{{/bad}}</small>
+                    </details>
+                    <div class="hkp-foot"><button type="submit" class="btn btn-primary">{{#str}}prepare_file_go, local_oksigeniahechauka{{/str}}</button></div>
+                </form>
+                <div class="hkp-prepare-way">
+                    <h3>{{#str}}prepare_type, local_oksigeniahechauka{{/str}}</h3>
+                    <p class="hkp-hint">{{#str}}prepare_type_help, local_oksigeniahechauka{{/str}}</p>
+                    <p class="hkp-start-url"><code>{{typed}}</code></p>
+                </div>
+            </div>
+        </section>
+        <section class="hkp-fs hkp-step" aria-labelledby="hkp-pr-on">
+            <h2 id="hkp-pr-on" class="hkp-label hkp-section-label"><span>4. {{#str}}prepare_on, local_oksigeniahechauka{{/str}}</span></h2>
+            <p class="hkp-hint hkp-section-hint">{{#str}}prepare_on_help, local_oksigeniahechauka{{/str}}</p>
+            <div class="hkp-foot"><a class="btn btn-primary" href="{{add}}">{{#str}}addscreen, local_oksigeniahechauka{{/str}}</a></div>
+        </section>
+    </div>
+</div>

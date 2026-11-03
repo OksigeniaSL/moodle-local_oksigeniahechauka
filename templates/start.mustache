@@ -28,7 +28,7 @@
         "query": "", "searched": false, "results": [], "hasresults": false, "resultsjson": "[]", "place": null,
         "icons": {"search": "", "pin": "", "out": "", "check": ""},
         "sources": [{"id": "s1", "setting": "sourcecalendar", "name": "Calendario", "available": true, "checked": true, "now": "14 eventos", "link": "", "linklabel": ""}],
-        "playerurl": "https://example.com/player/", "paired": false, "screensurl": "#", "home": "#"
+        "playerurl": "https://example.com/player/", "prepareurl": "#", "paired": false, "screensurl": "#", "home": "#"
     }
 }}
 <div class="hkp" id="hkp-start-page"{{#style}} style="{{style}}"{{/style}} data-strings="{{strings}}">
@@ -71,6 +71,7 @@
                 <h2 id="hkp-st-screen" class="hkp-label hkp-section-label"><span>5. {{#str}}start_screen, local_oksigeniahechauka{{/str}}</span><span class="hkp-step-state" data-step="screen" data-done="{{#states.screen.done}}1{{/states.screen.done}}{{^states.screen.done}}0{{/states.screen.done}}">{{states.screen.label}}</span></h2>
                 {{^paired}}<p class="hkp-hint hkp-section-hint">{{#str}}start_screen_help, local_oksigeniahechauka{{/str}}</p>
                 <p class="hkp-start-url"><code>{{playerurl}}</code></p>
+                <p class="hkp-hint"><a href="{{prepareurl}}">{{#str}}prepare, local_oksigeniahechauka{{/str}}</a></p>
                 <div class="hkp-foot"><a class="btn btn-primary" href="{{screensurl}}">{{#str}}start_screen_add, local_oksigeniahechauka{{/str}}</a><a class="btn btn-outline-secondary" href="{{home}}">{{#str}}start_finish, local_oksigeniahechauka{{/str}}</a></div>{{/paired}}
                 {{#paired}}<p class="hkp-hint hkp-section-hint">{{#str}}start_screen_done, local_oksigeniahechauka{{/str}}</p>
                 <div class="hkp-foot"><a class="btn btn-primary" href="{{home}}">{{#str}}start_finish, local_oksigeniahechauka{{/str}}</a></div>{{/paired}}

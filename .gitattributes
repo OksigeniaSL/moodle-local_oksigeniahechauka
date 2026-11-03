@@ -5,3 +5,4 @@
 /docs/guia/img export-ignore
 /docs/guia/*.md export-ignore
 /docs/guia/*.css export-ignore
+/device/test export-ignore

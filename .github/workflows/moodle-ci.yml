@@ -231,3 +231,20 @@ jobs:
         run: |
           npm run build
           git diff --exit-code -- . || { echo "::error::Run npm run build in player/ and commit the bundle"; exit 1; }
+
+  device:
+    # The Raspberry Pi's own software (device/): where a screen finds its Moodle, tested against a pretend one, and the
+    # shell scripts that install and build its card, checked for syntax.
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Check out plugin code
+        uses: actions/checkout@v4
+
+      - name: Tests of the setup of a screen
+        run: python3 -B -m unittest discover -s device/test -v
+
+      - name: Shell scripts
+        run: |
+          for f in device/instala.sh device/imagen/construye.sh device/raiz/usr/local/bin/hechauka-*; do
+            if head -1 "$f" | grep -q bash; then bash -n "$f" && echo "ok $f"; fi
+          done

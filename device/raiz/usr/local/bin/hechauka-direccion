@@ -1,0 +1,6 @@
+#!/bin/bash
+# Where this screen goes, or move it to another Moodle (as root, by SSH):
+#   sudo hechauka-direccion                     the address it has
+#   sudo hechauka-direccion aula.example.org    checks that a Moodle with Hechauka answers there, keeps it and restarts
+#                                               the session; the screen shows a new code to add it in that Moodle
+exec /usr/bin/python3 -B /usr/local/lib/hechauka/ajuste.py --direccion "$@"

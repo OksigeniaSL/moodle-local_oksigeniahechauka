@@ -1,0 +1,255 @@
+/* The setup page of a Hechauka screen: on the television, read from a few metres away and in the look of the screen that
+   shows the code to add it; on a phone, the same question at the size of a hand. */
+:root {
+    --hka-fondo: #f3f5f8;
+    --hka-tinta: #16191d;
+    --hka-suave: #4b5563;
+    --hka-borde: #c7cdd6;
+    --hka-caja: #fff;
+    --hka-error: #b42318;
+}
+html,
+body {
+    margin: 0;
+    height: 100%;
+    background: var(--hka-fondo);
+    color: var(--hka-tinta);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+[hidden] {
+    display: none !important;
+}
+.hka {
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+    min-height: 100%;
+}
+.hka-texto {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+.hka h1,
+.hka p {
+    margin: 0;
+}
+.hka h1 {
+    font-weight: 800;
+    line-height: 1.08;
+}
+.hka-nombre,
+.hka-otro,
+.hka-label,
+.hka-movil-dir {
+    color: var(--hka-suave);
+}
+.hka-label {
+    display: block;
+}
+.hka-fila {
+    display: flex;
+}
+.hka input {
+    flex: 1 1 auto;
+    min-width: 0;
+    box-sizing: border-box;
+    border-style: solid;
+    border-color: var(--hka-borde);
+    background: var(--hka-caja);
+    color: var(--hka-tinta);
+    font: inherit;
+    font-weight: 600;
+}
+.hka input:focus {
+    border-color: var(--hka-tinta);
+    outline: none;
+}
+.hka button {
+    flex: none;
+    border: 0;
+    background: var(--hka-tinta);
+    color: var(--hka-caja);
+    font: inherit;
+    font-weight: 800;
+    cursor: pointer;
+}
+.hka button:focus-visible {
+    outline: 3px solid var(--hka-tinta);
+    outline-offset: 3px;
+}
+.hka button:disabled,
+.hka input:disabled {
+    opacity: .55;
+}
+.hka-estado {
+    font-weight: 600;
+}
+.hka-estado.es-error {
+    color: var(--hka-error);
+}
+.hka-movil {
+    flex: none;
+    text-align: center;
+}
+.hka-movil-titulo {
+    font-weight: 700;
+}
+.hka-qr {
+    background: var(--hka-caja);
+    box-sizing: border-box;
+}
+.hka-qr svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+.hka-movil-dir {
+    font-variant-numeric: tabular-nums;
+}
+.hka-pixel {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 4px;
+    height: 4px;
+    z-index: 10;
+    pointer-events: none;
+}
+
+/* The television: sizes by the shorter side, so that a 4K screen and a portrait one read the same. */
+.es-tele .hka {
+    padding: 7vmin 9vmin;
+}
+.es-tele .hka-nombre {
+    margin-bottom: 2.4vmin;
+    font-size: 2.4vmin;
+}
+.es-tele .hka h1 {
+    font-size: 6.4vmin;
+}
+.es-tele .hka-otro {
+    margin: 1.6vmin 0 6vmin;
+    font-size: 3vmin;
+}
+.es-tele .hka-label {
+    margin-bottom: 2vmin;
+    font-size: 2.8vmin;
+}
+.es-tele .hka-fila {
+    gap: 2vmin;
+}
+.es-tele .hka input {
+    padding: 1.8vmin 2.6vmin;
+    border-width: .4vmin;
+    border-radius: 1.6vmin;
+    font-size: 4.6vmin;
+}
+.es-tele .hka button {
+    padding: 0 4.4vmin;
+    border-radius: 1.6vmin;
+    font-size: 3.8vmin;
+}
+.es-tele .hka-estado {
+    min-height: 2.6em;
+    margin-top: 4vmin;
+    font-size: 3.4vmin;
+    line-height: 1.3;
+}
+.es-tele .hka-movil {
+    width: 40vmin;
+    margin-left: 9vmin;
+}
+.es-tele .hka-movil-titulo {
+    margin-bottom: 2.4vmin;
+    font-size: 2.8vmin;
+    line-height: 1.25;
+}
+.es-tele .hka-qr {
+    width: 40vmin;
+    height: 40vmin;
+    padding: 3vmin;
+    border-radius: 3vmin;
+}
+.es-tele .hka-movil-dir {
+    margin-top: 2.2vmin;
+    font-size: 2.6vmin;
+}
+@media (orientation: portrait) {
+    .es-tele .hka {
+        flex-direction: column;
+        justify-content: center;
+        align-items: stretch;
+    }
+    .es-tele .hka-texto {
+        flex: none;
+    }
+    .es-tele .hka-movil {
+        width: auto;
+        margin: 8vmin 0 0;
+    }
+    .es-tele .hka-qr {
+        margin: 0 auto;
+    }
+}
+
+/* The phone. */
+.es-movil .hka {
+    display: block;
+    padding: 32px 16px;
+}
+.es-movil .hka-nombre {
+    margin-bottom: 12px;
+    font-size: .95rem;
+}
+.es-movil .hka h1 {
+    font-size: 1.7rem;
+}
+.es-movil .hka-otro {
+    margin: 6px 0 28px;
+    font-size: 1rem;
+}
+.es-movil .hka-label {
+    margin-bottom: 10px;
+    font-size: 1rem;
+    line-height: 1.4;
+}
+.es-movil .hka-fila {
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.es-movil .hka input {
+    flex-basis: 14rem;
+    padding: 12px 14px;
+    border-width: 2px;
+    border-radius: 10px;
+    font-size: 1.15rem;
+}
+.es-movil .hka button {
+    flex-grow: 1;
+    padding: 13px 22px;
+    border-radius: 10px;
+    font-size: 1.1rem;
+}
+.es-movil .hka-estado {
+    margin-top: 20px;
+    font-size: 1.05rem;
+    line-height: 1.45;
+}
+@media (prefers-color-scheme: dark) {
+    .es-movil {
+        --hka-fondo: #14171b;
+        --hka-tinta: #eef1f5;
+        --hka-suave: #a9b1bd;
+        --hka-borde: #3a414b;
+        --hka-caja: #1e2228;
+        --hka-error: #ff8a7a;
+    }
+    .es-movil .hka button {
+        color: #14171b;
+    }
+}
+@media (hover: hover) {
+    .hka button:hover:not(:disabled) {
+        opacity: .88;
+    }
+}

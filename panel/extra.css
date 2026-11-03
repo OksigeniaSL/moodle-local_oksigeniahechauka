@@ -1945,3 +1945,53 @@ dialog.hkp-dialog > footer {
 [data-bs-theme="dark"] .hkp-howto-thumb .is-dark {
     display: block;
 }
+/* A Raspberry Pi for the screen (prepare.php): the steps one under the other, and the two ways of telling the card its
+   Moodle side by side when they fit. */
+.hkp-prepare {
+    display: grid;
+    gap: 1rem;
+}
+.hkp-prepare-list {
+    margin: 0 0 1rem;
+    padding-left: 1.25rem;
+}
+.hkp-prepare-list li + li {
+    margin-top: .35rem;
+}
+.hkp-prepare-ways {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+    gap: 1rem;
+}
+.hkp-prepare-way {
+    min-width: 0;
+    padding: 1rem 1.1rem;
+    border: 1px solid var(--hkp-line);
+    border-radius: var(--hkp-radius-sm);
+    background: var(--hkp-sunk);
+}
+.hkp-prepare-way h3 {
+    margin: 0 0 .25rem;
+    font-size: 1.05rem;
+    font-weight: 700;
+}
+.hkp-prepare-way > .hkp-hint {
+    margin-bottom: 1rem;
+}
+.hkp-prepare-way label,
+.hkp-prepare-way summary {
+    display: block;
+    margin-bottom: .35rem;
+    font-weight: 600;
+}
+.hkp-prepare-way summary {
+    display: list-item;
+    cursor: pointer;
+}
+.hkp-prepare-way .hkp-field small {
+    display: block;
+}
+.hkp-hint.is-error {
+    color: var(--hkp-bad-ink);
+    font-weight: 600;
+}

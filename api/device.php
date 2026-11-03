@@ -33,6 +33,21 @@ require(__DIR__ . '/../../../config.php');
 
 $dir = __DIR__ . '/../device/';
 $name = optional_param('f', 'manifest.json', PARAM_PATH);
+
+// What a new screen asks when someone types this Moodle's address on it: that Hechauka is here, the name of the site,
+// to say where it got connected, and its time zone, which the device takes as its own.
+if ($name === 'hola') {
+    header('Content-Type: application/json; charset=utf-8');
+    header('Cache-Control: no-cache');
+    header('X-Content-Type-Options: nosniff');
+    echo json_encode([
+        'hechauka' => 1,
+        'version' => (int) get_config('local_oksigeniahechauka', 'version'),
+        'sitio' => format_string($SITE->fullname, true, ['context' => context_system::instance(), 'escape' => false]),
+        'zona' => core_date::get_server_timezone(),
+    ]);
+    die();
+}
 $manifest = json_decode((string) file_get_contents($dir . 'manifest.json'), true);
 $allowed = ['manifest.json', 'manifest.sig'];
 foreach ($manifest['files'] ?? [] as $entry) {

@@ -12,6 +12,17 @@
         </copyrights>
     </library>
     <library>
+        <location>device/raiz/usr/share/hechauka/ajuste/qrcode.js</location>
+        <name>qrcode-generator</name>
+        <description>Draws, on a Raspberry Pi screen that has no Moodle yet, the QR a phone on the same network scans to type the address. Served by the device itself, without the Internet.</description>
+        <version>2.0.4</version>
+        <license>MIT</license>
+        <repository>https://github.com/kazuhikoarase/qrcode-generator</repository>
+        <copyrights>
+            <copyright>2009 Kazuhiko Arase</copyright>
+        </copyrights>
+    </library>
+    <library>
         <location>player/build/hechauka.js</location>
         <name>qrcode-generator</name>
         <description>Makes the QR of the web of a picture or video on the showcase screens, without a network. Bundled into the player's build with its own code.</description>

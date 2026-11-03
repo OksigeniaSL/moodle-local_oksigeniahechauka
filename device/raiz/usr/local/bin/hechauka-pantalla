@@ -1,8 +1,14 @@
 #!/bin/bash
 # The screen: the agent, which runs Chromium at full screen on the Hechauka player and looks after it. Unlike the board of a
 # classroom, the profile is kept: it holds the key of the screen and the media it shows without a network.
-. /etc/hechauka/pantalla.conf
-export HK_URL="$URL"
+# The page comes from hechauka-ajuste: the player of its Moodle or, while it has none that answers, the page that asks for
+# it. A device installed before it existed goes straight to the address in its conf.
+URL=$(sed -n 's/^URL=//p' /etc/hechauka/pantalla.conf 2>/dev/null | tail -n 1)
+if [ -e /etc/systemd/system/multi-user.target.wants/hechauka-ajuste.service ]; then
+    for i in $(seq 1 150); do [ -s /run/hechauka/destino ] && break; sleep 1; done
+    [ -s /run/hechauka/destino ] && URL=$(head -n 1 /run/hechauka/destino)
+fi
+export HK_URL="${URL:-http://127.0.0.1:8080/}"
 mkdir -p "$HOME/.cache/hechauka"
 # A screen has no mouse, and labwc leaves the pointer in the middle.
 (sleep 4; wlrctl pointer move 10000 10000) >/dev/null 2>&1 &

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<!-- The page a Hechauka screen shows while it has no Moodle that answers: on the television itself and, through the QR, on
+     a phone on the same network. Served by the device (ajuste.py), without the Internet. -->
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hechauka</title>
+<link rel="stylesheet" href="ajuste.css">
+</head>
+<body>
+<main class="hka" id="hka">
+    <div class="hka-texto">
+        <p class="hka-nombre" id="nombre"></p>
+        <h1 id="titulo"></h1>
+        <p class="hka-otro" id="otro" lang="en"></p>
+        <form class="hka-form" id="form" autocomplete="off">
+            <label class="hka-label" for="direccion" id="etiqueta"></label>
+            <div class="hka-fila">
+                <input id="direccion" name="direccion" type="text" inputmode="url" autocapitalize="off" autocorrect="off"
+                       spellcheck="false" enterkeyhint="go" placeholder="moodle.example.org">
+                <button type="submit" id="boton"></button>
+            </div>
+        </form>
+        <p class="hka-estado" id="estado" role="status" aria-live="polite"></p>
+    </div>
+    <aside class="hka-movil" id="movil" hidden>
+        <p class="hka-movil-titulo" id="movil-titulo"></p>
+        <div class="hka-qr" id="qr"></div>
+        <p class="hka-movil-dir" id="movil-dir"></p>
+    </aside>
+</main>
+<script src="qrcode.js"></script>
+<script src="ajuste.js"></script>
+</body>
+</html>

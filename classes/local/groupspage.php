@@ -158,6 +158,7 @@ class groupspage {
             'choosemanagers' => $choose,
             'player' => (new \moodle_url('/local/oksigeniahechauka/player/'))->out(false),
             'claim' => (new \moodle_url('/local/oksigeniahechauka/claim.php'))->out(false),
+            'prepare' => (new \moodle_url('/local/oksigeniahechauka/prepare.php'))->out(false),
             'people' => (new \moodle_url('/local/oksigeniahechauka/people.php'))->out(false),
             'admin' => has_capability('moodle/site:config', \context_system::instance()) ?
                 (new \moodle_url('/admin/settings.php', ['section' => 'local_oksigeniahechauka_settings']))->out(false) : '',

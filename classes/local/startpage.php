@@ -200,6 +200,7 @@ class startpage {
             ],
             'savedword' => get_string('start_saved', $c),
             'playerurl' => $CFG->wwwroot . '/local/oksigeniahechauka/player/',
+            'prepareurl' => (new \moodle_url('/local/oksigeniahechauka/prepare.php'))->out(false),
             'paired' => $paired,
             'screensurl' => (new \moodle_url('/local/oksigeniahechauka/screens.php'))->out(false) . '#add',
             'home' => (new \moodle_url('/local/oksigeniahechauka/index.php'))->out(false),

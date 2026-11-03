@@ -1,0 +1,11 @@
+[Unit]
+Description=Hechauka: where the screen finds its Moodle (asks for it if it has none)
+After=systemd-tmpfiles-setup.service network.target
+Before=display-manager.service
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 -B /usr/local/lib/hechauka/ajuste.py
+
+[Install]
+WantedBy=multi-user.target

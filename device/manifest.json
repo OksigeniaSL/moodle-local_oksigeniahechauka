@@ -42,6 +42,11 @@
   },
   {
    "mode": "644",
+   "path": "/etc/systemd/system/hechauka-ajuste.service",
+   "sha256": "6d64a66484ae85352c34604da73a127f9b41268a4bf33298b8a900ea458644f8"
+  },
+  {
+   "mode": "644",
    "path": "/etc/systemd/system/hechauka-guardian.service",
    "sha256": "e224c0be3bca071f30e22c53a1cd1fb05c28fed59449cd1ecaf00d8b93ab67fa"
   },
@@ -72,13 +77,18 @@
   },
   {
    "mode": "755",
+   "path": "/usr/local/bin/hechauka-direccion",
+   "sha256": "27482e50de8a998e03d5dce03d6a0e1f36a06b09331a26d4f825c7f00183e689"
+  },
+  {
+   "mode": "755",
    "path": "/usr/local/bin/hechauka-mide",
    "sha256": "a53e977b1cdae45b2550aec047ade575f28ac98bf13d5befc98d5bd22378277c"
   },
   {
    "mode": "755",
    "path": "/usr/local/bin/hechauka-pantalla",
-   "sha256": "8da2b6336685d69e0303afa2643c7e06fc8a4e6c82ecbebb08c9d784b1a83582"
+   "sha256": "afd553e829e1ed8be30b4332ab78e241c9ee30f0d8989b8a0dea2f04b4e13ac8"
   },
   {
    "mode": "755",
@@ -97,8 +107,33 @@
   },
   {
    "mode": "755",
+   "path": "/usr/local/lib/hechauka/ajuste.py",
+   "sha256": "d7b1afcfab69e40b808d75f52322c9d32b4c1066d446519a431c8aac22488732"
+  },
+  {
+   "mode": "755",
    "path": "/usr/local/lib/hechauka/guardian.py",
    "sha256": "a1d93534a03520de89afeef8b66f81481247daa5c6caf749a0b0db003e9e64cc"
+  },
+  {
+   "mode": "644",
+   "path": "/usr/share/hechauka/ajuste/ajuste.css",
+   "sha256": "942e7c8692f2f10cce07a3e8b3b307b3c5a50955df43dd609bbaeef7672d853d"
+  },
+  {
+   "mode": "644",
+   "path": "/usr/share/hechauka/ajuste/ajuste.js",
+   "sha256": "62b0a3169bc27293df44d87a0b5b01d3ed50d77cd261ac29bbfb3006ee2d22e0"
+  },
+  {
+   "mode": "644",
+   "path": "/usr/share/hechauka/ajuste/index.html",
+   "sha256": "b389945180149ecc50bd0dd43dd7ddcccfcb96d1e81dc2dbae8b157d73309100"
+  },
+  {
+   "mode": "644",
+   "path": "/usr/share/hechauka/ajuste/qrcode.js",
+   "sha256": "79ec86f82856005b1c887905cfccfcfbec3821ca61c7fd5a952faa5f778f791c"
   },
   {
    "mode": "644",
@@ -246,5 +281,5 @@
    "sha256": "2a75bc7fb95c0cf402ac330202224deec3f0bb6f68c08dc41b6de60c5cad047e"
   }
  ],
- "version": "dcdb72c04b320e9c"
+ "version": "706f982e7be71bfc"
 }

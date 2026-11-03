@@ -1,0 +1,24 @@
+#cloud-config
+# Hechauka screen on a Raspberry Pi (Raspberry Pi OS Trixie, 64 bits). On first boot cloud-init creates the maintenance
+# account and runs hechauka/instala.sh from the boot partition, which installs everything, leaves the Raspberry going
+# straight into the screen session and reboots. It needs a network (cable). Ten to twenty minutes.
+# Maintenance: ssh hechauka@NOMBRE.local with the key put here by construye.sh or brought by the hechauka.conf of the
+# panel (instala.sh). Without a key nobody logs in.
+hostname: NOMBRE
+timezone: ZONA
+locale: es_ES.UTF-8
+keyboard:
+  layout: es
+users:
+  - name: hechauka
+    gecos: Mantenimiento de Hechauka
+    groups: [sudo, adm, video]
+    shell: /bin/bash
+    sudo: "ALL=(ALL) NOPASSWD:ALL"
+    lock_passwd: true
+    ssh_authorized_keys:
+      - LLAVE
+ssh_pwauth: false
+enable_ssh: true
+runcmd:
+  - [bash, -c, "bash /boot/firmware/hechauka/instala.sh > /var/log/hechauka-instala.log 2>&1"]

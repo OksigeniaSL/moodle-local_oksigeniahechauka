@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.10.0
+
+- **One card for every centre.** A centre that has only installed the plugin prepares its Raspberry Pi screens by itself: the panel page «A Raspberry Pi for the screen» says what it takes, links the card's image (published with the plugin's releases) and Raspberry Pi Imager, and gives the file that tells the card which Moodle it belongs to, with the screen's name on the network, its time zone and, if wanted, a maintenance key. «Add a screen» and «Get started» link to it.
+- **A screen with no Moodle asks for it**: on the television, typed with a keyboard, or from a phone on the same network through the QR it shows. It checks that a Moodle with Hechauka answers there and says clearly what went wrong if not (no network, a name that does not exist, a website without Hechauka…), and keeps trying by itself. `sudo hechauka-direccion` moves a screen to another Moodle by SSH.
+- The first boot of a card waits for the clock before updating the system: with the wrong time, the signatures of the repositories were taken as not valid yet and the installation went on with old package lists.
+- Each screen takes a name of its own on the network (from the panel's file, or from its serial number), so two screens of one centre never share one.
+- In the panel, what changes under the pointer only does so on devices with a pointer: a tap on a tablet no longer leaves it stuck.
+
 ## 0.9.4
 
 - **«How it works» speaks**: each piece has its voice, in English and Spanish, and the voice sets the pace of the steps. The frames follow the panel's theme, light or dark, and so do the pictures of the «Guide» tab. The arrow keys change step and the space bar pauses.
