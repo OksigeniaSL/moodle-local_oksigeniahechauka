@@ -108,7 +108,7 @@
   {
    "mode": "755",
    "path": "/usr/local/lib/hechauka/ajuste.py",
-   "sha256": "d7b1afcfab69e40b808d75f52322c9d32b4c1066d446519a431c8aac22488732"
+   "sha256": "09a4837206c321013677766d33021b9e47cc557ffcfdca4d7cc93ff7b2ee38d4"
   },
   {
    "mode": "755",
@@ -118,17 +118,22 @@
   {
    "mode": "644",
    "path": "/usr/share/hechauka/ajuste/ajuste.css",
-   "sha256": "942e7c8692f2f10cce07a3e8b3b307b3c5a50955df43dd609bbaeef7672d853d"
+   "sha256": "02b761b5214ddaad90bab9e6cc383c648b183edc074022200fa0c82a5faee204"
   },
   {
    "mode": "644",
    "path": "/usr/share/hechauka/ajuste/ajuste.js",
-   "sha256": "62b0a3169bc27293df44d87a0b5b01d3ed50d77cd261ac29bbfb3006ee2d22e0"
+   "sha256": "04d88fa058bd328b1c51bb1f7c9965c8c7998a8a874d47b6278679056e86bb86"
   },
   {
    "mode": "644",
    "path": "/usr/share/hechauka/ajuste/index.html",
-   "sha256": "b389945180149ecc50bd0dd43dd7ddcccfcb96d1e81dc2dbae8b157d73309100"
+   "sha256": "9f7f7671afe159b1ab94664a9ebdecb9bb4f56030a9da79adf388572b3cf40cb"
+  },
+  {
+   "mode": "644",
+   "path": "/usr/share/hechauka/ajuste/logotipo.svg",
+   "sha256": "6bf1b1625e3e19d61b77becd3e76bb6e0bc32d4948f8bfbc2cba64fbe33a2133"
   },
   {
    "mode": "644",
@@ -281,5 +286,5 @@
    "sha256": "2a75bc7fb95c0cf402ac330202224deec3f0bb6f68c08dc41b6de60c5cad047e"
   }
  ],
- "version": "706f982e7be71bfc"
+ "version": "7747ac181c3dc3ca"
 }

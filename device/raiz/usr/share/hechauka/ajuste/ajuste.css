@@ -36,6 +36,11 @@ body {
 .hka h1 {
     font-weight: 800;
     line-height: 1.08;
+    text-wrap: balance;
+}
+.hka-logo {
+    display: block;
+    width: auto;
 }
 .hka-nombre,
 .hka-otro,
@@ -116,9 +121,14 @@ body {
     pointer-events: none;
 }
 
-/* The television: sizes by the shorter side, so that a 4K screen and a portrait one read the same. */
+/* The television: sizes by the shorter side, so that a 4K screen and a portrait one read the same. The mark says what
+   device this is, with the face it had while booting. */
 .es-tele .hka {
     padding: 7vmin 9vmin;
+}
+.es-tele .hka-logo {
+    height: 4.4vmin;
+    margin-bottom: 3.2vmin;
 }
 .es-tele .hka-nombre {
     margin-bottom: 2.4vmin;
@@ -196,6 +206,9 @@ body {
 .es-movil .hka {
     display: block;
     padding: 32px 16px;
+}
+.es-movil .hka-logo {
+    display: none;
 }
 .es-movil .hka-nombre {
     margin-bottom: 12px;

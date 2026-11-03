@@ -8,7 +8,7 @@
         es: {
             title: '¿Cuál es la dirección de tu Moodle?',
             label: 'Escríbela con un teclado y pulsa Intro.',
-            labelPhone: 'La de la página de entrada de tu Moodle, la que tiene instalado Hechauka.',
+            labelPhone: 'La que escribes para abrir tu Moodle, el que tiene instalado Hechauka.',
             button: 'Conectar',
             phone: 'O desde el móvil, conectado a la misma red',
             looking: 'Buscando Hechauka en {host}…',
@@ -30,7 +30,7 @@
         en: {
             title: 'What is the address of your Moodle?',
             label: 'Type it with a keyboard and press Enter.',
-            labelPhone: 'The one of the front page of your Moodle, where Hechauka is installed.',
+            labelPhone: 'The one you type to open your Moodle, the one with Hechauka installed.',
             button: 'Connect',
             phone: 'Or from a phone on the same network',
             looking: 'Looking for Hechauka at {host}…',
@@ -115,8 +115,11 @@
         if (s.name) {
             $('nombre').textContent = fill(t.screen, {name: s.name});
         }
-        if (!typed && s.current && !input.value) {
-            input.value = s.current.replace(/^https:\/\//, '');
+        // The address being tried, or the one that failed, stays in the field: whoever looks at the television sees
+        // which one it was and corrects it there, even if it came from a phone.
+        var shown = s.tried || s.current;
+        if (!typed && shown) {
+            input.value = shown.replace(/^https:\/\//, '');
         }
         var message = '';
         if (s.state === 'comprobando') {

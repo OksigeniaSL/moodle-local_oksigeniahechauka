@@ -42,7 +42,7 @@ PORT = 8080
 PLUGIN = '/local/oksigeniahechauka'
 HELLO = PLUGIN + '/api/device.php?f=hola'
 STATIC = {'ajuste.css': 'text/css; charset=utf-8', 'ajuste.js': 'text/javascript; charset=utf-8',
-          'qrcode.js': 'text/javascript; charset=utf-8'}
+          'qrcode.js': 'text/javascript; charset=utf-8', 'logotipo.svg': 'image/svg+xml'}
 WRONG_PINS = 10
 RETRY = 30
 # What can get better by itself, with the network or the clock: the address is tried again.
@@ -276,13 +276,14 @@ class Setup:
         self.error = error.code if error else ''
         self.host = error.host if error else ''
         self.site = ''
+        self.tried = ''
         self.wrong = 0
         self.busy = threading.Lock()
         self.done = threading.Event()
 
     def status(self, local):
         out = {'state': self.state, 'error': self.error, 'host': self.host, 'site': self.site, 'current': self.current,
-               'name': socket.gethostname()}
+               'tried': self.tried, 'name': socket.gethostname()}
         if local:
             out.update(pin=self.pin, ip=address(), port=PORT)
         return out
@@ -303,6 +304,7 @@ class Setup:
         try:
             if self.done.is_set():
                 return
+            self.tried = text.strip()
             self.state, self.error, self.host = 'comprobando', '', urllib.parse.urlsplit(
                 (candidates(text) or [''])[0]).hostname or ''
             try:

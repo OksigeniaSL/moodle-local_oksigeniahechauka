@@ -24,7 +24,7 @@
     {
         "action": "#", "sesskey": "abc", "image": "https://example.com/hechauka.img.xz", "imagesize": "1.4 GB",
         "imager": "https://www.raspberrypi.com/software/", "typed": "moodle.example.org", "name": "", "keys": "",
-        "bad": false, "add": "#", "example": "hechauka-recepcion"
+        "bad": false, "add": "#", "example": "hechauka-recepcion", "icons": {"copy": ""}
     }
 }}
 <div class="hkp" id="hkp-prepare-page">
@@ -51,12 +51,12 @@
         </section>
         <section class="hkp-fs hkp-step" aria-labelledby="hkp-pr-where">
             <h2 id="hkp-pr-where" class="hkp-label hkp-section-label"><span>3. {{#str}}prepare_where, local_oksigeniahechauka{{/str}}</span></h2>
-            <p class="hkp-hint hkp-section-hint">{{#str}}prepare_where_help, local_oksigeniahechauka{{/str}}</p>
+            <p class="hkp-prepare-text">{{#str}}prepare_where_help, local_oksigeniahechauka{{/str}}</p>
             <div class="hkp-prepare-ways">
                 <form method="post" action="{{action}}" class="hkp-prepare-way">
                     <input type="hidden" name="sesskey" value="{{sesskey}}">
                     <h3>{{#str}}prepare_file, local_oksigeniahechauka{{/str}}</h3>
-                    <p class="hkp-hint">{{#str}}prepare_file_help, local_oksigeniahechauka{{/str}}</p>
+                    <p class="hkp-prepare-text">{{#str}}prepare_file_help, local_oksigeniahechauka{{/str}}</p>
                     <div class="hkp-field">
                         <label for="hkp-pr-name">{{#str}}prepare_name, local_oksigeniahechauka{{/str}}</label>
                         <input class="form-control" id="hkp-pr-name" name="name" value="{{name}}" maxlength="40" autocomplete="off" aria-describedby="hkp-pr-name-help">
@@ -71,15 +71,26 @@
                 </form>
                 <div class="hkp-prepare-way">
                     <h3>{{#str}}prepare_type, local_oksigeniahechauka{{/str}}</h3>
-                    <p class="hkp-hint">{{#str}}prepare_type_help, local_oksigeniahechauka{{/str}}</p>
-                    <p class="hkp-start-url"><code>{{typed}}</code></p>
+                    <p class="hkp-prepare-text">{{#str}}prepare_type_help, local_oksigeniahechauka{{/str}}</p>
+                    <div class="hkp-find"><input class="form-control hkp-prepare-address" id="hkp-pr-typed" value="{{typed}}" readonly aria-label="{{#str}}prepare_type, local_oksigeniahechauka{{/str}}"><button type="button" class="btn btn-outline-secondary" data-copy="hkp-pr-typed">{{{icons.copy}}}{{#str}}addscreen_copy, local_oksigeniahechauka{{/str}}</button></div>
                 </div>
             </div>
         </section>
         <section class="hkp-fs hkp-step" aria-labelledby="hkp-pr-on">
             <h2 id="hkp-pr-on" class="hkp-label hkp-section-label"><span>4. {{#str}}prepare_on, local_oksigeniahechauka{{/str}}</span></h2>
-            <p class="hkp-hint hkp-section-hint">{{#str}}prepare_on_help, local_oksigeniahechauka{{/str}}</p>
+            <p class="hkp-prepare-text">{{#str}}prepare_on_help, local_oksigeniahechauka{{/str}}</p>
             <div class="hkp-foot"><a class="btn btn-primary" href="{{add}}">{{#str}}addscreen, local_oksigeniahechauka{{/str}}</a></div>
         </section>
     </div>
 </div>
+{{#js}}
+document.querySelectorAll('#hkp-prepare-page [data-copy]').forEach(function(b) {
+    b.addEventListener('click', function() {
+        var field = document.getElementById(b.getAttribute('data-copy'));
+        field.select();
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(field.value);
+        }
+    });
+});
+{{/js}}

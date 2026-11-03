@@ -4516,8 +4516,16 @@ dialog.hkp-dialog > footer {
     font-size: 1.05rem;
     font-weight: 700;
 }
-.hkp-prepare-way > .hkp-hint {
-    margin-bottom: 1rem;
+.hkp-prepare-text {
+    margin: 0 0 1rem;
+}
+.hkp-prepare-way .hkp-prepare-address {
+    flex: 1 1 auto;
+    min-width: 0;
+    min-height: 3rem;
+    background: var(--hkp-card);
+    font-size: 1.5rem;
+    font-weight: 600;
 }
 .hkp-prepare-way label,
 .hkp-prepare-way summary {

@@ -26,6 +26,7 @@ require(__DIR__ . '/../../config.php');
 
 use local_oksigeniahechauka\local\access;
 use local_oksigeniahechauka\local\card;
+use local_oksigeniahechauka\local\icons;
 
 $c = 'local_oksigeniahechauka';
 $url = new moodle_url('/local/oksigeniahechauka/prepare.php');
@@ -68,5 +69,6 @@ echo $OUTPUT->render_from_template('local_oksigeniahechauka/prepare', [
     'bad' => $bad,
     'add' => (new moodle_url('/local/oksigeniahechauka/screens.php'))->out(false) . '#add',
     'example' => card::hostname(get_string('prepare_name_example', $c)),
+    'icons' => ['copy' => icons::svg('copy')],
 ]);
 echo $OUTPUT->footer();
