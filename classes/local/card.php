@@ -28,9 +28,9 @@ namespace local_oksigeniahechauka\local;
 class card {
     /** @var string The image of the card, compressed: Raspberry Pi Imager writes it as it is. */
     const IMAGE = 'https://github.com/OksigeniaSL/moodle-local_oksigeniahechauka/releases/download/'
-        . 'pantalla-2026-11-03/hechauka-pantalla-2026-11-03.img.xz';
+        . 'pantalla-2026-11-04/hechauka-pantalla-2026-11-04.img.xz';
     /** @var int Its size, to say it on the button. */
-    const IMAGE_SIZE = 1480226880;
+    const IMAGE_SIZE = 1480227928;
     /** @var string Where Raspberry Pi Imager is downloaded. */
     const IMAGER = 'https://www.raspberrypi.com/software/';
     /** @var string The public keys a screen accepts for its maintenance account. */

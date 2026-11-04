@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.10.2
+
+- The card of a Raspberry Pi screen, built again with what 0.10.1 fixed: a new screen with no hours keeps itself up to date from its first day.
+
 ## 0.10.1
 
 - **A screen that is never off keeps itself up to date.** Its device kept what it had downloaded in memory, and the reboot of each night lost it before the day it waited for had gone by, so a screen with no hours could go on for ever without taking a new version. What is ready now stays on the card through a reboot, and goes in during the small hours of the night, before that reboot.
