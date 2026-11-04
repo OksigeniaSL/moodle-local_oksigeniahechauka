@@ -98,7 +98,7 @@
   {
    "mode": "755",
    "path": "/usr/local/lib/hechauka/actualiza.py",
-   "sha256": "2453a48137dd87b347e9246d8900eb78a461b7094e3b7d2df21a194c5c103ccb"
+   "sha256": "7a6757dbbf4583b60a40c1f5dd670ecd66c34113d7690043e128aa937f61ba40"
   },
   {
    "mode": "755",
@@ -286,5 +286,5 @@
    "sha256": "2a75bc7fb95c0cf402ac330202224deec3f0bb6f68c08dc41b6de60c5cad047e"
   }
  ],
- "version": "7747ac181c3dc3ca"
+ "version": "ce391bb855a21b4c"
 }

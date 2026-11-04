@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.10.1
+
+- **A screen that is never off keeps itself up to date.** Its device kept what it had downloaded in memory, and the reboot of each night lost it before the day it waited for had gone by, so a screen with no hours could go on for ever without taking a new version. What is ready now stays on the card through a reboot, and goes in during the small hours of the night, before that reboot.
+- The time a screen has been on no longer jumps when a device with no battery gets the time from the network, and a device that has just started no longer reloads the page that same night.
+
 ## 0.10.0
 
 - **One card for every centre.** A centre that has only installed the plugin prepares its Raspberry Pi screens by itself: the panel page «A Raspberry Pi for the screen» says what it takes, links the card's image (published with the plugin's releases) and Raspberry Pi Imager, and gives the file that tells the card which Moodle it belongs to, with the screen's name on the network, its time zone and, if wanted, a maintenance key. «Add a screen» and «Get started» link to it.

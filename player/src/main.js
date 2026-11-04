@@ -51,7 +51,6 @@ class Player {
         this.mode = boot.mode || 'screen';
         this.strings = boot.strings || {};
         this.root = document.getElementById('hechauka') || document.body;
-        this.startedAt = Date.now();
         this.played = new Played();
         this.heardAt = 0;
         this.turnDue = 0;
@@ -656,7 +655,7 @@ class Player {
     // Once a day, in the small hours, a screen reloads itself: weeks of a page open wear any browser down.
     nightly(wall) {
         // Where the browser keeps nothing, not even the key, a reload would leave the screen asking to be paired.
-        if (this.mode === 'screen' && store.works() && Date.now() - this.startedAt > 20 * 3600000 && wall.min >= 180 && wall.min < 240) {
+        if (this.mode === 'screen' && store.works() && performance.now() > 20 * 3600000 && wall.min >= 180 && wall.min < 240) {
             location.reload();
         }
     }
@@ -730,7 +729,8 @@ class Player {
             time: Math.floor(Date.now() / 1000),
             tz_offset: -new Date().getTimezoneOffset(),
             version: VERSION,
-            uptime: Math.floor((Date.now() - this.startedAt) / 1000),
+            // Not by the wall clock: a Raspberry Pi has no battery, and it jumps when the network gives it the time.
+            uptime: Math.floor(performance.now() / 1000),
             manifest: m ? m.etag : null,
             stale: !!(m && m.horizon && wall.date > m.horizon),
             on: m ? isPowerOn(m.power, wall) : true,

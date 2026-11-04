@@ -2,9 +2,10 @@
 
 Twice a day it asks the plugin for the manifest of the device's software (api/device.php) and its signature. Only a manifest
 signed by Oksigenia (/etc/hechauka/firma.pub) is believed: whoever got into a Moodle cannot send code to its screens. What
-changed is downloaded, each file checked against its hash, and kept aside until the screen is off by its hours (or a day has
-gone by, for one that is never off). Then it goes in, with a copy of what it replaces. If the agent gives no sign of life in
-the next ten minutes, the copy goes back and that version is not tried again.
+changed is downloaded, each file checked against its hash, and kept aside until the screen is off by its hours or, for one
+that is never off, until the small hours of the night (a day at most, for one unplugged at night). What is kept aside
+survives a reboot: the reboot of each night comes before those 24 hours. Then it goes in, with a copy of what it replaces. If
+the agent gives no sign of life in the next ten minutes, the copy goes back and that version is not tried again.
 """
 import hashlib
 import json
@@ -20,6 +21,7 @@ PUB = '/etc/hechauka/firma.pub'
 KEEP = '/var/lib/hechauka'
 INSTALLED = KEEP + '/instalado.json'
 STAGE = KEEP + '/nuevo'
+STAGED = KEEP + '/preparado.json'
 BACKUP = KEEP + '/anterior'
 PENDING = KEEP + '/pendiente.json'
 LOG = '/var/log/hechauka-actualiza.log'
@@ -30,6 +32,8 @@ EVERY = 12 * 3600
 RETRY = 30 * 60                 # after a look that failed
 CONFIRM_WITHIN = 10 * 60
 WAIT_FOR_OFF = 24 * 3600
+# Hours of the night when a screen that is never off takes what is ready: before the reboot of 04:20, with nobody looking.
+NIGHT = (3,)
 LARGEST = 4 * 1024 * 1024
 # What each part of the system needs to take a new file.
 SESSION = ('/usr/local/lib/hechauka/agente.py', '/usr/local/bin/hechauka-pantalla', '/usr/local/bin/hechauka-sesion',
@@ -124,8 +128,32 @@ def run(command):
 class Updater:
     def __init__(self):
         self.next_look = time.time() + FIRST
-        self.staged = None
-        self.staged_at = 0
+        self.staged, self.staged_at = self.restore()
+
+    @staticmethod
+    def restore():
+        """What a previous run left ready, if all of it is still there and is still wanted."""
+        kept = read_json(STAGED, None)
+        if kept is None:
+            return None, 0
+        have = read_json(INSTALLED, {})
+        try:
+            hashes = {e['path']: e['sha256'] for e in kept['files']}
+            whole = all(sha256(STAGE + path) == hashes[path] for path in kept['changed'])
+            if whole and kept['version'] != have.get('version') and kept['version'] not in have.get('bad', []):
+                log('version %s still ready, since %s' % (kept['version'], time.strftime('%F %T', time.localtime(kept['at']))))
+                return {'version': kept['version'], 'files': kept['files'], 'changed': kept['changed']}, kept['at']
+        except (KeyError, TypeError):
+            pass
+        Updater.forget()
+        return None, 0
+
+    @staticmethod
+    def forget():
+        try:
+            os.remove(STAGED)
+        except OSError:
+            pass
 
     def tick(self, now, state, state_age):
         """Called by the guardian every 30 s. Returns True when the guardian itself has to start again."""
@@ -135,7 +163,8 @@ class Updater:
         hurry = os.path.exists(NOW)
         if self.staged:
             off = state is not None and state.get('on') is False
-            if hurry or off or now - self.staged_at > WAIT_FOR_OFF or state_age > 1800:
+            night = time.localtime(now).tm_hour in NIGHT
+            if hurry or off or night or now - self.staged_at > WAIT_FOR_OFF or state_age > 1800:
                 if hurry:
                     os.remove(NOW)
                 return self.install(now)
@@ -184,10 +213,12 @@ class Updater:
             f.write(manifest)
         self.staged = {'version': wanted['version'], 'files': wanted['files'], 'changed': changed}
         self.staged_at = now
+        write_json(STAGED, dict(self.staged, at=int(now)))
         log('version %s ready, %d files: %s' % (wanted['version'], len(changed), ', '.join(changed)[:300]))
 
     def install(self, now):
         staged, self.staged = self.staged, None
+        self.forget()
         modes = {e['path']: e['mode'] for e in staged['files']}
         shutil.rmtree(BACKUP, ignore_errors=True)
         created = []
