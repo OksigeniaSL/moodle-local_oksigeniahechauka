@@ -157,6 +157,35 @@ final class birthdays_test extends \advanced_testcase {
     }
 
     /**
+     * What a management program exports: titles in any order, the surnames apart, the whole date of birth and an ID number.
+     */
+    public function test_a_sheet_with_titles(): void {
+        global $DB;
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        $sheet = "\xEF\xBB\xBFNombre;Apellidos;Curso;Grupo;Expediente;Fecha de nacimiento\r\n" .
+            "Lucía;de la Fuente Martín;1º ESO;ESO 1º A;10234;15/03/2013\r\n" .
+            "Pablo;Ruiz Gómez;5º Primaria;Pri 5º B;9876;02/11/2015\r\n" .
+            "Sin;Fecha;1º ESO;ESO 1º B;555;\r\n";
+        $done = birthdays::import($sheet, true);
+        $this->assertSame(2, $done['added']);
+        $this->assertSame(['Sin;Fecha;1º ESO;ESO 1º B;555;'], $done['wrong']);
+        $this->assertTrue($DB->record_exists(birthdays::TABLE, ['name' => 'Lucía de la Fuente', 'groupname' => 'ESO 1º A',
+            'day' => 15, 'month' => 3, 'idnumber' => '10234']));
+        $this->assertTrue($DB->record_exists(birthdays::TABLE, ['name' => 'Pablo Ruiz', 'groupname' => 'Pri 5º B',
+            'day' => 2, 'month' => 11, 'idnumber' => '9876']));
+
+        // In English, with the year first and the day and month apart in another one.
+        $done = birthdays::import("Student ID,Date of birth,First name,Last name,Class\nA-1,2014-07-09,Emma,Clark,Year 6\n", true);
+        $this->assertSame(1, $done['added']);
+        $this->assertTrue($DB->record_exists(birthdays::TABLE, ['name' => 'Emma Clark', 'groupname' => 'Year 6', 'day' => 9,
+            'month' => 7, 'idnumber' => 'A-1']));
+        $done = birthdays::import("Name\tDay\tMonth\nOmar Haddad\t30\t1\n", true);
+        $this->assertSame(1, $done['added']);
+        $this->assertTrue($DB->record_exists(birthdays::TABLE, ['name' => 'Omar Haddad', 'day' => 30, 'month' => 1]));
+    }
+
+    /**
      * The ID number: a picture named after it finds its person, and the Moodle user with it is not twice.
      */
     public function test_the_idnumber(): void {

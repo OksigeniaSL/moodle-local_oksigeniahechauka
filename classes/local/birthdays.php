@@ -318,6 +318,105 @@ class birthdays {
         }, explode("\n", get_string('model_birthdays', 'local_oksigeniahechauka')));
     }
 
+    /** @var array[] What a column holds, by the words of its title (plain: lower case, without accents); the first wins. */
+    const TITLES = [
+        'name' => ['nombre', 'name', 'first name', 'firstname', 'given name', 'nombre completo', 'full name', 'alumno', 'persona'],
+        'surname' => ['apellidos', 'apellido', 'apellido1', 'apellido 1', 'primer apellido', 'surname', 'surnames', 'last name',
+            'lastname', 'family name'],
+        'group' => ['grupo', 'group', 'clase', 'class', 'unidad', 'curso', 'course', 'form'],
+        'date' => ['fecha de nacimiento', 'fecha nacimiento', 'f nacimiento', 'nacimiento', 'cumpleanos', 'fecha', 'birthday',
+            'date of birth', 'birth date', 'birthdate', 'dob'],
+        'day' => ['dia', 'day'],
+        'month' => ['mes', 'month'],
+        'idnumber' => ['numero de id', 'id number', 'idnumber', 'id', 'expediente', 'n expediente', 'nia', 'matricula', 'student id'],
+    ];
+
+    /** @var string[] Words that go with the surname after them: «de la Fuente» is one surname. */
+    const PARTICLES = ['de', 'del', 'la', 'las', 'los', 'y', 'da', 'das', 'do', 'dos', 'di', 'du', 'van', 'von', 'der', 'den', 'le'];
+
+    /**
+     * The columns of a first line made of titles: what each holds, or null when it is not a line of titles that says at least
+     * the name and the date (or the day and the month).
+     *
+     * @param array $parts the fields of the first line
+     * @return array|null [what => column]
+     */
+    protected static function titles(array $parts): ?array {
+        $plain = array_map(function ($part) {
+            return self::plain_name((string) $part);
+        }, $parts);
+        $map = [];
+        foreach (self::TITLES as $what => $words) {
+            foreach ($words as $word) {
+                $column = array_search($word, $plain, true);
+                if ($column !== false && !in_array($column, $map, true)) {
+                    $map[$what] = $column;
+                    break;
+                }
+            }
+        }
+        $dated = isset($map['date']) || (isset($map['day']) && isset($map['month']));
+        return isset($map['name']) && $dated ? $map : null;
+    }
+
+    /**
+     * The first surname of «Apellidos», as a screen says a name: «de la Fuente Martín» is «de la Fuente».
+     *
+     * @param string $surnames
+     * @return string
+     */
+    protected static function first_surname(string $surnames): string {
+        $out = [];
+        foreach (preg_split('/\s+/u', trim($surnames), -1, PREG_SPLIT_NO_EMPTY) as $word) {
+            $out[] = $word;
+            if (!in_array(\core_text::strtolower($word), self::PARTICLES, true)) {
+                break;
+            }
+        }
+        return implode(' ', $out);
+    }
+
+    /**
+     * The day and the month of a date as a sheet writes it: day first (15/03/2014, 15.3, 15-03-14) or a year first
+     * (2014-03-15, also with its time).
+     *
+     * @param string $date
+     * @return array|null [day, month]
+     */
+    protected static function day_month(string $date): ?array {
+        $date = trim($date);
+        if (preg_match('~^(\d{4})-(\d{1,2})-(\d{1,2})(?:[ T].*)?$~', $date, $m)) {
+            return [(int) $m[3], (int) $m[2]];
+        }
+        if (preg_match('~^(\d{1,2})[/.-](\d{1,2})(?:[/.-]\d{2,4})?$~', $date, $m)) {
+            return [(int) $m[1], (int) $m[2]];
+        }
+        return null;
+    }
+
+    /**
+     * What a line says, read by the titles of its columns.
+     *
+     * @param array $parts the fields of the line
+     * @param array $map [what => column], from titles()
+     * @return array|null [name, group, day, month, idnumber]
+     */
+    protected static function read_titled(array $parts, array $map): ?array {
+        $get = function (string $what) use ($parts, $map): string {
+            return isset($map[$what]) ? trim((string) ($parts[$map[$what]] ?? '')) : '';
+        };
+        $name = trim($get('name') . ' ' . self::first_surname($get('surname')));
+        if (isset($map['date'])) {
+            $date = self::day_month($get('date'));
+        } else {
+            $date = ctype_digit($get('day')) && ctype_digit($get('month')) ? [(int) $get('day'), (int) $get('month')] : null;
+        }
+        if ($name === '' || !$date) {
+            return null;
+        }
+        return [$name, $get('group'), $date[0], $date[1], $get('idnumber')];
+    }
+
     /**
      * What a line says: name, group, day, month and ID number. Two shapes: the model's columns (name, group, day, month and the
      * ID number, if any) or a date at the end («Lucía Pérez; 3.º A; 15/03», the group may be left out). Of a date, the day and
@@ -337,12 +436,12 @@ class birthdays {
         if (count($parts) < 2) {
             return null;
         }
-        $date = array_pop($parts);
-        if (!preg_match('~^(\d{1,2})[/.-](\d{1,2})(?:[/.-]\d{2,4})?$~', $date, $m)) {
+        $date = self::day_month((string) array_pop($parts));
+        if (!$date) {
             return null;
         }
         $name = (string) array_shift($parts);
-        return [$name, implode(' ', $parts), (int) $m[1], (int) $m[2], ''];
+        return [$name, implode(' ', $parts), $date[0], $date[1], ''];
     }
 
     /**
@@ -376,11 +475,19 @@ class birthdays {
         }
         $added = 0;
         $wrong = [];
+        $split = function (string $line) use ($separator): array {
+            return $separator !== null ? str_getcsv($line, $separator, '"', '') : preg_split('/[;\t,]/', $line);
+        };
+        // A first line of titles says what each column holds: what a management program exports, in any order.
+        $map = $lines ? self::titles($split($lines[0])) : null;
+        if ($map) {
+            array_shift($lines);
+        }
         foreach ($lines as $n => $line) {
-            $parts = $separator !== null ? str_getcsv($line, $separator, '"', '') : preg_split('/[;\t,]/', $line);
-            $person = self::read_line($parts);
+            $parts = $split($line);
+            $person = $map ? self::read_titled($parts, $map) : self::read_line($parts);
             if (!$person) {
-                if ($n > 0 || preg_match('/\d/', $line)) {
+                if ($map || $n > 0 || preg_match('/\d/', $line)) {
                     $wrong[] = $line;
                 }
                 continue;
