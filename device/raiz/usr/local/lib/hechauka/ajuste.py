@@ -200,8 +200,8 @@ def hello(base):
 
 
 def follow(text):
-    """Where an address leads after its redirections, as a short link of a link shortener does (nur.click/player): ''
-    when it leads nowhere."""
+    """Where an address leads after its redirections, as a short link of a link shortener does
+    (links.example.org/player): '' when it leads nowhere."""
     places = candidates(text)
     if not places:
         return ''

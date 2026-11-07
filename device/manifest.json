@@ -108,7 +108,7 @@
   {
    "mode": "755",
    "path": "/usr/local/lib/hechauka/ajuste.py",
-   "sha256": "f0ee909dac111d2334adcd82f0a5a323f5123f989a22decc9475f3d0671d9b33"
+   "sha256": "d8b056c4a606c7e3fa3321bb768ea0afd5a60a0a018751c43dfbe0ca83a22588"
   },
   {
    "mode": "755",
@@ -286,5 +286,5 @@
    "sha256": "2a75bc7fb95c0cf402ac330202224deec3f0bb6f68c08dc41b6de60c5cad047e"
   }
  ],
- "version": "654d4fdb7467fc55"
+ "version": "57d0fb4ab48a5d02"
 }
