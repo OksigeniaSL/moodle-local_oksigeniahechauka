@@ -752,6 +752,10 @@ class Player {
             self.played.sent();
             if (r && r.manifest && (!m || r.manifest !== m.etag)) {
                 self.refresh();
+            } else if (m && self.media.errors().length) {
+                // What did not come down (a photo the server was still refusing, the network gone a moment) is asked for
+                // again at each heartbeat, not left until the content changes.
+                self.media.sync(mediaOf(m));
             }
             // Asked from the panel, or a new player on the server: reload at the next change of slide.
             const asked = r && r.commands && r.commands.indexOf('reload') !== -1;

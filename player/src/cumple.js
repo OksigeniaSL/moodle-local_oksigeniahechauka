@@ -2,6 +2,8 @@
 // grown-up at a university: flags in the skin's colours, no balloons and no ages. How many fit depends on the distance it is read
 // from; the composer sends the next page with the next turn. Gaudí, 2 November 2026.
 
+import {bichito} from './bichito.js';
+
 function el(tag, cls, text) {
     const n = document.createElement(tag);
     if (cls) {
@@ -118,14 +120,20 @@ function person(p, media) {
     const a = el('article', 'hk-cumple-persona');
     const face = el('div', 'hk-cumple-cara');
     const src = p.photo ? (media(p.photo) || p.photo.url) : null;
+    // Without a photo, or when it does not arrive, the little creature of their name: never an empty circle.
+    const creature = function () {
+        face.setAttribute('data-tono', String(toneOf(p.name)));
+        face.classList.add('is-bichito');
+        face.innerHTML = bichito(p.name, document.documentElement.getAttribute('data-tema') === 'oscuro');
+    };
     if (src) {
         const im = el('img');
         im.alt = '';
+        im.onerror = creature;
         im.src = src;
         face.appendChild(im);
     } else {
-        face.setAttribute('data-tono', String(toneOf(p.name)));
-        face.appendChild(el('span', '', initialsOf(p.name)));
+        creature();
     }
     a.appendChild(face);
     const t = el('div', 'hk-cumple-texto');

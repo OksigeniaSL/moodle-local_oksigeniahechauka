@@ -96,6 +96,11 @@
 }
 .hk .hk-cumple-cara[data-tono="1"] { background: var(--hk-menu); color: var(--hk-sobre-menu); }
 .hk .hk-cumple-cara[data-tono="2"] { background: var(--hk-evento); color: var(--hk-sobre-evento); }
+.hk .hk-cumple-cara.is-bichito svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
 .hk .hk-cumple-cara img {
     display: block;
     width: 100%;
