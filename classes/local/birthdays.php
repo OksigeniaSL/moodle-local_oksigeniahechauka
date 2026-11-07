@@ -151,12 +151,24 @@ class birthdays {
         $users = self::users_by_idnumber(array_map(function ($row) {
             return (string) $row->idnumber;
         }, $rows));
+        $linked = array_filter(array_map(function ($row) {
+            return (int) ($row->userid ?? 0);
+        }, $rows));
+        $accounts = $linked ? $DB->get_records_list('user', 'id', array_values(array_unique($linked)), '', 'id, picture') : [];
+        $seen = [];
         foreach ($rows as $row) {
-            $user = $users[(string) $row->idnumber] ?? null;
+            // Its account: the one it was linked to, or the one with its ID number.
+            $user = !empty($row->userid) ? ($accounts[(int) $row->userid] ?? null) : ($users[(string) $row->idnumber] ?? null);
             if ($user && in_array((int) $user->id, $ids)) {
                 // Already there, from the profile.
                 continue;
             }
+            // The same person twice (written by hand and brought from Cifra): once.
+            $plain = self::plain_name($row->name);
+            if (isset($seen[$plain])) {
+                continue;
+            }
+            $seen[$plain] = true;
             // Its own picture, or the one of the Moodle user with its ID number.
             $photo = self::list_picture((int) $row->id) ?: ($user && $user->picture ? self::user_picture((int) $user->id) : null);
             $people[] = self::person($row->name, (string) $row->groupname, $photo);
@@ -247,14 +259,16 @@ class birthdays {
                     return true;
                 }
             }
-            // Someone of the list with the ID number of this Moodle user, and only of this one: the picture of their account.
+            // Someone of the list linked to this Moodle account, or with its ID number and only its: the picture of the account.
             $idnumber = (string) $DB->get_field('user', 'idnumber', ['id' => $context->instanceid, 'deleted' => 0]);
-            if ($idnumber === '' || !isset(self::users_by_idnumber([$idnumber])[$idnumber])) {
-                return false;
-            }
+            $byidnumber = $idnumber !== '' && isset(self::users_by_idnumber([$idnumber])[$idnumber]);
             foreach ($dates as $date) {
                 foreach (self::days_of($date) as [$month, $day]) {
-                    if ($DB->record_exists(self::TABLE, ['month' => $month, 'day' => $day, 'idnumber' => $idnumber])) {
+                    if ($DB->record_exists(self::TABLE, ['month' => $month, 'day' => $day, 'userid' => $context->instanceid])) {
+                        return true;
+                    }
+                    $same = ['month' => $month, 'day' => $day, 'idnumber' => $idnumber];
+                    if ($byidnumber && $DB->record_exists(self::TABLE, $same)) {
                         return true;
                     }
                 }
@@ -295,7 +309,8 @@ class birthdays {
      * @param string $idnumber the ID number in Moodle, often the one of enrolment: it matches a picture, or the Moodle user
      * @return int|null the id, or null if the date is no date or there is no name
      */
-    public static function add(string $name, string $group, int $day, int $month, string $idnumber = ''): ?int {
+    public static function add(string $name, string $group, int $day, int $month, string $idnumber = '',
+            string $email = ''): ?int {
         global $DB, $USER;
         $name = \core_text::substr(trim($name), 0, 120);
         $group = \core_text::substr(trim($group), 0, 60);
@@ -305,18 +320,26 @@ class birthdays {
             return null;
         }
         $now = time();
-        $same = $DB->get_record(self::TABLE, ['name' => $name, 'month' => $month, 'day' => $day]);
+        if (!self::$batch) {
+            self::$accounts = null;
+        }
+        $same = $DB->get_record(self::TABLE, ['name' => $name, 'month' => $month, 'day' => $day], '*', IGNORE_MULTIPLE);
+        $idnumber = $idnumber !== '' ? $idnumber : (string) ($same->idnumber ?? '');
+        $userid = self::account($name, $idnumber, $email);
         if ($same) {
             $update = ['id' => $same->id, 'groupname' => $group, 'usermodified' => $USER->id, 'timemodified' => $now];
             if ($idnumber !== '') {
                 $update['idnumber'] = $idnumber;
             }
+            if ($userid) {
+                $update['userid'] = $userid;
+            }
             $DB->update_record(self::TABLE, (object) $update);
             return (int) $same->id;
         }
         return (int) $DB->insert_record(self::TABLE, (object) ['name' => $name, 'groupname' => $group, 'month' => $month,
-            'day' => $day, 'idnumber' => $idnumber !== '' ? $idnumber : null, 'usermodified' => $USER->id, 'timecreated' => $now,
-            'timemodified' => $now]);
+            'day' => $day, 'idnumber' => $idnumber !== '' ? $idnumber : null, 'userid' => $userid ?: null,
+            'usermodified' => $USER->id, 'timecreated' => $now, 'timemodified' => $now]);
     }
 
     /**
@@ -343,11 +366,62 @@ class birthdays {
         'month' => ['mes', 'month'],
         'idnumber' => ['numero de id', 'id number', 'idnumber', 'id', 'expediente', 'n expediente', 'nia', 'matricula',
             'student id'],
+        'email' => ['correo', 'correo electronico', 'email', 'e mail', 'mail'],
     ];
 
     /** @var string[] Words that go with the surname after them: «de la Fuente» is one surname. */
     const PARTICLES = ['de', 'del', 'la', 'las', 'los', 'y', 'da', 'das', 'do', 'dos', 'di', 'du', 'van', 'von', 'der', 'den',
         'le'];
+
+    /** @var string Where a row of the list comes from when Cifra brings it. */
+    const CIFRA = 'cifra';
+
+    /** @var array|null The accounts of the site by ID number, email and name, gathered once for a whole list. */
+    protected static $accounts = null;
+
+    /** @var bool Whether a whole list is being added, so that the accounts are gathered only once. */
+    protected static $batch = false;
+
+    /**
+     * The Moodle account of someone on the list: by ID number, else by email, else by a name only one account has (the
+     * first name and the first surname, or the whole name). Never a guess: two accounts that fit are none.
+     *
+     * @param string $name
+     * @param string $idnumber
+     * @param string $email
+     * @return int the user id, or 0
+     */
+    public static function account(string $name, string $idnumber = '', string $email = ''): int {
+        global $DB, $CFG;
+        if (self::$accounts === null) {
+            $index = ['idnumber' => [], 'email' => [], 'name' => []];
+            $users = $DB->get_recordset_select('user', 'deleted = 0 AND suspended = 0 AND id <> :guest',
+                ['guest' => $CFG->siteguest], '', 'id, idnumber, email, firstname, lastname');
+            foreach ($users as $user) {
+                $id = (int) $user->id;
+                if (trim((string) $user->idnumber) !== '') {
+                    $index['idnumber'][\core_text::strtolower(trim($user->idnumber))][$id] = $id;
+                }
+                if (trim((string) $user->email) !== '') {
+                    $index['email'][\core_text::strtolower(trim($user->email))][$id] = $id;
+                }
+                $index['name'][self::plain_name($user->firstname . ' ' . self::first_surname((string) $user->lastname))][$id] = $id;
+                $index['name'][self::plain_name($user->firstname . ' ' . $user->lastname)][$id] = $id;
+            }
+            $users->close();
+            self::$accounts = $index;
+        }
+        $keys = ['idnumber' => \core_text::strtolower(trim($idnumber)), 'email' => \core_text::strtolower(trim($email)),
+            'name' => self::plain_name($name)];
+        foreach ($keys as $kind => $key) {
+            if ($key === '' || empty(self::$accounts[$kind][$key])) {
+                continue;
+            }
+            $ids = self::$accounts[$kind][$key];
+            return count($ids) === 1 ? (int) reset($ids) : 0;
+        }
+        return 0;
+    }
 
     /**
      * The columns of a first line made of titles: what each holds, or null when it is not a line of titles that says at least
@@ -414,7 +488,7 @@ class birthdays {
      *
      * @param array $parts the fields of the line
      * @param array $map [what => column], from titles()
-     * @return array|null [name, group, day, month, idnumber]
+     * @return array|null [name, group, day, month, idnumber, email]
      */
     protected static function read_titled(array $parts, array $map): ?array {
         $get = function (string $what) use ($parts, $map): string {
@@ -429,7 +503,7 @@ class birthdays {
         if ($name === '' || !$date) {
             return null;
         }
-        return [$name, $get('group'), $date[0], $date[1], $get('idnumber')];
+        return [$name, $get('group'), $date[0], $date[1], $get('idnumber'), $get('email')];
     }
 
     /**
@@ -490,6 +564,8 @@ class birthdays {
         }
         $added = 0;
         $wrong = [];
+        self::$accounts = null;
+        self::$batch = true;
         $split = function (string $line) use ($separator): array {
             return $separator !== null ? str_getcsv($line, $separator, '"', '') : preg_split('/[;\t,]/', $line);
         };
@@ -508,15 +584,18 @@ class birthdays {
                 continue;
             }
             [$name, $group, $day, $month, $idnumber] = $person;
+            $email = (string) ($person[5] ?? '');
             if (in_array(self::plain_name($name) . '|' . $day . '|' . $month, $examples, true)) {
                 continue;
             }
-            if (self::add($name, $group, $day, $month, $idnumber)) {
+            if (self::add($name, $group, $day, $month, $idnumber, $email)) {
                 $added++;
             } else {
                 $wrong[] = $line;
             }
         }
+        self::$accounts = null;
+        self::$batch = false;
         return ['added' => $added, 'wrong' => $wrong];
     }
 
@@ -623,5 +702,97 @@ class birthdays {
     protected static function plain_name(string $name): string {
         $ascii = \core_text::strtolower(\core_text::specialtoascii($name));
         return trim(preg_replace('/[^a-z0-9]+/', ' ', $ascii));
+    }
+
+    /**
+     * The pupils of Cifra on the list, as Cifra has them tonight: who is new comes in, who changed is put right, who was
+     * already there by hand (the same name and day) is taken over with its photo, and who left goes. Nothing is taken from a
+     * list that comes empty when there were people: it would empty the screens by a failure.
+     *
+     * @param array[] $people as Cifra gives them, keyed by its id
+     * @param int $now
+     * @return array {added, updated, adopted, gone, count}
+     */
+    public static function from_cifra(array $people, int $now): array {
+        global $DB, $USER;
+        $have = [];
+        foreach ($DB->get_records(self::TABLE, ['source' => self::CIFRA], '', 'id, sourcekey') as $row) {
+            $have[(string) $row->sourcekey] = (int) $row->id;
+        }
+        $present = cifra::present($people, $now);
+        $done = ['added' => 0, 'updated' => 0, 'adopted' => 0, 'gone' => 0, 'count' => 0];
+        if (!$present && $have) {
+            throw new \moodle_exception('cifraerrorincomplete', 'local_oksigeniahechauka', '', 'alumnos');
+        }
+        self::$accounts = null;
+        self::$batch = true;
+        $seen = [];
+        foreach ($present as $id => $person) {
+            $date = self::day_month((string) ($person['fecha_nacimiento'] ?? ''));
+            $name = trim(trim((string) ($person['nombre'] ?? '')) . ' ' .
+                self::first_surname(trim((string) ($person['apellido1'] ?? ''))));
+            if (!$date || $name === '' || !checkdate($date[1], $date[0], 2024)) {
+                continue;
+            }
+            $key = (string) ($person['id'] ?? $id);
+            $name = \core_text::substr($name, 0, 120);
+            $group = \core_text::substr(trim((string) ($person['grupo_academico_principal']['etiqueta'] ?? '')), 0, 60);
+            $fields = ['name' => $name, 'groupname' => $group, 'day' => $date[0], 'month' => $date[1],
+                'source' => self::CIFRA, 'sourcekey' => $key, 'usermodified' => $USER->id, 'timemodified' => $now];
+            $userid = self::account($name, '', (string) ($person['email'] ?? ''));
+            if ($userid) {
+                $fields['userid'] = $userid;
+            }
+            if (isset($have[$key])) {
+                $DB->update_record(self::TABLE, (object) (['id' => $have[$key]] + $fields));
+                $done['updated']++;
+            } else {
+                $same = $DB->get_record_select(self::TABLE, 'source IS NULL AND month = :month AND day = :day AND name = :name',
+                    ['month' => $date[1], 'day' => $date[0], 'name' => $name], 'id', IGNORE_MULTIPLE);
+                if ($same) {
+                    $DB->update_record(self::TABLE, (object) (['id' => $same->id] + $fields));
+                    $done['adopted']++;
+                } else {
+                    $DB->insert_record(self::TABLE, (object) ($fields + ['timecreated' => $now]));
+                    $done['added']++;
+                }
+            }
+            $seen[$key] = true;
+        }
+        foreach ($have as $key => $rowid) {
+            if (!isset($seen[$key])) {
+                self::delete($rowid);
+                $done['gone']++;
+            }
+        }
+        self::$accounts = null;
+        self::$batch = false;
+        $done['count'] = count($seen);
+        return $done;
+    }
+
+    /**
+     * The nightly reading of Cifra, when it is on and the site has a connection: what happened is kept for the panel.
+     *
+     * @param int $now
+     * @return string what happened, for the log of the task
+     */
+    public static function sync_cifra(int $now): string {
+        $c = 'local_oksigeniahechauka';
+        if (empty(get_config($c, 'birthdayscifra'))) {
+            return 'off';
+        }
+        $cifra = cifra::of_site();
+        try {
+            if (!$cifra) {
+                throw new \moodle_exception('cifraerrorsettings', $c);
+            }
+            $done = self::from_cifra($cifra->people(), $now);
+        } catch (\moodle_exception $e) {
+            set_config('birthdayscifrastatus', json_encode(['time' => $now, 'error' => $e->getMessage()]), $c);
+            return 'error: ' . $e->errorcode;
+        }
+        set_config('birthdayscifrastatus', json_encode(['time' => $now] + $done), $c);
+        return json_encode($done);
     }
 }

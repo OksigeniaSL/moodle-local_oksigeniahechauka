@@ -149,6 +149,9 @@
         <FIELD NAME="name" TYPE="char" LENGTH="120" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="groupname" TYPE="char" LENGTH="60" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="idnumber" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false" COMMENT="The ID number in Moodle, often the one of enrolment: it matches a picture or the Moodle user"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="The Moodle account of the person, when one fits: by ID number, email or a name only one account has"/>
+        <FIELD NAME="source" TYPE="char" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Where it comes from when not from the panel: cifra"/>
+        <FIELD NAME="sourcekey" TYPE="char" LENGTH="64" NOTNULL="false" SEQUENCE="false" COMMENT="Its key there, to keep it up to date"/>
         <FIELD NAME="month" TYPE="int" LENGTH="2" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="day" TYPE="int" LENGTH="2" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="usermodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
@@ -160,6 +163,8 @@
       </KEYS>
       <INDEXES>
         <INDEX NAME="monthday" UNIQUE="false" FIELDS="month, day"/>
+        <INDEX NAME="userid" UNIQUE="false" FIELDS="userid"/>
+        <INDEX NAME="sourcekey" UNIQUE="false" FIELDS="source, sourcekey"/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="local_oksigeniahechauka_stat" COMMENT="A day of a screen, for the monthly report: seconds it should have been on, seconds it was, seconds the television was on and off, and what came out.">

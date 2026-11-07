@@ -101,16 +101,21 @@ class startpage {
                 $days += substr($menu['id'], -4) === '-eve' ? 0 : 1;
             }
         }
-        $rows[] = ['setting' => 'sourcemenu', 'name' => get_string('start_source_menu', $c), 'available' => $meals,
-            'now' => $meals ? self::figure('menu', $days) : get_string('start_source_menu_missing', $c)];
+        // Another Oksigenia plugin's source only where it is installed: nothing is said where it is not.
+        if ($meals) {
+            $rows[] = ['setting' => 'sourcemenu', 'name' => get_string('start_source_menu', $c), 'available' => true,
+                'now' => self::figure('menu', $days)];
+        }
         $hasbooks = sources::has_books();
         $books = 0;
         if ($hasbooks) {
             $list = sources::books($now, (int) ($config->booksdays ?? 14) ?: 14);
             $books = $list ? count($list[0]['books']) : 0;
         }
-        $rows[] = ['setting' => 'sourcebooks', 'name' => get_string('start_source_books', $c), 'available' => $hasbooks,
-            'now' => $hasbooks ? self::figure('books', $books) : get_string('start_source_books_missing', $c)];
+        if ($hasbooks) {
+            $rows[] = ['setting' => 'sourcebooks', 'name' => get_string('start_source_books', $c), 'available' => true,
+                'now' => self::figure('books', $books)];
+        }
         $list = sources::deadlines($now, (int) ($config->deadlinesdays ?? 7) ?: 7);
         $deadlines = 0;
         foreach ($list ? $list[0]['days'] : [] as $day) {

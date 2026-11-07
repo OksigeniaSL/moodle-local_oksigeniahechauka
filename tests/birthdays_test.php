@@ -135,9 +135,13 @@ final class birthdays_test extends \advanced_testcase {
         $this->assertFalse(files::readable($picture));
         birthdays::add('Cerca con ID', '', $day, $month, 'E-1');
         $this->assertTrue(files::readable($picture));
-        // Two accounts with the same ID number: neither picture goes.
-        $this->getDataGenerator()->create_user(['idnumber' => 'E-1']);
-        $this->assertFalse(files::readable($picture));
+        // Two accounts with the same ID number when it is added: it is linked to neither, and no picture goes.
+        $twin = $this->getDataGenerator()->create_user(['idnumber' => 'E-2']);
+        $this->getDataGenerator()->create_user(['idnumber' => 'E-2']);
+        $twinpicture = $fs->create_file_from_string(['contextid' => \context_user::instance($twin->id)->id, 'component' => 'user',
+            'filearea' => 'icon', 'itemid' => 0, 'filepath' => '/', 'filename' => 'f3.png'], 'x');
+        birthdays::add('Gemelo', '', $day, $month, 'E-2');
+        $this->assertFalse(files::readable($twinpicture));
         // Nobody can reach a user's own files by this door.
         $user = $this->getDataGenerator()->create_user();
         $other = $fs->create_file_from_string(['contextid' => \context_user::instance($user->id)->id, 'component' => 'user',
@@ -196,6 +200,131 @@ final class birthdays_test extends \advanced_testcase {
         $done = birthdays::import("Name\tDay\tMonth\nOmar Haddad\t30\t1\n", true);
         $this->assertSame(1, $done['added']);
         $this->assertTrue($DB->record_exists(birthdays::TABLE, ['name' => 'Omar Haddad', 'day' => 30, 'month' => 1]));
+    }
+
+    /**
+     * Someone of the list linked to their Moodle account: by ID number, else by email, else by a name only one account has;
+     * two accounts with the name are none. The picture of a linked account goes on their day.
+     */
+    public function test_linked_to_their_account(): void {
+        global $DB;
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        $gen = $this->getDataGenerator();
+        $byid = $gen->create_user(['firstname' => 'Ana', 'lastname' => 'Ruiz Gil', 'idnumber' => 'E-7']);
+        $bymail = $gen->create_user(['firstname' => 'Bruno', 'lastname' => 'Díaz', 'email' => 'bdiaz@centre.example']);
+        $byname = $gen->create_user(['firstname' => 'Lucía', 'lastname' => 'de la Fuente Martín']);
+        $gen->create_user(['firstname' => 'Pablo', 'lastname' => 'Ruiz']);
+        $gen->create_user(['firstname' => 'Pablo', 'lastname' => 'Ruiz']);
+        [, $month, $day] = array_map('intval', explode('-', schedule::day(time())));
+        $sheet = "Nombre;Apellidos;Grupo;Fecha de nacimiento;Expediente;Correo\n" .
+            "Ana;Ruiz Gil;ESO 1º A;" . $day . "/" . $month . "/2013;E-7;\n" .
+            "Bruno;Díaz;Profesorado;3/4/1980;;bdiaz@centre.example\n" .
+            "Lucía;de la Fuente Martín;Pri 2º B;5/6/2018;;\n" .
+            "Pablo;Ruiz;Secretaría;7/8/1975;;\n";
+        $this->assertSame(4, birthdays::import($sheet, true)['added']);
+        $link = fn(string $name) => (int) $DB->get_field(birthdays::TABLE, 'userid', ['name' => $name]);
+        $this->assertSame((int) $byid->id, $link('Ana Ruiz'));
+        $this->assertSame((int) $bymail->id, $link('Bruno Díaz'));
+        $this->assertSame((int) $byname->id, $link('Lucía de la Fuente'));
+        $this->assertSame(0, $link('Pablo Ruiz'));
+        // One added by hand finds its account too.
+        $one = birthdays::add('Bruno Díaz', '', 3, 4);
+        $this->assertSame((int) $bymail->id, (int) $DB->get_field(birthdays::TABLE, 'userid', ['id' => $one]));
+
+        // The picture of a linked account, on their day.
+        set_config('sourcebirthdays', 1, 'local_oksigeniahechauka');
+        $picture = get_file_storage()->create_file_from_string(['contextid' => \context_user::instance($byid->id)->id,
+            'component' => 'user', 'filearea' => 'icon', 'itemid' => 0, 'filepath' => '/', 'filename' => 'f3.png'],
+            base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=='));
+        $this->assertTrue(files::readable($picture));
+        $DB->set_field('user', 'picture', $picture->get_id(), ['id' => $byid->id]);
+        $today = birthdays::on(get_config('local_oksigeniahechauka'), schedule::day(time()));
+        $this->assertSame(['Ana Ruiz'], array_column($today, 'name'));
+        $this->assertNotEmpty($today[0]['photo']);
+    }
+
+    /**
+     * The pupils of Cifra: who is new comes in, who was there by hand is taken over, who changed is put right, who left goes,
+     * and an empty list does not empty the screens. The same person twice is shown once.
+     */
+    public function test_from_cifra(): void {
+        global $DB;
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        $pupil = $this->getDataGenerator()->create_user(['firstname' => 'Emma', 'lastname' => 'Clark',
+            'email' => 'emma@centre.example']);
+        $handmade = birthdays::add('Omar Haddad', 'Pri 3º', 30, 1, '881');
+        birthdays::add('Staff Member', 'Secretaría', 2, 2);
+        $person = function (int $id, string $first, string $last, string $born, string $group, string $email = '') {
+            return ['id' => $id, 'nombre' => $first, 'apellido1' => $last, 'apellido2' => 'X', 'fecha_nacimiento' => $born,
+                'email' => $email, 'grupo_academico_principal' => ['etiqueta' => $group], 'fecha_baja' => null];
+        };
+        $people = [
+            11 => $person(11, 'Emma', 'Clark', '2014-07-09', 'Pri 6º A', 'emma@centre.example'),
+            12 => $person(12, 'Omar', 'Haddad', '2017-01-30', 'Pri 3º B'),
+            13 => $person(13, 'Lía', 'Faro', '2015-13-02', 'Pri 5º C'),
+            14 => $person(14, 'Darío', 'Pérez', '', 'Pri 1º A'),
+        ];
+        $done = birthdays::from_cifra($people, time());
+        $this->assertSame(['added' => 1, 'updated' => 0, 'adopted' => 1, 'gone' => 0, 'count' => 2], $done);
+        $emma = $DB->get_record(birthdays::TABLE, ['source' => birthdays::CIFRA, 'sourcekey' => '11']);
+        $this->assertSame((int) $pupil->id, (int) $emma->userid);
+        $this->assertSame('Pri 6º A', $emma->groupname);
+        // Omar was there by hand, with his ID number: now he is Cifra's, the same row.
+        $omar = $DB->get_record(birthdays::TABLE, ['id' => $handmade]);
+        $this->assertSame([birthdays::CIFRA, '12', '881', 'Pri 3º B'],
+            [$omar->source, $omar->sourcekey, $omar->idnumber, $omar->groupname]);
+        // A date that is not one, and no date: out.
+        $this->assertFalse($DB->record_exists(birthdays::TABLE, ['sourcekey' => '13']));
+        $this->assertFalse($DB->record_exists(birthdays::TABLE, ['sourcekey' => '14']));
+
+        // Next night: Emma changed group, Omar left; the staff, written by hand, stays.
+        $people[11]['grupo_academico_principal']['etiqueta'] = 'ESO 1º A';
+        $people[12]['fecha_baja'] = '2026-01-01T00:00:00+01:00';
+        $done = birthdays::from_cifra($people, time());
+        $this->assertSame(1, $done['updated']);
+        $this->assertSame(1, $done['gone']);
+        $this->assertSame('ESO 1º A', $DB->get_field(birthdays::TABLE, 'groupname', ['sourcekey' => '11']));
+        $this->assertFalse($DB->record_exists(birthdays::TABLE, ['id' => $handmade]));
+        $this->assertTrue($DB->record_exists(birthdays::TABLE, ['name' => 'Staff Member']));
+
+        // A list that comes empty takes nobody away.
+        try {
+            birthdays::from_cifra([], time());
+            $this->fail('An empty list was taken.');
+        } catch (\moodle_exception $e) {
+            $this->assertSame('cifraerrorincomplete', $e->errorcode);
+        }
+        $this->assertTrue($DB->record_exists(birthdays::TABLE, ['sourcekey' => '11']));
+
+        // Written by hand and brought from Cifra too: once on the screen.
+        birthdays::add('Emma Clark', '6A', 9, 7);
+        set_config('sourcebirthdays', 1, 'local_oksigeniahechauka');
+        $this->assertSame(['Emma Clark'], array_column(birthdays::on(get_config('local_oksigeniahechauka'), '2026-07-09'), 'name'));
+
+        // Off, the task does nothing; on without a connection, it says so.
+        $this->assertSame('off', birthdays::sync_cifra(time()));
+        set_config('birthdayscifra', 1, 'local_oksigeniahechauka');
+        $this->assertSame('error: cifraerrorsettings', birthdays::sync_cifra(time()));
+    }
+
+    /**
+     * Someone who asks to be forgotten leaves the list; the rest stays.
+     */
+    public function test_privacy_forgets_a_linked_birthday(): void {
+        global $DB;
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        $user = $this->getDataGenerator()->create_user(['firstname' => 'Ana', 'lastname' => 'Ruiz', 'idnumber' => 'E-9']);
+        birthdays::add('Ana Ruiz', 'ESO 1º A', 1, 3, 'E-9');
+        birthdays::add('Otra Persona', '', 2, 3);
+        $contexts = \local_oksigeniahechauka\privacy\provider::get_contexts_for_userid($user->id);
+        $this->assertCount(1, $contexts);
+        \local_oksigeniahechauka\privacy\provider::delete_data_for_user(
+            new \core_privacy\local\request\approved_contextlist($user, 'local_oksigeniahechauka', $contexts->get_contextids()));
+        $this->assertFalse($DB->record_exists(birthdays::TABLE, ['userid' => $user->id]));
+        $this->assertTrue($DB->record_exists(birthdays::TABLE, ['name' => 'Otra Persona']));
     }
 
     /**

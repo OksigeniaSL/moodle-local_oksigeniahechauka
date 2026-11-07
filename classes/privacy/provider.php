@@ -30,6 +30,7 @@ use core_privacy\local\request\approved_userlist;
 use core_privacy\local\request\contextlist;
 use core_privacy\local\request\userlist;
 use core_privacy\local\request\writer;
+use local_oksigeniahechauka\local\birthdays;
 
 /**
  * The only things about a person: who created each piece of content of the screens and who changed it last. Screens and
@@ -41,6 +42,9 @@ class provider implements
     \core_privacy\local\request\plugin\provider {
     /** Table of the content. */
     const TABLE = 'local_oksigeniahechauka_item';
+
+    /** @var string The birthdays list, where someone may be linked to their account. */
+    const BIRTHDAYS = 'local_oksigeniahechauka_birthday';
 
     /**
      * What is stored.
@@ -57,6 +61,7 @@ class provider implements
         $collection->add_database_table('local_oksigeniahechauka_birthday', [
             'name' => 'privacy:metadata:birthday:name',
             'groupname' => 'privacy:metadata:birthday:groupname',
+            'userid' => 'privacy:metadata:birthday:userid',
             'month' => 'privacy:metadata:birthday:month',
             'day' => 'privacy:metadata:birthday:day',
             'usermodified' => 'privacy:metadata:birthday:usermodified',
@@ -73,7 +78,8 @@ class provider implements
     public static function get_contexts_for_userid(int $userid): contextlist {
         global $DB;
         $list = new contextlist();
-        if ($DB->record_exists_select(self::TABLE, 'usermodified = :a OR createdby = :b', ['a' => $userid, 'b' => $userid])) {
+        if ($DB->record_exists_select(self::TABLE, 'usermodified = :a OR createdby = :b', ['a' => $userid, 'b' => $userid])
+                || $DB->record_exists(self::BIRTHDAYS, ['userid' => $userid])) {
             $list->add_system_context();
         }
         return $list;
@@ -99,6 +105,7 @@ class provider implements
             'SELECT createdby FROM {' . self::TABLE . '} WHERE createdby > 0',
             []
         );
+        $userlist->add_from_sql('userid', 'SELECT userid FROM {' . self::BIRTHDAYS . '} WHERE userid > 0', []);
     }
 
     /**
@@ -129,10 +136,15 @@ class provider implements
                     'timemodified' => \core_privacy\local\request\transform::datetime($item->timemodified),
                 ];
             }
-            if ($out) {
+            $birthdays = [];
+            foreach ($DB->get_records(self::BIRTHDAYS, ['userid' => $id], 'id', 'id, name, groupname, day, month') as $row) {
+                $birthdays[] = ['name' => $row->name, 'group' => (string) $row->groupname, 'day' => (int) $row->day,
+                    'month' => (int) $row->month];
+            }
+            if ($out || $birthdays) {
                 writer::with_context($context)->export_data(
                     [get_string('pluginname', 'local_oksigeniahechauka')],
-                    (object) ['items' => $out]
+                    (object) ['items' => $out, 'birthdays' => $birthdays]
                 );
             }
         }
@@ -149,6 +161,9 @@ class provider implements
         if ($context->contextlevel == CONTEXT_SYSTEM) {
             $DB->set_field_select(self::TABLE, 'usermodified', 0, 'usermodified > 0');
             $DB->set_field_select(self::TABLE, 'createdby', 0, 'createdby > 0');
+            foreach ($DB->get_fieldset_select(self::BIRTHDAYS, 'id', 'userid > 0') as $rowid) {
+                birthdays::delete((int) $rowid);
+            }
         }
     }
 
@@ -164,6 +179,10 @@ class provider implements
             if ($context->contextlevel == CONTEXT_SYSTEM) {
                 $DB->set_field(self::TABLE, 'usermodified', 0, ['usermodified' => $contextlist->get_user()->id]);
                 $DB->set_field(self::TABLE, 'createdby', 0, ['createdby' => $contextlist->get_user()->id]);
+                // Their birthday leaves the list, with its photo.
+                foreach ($DB->get_fieldset_select(self::BIRTHDAYS, 'id', 'userid = ?', [$contextlist->get_user()->id]) as $rowid) {
+                    birthdays::delete((int) $rowid);
+                }
             }
         }
     }
@@ -182,5 +201,8 @@ class provider implements
         [$in, $params] = $DB->get_in_or_equal($userlist->get_userids(), SQL_PARAMS_NAMED);
         $DB->set_field_select(self::TABLE, 'usermodified', 0, 'usermodified ' . $in, $params);
         $DB->set_field_select(self::TABLE, 'createdby', 0, 'createdby ' . $in, $params);
+        foreach ($DB->get_fieldset_select(self::BIRTHDAYS, 'id', 'userid ' . $in, $params) as $rowid) {
+            birthdays::delete((int) $rowid);
+        }
     }
 }

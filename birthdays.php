@@ -60,6 +60,23 @@ if ($action !== '' && confirm_sesskey()) {
         set_config('sourcebirthdays', optional_param('on', 0, PARAM_BOOL), $c);
         set_config('birthdayfield', isset(birthdays::fields()[$field]) ? $field : '', $c);
         \cache::make($c, 'birthdays')->purge();
+        // The pupils from Cifra, where the site has a connection: read at once when it is turned on, then every night.
+        if (\local_oksigeniahechauka\local\cifra::of_site()) {
+            $cifra = optional_param('cifra', 0, PARAM_BOOL);
+            $was = !empty(get_config($c, 'birthdayscifra'));
+            set_config('birthdayscifra', $cifra ? 1 : 0, $c);
+            if ($cifra && !$was) {
+                \core_php_time_limit::raise(900);
+                birthdays::sync_cifra(time());
+                $status = json_decode((string) get_config($c, 'birthdayscifrastatus'), true) ?: [];
+                if (!empty($status['error'])) {
+                    $message = get_string('birthdays_cifra_error', $c, $status['error']);
+                    $kind = notification::NOTIFY_ERROR;
+                } else {
+                    $message = get_string('birthdays_cifra_done', $c, (object) $status);
+                }
+            }
+        }
     } else if ($action === 'add') {
         $id = birthdays::add(
             optional_param('name', '', PARAM_TEXT),

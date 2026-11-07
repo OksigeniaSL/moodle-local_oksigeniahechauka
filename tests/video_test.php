@@ -90,6 +90,8 @@ final class video_test extends \advanced_testcase {
     public function test_without_ffmpeg(): void {
         global $DB;
         $this->resetAfterTest();
+        // A path that is not there: neither it nor the usual places are looked at (the CI machine has ffmpeg).
+        set_config('ffmpeg', '/nonexistent/ffmpeg', 'local_oksigeniahechauka');
         $id = $this->video_item();
         video::queue($id);
         $data = items::data($DB->get_record('local_oksigeniahechauka_item', ['id' => $id]));

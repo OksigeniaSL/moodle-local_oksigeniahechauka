@@ -45,17 +45,26 @@ class video {
     /** The parts made from the upload. */
     const AREAS = [files::VIDEO, files::POSTER, files::BACKDROP];
 
+    /** @var string[] Where ffmpeg usually is: a package of the system, one built by hand, a static one in a container. */
+    const USUAL = ['/usr/bin/ffmpeg', '/usr/local/bin/ffmpeg', '/opt/ffmpeg/ffmpeg'];
+
     /**
      * The path of ffmpeg, if it is set and can run.
      *
      * @return string|null
      */
     public static function ffmpeg(): ?string {
-        $path = trim((string) get_config('local_oksigeniahechauka', 'ffmpeg'));
-        if ($path === '' || !function_exists('proc_open') || !is_file($path) || !is_executable($path)) {
+        if (!function_exists('proc_open')) {
             return null;
         }
-        return $path;
+        $path = trim((string) get_config('local_oksigeniahechauka', 'ffmpeg'));
+        // Not set: where it usually is, so that a server with ffmpeg needs nothing in the settings.
+        foreach ($path !== '' ? [$path] : self::USUAL as $candidate) {
+            if (is_file($candidate) && is_executable($candidate)) {
+                return $candidate;
+            }
+        }
+        return null;
     }
 
     /**

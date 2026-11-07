@@ -136,44 +136,58 @@ if ($hassiteconfig) {
         $setting->set_updatedcallback($forget);
         $settings->add($setting);
 
+        // The connection with Cifra, a school management program: optional, and once for every Oksigenia plugin of the site.
+        $settings->add(new admin_setting_heading("$p/cifra", get_string('cifra', $p), get_string('cifra_desc', $p)));
+        $settings->add(new admin_setting_configselect("$p/ciframode", get_string('ciframode', $p), '', '', [
+            '' => get_string('ciframode_auto', $p),
+            'oauth' => get_string('ciframode_oauth', $p),
+            'key' => get_string('ciframode_key', $p),
+        ]));
+        $settings->add(new admin_setting_configtext("$p/cifraurl", get_string('cifraurl', $p), get_string('cifraurl_desc', $p),
+            '', PARAM_URL));
+        $settings->add(new admin_setting_configtext("$p/cifraclientid", get_string('cifraclientid', $p), '', '', PARAM_TEXT));
+        $settings->add(new admin_setting_encryptedpassword("$p/cifrasecret", get_string('cifrasecret', $p), ''));
+        $settings->add(new admin_setting_encryptedpassword("$p/cifrakey", get_string('cifrakey', $p),
+            get_string('cifrakey_desc', $p)));
+        $settings->add(new admin_setting_configtext("$p/cifrainternalhosts", get_string('cifrainternalhosts', $p),
+            get_string('cifrainternalhosts_desc', $p), '', PARAM_TEXT));
+
         // What reaches the screens by itself.
         $settings->add(new admin_setting_heading("$p/sources", get_string('sources', $p), ''));
-        $hasmeals = \local_oksigeniahechauka\local\sources::has_meals();
-        $settings->add(new admin_setting_configcheckbox(
-            "$p/sourcemenu",
-            get_string('sourcemenu', $p),
-            $hasmeals ? '' : get_string('sourcemenu_missing', $p),
-            $hasmeals ? 1 : 0
-        ));
-        $settings->add(new admin_setting_configtext(
-            "$p/menucentre",
-            get_string('menucentre', $p),
-            get_string('menucentre_desc', $p),
-            0,
-            PARAM_INT,
-            6
-        ));
-        $settings->add(new admin_setting_configcheckbox(
-            "$p/menuallergens",
-            get_string('menuallergens', $p),
-            get_string('menuallergens_desc', $p),
-            1
-        ));
-        $hasbooks = \local_oksigeniahechauka\local\sources::has_books();
-        $settings->add(new admin_setting_configcheckbox(
-            "$p/sourcebooks",
-            get_string('sourcebooks', $p),
-            $hasbooks ? get_string('sourcebooks_desc', $p) : get_string('sourcebooks_missing', $p),
-            $hasbooks ? 1 : 0
-        ));
-        $settings->add(new admin_setting_configtext(
-            "$p/booksdays",
-            get_string('booksdays', $p),
-            get_string('booksdays_desc', $p),
-            14,
-            PARAM_INT,
-            4
-        ));
+        // What another Oksigenia plugin brings is offered only where it is installed, and nothing is said where it is not.
+        if (\local_oksigeniahechauka\local\sources::has_meals()) {
+            $settings->add(new admin_setting_configcheckbox("$p/sourcemenu", get_string('sourcemenu', $p), '', 1));
+            $settings->add(new admin_setting_configtext(
+                "$p/menucentre",
+                get_string('menucentre', $p),
+                get_string('menucentre_desc', $p),
+                0,
+                PARAM_INT,
+                6
+            ));
+            $settings->add(new admin_setting_configcheckbox(
+                "$p/menuallergens",
+                get_string('menuallergens', $p),
+                get_string('menuallergens_desc', $p),
+                1
+            ));
+        }
+        if (\local_oksigeniahechauka\local\sources::has_books()) {
+            $settings->add(new admin_setting_configcheckbox(
+                "$p/sourcebooks",
+                get_string('sourcebooks', $p),
+                get_string('sourcebooks_desc', $p),
+                1
+            ));
+            $settings->add(new admin_setting_configtext(
+                "$p/booksdays",
+                get_string('booksdays', $p),
+                get_string('booksdays_desc', $p),
+                14,
+                PARAM_INT,
+                4
+            ));
+        }
         $settings->add(new admin_setting_configcheckbox(
             "$p/sourcedeadlines",
             get_string('sourcedeadlines', $p),

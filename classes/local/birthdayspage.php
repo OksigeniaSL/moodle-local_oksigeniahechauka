@@ -77,6 +77,7 @@ class birthdayspage {
                 (new \moodle_url('/admin/tool/uploaduser/picture.php'))->out(false) : '',
             'sesskey' => sesskey(),
             'on' => !empty($config->sourcebirthdays),
+            'cifra' => self::cifra($config),
             'fields' => $fields,
             'hasfields' => count($fields) > 1,
             'days' => range(1, 31),
@@ -87,5 +88,28 @@ class birthdayspage {
             'today' => implode(', ', $today),
             'hastoday' => (bool) $today,
         ];
+    }
+
+    /**
+     * The pupils from Cifra: offered only where the site has a connection with Cifra, with what the last reading did.
+     *
+     * @param \stdClass $config
+     * @return array|null on, status
+     */
+    protected static function cifra(\stdClass $config): ?array {
+        if (!cifra::of_site()) {
+            return null;
+        }
+        $c = 'local_oksigeniahechauka';
+        $status = json_decode((string) ($config->birthdayscifrastatus ?? ''), true) ?: [];
+        if (!empty($status['error'])) {
+            $text = get_string('birthdays_cifra_error', $c, $status['error']);
+        } else if (isset($status['count'])) {
+            $text = get_string('birthdays_cifra_status', $c, (object) ['count' => $status['count'],
+                'time' => userdate((int) $status['time'], get_string('strftimedatetimeshort', 'langconfig'))]);
+        } else {
+            $text = get_string('birthdays_cifra_help', $c);
+        }
+        return ['on' => !empty($config->birthdayscifra), 'status' => $text];
     }
 }
