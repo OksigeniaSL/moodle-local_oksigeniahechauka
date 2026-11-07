@@ -329,11 +329,13 @@ class birthdays {
             'date of birth', 'birth date', 'birthdate', 'dob'],
         'day' => ['dia', 'day'],
         'month' => ['mes', 'month'],
-        'idnumber' => ['numero de id', 'id number', 'idnumber', 'id', 'expediente', 'n expediente', 'nia', 'matricula', 'student id'],
+        'idnumber' => ['numero de id', 'id number', 'idnumber', 'id', 'expediente', 'n expediente', 'nia', 'matricula',
+            'student id'],
     ];
 
     /** @var string[] Words that go with the surname after them: «de la Fuente» is one surname. */
-    const PARTICLES = ['de', 'del', 'la', 'las', 'los', 'y', 'da', 'das', 'do', 'dos', 'di', 'du', 'van', 'von', 'der', 'den', 'le'];
+    const PARTICLES = ['de', 'del', 'la', 'las', 'los', 'y', 'da', 'das', 'do', 'dos', 'di', 'du', 'van', 'von', 'der', 'den',
+        'le'];
 
     /**
      * The columns of a first line made of titles: what each holds, or null when it is not a line of titles that says at least
