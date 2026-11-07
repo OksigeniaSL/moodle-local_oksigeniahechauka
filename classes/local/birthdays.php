@@ -318,11 +318,12 @@ class birthdays {
         }, explode("\n", get_string('model_birthdays', 'local_oksigeniahechauka')));
     }
 
-    /** @var array[] What a column holds, by the words of its title (plain: lower case, without accents); the first wins. */
+    /** @var array[] What a column holds, by the words of its title (plain: lower case, no accents); the first wins. */
     const TITLES = [
-        'name' => ['nombre', 'name', 'first name', 'firstname', 'given name', 'nombre completo', 'full name', 'alumno', 'persona'],
-        'surname' => ['apellidos', 'apellido', 'apellido1', 'apellido 1', 'primer apellido', 'surname', 'surnames', 'last name',
-            'lastname', 'family name'],
+        'name' => ['nombre', 'name', 'first name', 'firstname', 'given name', 'nombre completo', 'full name', 'alumno',
+            'persona'],
+        'surname' => ['apellidos', 'apellido', 'apellido1', 'apellido 1', 'primer apellido', 'surname', 'surnames',
+            'last name', 'lastname', 'family name'],
         'group' => ['grupo', 'group', 'clase', 'class', 'unidad', 'curso', 'course', 'form'],
         'date' => ['fecha de nacimiento', 'fecha nacimiento', 'f nacimiento', 'nacimiento', 'cumpleanos', 'fecha', 'birthday',
             'date of birth', 'birth date', 'birthdate', 'dob'],
