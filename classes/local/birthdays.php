@@ -728,8 +728,9 @@ class birthdays {
     public static function from_cifra(array $people, int $now): array {
         global $DB, $USER;
         $have = [];
-        foreach ($DB->get_records(self::TABLE, ['source' => self::CIFRA], '', 'id, sourcekey') as $row) {
-            $have[(string) $row->sourcekey] = (int) $row->id;
+        $rows = $DB->get_records(self::TABLE, ['source' => self::CIFRA], '', 'id, sourcekey, name, groupname, day, month, userid');
+        foreach ($rows as $row) {
+            $have[(string) $row->sourcekey] = $row;
         }
         $present = cifra::present($people, $now);
         $done = ['added' => 0, 'updated' => 0, 'adopted' => 0, 'gone' => 0, 'count' => 0];
@@ -756,8 +757,14 @@ class birthdays {
                 $fields['userid'] = $userid;
             }
             if (isset($have[$key])) {
-                $DB->update_record(self::TABLE, (object) (['id' => $have[$key]] + $fields));
-                $done['updated']++;
+                // Only what changed is written: the same person every night is not a change.
+                $old = $have[$key];
+                $same = $old->name === $name && (string) $old->groupname === $group && (int) $old->day === $date[0]
+                    && (int) $old->month === $date[1] && (!$userid || (int) $old->userid === $userid);
+                if (!$same) {
+                    $DB->update_record(self::TABLE, (object) (['id' => $old->id] + $fields));
+                    $done['updated']++;
+                }
             } else {
                 $same = $DB->get_record_select(
                     self::TABLE,
@@ -776,9 +783,9 @@ class birthdays {
             }
             $seen[$key] = true;
         }
-        foreach ($have as $key => $rowid) {
+        foreach ($have as $key => $row) {
             if (!isset($seen[$key])) {
-                self::delete($rowid);
+                self::delete((int) $row->id);
                 $done['gone']++;
             }
         }

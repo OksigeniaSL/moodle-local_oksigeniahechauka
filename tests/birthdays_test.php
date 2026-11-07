@@ -292,6 +292,9 @@ final class birthdays_test extends \advanced_testcase {
         $this->assertSame('ESO 1º A', $DB->get_field(birthdays::TABLE, 'groupname', ['sourcekey' => '11']));
         $this->assertFalse($DB->record_exists(birthdays::TABLE, ['id' => $handmade]));
         $this->assertTrue($DB->record_exists(birthdays::TABLE, ['name' => 'Staff Member']));
+        // The same again: nothing is written.
+        $done = birthdays::from_cifra($people, time());
+        $this->assertSame([0, 0, 0, 0], [$done['added'], $done['updated'], $done['adopted'], $done['gone']]);
 
         // A list that comes empty takes nobody away.
         try {
