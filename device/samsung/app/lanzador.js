@@ -295,9 +295,9 @@
         });
     }
 
-    // The Moodle behind what was typed. A short address (nur.click/player, from the site's own shortener) is followed to
-    // where it leads, and that is what is kept. If the display does not let this page read where it led, the short address
-    // is kept as it was typed: opening it leads to the player all the same.
+    // The Moodle behind what was typed. A short address (links.example.org/player, from the site's own shortener) is
+    // followed to where it leads, and that is what is kept. If the display does not let this page read where it led, the
+    // short address is kept as it was typed: opening it leads to the player all the same.
     function check(text) {
         var u = parse(text);
         var places = u ? candidates(u) : [];
