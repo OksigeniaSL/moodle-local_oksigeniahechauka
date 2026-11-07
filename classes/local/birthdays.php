@@ -169,18 +169,21 @@ class birthdays {
                 continue;
             }
             $seen[$plain] = true;
-            // Its own picture, or the one of the Moodle user with its ID number.
-            $photo = self::list_picture((int) $row->id) ?: ($user && $user->picture ? self::user_picture((int) $user->id) : null);
+            // Its own picture, the one in the families' file, or the one of its Moodle account; none where a no counts.
+            [$allowed, $familyphoto] = self::family_photo($row, $user ? (int) $user->id : 0);
+            $photo = !$allowed ? null : (self::list_picture((int) $row->id) ?: $familyphoto
+                ?: ($user && $user->picture ? self::user_picture((int) $user->id) : null));
             $people[] = self::person($row->name, (string) $row->groupname, $photo);
         }
         if ($ids) {
             foreach ($DB->get_records_list('user', 'id', $ids, '', 'id, firstname, lastname, department, picture') as $user) {
                 // The first name and the first surname: enough to know who it is, and no more.
                 $surname = preg_split('/\s+/', trim((string) $user->lastname))[0];
+                [$allowed, $familyphoto] = self::family_photo(null, (int) $user->id);
                 $people[] = self::person(
                     trim($user->firstname . ' ' . $surname),
                     (string) $user->department,
-                    $user->picture ? self::user_picture((int) $user->id) : null
+                    !$allowed ? null : ($familyphoto ?: ($user->picture ? self::user_picture((int) $user->id) : null))
                 );
             }
         }
@@ -239,49 +242,15 @@ class birthdays {
      * @return bool
      */
     public static function may_show(\stored_file $file): bool {
-        global $DB;
         $config = get_config('local_oksigeniahechauka');
         if (empty($config->sourcebirthdays) || $file->is_directory()) {
             return false;
         }
+        // Only the photos that the birthdays of yesterday, today or tomorrow show, with every rule already applied.
         $now = time();
-        $dates = [schedule::day($now, -1), schedule::day($now), schedule::day($now, 1)];
-        if ($file->get_component() === 'user') {
-            if ($file->get_filearea() !== 'icon' || strpos($file->get_filename(), 'f3.') !== 0) {
-                return false;
-            }
-            $context = \context::instance_by_id($file->get_contextid(), IGNORE_MISSING);
-            if (!$context || (int) $context->contextlevel !== CONTEXT_USER) {
-                return false;
-            }
-            foreach ($dates as $date) {
-                if (in_array((int) $context->instanceid, self::users_on((string) ($config->birthdayfield ?? ''), $date), true)) {
-                    return true;
-                }
-            }
-            // Someone of the list linked to this Moodle account, or with its ID number and only its: the picture of the account.
-            $idnumber = (string) $DB->get_field('user', 'idnumber', ['id' => $context->instanceid, 'deleted' => 0]);
-            $byidnumber = $idnumber !== '' && isset(self::users_by_idnumber([$idnumber])[$idnumber]);
-            foreach ($dates as $date) {
-                foreach (self::days_of($date) as [$month, $day]) {
-                    if ($DB->record_exists(self::TABLE, ['month' => $month, 'day' => $day, 'userid' => $context->instanceid])) {
-                        return true;
-                    }
-                    $same = ['month' => $month, 'day' => $day, 'idnumber' => $idnumber];
-                    if ($byidnumber && $DB->record_exists(self::TABLE, $same)) {
-                        return true;
-                    }
-                }
-            }
-            return false;
-        }
-        $row = $DB->get_record(self::TABLE, ['id' => $file->get_itemid()]);
-        if (!$row) {
-            return false;
-        }
-        foreach ($dates as $date) {
-            foreach (self::days_of($date) as [$month, $day]) {
-                if ((int) $row->month === $month && (int) $row->day === $day) {
+        foreach ([schedule::day($now, -1), schedule::day($now), schedule::day($now, 1)] as $date) {
+            foreach (self::on($config, $date) as $person) {
+                if ((int) ($person['photo']['id'] ?? 0) === (int) $file->get_id()) {
                     return true;
                 }
             }
@@ -818,5 +787,49 @@ class birthdays {
         }
         set_config('birthdayscifrastatus', json_encode(['time' => $now] + $done), $c);
         return json_encode($done);
+    }
+
+    /**
+     * The families' file (Oksigenia Family), when it is on the site with its photos on and the screens take them.
+     *
+     * @return string|null its API class
+     */
+    protected static function family(): ?string {
+        return self::family_available() && get_config('local_oksigeniahechauka', 'birthdaysfamily') !== '0' ?
+            '\\local_oksigeniafamily\\api' : null;
+    }
+
+    /**
+     * Whether the families' file is on the site with its photos on: then the panel offers to take them.
+     *
+     * @return bool
+     */
+    public static function family_available(): bool {
+        $api = '\\local_oksigeniafamily\\api';
+        return class_exists($api) && method_exists($api, 'photos_enabled') && $api::is_available() && $api::photos_enabled();
+    }
+
+    /**
+     * What the families' file says of someone: whether their image may be shown (yes unless a no counts) and its photo.
+     *
+     * @param \stdClass|null $row someone of the list, or null for a Moodle account alone
+     * @param int $userid their account, or 0
+     * @return array [allowed, stored_file|null]
+     */
+    protected static function family_photo(?\stdClass $row, int $userid): array {
+        $api = self::family();
+        if (!$api) {
+            return [true, null];
+        }
+        if ($userid) {
+            return [$api::photo_allowed_for_user($userid), $api::photo_for_user($userid)];
+        }
+        $key = null;
+        if ($row && ($row->source ?? '') === self::CIFRA) {
+            $key = 'cifra:' . $row->sourcekey;
+        } else if ($row && trim((string) $row->idnumber) !== '') {
+            $key = $api::student_key((string) $row->idnumber, 'idnumber');
+        }
+        return $key ? [$api::photo_allowed_for_key($key), $api::photo_for_key($key)] : [true, null];
     }
 }

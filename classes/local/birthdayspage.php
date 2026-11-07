@@ -78,6 +78,7 @@ class birthdayspage {
             'sesskey' => sesskey(),
             'on' => !empty($config->sourcebirthdays),
             'cifra' => self::cifra($config),
+            'family' => birthdays::family_available() ? ['on' => ($config->birthdaysfamily ?? '1') !== '0'] : null,
             'fields' => $fields,
             'hasfields' => count($fields) > 1,
             'days' => range(1, 31),

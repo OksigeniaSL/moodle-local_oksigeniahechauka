@@ -138,7 +138,7 @@ class files {
             return !$file->is_directory() && sources::has_books();
         }
         $listed = $file->get_component() === self::COMPONENT && $file->get_filearea() === self::BIRTHDAY;
-        if ($file->get_component() === 'user' || $listed) {
+        if ($file->get_component() === 'user' || $file->get_component() === 'local_oksigeniafamily' || $listed) {
             return birthdays::may_show($file);
         }
         return false;

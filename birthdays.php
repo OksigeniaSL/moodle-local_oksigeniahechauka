@@ -60,6 +60,9 @@ if ($action !== '' && confirm_sesskey()) {
         set_config('sourcebirthdays', optional_param('on', 0, PARAM_BOOL), $c);
         set_config('birthdayfield', isset(birthdays::fields()[$field]) ? $field : '', $c);
         \cache::make($c, 'birthdays')->purge();
+        if (birthdays::family_available()) {
+            set_config('birthdaysfamily', optional_param('family', 0, PARAM_BOOL) ? 1 : 0, $c);
+        }
         // The pupils from Cifra, where the site has a connection: read at once when it is turned on, then every night.
         if (\local_oksigeniahechauka\local\cifra::of_site()) {
             $cifra = optional_param('cifra', 0, PARAM_BOOL);

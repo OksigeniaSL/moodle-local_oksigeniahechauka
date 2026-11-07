@@ -106,6 +106,7 @@ final class birthdays_test extends \advanced_testcase {
      * A screen reads a picture only with the birthdays on and around that person's day.
      */
     public function test_who_may_be_read(): void {
+        global $DB;
         $this->resetAfterTest();
         $this->setAdminUser();
         $c = 'local_oksigeniahechauka';
@@ -116,8 +117,11 @@ final class birthdays_test extends \advanced_testcase {
         $far = birthdays::add('Lejos', '', $farday, $farmonth);
         $fs = get_file_storage();
         $file = function (int $id) use ($fs) {
-            return $fs->create_file_from_string(['contextid' => files::context()->id, 'component' => files::COMPONENT,
-                'filearea' => files::BIRTHDAY, 'itemid' => $id, 'filepath' => '/', 'filename' => 'p.jpg'], 'x');
+            return $fs->create_file_from_string(
+                ['contextid' => files::context()->id, 'component' => files::COMPONENT,
+                'filearea' => files::BIRTHDAY, 'itemid' => $id, 'filepath' => '/', 'filename' => 'p.png'],
+                base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==')
+            );
         };
         $nearfile = $file($near);
         $farfile = $file($far);
@@ -128,8 +132,10 @@ final class birthdays_test extends \advanced_testcase {
         // The picture of the Moodle account of someone of the list, by their ID number: on their day, not on another.
         $pupil = $this->getDataGenerator()->create_user(['idnumber' => 'E-1']);
         $pupilcontext = \context_user::instance($pupil->id);
+        $png = base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==');
         $picture = $fs->create_file_from_string(['contextid' => $pupilcontext->id, 'component' => 'user', 'filearea' => 'icon',
-            'itemid' => 0, 'filepath' => '/', 'filename' => 'f3.png'], 'x');
+            'itemid' => 0, 'filepath' => '/', 'filename' => 'f3.png'], $png);
+        $DB->set_field('user', 'picture', $picture->get_id(), ['id' => $pupil->id]);
         $this->assertFalse(files::readable($picture));
         birthdays::add('Lejos con ID', '', $farday, $farmonth, 'E-1');
         $this->assertFalse(files::readable($picture));
@@ -139,7 +145,8 @@ final class birthdays_test extends \advanced_testcase {
         $twin = $this->getDataGenerator()->create_user(['idnumber' => 'E-2']);
         $this->getDataGenerator()->create_user(['idnumber' => 'E-2']);
         $twinpicture = $fs->create_file_from_string(['contextid' => \context_user::instance($twin->id)->id, 'component' => 'user',
-            'filearea' => 'icon', 'itemid' => 0, 'filepath' => '/', 'filename' => 'f3.png'], 'x');
+            'filearea' => 'icon', 'itemid' => 0, 'filepath' => '/', 'filename' => 'f3.png'], $png);
+        $DB->set_field('user', 'picture', $twinpicture->get_id(), ['id' => $twin->id]);
         birthdays::add('Gemelo', '', $day, $month, 'E-2');
         $this->assertFalse(files::readable($twinpicture));
         // Nobody can reach a user's own files by this door.
@@ -239,8 +246,8 @@ final class birthdays_test extends \advanced_testcase {
             'component' => 'user', 'filearea' => 'icon', 'itemid' => 0, 'filepath' => '/', 'filename' => 'f3.png'],
             base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==')
         );
-        $this->assertTrue(files::readable($picture));
         $DB->set_field('user', 'picture', $picture->get_id(), ['id' => $byid->id]);
+        $this->assertTrue(files::readable($picture));
         $today = birthdays::on(get_config('local_oksigeniahechauka'), schedule::day(time()));
         $this->assertSame(['Ana Ruiz'], array_column($today, 'name'));
         $this->assertNotEmpty($today[0]['photo']);
