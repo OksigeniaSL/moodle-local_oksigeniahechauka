@@ -71,6 +71,7 @@
                 <h2 id="hkp-st-screen" class="hkp-label hkp-section-label"><span>5. {{#str}}start_screen, local_oksigeniahechauka{{/str}}</span><span class="hkp-step-state" data-step="screen" data-done="{{#states.screen.done}}1{{/states.screen.done}}{{^states.screen.done}}0{{/states.screen.done}}">{{states.screen.label}}</span></h2>
                 {{^paired}}<p class="hkp-hint hkp-section-hint">{{#str}}start_screen_help, local_oksigeniahechauka{{/str}}</p>
                 <p class="hkp-start-url"><code>{{playerurl}}</code></p>
+                {{#playerlong}}<p class="hkp-hint hkp-long-url">{{#str}}addscreen_short, local_oksigeniahechauka, {{playerlong}}{{/str}}</p>{{/playerlong}}
                 <p class="hkp-hint"><a href="{{prepareurl}}">{{#str}}prepare, local_oksigeniahechauka{{/str}}</a></p>
                 <div class="hkp-foot"><a class="btn btn-primary" href="{{screensurl}}">{{#str}}start_screen_add, local_oksigeniahechauka{{/str}}</a><a class="btn btn-outline-secondary" href="{{home}}">{{#str}}start_finish, local_oksigeniahechauka{{/str}}</a></div>{{/paired}}
                 {{#paired}}<p class="hkp-hint hkp-section-hint">{{#str}}start_screen_done, local_oksigeniahechauka{{/str}}</p>

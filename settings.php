@@ -107,6 +107,35 @@ if ($hassiteconfig) {
             0
         ));
 
+        // The short address of the player, through a link shortener that speaks the API of YOURLS.
+        $forget = '\local_oksigeniahechauka\local\playerlink::forget';
+        $settings->add(new admin_setting_heading("$p/shortlinks", get_string('shortlinks', $p), get_string('shortlinks_desc', $p)));
+        $setting = new admin_setting_configtext(
+            "$p/shortenerapi",
+            get_string('shortenerapi', $p),
+            get_string('shortenerapi_desc', $p),
+            '',
+            PARAM_URL
+        );
+        $setting->set_updatedcallback($forget);
+        $settings->add($setting);
+        $settings->add(new admin_setting_configpasswordunmask(
+            "$p/shortenerkey",
+            get_string('shortenerkey', $p),
+            get_string('shortenerkey_desc', $p),
+            ''
+        ));
+        $setting = new admin_setting_configtext(
+            "$p/shortkeyword",
+            get_string('shortkeyword', $p),
+            get_string('shortkeyword_desc', $p),
+            \local_oksigeniahechauka\local\playerlink::KEYWORD,
+            PARAM_ALPHANUMEXT,
+            20
+        );
+        $setting->set_updatedcallback($forget);
+        $settings->add($setting);
+
         // What reaches the screens by itself.
         $settings->add(new admin_setting_heading("$p/sources", get_string('sources', $p), ''));
         $hasmeals = \local_oksigeniahechauka\local\sources::has_meals();

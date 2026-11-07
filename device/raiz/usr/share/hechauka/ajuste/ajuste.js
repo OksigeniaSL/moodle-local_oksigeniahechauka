@@ -7,8 +7,8 @@
     var TEXTS = {
         es: {
             title: '¿Cuál es la dirección de tu Moodle?',
-            label: 'Escríbela con un teclado y pulsa Intro.',
-            labelPhone: 'La que escribes para abrir tu Moodle, el que tiene instalado Hechauka.',
+            label: 'Escríbela con un teclado y pulsa Intro. También vale la corta que da el panel en «Añadir una pantalla».',
+            labelPhone: 'La que escribes para abrir tu Moodle, el que tiene instalado Hechauka, o la corta que da su panel en «Añadir una pantalla».',
             button: 'Conectar',
             phone: 'O desde el móvil, conectado a la misma red',
             looking: 'Buscando Hechauka en {host}…',
@@ -29,8 +29,8 @@
         },
         en: {
             title: 'What is the address of your Moodle?',
-            label: 'Type it with a keyboard and press Enter.',
-            labelPhone: 'The one you type to open your Moodle, the one with Hechauka installed.',
+            label: 'Type it with a keyboard and press Enter. The short one the panel gives in «Add a screen» works too.',
+            labelPhone: 'The one you type to open your Moodle, the one with Hechauka installed, or the short one its panel gives in «Add a screen».',
             button: 'Connect',
             phone: 'Or from a phone on the same network',
             looking: 'Looking for Hechauka at {host}…',

@@ -108,7 +108,7 @@
   {
    "mode": "755",
    "path": "/usr/local/lib/hechauka/ajuste.py",
-   "sha256": "09a4837206c321013677766d33021b9e47cc557ffcfdca4d7cc93ff7b2ee38d4"
+   "sha256": "f0ee909dac111d2334adcd82f0a5a323f5123f989a22decc9475f3d0671d9b33"
   },
   {
    "mode": "755",
@@ -123,7 +123,7 @@
   {
    "mode": "644",
    "path": "/usr/share/hechauka/ajuste/ajuste.js",
-   "sha256": "04d88fa058bd328b1c51bb1f7c9965c8c7998a8a874d47b6278679056e86bb86"
+   "sha256": "95d93263292f0a2af7d7a976e44a133879299b1187cd4967354d132f53905964"
   },
   {
    "mode": "644",
@@ -286,5 +286,5 @@
    "sha256": "2a75bc7fb95c0cf402ac330202224deec3f0bb6f68c08dc41b6de60c5cad047e"
   }
  ],
- "version": "ce391bb855a21b4c"
+ "version": "654d4fdb7467fc55"
 }

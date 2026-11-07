@@ -199,6 +199,22 @@ def hello(base):
     return info, base.rstrip('/')
 
 
+def follow(text):
+    """Where an address leads after its redirections, as a short link of a link shortener does (nur.click/player): ''
+    when it leads nowhere."""
+    places = candidates(text)
+    if not places:
+        return ''
+    text = re.sub(r'\s+', '', text)
+    url = text if '://' in text else 'https://' + text
+    request = urllib.request.Request(url, headers={'User-Agent': 'Hechauka device'})
+    try:
+        with urllib.request.urlopen(request, timeout=15) as answer:
+            return answer.geturl()
+    except (urllib.error.URLError, OSError, ValueError):
+        return ''
+
+
 def check(text):
     """The Moodle behind what was typed: (what it says, its address), or Unreachable with the clearest reason."""
     places = candidates(text)
@@ -216,6 +232,14 @@ def check(text):
                 worst = e
             if e.code in ('no-existe', 'no-contesta', 'hora'):
                 break
+    if worst.code == 'sin-hechauka':
+        # There is a site but no Hechauka: maybe a short address that leads to the player.
+        final = follow(text)
+        if PLUGIN in final:
+            try:
+                return hello(base_of(final))
+            except Unreachable:
+                pass
     raise worst
 
 

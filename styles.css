@@ -3729,6 +3729,9 @@ dialog.hkp-dialog > footer {
 .hkp-start-url code {
     overflow-wrap: anywhere;
 }
+.hkp-long-url {
+    overflow-wrap: anywhere;
+}
 .hkp-missing {
     display: flex;
     flex-wrap: wrap;

@@ -133,7 +133,7 @@ class startpage {
      * @return array
      */
     public static function context(string $query, int $now): array {
-        global $DB, $CFG;
+        global $DB;
         $c = 'local_oksigeniahechauka';
         $config = get_config($c);
         // The place, the screen beside it and its words are those of «Tu centro».
@@ -199,7 +199,8 @@ class startpage {
                 'screen' => $state($paired),
             ],
             'savedword' => get_string('start_saved', $c),
-            'playerurl' => $CFG->wwwroot . '/local/oksigeniahechauka/player/',
+            'playerurl' => playerlink::shown(),
+            'playerlong' => playerlink::short() !== '' ? playerlink::long() : '',
             'prepareurl' => (new \moodle_url('/local/oksigeniahechauka/prepare.php'))->out(false),
             'paired' => $paired,
             'screensurl' => (new \moodle_url('/local/oksigeniahechauka/screens.php'))->out(false) . '#add',

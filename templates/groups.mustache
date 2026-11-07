@@ -118,6 +118,7 @@
         <div class="hkp-dialog-body">
             <p class="hkp-block"><b>{{#str}}addscreen_step1, local_oksigeniahechauka{{/str}}</b> {{#str}}addscreen_step1_help, local_oksigeniahechauka{{/str}}</p>
             <div class="hkp-find hkp-block"><input class="form-control is-big hkp-mono" id="hkp-player-url" value="{{player}}" readonly aria-label="{{#str}}addscreen_address, local_oksigeniahechauka{{/str}}"><button type="button" class="btn btn-outline-secondary" data-copy="hkp-player-url">{{{icons.copy}}}{{#str}}addscreen_copy, local_oksigeniahechauka{{/str}}</button></div>
+            {{#playerlong}}<p class="hkp-hint hkp-block hkp-long-url">{{#str}}addscreen_short, local_oksigeniahechauka, {{playerlong}}{{/str}}</p>{{/playerlong}}
             <p class="hkp-hint hkp-block"><a href="{{prepare}}">{{#str}}prepare, local_oksigeniahechauka{{/str}}</a></p>
             <p class="hkp-block"><b>{{#str}}addscreen_step2, local_oksigeniahechauka{{/str}}</b> {{#str}}addscreen_step2_help, local_oksigeniahechauka{{/str}}</p>
             <form method="get" action="{{claim}}" class="hkp-find"><input class="form-control is-big hkp-code" name="code" placeholder="KM7 Q4X" aria-label="{{#str}}addscreen_code, local_oksigeniahechauka{{/str}}" spellcheck="false" autocomplete="off" required><button type="submit" class="btn btn-primary">{{#str}}addscreen_go, local_oksigeniahechauka{{/str}}</button></form>

@@ -30,6 +30,14 @@ class FakeMoodle(http.server.BaseHTTPRequestHandler):
             self.send_response(302)
             self.send_header('Location', '/campus' + ajuste.HELLO)
             body = b''
+        elif self.path == '/player':
+            # A short address of a link shortener, that leads to the player of the Moodle in /campus.
+            self.send_response(302)
+            self.send_header('Location', '/campus' + ajuste.PLUGIN + '/player/')
+            body = b''
+        elif self.path == '/campus' + ajuste.PLUGIN + '/player/':
+            body = b'<html>the player</html>'
+            self.send_response(200)
         else:
             body = b'<html>a website</html>'
             self.send_response(404)
@@ -111,6 +119,11 @@ class WithMoodle(Base):
     def test_follows_a_redirection(self):
         _, base = ajuste.check(self.host + '/viejo')
         self.assertEqual(base, self.host + '/campus')
+
+    def test_a_short_address_leads_to_the_moodle(self):
+        info, base = ajuste.check(self.host + '/player')
+        self.assertEqual(base, self.host + '/campus')
+        self.assertEqual(info['sitio'], 'Centro de ejemplo')
 
     def test_a_website_without_hechauka(self):
         with self.assertRaises(ajuste.Unreachable) as caught:
