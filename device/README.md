@@ -46,3 +46,19 @@ Updating the plugin in a Moodle updates the devices of all its screens. To look 
 
 A centre that changes `raiz/` for its own devices signs its manifest with its own key and puts its public half in
 `raiz/etc/hechauka/firma.pub` of its cards.
+
+## Samsung professional displays, without a Pi
+
+Samsung's professional displays (SSSP, Tizen 4 to 6.5) open a web page through an app that their URL Launcher installs from
+an address. The plugin serves that app next to the player, `player/sssp_config.xml` and `player/Hechauka.wgt`, so the
+address of the player (`https://MOODLE/local/oksigeniahechauka/player/`) is also the one for the URL Launcher. The package
+is the same for every centre: the first time it asks for the address of the Moodle with the remote (the Moodle's own, the
+player's, or a short one that leads to it), checks that Hechauka answers there (`api/device.php?f=hola`) and keeps it; from
+then on it opens the player, and without a network it waits for one.
+
+- `samsung/app/` is the app: plain HTML, CSS and JavaScript for Chromium 56, with nothing from outside.
+- `bash device/samsung/construye.sh` signs it (with the Tizen Studio command line and Oksigenia's Tizen author certificate,
+  both outside the repository) and leaves the two files in `player/`. Each change to the app raises the last number of its
+  version in `app/config.xml`, which the displays compare to update themselves.
+- `python3 -B device/samsung/comprueba.py` checks the package: the app as it is, its size and version, and both signatures
+  with their certificates. `test/test_samsung.py` runs it.

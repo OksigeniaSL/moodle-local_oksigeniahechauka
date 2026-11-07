@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<!-- The first page of a Samsung professional display with Hechauka (SSSP, Tizen 4 and later, Chromium 56): it asks for the
+     address of the Moodle the first time, with the remote, and from then on opens its player. Nothing from outside: it has
+     to show even without a network. -->
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hechauka</title>
+<link rel="stylesheet" href="lanzador.css">
+</head>
+<body>
+<main class="hka" id="hka">
+    <img class="hka-logo" src="logotipo.svg" alt="Hechauka">
+    <h1 id="titulo"></h1>
+    <p class="hka-otro" id="otro"></p>
+    <form class="hka-form" id="form" autocomplete="off" novalidate hidden>
+        <label class="hka-label" for="direccion" id="etiqueta"></label>
+        <div class="hka-fila">
+            <input id="direccion" name="direccion" type="url" autocapitalize="off" autocorrect="off" spellcheck="false"
+                   placeholder="moodle.example.org">
+            <button type="submit" id="conectar"></button>
+        </div>
+        <p class="hka-pista" id="pista"></p>
+    </form>
+    <p class="hka-estado" id="estado" role="status" aria-live="polite"></p>
+    <div class="hka-acciones" id="acciones" hidden>
+        <button type="button" id="cambiar"></button>
+        <button type="button" class="hka-segundo" id="seguir"></button>
+    </div>
+    <div class="hka-barra" id="barra" hidden><div class="hka-barra-llena" id="llena"></div></div>
+</main>
+<script src="lanzador.js"></script>
+</body>
+</html>
