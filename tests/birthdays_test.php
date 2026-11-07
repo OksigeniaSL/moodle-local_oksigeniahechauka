@@ -234,9 +234,11 @@ final class birthdays_test extends \advanced_testcase {
 
         // The picture of a linked account, on their day.
         set_config('sourcebirthdays', 1, 'local_oksigeniahechauka');
-        $picture = get_file_storage()->create_file_from_string(['contextid' => \context_user::instance($byid->id)->id,
+        $picture = get_file_storage()->create_file_from_string(
+            ['contextid' => \context_user::instance($byid->id)->id,
             'component' => 'user', 'filearea' => 'icon', 'itemid' => 0, 'filepath' => '/', 'filename' => 'f3.png'],
-            base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=='));
+            base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==')
+        );
         $this->assertTrue(files::readable($picture));
         $DB->set_field('user', 'picture', $picture->get_id(), ['id' => $byid->id]);
         $today = birthdays::on(get_config('local_oksigeniahechauka'), schedule::day(time()));
@@ -273,8 +275,10 @@ final class birthdays_test extends \advanced_testcase {
         $this->assertSame('Pri 6º A', $emma->groupname);
         // Omar was there by hand, with his ID number: now he is Cifra's, the same row.
         $omar = $DB->get_record(birthdays::TABLE, ['id' => $handmade]);
-        $this->assertSame([birthdays::CIFRA, '12', '881', 'Pri 3º B'],
-            [$omar->source, $omar->sourcekey, $omar->idnumber, $omar->groupname]);
+        $this->assertSame(
+            [birthdays::CIFRA, '12', '881', 'Pri 3º B'],
+            [$omar->source, $omar->sourcekey, $omar->idnumber, $omar->groupname]
+        );
         // A date that is not one, and no date: out.
         $this->assertFalse($DB->record_exists(birthdays::TABLE, ['sourcekey' => '13']));
         $this->assertFalse($DB->record_exists(birthdays::TABLE, ['sourcekey' => '14']));
@@ -322,7 +326,8 @@ final class birthdays_test extends \advanced_testcase {
         $contexts = \local_oksigeniahechauka\privacy\provider::get_contexts_for_userid($user->id);
         $this->assertCount(1, $contexts);
         \local_oksigeniahechauka\privacy\provider::delete_data_for_user(
-            new \core_privacy\local\request\approved_contextlist($user, 'local_oksigeniahechauka', $contexts->get_contextids()));
+            new \core_privacy\local\request\approved_contextlist($user, 'local_oksigeniahechauka', $contexts->get_contextids())
+        );
         $this->assertFalse($DB->record_exists(birthdays::TABLE, ['userid' => $user->id]));
         $this->assertTrue($DB->record_exists(birthdays::TABLE, ['name' => 'Otra Persona']));
     }

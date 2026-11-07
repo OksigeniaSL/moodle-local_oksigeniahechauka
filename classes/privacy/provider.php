@@ -78,8 +78,10 @@ class provider implements
     public static function get_contexts_for_userid(int $userid): contextlist {
         global $DB;
         $list = new contextlist();
-        if ($DB->record_exists_select(self::TABLE, 'usermodified = :a OR createdby = :b', ['a' => $userid, 'b' => $userid])
-                || $DB->record_exists(self::BIRTHDAYS, ['userid' => $userid])) {
+        if (
+            $DB->record_exists_select(self::TABLE, 'usermodified = :a OR createdby = :b', ['a' => $userid, 'b' => $userid])
+                || $DB->record_exists(self::BIRTHDAYS, ['userid' => $userid])
+        ) {
             $list->add_system_context();
         }
         return $list;

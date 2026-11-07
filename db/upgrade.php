@@ -258,17 +258,21 @@ function xmldb_local_oksigeniahechauka_upgrade($oldversion) {
     if ($oldversion < 2026110704) {
         // Someone on the birthdays list linked to their Moodle account, and the list kept up to date from Cifra.
         $table = new xmldb_table('local_oksigeniahechauka_birthday');
-        foreach ([
+        foreach (
+            [
             new xmldb_field('userid', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'idnumber'),
             new xmldb_field('source', XMLDB_TYPE_CHAR, '10', null, null, null, null, 'userid'),
             new xmldb_field('sourcekey', XMLDB_TYPE_CHAR, '64', null, null, null, null, 'source'),
-        ] as $field) {
+            ] as $field
+        ) {
             if (!$dbman->field_exists($table, $field)) {
                 $dbman->add_field($table, $field);
             }
         }
-        foreach ([new xmldb_index('userid', XMLDB_INDEX_NOTUNIQUE, ['userid']),
-                new xmldb_index('sourcekey', XMLDB_INDEX_NOTUNIQUE, ['source', 'sourcekey'])] as $index) {
+        foreach (
+            [new xmldb_index('userid', XMLDB_INDEX_NOTUNIQUE, ['userid']),
+                new xmldb_index('sourcekey', XMLDB_INDEX_NOTUNIQUE, ['source', 'sourcekey'])] as $index
+        ) {
             if (!$dbman->index_exists($table, $index)) {
                 $dbman->add_index($table, $index);
             }

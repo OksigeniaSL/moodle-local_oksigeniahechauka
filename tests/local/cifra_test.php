@@ -342,8 +342,10 @@ final class cifra_test extends \advanced_testcase {
         // A centre in another zone than the server: its own, passed in.
         $madrid = new \DateTimeZone('Europe/Madrid');
         $this->assertSame('2026-10-15T15:24:00+02:00', cifra::local('2026-10-15T15:24:00+02:00', $madrid));
-        $this->assertSame((new \DateTimeImmutable('2014-03-02 00:00', $madrid))->getTimestamp(),
-            cifra::timestamp('2014-03-02', $madrid));
+        $this->assertSame(
+            (new \DateTimeImmutable('2014-03-02 00:00', $madrid))->getTimestamp(),
+            cifra::timestamp('2014-03-02', $madrid)
+        );
 
         // Who has not left: no date, or one still to come.
         $people = self::people([1, 2, 3]);

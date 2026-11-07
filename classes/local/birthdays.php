@@ -307,10 +307,17 @@ class birthdays {
      * @param int $day
      * @param int $month
      * @param string $idnumber the ID number in Moodle, often the one of enrolment: it matches a picture, or the Moodle user
+     * @param string $email their email, to find their Moodle account when the ID number does not
      * @return int|null the id, or null if the date is no date or there is no name
      */
-    public static function add(string $name, string $group, int $day, int $month, string $idnumber = '',
-            string $email = ''): ?int {
+    public static function add(
+        string $name,
+        string $group,
+        int $day,
+        int $month,
+        string $idnumber = '',
+        string $email = ''
+    ): ?int {
         global $DB, $USER;
         $name = \core_text::substr(trim($name), 0, 120);
         $group = \core_text::substr(trim($group), 0, 60);
@@ -395,8 +402,13 @@ class birthdays {
         global $DB, $CFG;
         if (self::$accounts === null) {
             $index = ['idnumber' => [], 'email' => [], 'name' => []];
-            $users = $DB->get_recordset_select('user', 'deleted = 0 AND suspended = 0 AND id <> :guest',
-                ['guest' => $CFG->siteguest], '', 'id, idnumber, email, firstname, lastname');
+            $users = $DB->get_recordset_select(
+                'user',
+                'deleted = 0 AND suspended = 0 AND id <> :guest',
+                ['guest' => $CFG->siteguest],
+                '',
+                'id, idnumber, email, firstname, lastname'
+            );
             foreach ($users as $user) {
                 $id = (int) $user->id;
                 if (trim((string) $user->idnumber) !== '') {
@@ -747,8 +759,13 @@ class birthdays {
                 $DB->update_record(self::TABLE, (object) (['id' => $have[$key]] + $fields));
                 $done['updated']++;
             } else {
-                $same = $DB->get_record_select(self::TABLE, 'source IS NULL AND month = :month AND day = :day AND name = :name',
-                    ['month' => $date[1], 'day' => $date[0], 'name' => $name], 'id', IGNORE_MULTIPLE);
+                $same = $DB->get_record_select(
+                    self::TABLE,
+                    'source IS NULL AND month = :month AND day = :day AND name = :name',
+                    ['month' => $date[1], 'day' => $date[0], 'name' => $name],
+                    'id',
+                    IGNORE_MULTIPLE
+                );
                 if ($same) {
                     $DB->update_record(self::TABLE, (object) (['id' => $same->id] + $fields));
                     $done['adopted']++;

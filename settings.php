@@ -143,14 +143,27 @@ if ($hassiteconfig) {
             'oauth' => get_string('ciframode_oauth', $p),
             'key' => get_string('ciframode_key', $p),
         ]));
-        $settings->add(new admin_setting_configtext("$p/cifraurl", get_string('cifraurl', $p), get_string('cifraurl_desc', $p),
-            '', PARAM_URL));
+        $settings->add(new admin_setting_configtext(
+            "$p/cifraurl",
+            get_string('cifraurl', $p),
+            get_string('cifraurl_desc', $p),
+            '',
+            PARAM_URL
+        ));
         $settings->add(new admin_setting_configtext("$p/cifraclientid", get_string('cifraclientid', $p), '', '', PARAM_TEXT));
         $settings->add(new admin_setting_encryptedpassword("$p/cifrasecret", get_string('cifrasecret', $p), ''));
-        $settings->add(new admin_setting_encryptedpassword("$p/cifrakey", get_string('cifrakey', $p),
-            get_string('cifrakey_desc', $p)));
-        $settings->add(new admin_setting_configtext("$p/cifrainternalhosts", get_string('cifrainternalhosts', $p),
-            get_string('cifrainternalhosts_desc', $p), '', PARAM_TEXT));
+        $settings->add(new admin_setting_encryptedpassword(
+            "$p/cifrakey",
+            get_string('cifrakey', $p),
+            get_string('cifrakey_desc', $p)
+        ));
+        $settings->add(new admin_setting_configtext(
+            "$p/cifrainternalhosts",
+            get_string('cifrainternalhosts', $p),
+            get_string('cifrainternalhosts_desc', $p),
+            '',
+            PARAM_TEXT
+        ));
 
         // What reaches the screens by itself.
         $settings->add(new admin_setting_heading("$p/sources", get_string('sources', $p), ''));
