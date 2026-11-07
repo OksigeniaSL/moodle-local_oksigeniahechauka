@@ -247,6 +247,18 @@ class birthdays {
                     return true;
                 }
             }
+            // Someone of the list with the ID number of this Moodle user, and only of this one: the picture of their account.
+            $idnumber = (string) $DB->get_field('user', 'idnumber', ['id' => $context->instanceid, 'deleted' => 0]);
+            if ($idnumber === '' || !isset(self::users_by_idnumber([$idnumber])[$idnumber])) {
+                return false;
+            }
+            foreach ($dates as $date) {
+                foreach (self::days_of($date) as [$month, $day]) {
+                    if ($DB->record_exists(self::TABLE, ['month' => $month, 'day' => $day, 'idnumber' => $idnumber])) {
+                        return true;
+                    }
+                }
+            }
             return false;
         }
         $row = $DB->get_record(self::TABLE, ['id' => $file->get_itemid()]);

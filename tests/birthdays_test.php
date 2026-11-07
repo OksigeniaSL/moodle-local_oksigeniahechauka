@@ -125,6 +125,19 @@ final class birthdays_test extends \advanced_testcase {
         set_config('sourcebirthdays', 1, $c);
         $this->assertTrue(files::readable($nearfile));
         $this->assertFalse(files::readable($farfile));
+        // The picture of the Moodle account of someone of the list, by their ID number: on their day, not on another.
+        $pupil = $this->getDataGenerator()->create_user(['idnumber' => 'E-1']);
+        $pupilcontext = \context_user::instance($pupil->id);
+        $picture = $fs->create_file_from_string(['contextid' => $pupilcontext->id, 'component' => 'user', 'filearea' => 'icon',
+            'itemid' => 0, 'filepath' => '/', 'filename' => 'f3.png'], 'x');
+        $this->assertFalse(files::readable($picture));
+        birthdays::add('Lejos con ID', '', $farday, $farmonth, 'E-1');
+        $this->assertFalse(files::readable($picture));
+        birthdays::add('Cerca con ID', '', $day, $month, 'E-1');
+        $this->assertTrue(files::readable($picture));
+        // Two accounts with the same ID number: neither picture goes.
+        $this->getDataGenerator()->create_user(['idnumber' => 'E-1']);
+        $this->assertFalse(files::readable($picture));
         // Nobody can reach a user's own files by this door.
         $user = $this->getDataGenerator()->create_user();
         $other = $fs->create_file_from_string(['contextid' => \context_user::instance($user->id)->id, 'component' => 'user',
