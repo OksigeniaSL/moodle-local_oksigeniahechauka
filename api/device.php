@@ -39,6 +39,8 @@ $name = optional_param('f', 'manifest.json', PARAM_PATH);
 if ($name === 'hola') {
     header('Content-Type: application/json; charset=utf-8');
     header('Cache-Control: no-cache');
+    // The Samsung app asks from a page of its own (device/samsung/app/): a public answer, without cookies.
+    header('Access-Control-Allow-Origin: *');
     header('X-Content-Type-Options: nosniff');
     echo json_encode([
         'hechauka' => 1,

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- The Hechauka app for Samsung professional displays (SSSP, Tizen 4 and later), installed by their URL Launcher from the
+     player's folder of a Moodle. The same signed package for every centre: it asks for its Moodle the first time and then
+     opens the player. The last number of the version is the <ver> of sssp_config.xml, which the displays compare to
+     update themselves: it only grows. The package id never changes, or the displays would take it for another app. -->
+<widget xmlns="http://www.w3.org/ns/widgets" xmlns:tizen="http://tizen.org/ns/widgets"
+        id="https://oksigenia.com/hechauka/samsung" version="1.0.2" viewmodes="maximized">
+    <tizen:application id="OkHechauka.Hechauka" package="OkHechauka" required_version="4.0"/>
+    <tizen:profile name="tv-samsung"/>
+    <content src="index.html"/>
+    <name>Hechauka</name>
+    <icon src="icon.png"/>
+    <author href="https://oksigenia.com" email="dev@oksigenia.cc">Oksigenia SL</author>
+    <license href="https://www.gnu.org/licenses/gpl-3.0.html">GPL-3.0-or-later</license>
+    <!-- The player lives on each centre's own Moodle, so any address: to check it, and to go there. -->
+    <access origin="*" subdomains="true"/>
+    <tizen:allow-navigation>*</tizen:allow-navigation>
+    <tizen:privilege name="http://tizen.org/privilege/internet"/>
+    <tizen:setting screen-orientation="landscape" context-menu="disable"/>
+</widget>
