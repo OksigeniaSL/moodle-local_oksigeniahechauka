@@ -126,7 +126,7 @@ class groupspage {
         $everywhere = [];
         foreach (access::holders('publishall', access::EVERYWHERE) as $h) {
             $runs = has_capability('local/oksigeniahechauka:managescreens', $system, $h['user']->id);
-            $note = $h['own'] ? '' : get_string($runs ? 'groups_runs' : 'groups_byrole', $c);
+            $note = $h['own'] ? '' : ($runs ? get_string('groups_runs', $c) : self::byrole($h['via']));
             $everywhere[] = self::person($h['user'], $note) +
                 ['own' => $h['own'], 'label' => get_string('groups_uneverywhere', $c, fullname($h['user']))];
         }
@@ -134,7 +134,7 @@ class groupspage {
         $choose = access::may_choose_managers();
         $managers = [];
         foreach (access::holders('managescreens', access::MANAGER) as $h) {
-            $managers[] = self::person($h['user'], $h['own'] ? '' : get_string('groups_byrole', $c)) +
+            $managers[] = self::person($h['user'], $h['own'] ? '' : self::byrole($h['via'])) +
                 ['own' => $h['own'] && $choose, 'label' => get_string('groups_unmanager', $c, fullname($h['user']))];
         }
         return [
@@ -166,7 +166,7 @@ class groupspage {
             'icons' => ['qr' => icons::svg('qr'), 'x' => icons::svg('x'), 'plus' => icons::svg('plus'), 'pin' => icons::svg('pin'),
                 'search' => icons::svg('search'), 'sliders' => icons::svg('sliders'), 'copy' => icons::svg('copy')],
             'strings' => json_encode(
-                ['already' => get_string('groups_already', $c), 'none' => get_string('groups_nobody', $c),
+                ['already' => get_string('groups_already', $c), 'none' => get_string(people::by_email() ? 'groups_nobody_email' : 'groups_nobody', $c),
                     'everywhere' => get_string('groups_already_everywhere', $c),
                     'managers' => get_string('groups_already_manager', $c)],
                 JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP
@@ -270,5 +270,16 @@ class groupspage {
                 return null;
         }
         return null;
+    }
+
+    /**
+     * What is said under someone who has it through a role of the site: which role, when it is known.
+     *
+     * @param string $roles Names of the roles.
+     * @return string
+     */
+    protected static function byrole(string $roles): string {
+        $c = 'local_oksigeniahechauka';
+        return $roles !== '' ? get_string('groups_byrole_named', $c, $roles) : get_string('groups_byrole', $c);
     }
 }

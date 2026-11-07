@@ -16,7 +16,8 @@
 
 /**
  * The people of the school, for «Quién publica aquí»: who runs the screens types a name and chooses. Moodle's own user
- * search asks for a capability of administrators; this one asks for running the screens, and says only the names.
+ * search asks for a capability of administrators; this one asks for running the screens, and says the names (and the email
+ * to whoever may see it: classes/local/people.php).
  *
  * @package    local_oksigeniahechauka
  * @copyright  2026 Oksigenia SL <dev@oksigenia.cc>
@@ -47,27 +48,7 @@ if (core_text::strlen($query) >= 2) {
         }, $list === 'managers' ? access::holders('managescreens', access::MANAGER) :
             access::holders('publishall', access::EVERYWHERE));
     }
-    $fields = \core_user\fields::for_name()->get_sql('u', false, '', '', false)->selects;
-    $full = $DB->sql_concat('u.firstname', "' '", 'u.lastname');
-    $sql = "SELECT u.id, u.department, $fields
-              FROM {user} u
-             WHERE u.deleted = 0 AND u.suspended = 0 AND u.confirmed = 1 AND u.id <> :guest
-                   AND (" . $DB->sql_like($full, ':q1', false, false) . ' OR ' .
-                        $DB->sql_like('u.lastname', ':q2', false, false) . ")
-          ORDER BY u.lastname, u.firstname";
-    $like = '%' . $DB->sql_like_escape($query) . '%';
-    foreach ($DB->get_records_sql($sql, ['guest' => $CFG->siteguest, 'q1' => $like, 'q2' => $like], 0, 8) as $user) {
-        $name = fullname($user);
-        $words = preg_split('/\s+/', trim($user->firstname . ' ' . $user->lastname));
-        $out[] = [
-            'id' => (int) $user->id,
-            'name' => $name,
-            'initials' => core_text::strtoupper(core_text::substr($words[0] ?? '', 0, 1) .
-                core_text::substr(end($words) ?: '', 0, 1)),
-            'detail' => (string) $user->department,
-            'already' => in_array((int) $user->id, $already),
-        ];
-    }
+    $out = \local_oksigeniahechauka\local\people::find($query, $already);
 }
 header('Content-Type: application/json; charset=utf-8');
 echo json_encode($out, JSON_UNESCAPED_UNICODE);

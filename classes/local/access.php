@@ -262,9 +262,36 @@ class access {
         $out = [];
         $users = get_users_by_capability($system, 'local/oksigeniahechauka:' . $capability, $fields, 'u.lastname, u.firstname');
         foreach ($users as $user) {
-            $out[] = ['user' => $user, 'own' => in_array((int) $user->id, $own)];
+            $out[] = ['user' => $user, 'own' => in_array((int) $user->id, $own),
+                'via' => self::roles_giving($capability, (int) $user->id, $roleid)];
         }
         return $out;
+    }
+
+    /**
+     * The names of the roles of the whole site through which someone has a capability of the screens (Moodle's «Manager»,
+     * for instance), leaving out the role of the screens itself: what the panel says under a name it cannot take out.
+     *
+     * @param string $capability
+     * @param int $userid
+     * @param int $leaveout The role of the screens for that capability.
+     * @return string Names, separated by commas; '' when none.
+     */
+    protected static function roles_giving(string $capability, int $userid, int $leaveout): string {
+        global $DB;
+        $system = \context_system::instance();
+        $names = [];
+        foreach (get_user_roles($system, $userid, false) as $ra) {
+            if ((int) $ra->roleid === $leaveout || (int) $ra->contextid !== (int) $system->id) {
+                continue;
+            }
+            $allows = $DB->record_exists('role_capabilities', ['roleid' => $ra->roleid, 'contextid' => $system->id,
+                'capability' => 'local/oksigeniahechauka:' . $capability, 'permission' => CAP_ALLOW]);
+            if ($allows) {
+                $names[(int) $ra->roleid] = role_get_name($DB->get_record('role', ['id' => $ra->roleid]), $system);
+            }
+        }
+        return implode(', ', $names);
     }
 
     /**
