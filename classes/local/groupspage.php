@@ -166,7 +166,8 @@ class groupspage {
             'icons' => ['qr' => icons::svg('qr'), 'x' => icons::svg('x'), 'plus' => icons::svg('plus'), 'pin' => icons::svg('pin'),
                 'search' => icons::svg('search'), 'sliders' => icons::svg('sliders'), 'copy' => icons::svg('copy')],
             'strings' => json_encode(
-                ['already' => get_string('groups_already', $c), 'none' => get_string(people::by_email() ? 'groups_nobody_email' : 'groups_nobody', $c),
+                ['already' => get_string('groups_already', $c),
+                    'none' => get_string(people::by_email() ? 'groups_nobody_email' : 'groups_nobody', $c),
                     'everywhere' => get_string('groups_already_everywhere', $c),
                     'managers' => get_string('groups_already_manager', $c)],
                 JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP
