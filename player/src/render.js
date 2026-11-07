@@ -6,7 +6,7 @@
 import {ratio, shapeOf} from './compose.js';
 import {buildWeatherThird} from './today.js';
 import {MARK, buildLead, buildRest, fitAlso, fitHeadline, fitWord, leadOfTurn, leadsOf, linesOf, paginateRest, showRestPage, turnFixed, weekHeadline, wordsCramped} from './lead.js';
-import {buildBirthdays, fitBirthdays} from './cumple.js';
+import {buildBirthdays, fitBirthdays, startBirthdays} from './cumple.js';
 import {buildDeadlines, fitDeadlines} from './plazos.js';
 import {buildIdle} from './reposo.js';
 import {buildTable, fitTable} from './tabla.js';
@@ -608,7 +608,8 @@ export class Screen {
         };
         if (comp === 'cumple') {
             buildBirthdays(c, extra && extra.item, (extra && extra.page) || 0, {distance: this.distance || 3, horizontal: this.horizontal,
-                glass: !!this.glass, one: this.s.birthdays_one || '', many: this.s.birthdays_many || '', media: mediaOf});
+                glass: !!this.glass, one: this.s.birthdays_one || '', many: this.s.birthdays_many || '', media: mediaOf,
+                still: this.keepsStill(), cheers: this.s.birthdays_cheers || ''});
             return c;
         }
         if (comp === 'tabla') {
@@ -778,6 +779,9 @@ export class Screen {
             }, linesOf);
         } else if (comp === 'muro') {
             c.hkSeconds = startWall(c, c.hkAlbum, false);
+        } else if (comp === 'cumple') {
+            // Each person their moment: as long as the people of the day take (Gaudí, 7 November 2026).
+            c.hkSeconds = startBirthdays(c, {still: this.keepsStill()});
         }
     }
 

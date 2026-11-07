@@ -2,22 +2,12 @@
 
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {birthdaysPages, birthdaysPerPage, initialsOf} from '../src/cumple.js';
+import {initialsOf} from '../src/cumple.js';
 import {booksPages} from '../src/biblioteca.js';
 import {allergensOf, menuParts, wordsCramped} from '../src/lead.js';
 import {contrast, skyAt} from '../src/reposo.js';
 import {pagesOf, tableShape} from '../src/tabla.js';
 import {deadlineTime, deadlinesPage, deadlinesPages, deadlinesPerPage} from '../src/plazos.js';
-
-test('how many birthdays fit, by the distance; pages for up to thirty people', () => {
-    assert.equal(birthdaysPerPage(3, true), 9);
-    assert.equal(birthdaysPerPage(8, true), 4);
-    assert.ok(birthdaysPerPage(5, true, true) < birthdaysPerPage(5, true));
-    const people = new Array(30).fill({name: 'Ana'});
-    assert.equal(birthdaysPages({people}, 3, true), 4);
-    assert.equal(birthdaysPages({people: [{name: 'Ana'}]}, 8, true), 1);
-    assert.equal(birthdaysPages({people: []}, 3, true), 1);
-});
 
 test('initials: the first two words, in capitals', () => {
     assert.equal(initialsOf('lucía pérez ruiz'), 'LP');

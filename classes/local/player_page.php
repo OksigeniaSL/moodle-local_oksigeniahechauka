@@ -63,6 +63,7 @@ class player_page {
             'date_format' => get_string('date_format', $c),
             'birthdays_one' => get_string('label_birthdays_one', $c),
             'birthdays_many' => get_string('label_birthdays_many', $c),
+            'birthdays_cheers' => get_string('label_birthdays_cheers', $c),
             'allergens' => get_string('label_allergens', $c),
             'also' => get_string('label_also', $c),
             'also_more' => get_string('label_also_more', $c),

@@ -1,23 +1,51 @@
-/* Oksigenia Hechauka 0.8: «Hoy cumplen años», a slide of its own (Gaudí, 2 November 2026). Goes after lideres.css.
+/* Oksigenia Hechauka: «Hoy cumplen años», each person with their moment (Gaudí, 7 November 2026). Replaces the cumple.css
+ * of 2 November; goes in the same place (after lideres.css, before pieles.css).
  *
  *   <div class="hk-cuerpo hk-capa" data-composicion="cumple">
- *     <section class="hk-cumple">
- *       <svg class="hk-guirnalda">…</svg>
- *       <h2 class="hk-cumple-titulo">Hoy cumplen años</h2>
- *       <div class="hk-cumple-gente" data-columnas="3" data-tam="uno|grande|lista" data-ajuste="1|2|3">
- *         <article class="hk-cumple-persona">
- *           <div class="hk-cumple-cara" data-tono="0|1|2"><img> or <span>LP</span></div>
- *           <div class="hk-cumple-texto"><p class="hk-cumple-nombre">Lucía Pérez</p><p class="hk-cumple-grupo">3.º A</p></div>
+ *     <section class="hk-cumple" data-modo="escenario|desfile" data-fiesta="sobria|elegante|juguetona" data-n="1…9"
+ *              [.is-lista once it starts] [.is-quieto on a still screen]>
+ *       <div class="hk-cumple-globos"><div class="hk-globo hk-globo-0"><div class="hk-globo-vaiven"><svg>…</div></div>…
+ *       <div class="hk-cumple-guirnalda"><svg class="hk-cumple-tramo">…</svg>…</div>                 (the stage)
+ *       <div class="hk-cumple-cuerda"><div class="hk-cumple-tira">                                     (the parade)
+ *           <div class="hk-cumple-eslabon"><svg>…</svg><div class="hk-cumple-adorno [is-vacio]">
+ *               <span class="hk-cumple-pinza"></span><div class="hk-cumple-cara"><img></div></div></div>…
+ *       <canvas class="hk-cumple-confeti"></canvas>
+ *       <div class="hk-cumple-escena">
+ *         <article class="hk-cumple-momento [is-dentro] [is-texto] [is-fuera]">
+ *           <div class="hk-cumple-cara hk-cumple-cara-grande"><img> or the creature's <svg></div>
+ *           <div class="hk-cumple-texto"><p class="hk-cumple-antetitulo">Hoy cumple años</p>
+ *             <p class="hk-cumple-nombre" data-ajuste="1…4"><span class="hk-cumple-nombre-texto">…</span>
+ *               <span class="hk-cumple-brillo hk-cumple-brillo-ancho"><span>…</span></span>…</p>
+ *             <p class="hk-cumple-grupo">3.º B</p></div></article>…
+ *         <div class="hk-cumple-foto [is-dentro]" data-ajuste="0…4">                               (two or three)
+ *           <p class="hk-cumple-nombre hk-cumple-titulo">¡Felicidades!</p>
+ *           <div class="hk-cumple-fila"><figure class="hk-cumple-retrato">…</figure>…</div></div>
  *
- * Chromium 56: flexbox only, margins instead of gap, no aspect-ratio. */
+ * How much party, by skin: --hk-fiesta (sobria, elegante or juguetona). The script reads it and writes data-fiesta on the
+ * slide; a centre (or a screen) may set its own over the skin's.
+ *
+ * Chromium 56: transform and opacity only; flexbox with margins, no gap, no aspect-ratio, no inset; no custom
+ * properties inside @keyframes (their values are plain); vh in a keyframe is fine. */
+
+/* --- How much party each skin brings ------------------------------------------------------------------------------ */
+:root,
+[data-piel="petroleo"] {
+    --hk-fiesta: elegante;
+}
+[data-piel="botella"] {
+    --hk-fiesta: sobria;
+}
+[data-piel="berenjena"] {
+    --hk-fiesta: juguetona;
+}
+
+/* --- The slide ---------------------------------------------------------------------------------------------------- */
 .hk-cuerpo[data-composicion="cumple"] {
     flex-direction: column;
 }
 .hk .hk-cumple {
     position: relative;
-    display: flex;
     flex: 1 1 auto;
-    flex-direction: column;
     min-width: 0;
     min-height: 0;
     overflow: hidden;
@@ -25,11 +53,149 @@
     background: var(--hk-primario);
     color: var(--hk-sobre-primario);
 }
-.hk .hk-guirnalda {
+/* A soft light on the stage, where the person stands */
+.hk .hk-cumple::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(ellipse at 50% 62%, rgba(255, 255, 255, .13) 0%, rgba(255, 255, 255, 0) 62%);
+}
+.hk .hk-cumple[data-modo="desfile"]::before {
+    background: radial-gradient(ellipse at 34% 66%, rgba(255, 255, 255, .13) 0%, rgba(255, 255, 255, 0) 58%);
+}
+.hk-vertical .hk-cumple[data-modo="desfile"]::before {
+    background: radial-gradient(ellipse at 50% 50%, rgba(255, 255, 255, .13) 0%, rgba(255, 255, 255, 0) 60%);
+}
+
+/* --- Balloons at the back ----------------------------------------------------------------------------------------- */
+.hk-cumple-globos {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+.hk-globo {
+    position: absolute;
+    top: 100%;
+    width: 11rem;
+    margin-left: -5.5rem;
+    will-change: transform;
+    -webkit-animation: hk-globo-sube 20s linear infinite;
+    animation: hk-globo-sube 20s linear infinite;
+}
+.hk-globo-chico {
+    width: 8.4rem;
+    margin-left: -4.2rem;
+}
+.hk-globo-vaiven {
+    -webkit-transform-origin: 50% 30%;
+    transform-origin: 50% 30%;
+    -webkit-animation: hk-globo-vaiven 3.6s ease-in-out infinite alternate;
+    animation: hk-globo-vaiven 3.6s ease-in-out infinite alternate;
+}
+.hk-globo svg {
     display: block;
-    flex: none;
     width: 100%;
     height: auto;
+}
+.hk-globo-hilo {
+    fill: none;
+    stroke: var(--hk-sobre-primario);
+    stroke-width: 1.6;
+    opacity: .55;
+}
+.hk-globo-0 .hk-globo-cuerpo { fill: var(--hk-acento); }
+.hk-globo-1 .hk-globo-cuerpo { fill: var(--hk-sobre-primario); }
+.hk-globo-2 .hk-globo-cuerpo { fill: var(--hk-marca-2); }
+.hk-globo-3 .hk-globo-cuerpo { fill: var(--hk-marca-4); }
+/* Sober: a few pearls, barely there. Elegant: pearl and the accent. Playful: every colour of the skin. */
+.hk-cumple[data-fiesta="sobria"] .hk-globo { opacity: .2; }
+.hk-cumple[data-fiesta="sobria"] .hk-globo-cuerpo { fill: var(--hk-sobre-primario); }
+.hk-cumple[data-fiesta="elegante"] .hk-globo { opacity: .34; }
+.hk-cumple[data-fiesta="elegante"] .hk-globo-2 .hk-globo-cuerpo { fill: var(--hk-acento); }
+.hk-cumple[data-fiesta="elegante"] .hk-globo-3 .hk-globo-cuerpo { fill: var(--hk-sobre-primario); }
+.hk-cumple[data-fiesta="juguetona"] .hk-globo { opacity: .8; }
+@-webkit-keyframes hk-globo-sube {
+    from { -webkit-transform: translate3d(0, 0, 0); }
+    to { -webkit-transform: translate3d(0, -150vh, 0); }
+}
+@keyframes hk-globo-sube {
+    from { transform: translate3d(0, 0, 0); }
+    to { transform: translate3d(0, -150vh, 0); }
+}
+@-webkit-keyframes hk-globo-vaiven {
+    from { -webkit-transform: rotate(-4deg) translate3d(-.8rem, 0, 0); }
+    to { -webkit-transform: rotate(4deg) translate3d(.8rem, 0, 0); }
+}
+@keyframes hk-globo-vaiven {
+    from { transform: rotate(-4deg) translate3d(-.8rem, 0, 0); }
+    to { transform: rotate(4deg) translate3d(.8rem, 0, 0); }
+}
+
+/* --- The garland of the stage: it drops in and sways, each swag on its own ---------------------------------------- */
+.hk-cumple-guirnalda {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    width: 100%;
+    -webkit-transform: translate3d(0, -100%, 0);
+    transform: translate3d(0, -100%, 0);
+    -webkit-transition: -webkit-transform 1s cubic-bezier(.2, .8, .2, 1);
+    transition: transform 1s cubic-bezier(.2, .8, .2, 1);
+}
+.hk-cumple.is-lista .hk-cumple-guirnalda {
+    -webkit-transform: none;
+    transform: none;
+}
+.hk-cumple[data-fiesta="juguetona"] .hk-cumple-guirnalda {
+    -webkit-transition-timing-function: cubic-bezier(.3, 1.45, .5, 1);
+    transition-timing-function: cubic-bezier(.3, 1.45, .5, 1);
+}
+.hk .hk-cumple-tramo {
+    display: block;
+    flex: none;
+    height: auto;
+    -webkit-transform-origin: 50% 5%;
+    transform-origin: 50% 5%;
+    -webkit-animation: hk-cumple-mece 3.2s ease-in-out infinite alternate;
+    animation: hk-cumple-mece 3.2s ease-in-out infinite alternate;
+}
+.hk .hk-cumple-tramo:nth-child(2n) {
+    -webkit-animation-duration: 3.7s;
+    animation-duration: 3.7s;
+    -webkit-animation-delay: -1.3s;
+    animation-delay: -1.3s;
+}
+.hk .hk-cumple-tramo:nth-child(3n) {
+    -webkit-animation-duration: 2.9s;
+    animation-duration: 2.9s;
+    -webkit-animation-delay: -.6s;
+    animation-delay: -.6s;
+}
+.hk-cumple[data-fiesta="juguetona"] .hk-cumple-tramo {
+    -webkit-animation-name: hk-cumple-mece-mas;
+    animation-name: hk-cumple-mece-mas;
+}
+@-webkit-keyframes hk-cumple-mece {
+    from { -webkit-transform: rotate(-.7deg) scaleY(.96); }
+    to { -webkit-transform: rotate(.7deg) scaleY(1.05); }
+}
+@keyframes hk-cumple-mece {
+    from { transform: rotate(-.7deg) scaleY(.96); }
+    to { transform: rotate(.7deg) scaleY(1.05); }
+}
+@-webkit-keyframes hk-cumple-mece-mas {
+    from { -webkit-transform: rotate(-1.4deg) scaleY(.93); }
+    to { -webkit-transform: rotate(1.4deg) scaleY(1.08); }
+}
+@keyframes hk-cumple-mece-mas {
+    from { transform: rotate(-1.4deg) scaleY(.93); }
+    to { transform: rotate(1.4deg) scaleY(1.08); }
 }
 .hk-guirnalda-cuerda {
     fill: none;
@@ -41,196 +207,528 @@
 .hk-banderin-1 { fill: var(--hk-superficie); }
 .hk-banderin-2 { fill: var(--hk-menu); }
 .hk-banderin-3 { fill: var(--hk-evento); }
-.hk .hk-cumple-titulo {
-    flex: none;
-    margin-top: -1rem;
-    padding: 0 5rem;
-    font-family: var(--hk-letra-titulos);
-    font-size: calc(var(--hk-t-entrada) * 1.35);
-    font-weight: 800;
-    letter-spacing: -.015em;
-    line-height: 1.04;
-    text-align: center;
+/* Sober and elegant: the flags only in the accent and white; the skin's other colours are for the playful one */
+.hk-cumple[data-fiesta="sobria"] .hk-banderin-2,
+.hk-cumple[data-fiesta="elegante"] .hk-banderin-2 { fill: var(--hk-acento); }
+.hk-cumple[data-fiesta="sobria"] .hk-banderin-3,
+.hk-cumple[data-fiesta="elegante"] .hk-banderin-3 { fill: var(--hk-superficie); }
+[data-tema="oscuro"] .hk-cumple[data-fiesta="sobria"] .hk-banderin-3,
+[data-tema="oscuro"] .hk-cumple[data-fiesta="elegante"] .hk-banderin-3,
+[data-tema="oscuro"] .hk-banderin-1 { fill: var(--hk-sobre-primario); }
+
+/* --- The string of the parade: the people hang from it, and it moves on ------------------------------------------- */
+.hk-cumple-cuerda {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 21rem;
 }
-.hk .hk-cumple-gente {
+.hk-cumple-tira {
+    position: absolute;
+    top: 0;
+    left: 0;
     display: flex;
-    flex: 1 1 auto;
-    flex-wrap: wrap;
-    align-content: center;
-    justify-content: center;
-    min-height: 0;
-    padding: 1.6rem 3rem 3rem;
-    overflow: hidden;
+    will-change: transform;
 }
-.hk .hk-cumple-persona {
-    display: flex;
+.hk-cumple-tira.is-entra {
+    -webkit-transition: -webkit-transform 1.4s cubic-bezier(.15, .7, .2, 1);
+    transition: transform 1.4s cubic-bezier(.15, .7, .2, 1);
+}
+.hk-cumple-tira.is-avanza {
+    -webkit-transition: -webkit-transform .45s cubic-bezier(.45, 0, .25, 1);
+    transition: transform .45s cubic-bezier(.45, 0, .25, 1);
+}
+.hk-cumple-eslabon {
+    position: relative;
     flex: none;
+    width: 21rem;
+    height: 21rem;
+}
+.hk-cumple-eslabon > svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 10rem;
+}
+.hk-cumple-adorno {
+    position: absolute;
+    top: 3.4rem;
+    left: 50%;
+    width: 13rem;
+    margin-left: -6.5rem;
+    -webkit-transform-origin: 50% 0;
+    transform-origin: 50% 0;
+    -webkit-animation: hk-cumple-adorno 3s ease-in-out infinite alternate;
+    animation: hk-cumple-adorno 3s ease-in-out infinite alternate;
+}
+.hk-cumple[data-fiesta="juguetona"] .hk-cumple-adorno {
+    -webkit-animation-name: hk-cumple-adorno-mas;
+    animation-name: hk-cumple-adorno-mas;
+}
+.hk-cumple-pinza {
+    position: relative;
+    z-index: 1;
+    display: block;
+    width: 1.6rem;
+    height: 2.6rem;
+    margin: 0 auto -1rem;
+    border-radius: .4rem;
+    background: var(--hk-acento);
+}
+.hk .hk-cumple-adorno .hk-cumple-cara {
+    width: 13rem;
+    height: 13rem;
+    border: .6rem solid var(--hk-sobre-primario);
+}
+.hk .hk-cumple-adorno.is-vacio .hk-cumple-cara {
+    opacity: 0;
+}
+/* The hook stays, with the outline of whoever came down */
+.hk-cumple-adorno::after {
+    content: "";
+    position: absolute;
+    top: 1.6rem;
+    left: 0;
+    box-sizing: border-box;
+    width: 13rem;
+    height: 13rem;
+    border: .4rem dashed var(--hk-sobre-primario);
+    border-radius: 50%;
+    opacity: 0;
+    -webkit-transition: opacity .3s;
+    transition: opacity .3s;
+}
+.hk-cumple-adorno.is-vacio::after {
+    opacity: .5;
+}
+@-webkit-keyframes hk-cumple-adorno {
+    from { -webkit-transform: rotate(-2.5deg); }
+    to { -webkit-transform: rotate(2.5deg); }
+}
+@keyframes hk-cumple-adorno {
+    from { transform: rotate(-2.5deg); }
+    to { transform: rotate(2.5deg); }
+}
+@-webkit-keyframes hk-cumple-adorno-mas {
+    from { -webkit-transform: rotate(-4.5deg); }
+    to { -webkit-transform: rotate(4.5deg); }
+}
+@keyframes hk-cumple-adorno-mas {
+    from { transform: rotate(-4.5deg); }
+    to { transform: rotate(4.5deg); }
+}
+
+/* --- The confetti, over the garland and behind the person --------------------------------------------------------- */
+.hk-cumple-confeti {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+/* --- The stage, where each one has their moment ------------------------------------------------------------------- */
+.hk-cumple-escena {
+    position: absolute;
+    top: 13rem;
+    right: 0;
+    bottom: 0;
+    left: 0;
+}
+.hk-cumple[data-modo="desfile"] .hk-cumple-escena {
+    top: 20rem;
+}
+.hk-cumple-momento {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
     align-items: center;
-    width: calc(100% - 2.4rem);
-    min-width: 0;
-    margin: 1.2rem;
-    padding: 1.6rem 2.4rem 1.6rem 1.6rem;
-    border-radius: calc(2rem * var(--hk-esquina));
-    background: var(--hk-superficie);
-    color: var(--hk-texto);
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    padding: 1rem 7rem 4rem;
+    visibility: hidden;
+    opacity: 0;
+    -webkit-transition: opacity .45s, visibility 0s linear .45s;
+    transition: opacity .45s, visibility 0s linear .45s;
 }
-.hk-cumple-gente[data-columnas="2"] .hk-cumple-persona { width: calc(50% - 2.4rem); }
-.hk-cumple-gente[data-columnas="3"] .hk-cumple-persona { width: calc(33.333% - 2.4rem); }
-.hk-cumple-gente[data-columnas="4"] .hk-cumple-persona { width: calc(25% - 2.4rem); }
+.hk-cumple-momento.is-dentro {
+    visibility: visible;
+    opacity: 1;
+    -webkit-transition: opacity .3s, visibility 0s;
+    transition: opacity .3s, visibility 0s;
+}
+.hk-cumple[data-modo="desfile"] .hk-cumple-momento {
+    -webkit-justify-content: flex-start;
+    justify-content: flex-start;
+    padding-left: 12rem;
+    -webkit-transition: none;
+    transition: none;
+}
+
+/* The faces */
 .hk .hk-cumple-cara {
+    position: relative;
     display: flex;
     flex: none;
     align-items: center;
     justify-content: center;
-    width: calc(var(--hk-t-lista) * 2.3);
-    height: calc(var(--hk-t-lista) * 2.3);
-    margin-right: 2rem;
     overflow: hidden;
     border-radius: 50%;
-    background: var(--hk-primario);
-    color: var(--hk-sobre-primario);
-    font-family: var(--hk-letra-titulos);
-    font-size: var(--hk-t-lista);
-    font-weight: 800;
-    line-height: 1;
+    background: var(--hk-superficie);
 }
-.hk .hk-cumple-cara[data-tono="1"] { background: var(--hk-menu); color: var(--hk-sobre-menu); }
-.hk .hk-cumple-cara[data-tono="2"] { background: var(--hk-evento); color: var(--hk-sobre-evento); }
+.hk .hk-cumple-cara img,
 .hk .hk-cumple-cara.is-bichito svg {
     display: block;
     width: 100%;
     height: 100%;
 }
 .hk .hk-cumple-cara img {
-    display: block;
-    width: 100%;
-    height: 100%;
     object-fit: cover;
 }
-.hk .hk-cumple-texto {
-    flex: 1 1 0px;
+.hk .hk-cumple-cara-grande {
+    width: 48rem;
+    height: 48rem;
+    border: 1.4rem solid var(--hk-sobre-primario);
+    box-shadow: 0 0 0 1.4rem rgba(255, 255, 255, .14), 0 2.4rem 5rem rgba(0, 0, 0, .22);
+}
+.hk-cumple[data-modo="desfile"] .hk-cumple-cara-grande {
+    width: 38rem;
+    height: 38rem;
+    border-width: 1.6rem;
+    box-shadow: 0 0 0 1.2rem rgba(255, 255, 255, .12), 0 2rem 4rem rgba(0, 0, 0, .22);
+    -webkit-transition: -webkit-transform .75s cubic-bezier(.2, .85, .25, 1);
+    transition: transform .75s cubic-bezier(.2, .85, .25, 1);
+}
+.hk-cumple[data-modo="desfile"][data-fiesta="juguetona"] .hk-cumple-cara-grande {
+    -webkit-transition-timing-function: cubic-bezier(.3, 1.35, .5, 1);
+    transition-timing-function: cubic-bezier(.3, 1.35, .5, 1);
+}
+.hk[data-distancia="5"] .hk-cumple-cara-grande { width: 44rem; height: 44rem; }
+.hk[data-distancia="8"] .hk-cumple-cara-grande { width: 40rem; height: 40rem; }
+.hk[data-distancia="5"] .hk-cumple[data-modo="desfile"] .hk-cumple-cara-grande,
+.hk[data-distancia="8"] .hk-cumple[data-modo="desfile"] .hk-cumple-cara-grande { width: 34rem; height: 34rem; }
+
+/* On the stage: the face opens out, the words rise after it; going, both give way */
+.hk-cumple[data-modo="escenario"] .hk-cumple-cara-grande {
+    opacity: 0;
+    -webkit-transform: scale(.55);
+    transform: scale(.55);
+    -webkit-transition: -webkit-transform .8s cubic-bezier(.2, .9, .25, 1), opacity .4s;
+    transition: transform .8s cubic-bezier(.2, .9, .25, 1), opacity .4s;
+}
+.hk-cumple[data-modo="escenario"][data-fiesta="juguetona"] .hk-cumple-cara-grande {
+    -webkit-transition-timing-function: cubic-bezier(.3, 1.55, .45, 1), ease;
+    transition-timing-function: cubic-bezier(.3, 1.55, .45, 1), ease;
+}
+.hk-cumple[data-modo="escenario"] .is-dentro .hk-cumple-cara-grande {
+    opacity: 1;
+    -webkit-transform: none;
+    transform: none;
+}
+.hk-cumple-texto {
+    flex: 0 1 auto;
     min-width: 0;
+    margin-left: 6rem;
+    opacity: 0;
+    -webkit-transform: translate3d(0, 3rem, 0);
+    transform: translate3d(0, 3rem, 0);
+    -webkit-transition: -webkit-transform .7s cubic-bezier(.2, .8, .2, 1) .25s, opacity .5s .25s;
+    transition: transform .7s cubic-bezier(.2, .8, .2, 1) .25s, opacity .5s .25s;
+}
+.hk-cumple[data-modo="escenario"] .is-dentro .hk-cumple-texto,
+.hk-cumple[data-modo="desfile"] .is-texto .hk-cumple-texto {
+    opacity: 1;
+    -webkit-transform: none;
+    transform: none;
+}
+.hk-cumple[data-modo="desfile"] .hk-cumple-texto {
+    -webkit-transition-delay: 0s;
+    transition-delay: 0s;
+    -webkit-transition-duration: .5s, .35s;
+    transition-duration: .5s, .35s;
+}
+.hk-cumple-momento.is-fuera .hk-cumple-cara-grande {
+    opacity: 0;
+    -webkit-transform: scale(.85);
+    transform: scale(.85);
+    -webkit-transition-duration: .45s;
+    transition-duration: .45s;
+}
+.hk-cumple-momento.is-fuera .hk-cumple-texto {
+    opacity: 0;
+    -webkit-transform: translate3d(0, -2rem, 0);
+    transform: translate3d(0, -2rem, 0);
+    -webkit-transition-delay: 0s;
+    transition-delay: 0s;
+    -webkit-transition-duration: .35s;
+    transition-duration: .35s;
+}
+
+/* The words */
+.hk .hk-cumple-antetitulo {
+    margin-bottom: 1.6rem;
+    color: var(--hk-acento);
+    font-family: var(--hk-letra-titulos);
+    font-size: var(--hk-t-min);
+    font-weight: 800;
+    letter-spacing: .06em;
+    line-height: 1.1;
+    text-transform: uppercase;
+}
+.hk .is-antetitulo-claro .hk-cumple-antetitulo {
+    color: var(--hk-sobre-primario);
+}
+.hk-cumple-nombre-texto {
+    display: block;
 }
 .hk .hk-cumple-nombre {
-    font-size: var(--hk-t-lista);
-    font-weight: 800;
-    line-height: 1.06;
-}
-.hk .hk-cumple-grupo {
-    margin-top: .4rem;
-    color: var(--hk-texto-suave);
-    font-size: var(--hk-t-min);
-    font-weight: 700;
-    line-height: 1.08;
-}
-.hk[data-distancia="8"] .hk-cumple-titulo {
-    font-size: calc(var(--hk-t-entrada) * 1.1);
-}
-/* Long names: a step down, to the least that is read; then each of them loses its group */
-.hk .hk-cumple-gente[data-ajuste] .hk-cumple-nombre {
-    font-size: var(--hk-t-min);
-}
-.hk .hk-cumple-gente[data-ajuste="1"] .hk-cumple-nombre {
-    font-size: calc((var(--hk-t-lista) + var(--hk-t-min)) / 2);
-}
-.hk .hk-cumple-gente[data-ajuste="3"] .hk-cumple-grupo {
-    display: none;
-}
-/* Two or three: each of them stands up */
-.hk .hk-cumple-gente[data-tam="grande"] .hk-cumple-persona {
-    display: block;
-    padding: 3rem 3rem 3.2rem;
-    text-align: center;
-}
-.hk .hk-cumple-gente[data-tam="grande"] .hk-cumple-cara {
-    width: calc(var(--hk-t-entrada) * 3.2);
-    height: calc(var(--hk-t-entrada) * 3.2);
-    margin: 0 auto 2rem;
-    font-size: calc(var(--hk-t-entrada) * 1.3);
-}
-.hk .hk-cumple-gente[data-tam="grande"] .hk-cumple-nombre {
-    font-family: var(--hk-letra-titulos);
-    font-size: var(--hk-t-entrada);
-}
-.hk .hk-cumple-gente[data-tam="grande"] .hk-cumple-grupo {
-    font-size: var(--hk-t-lista);
-}
-/* Up to three from further away: a line each, larger */
-.hk .hk-cumple-gente[data-tam="medio"] .hk-cumple-cara {
-    width: calc(var(--hk-t-entrada) * 1.75);
-    height: calc(var(--hk-t-entrada) * 1.75);
-    font-size: var(--hk-t-lista);
-}
-.hk .hk-cumple-gente[data-tam="medio"] .hk-cumple-nombre {
-    font-size: var(--hk-t-entrada);
-}
-.hk .hk-cumple-gente[data-tam="medio"] .hk-cumple-grupo {
-    font-size: var(--hk-t-min);
-}
-.hk .hk-cumple-gente[data-tam="medio"][data-ajuste] .hk-cumple-nombre {
-    font-size: var(--hk-t-lista);
-}
-.hk .hk-cumple-gente[data-tam="medio"][data-ajuste="2"] .hk-cumple-grupo,
-.hk .hk-cumple-gente[data-tam="grande"][data-ajuste="3"] .hk-cumple-grupo {
-    display: none;
-}
-/* From 5 and 8 m, the line takes the name at its size, with a smaller face */
-.hk[data-distancia="5"] .hk-cumple-gente[data-tam="lista"] .hk-cumple-cara,
-.hk[data-distancia="8"] .hk-cumple-gente[data-tam="lista"] .hk-cumple-cara,
-.hk[data-distancia="8"] .hk-cumple-gente[data-tam="medio"] .hk-cumple-cara {
-    width: calc(var(--hk-t-lista) * 1.5);
-    height: calc(var(--hk-t-lista) * 1.5);
-    font-size: var(--hk-t-min);
-}
-.hk[data-distancia="8"] .hk-cumple-gente[data-tam="medio"] .hk-cumple-nombre {
-    font-size: var(--hk-t-lista);
-}
-.hk[data-distancia="8"] .hk-cumple-gente {
-    padding: .4rem 3rem 1rem;
-}
-.hk[data-distancia="8"] .hk-cumple-persona {
-    margin: .8rem 1.2rem;
-    padding-top: 1rem;
-    padding-bottom: 1rem;
-}
-/* One: the whole slide is theirs */
-.hk .hk-cumple-gente[data-tam="uno"] .hk-cumple-persona {
-    width: auto;
-    max-width: calc(100% - 2.4rem);
-    padding: 2.4rem 6rem 2.4rem 2.4rem;
-}
-.hk .hk-cumple-gente[data-tam="uno"] .hk-cumple-cara {
-    width: calc(var(--hk-t-cifra) * 2.4);
-    height: calc(var(--hk-t-cifra) * 2.4);
-    margin-right: 4rem;
-    font-size: var(--hk-t-cifra);
-}
-.hk-horizontal[data-distancia="5"] .hk-cumple-gente[data-tam="uno"] .hk-cumple-cara,
-.hk-horizontal[data-distancia="8"] .hk-cumple-gente[data-tam="uno"] .hk-cumple-cara {
-    width: calc(var(--hk-t-cifra) * 1.7);
-    height: calc(var(--hk-t-cifra) * 1.7);
-}
-.hk .hk-cumple-gente[data-tam="uno"] .hk-cumple-texto {
-    flex: 0 1 auto;
-}
-.hk .hk-cumple-gente[data-tam="uno"] .hk-cumple-nombre {
+    position: relative;
     font-family: var(--hk-letra-titulos);
     font-size: var(--hk-t-titular);
-    letter-spacing: -.015em;
+    font-weight: 800;
+    letter-spacing: -.02em;
     line-height: 1.02;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
 }
-.hk .hk-cumple-gente[data-tam="uno"] .hk-cumple-grupo {
-    margin-top: 1.4rem;
+.hk .hk-cumple-nombre[data-ajuste="1"] { font-size: calc(var(--hk-t-titular) * .86); }
+.hk .hk-cumple-nombre[data-ajuste="2"] { font-size: calc(var(--hk-t-titular) * .74); }
+.hk .hk-cumple-nombre[data-ajuste="3"] { font-size: calc(var(--hk-t-titular) * .62); }
+.hk .hk-cumple-nombre[data-ajuste="4"] { font-size: calc(var(--hk-t-titular) * .52); }
+.hk .hk-cumple-grupo {
+    margin-top: 2.4rem;
     font-size: var(--hk-t-entrada);
+    font-weight: 700;
+    line-height: 1.1;
+    opacity: .9;
 }
-.hk .hk-cumple-gente[data-tam="uno"][data-ajuste] .hk-cumple-nombre {
-    font-size: calc(var(--hk-t-titular) * .76);
+
+/* The shine: a band that crosses the name, made of the name itself in a lighter colour (the script moves it) */
+.hk-cumple-brillo {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    overflow: hidden;
+    visibility: hidden;
+    pointer-events: none;
+    -webkit-transform-origin: 0 0;
+    transform-origin: 0 0;
 }
-.hk-vertical .hk-cumple-gente[data-tam="uno"] .hk-cumple-persona {
+/* The band fades in and out at its edges: a glint, not a stripe. Where the mask is not known, a plain band. */
+.hk-cumple-brillo {
+    width: 22rem;
+    -webkit-mask-image: -webkit-linear-gradient(left, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, .55) 30%, #000 50%, rgba(0, 0, 0, .55) 70%, rgba(0, 0, 0, 0) 100%);
+    -webkit-mask-image: linear-gradient(90deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, .55) 30%, #000 50%, rgba(0, 0, 0, .55) 70%, rgba(0, 0, 0, 0) 100%);
+}
+.is-brilla > .hk-cumple-brillo {
+    visibility: visible;
+}
+.hk-cumple-brillo > span {
+    position: absolute;
+    top: 0;
+    left: 0;
     display: block;
-    padding: 4rem;
+    -webkit-transform-origin: 0 0;
+    transform-origin: 0 0;
+}
+
+/* --- The group photo, with two or three ----------------------------------------------------------------------------- */
+.hk-cumple-foto {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    padding: 0 4rem 3rem;
+    text-align: center;
+    visibility: hidden;
+    opacity: 0;
+    -webkit-transition: opacity .4s, visibility 0s linear .4s;
+    transition: opacity .4s, visibility 0s linear .4s;
+}
+.hk-cumple-foto.is-dentro {
+    visibility: visible;
+    opacity: 1;
+    -webkit-transition: opacity .4s, visibility 0s;
+    transition: opacity .4s, visibility 0s;
+}
+.hk .hk-cumple-nombre.hk-cumple-titulo {
+    flex: none;
+    margin-bottom: 3.6rem;
+    font-size: calc(var(--hk-t-entrada) * 1.25);
+    letter-spacing: -.01em;
+    opacity: 0;
+    -webkit-transform: translate3d(0, -2rem, 0);
+    transform: translate3d(0, -2rem, 0);
+    -webkit-transition: -webkit-transform .7s cubic-bezier(.2, .8, .2, 1), opacity .5s;
+    transition: transform .7s cubic-bezier(.2, .8, .2, 1), opacity .5s;
+}
+.hk-cumple-foto.is-dentro .hk-cumple-titulo {
+    opacity: 1;
+    -webkit-transform: none;
+    transform: none;
+}
+.hk-cumple-fila {
+    display: flex;
+    flex: none;
+    justify-content: center;
+    width: 100%;
+}
+.hk .hk-cumple-retrato {
+    flex: 0 1 56rem;
+    min-width: 0;
+    margin: 0 2.4rem;
+    opacity: 0;
+    -webkit-transform: translate3d(0, 5rem, 0) scale(.9);
+    transform: translate3d(0, 5rem, 0) scale(.9);
+    -webkit-transition: -webkit-transform .8s cubic-bezier(.2, .9, .25, 1), opacity .45s;
+    transition: transform .8s cubic-bezier(.2, .9, .25, 1), opacity .45s;
+}
+.hk-cumple[data-fiesta="juguetona"] .hk-cumple-retrato {
+    -webkit-transition-timing-function: cubic-bezier(.3, 1.5, .45, 1), ease;
+    transition-timing-function: cubic-bezier(.3, 1.5, .45, 1), ease;
+}
+.hk-cumple-foto.is-dentro .hk-cumple-retrato {
+    opacity: 1;
+    -webkit-transform: none;
+    transform: none;
+}
+.hk-cumple-foto.is-dentro .hk-cumple-retrato:nth-child(2) {
+    -webkit-transition-delay: .18s;
+    transition-delay: .18s;
+}
+.hk-cumple-foto.is-dentro .hk-cumple-retrato:nth-child(3) {
+    -webkit-transition-delay: .36s;
+    transition-delay: .36s;
+}
+.hk .hk-cumple-retrato .hk-cumple-cara {
+    width: 32rem;
+    height: 32rem;
+    margin: 0 auto 2.8rem;
+    border: 1.1rem solid var(--hk-sobre-primario);
+    box-shadow: 0 0 0 1rem rgba(255, 255, 255, .12);
+}
+.hk-cumple[data-n="3"] .hk-cumple-retrato .hk-cumple-cara {
+    width: 28rem;
+    height: 28rem;
+}
+.hk .hk-cumple-nombre-foto {
+    font-size: var(--hk-t-entrada);
+    line-height: 1.04;
+}
+.hk .hk-cumple-nombre-foto[data-ajuste="1"] { font-size: calc(var(--hk-t-entrada) * .88); }
+.hk .hk-cumple-nombre-foto[data-ajuste="2"] { font-size: calc(var(--hk-t-entrada) * .78); }
+.hk .hk-cumple-nombre-foto[data-ajuste="3"] { font-size: var(--hk-t-min); }
+.hk .hk-cumple-nombre-foto[data-ajuste="4"] { font-size: var(--hk-t-min); }
+.hk .hk-cumple-retrato .hk-cumple-grupo {
+    margin-top: 1.2rem;
+    font-size: var(--hk-t-min);
+}
+.hk-cumple-foto[data-ajuste="4"] .hk-cumple-retrato .hk-cumple-grupo {
+    display: none;
+}
+.hk[data-distancia="8"] .hk-cumple-retrato .hk-cumple-cara {
+    width: 26rem;
+    height: 26rem;
+}
+.hk[data-distancia="8"] .hk-cumple[data-n="3"] .hk-cumple-retrato .hk-cumple-cara {
+    width: 22rem;
+    height: 22rem;
+}
+
+/* --- Upright screens: one under the other --------------------------------------------------------------------------- */
+.hk-vertical .hk-cumple-escena {
+    top: 11rem;
+}
+.hk-vertical .hk-cumple[data-modo="desfile"] .hk-cumple-escena {
+    top: 21rem;
+}
+.hk-vertical .hk-cumple-momento,
+.hk-vertical .hk-cumple[data-modo="desfile"] .hk-cumple-momento {
+    flex-direction: column;
+    justify-content: center;
+    padding: 2rem 5rem 6rem;
     text-align: center;
 }
-.hk-vertical .hk-cumple-gente[data-tam="uno"] .hk-cumple-cara {
-    margin: 0 auto 3rem;
+.hk-vertical .hk-cumple-texto {
+    flex: none;
+    width: 100%;
+    margin: 5rem 0 0;
+}
+.hk-vertical .hk-cumple-cara-grande {
+    width: 62rem;
+    height: 62rem;
+}
+.hk-vertical .hk-cumple[data-modo="desfile"] .hk-cumple-cara-grande {
+    width: 52rem;
+    height: 52rem;
+}
+.hk-vertical .hk-cumple-fila {
+    flex-wrap: wrap;
+}
+.hk-vertical .hk-cumple-retrato {
+    flex: 0 1 46rem;
+    margin-bottom: 4rem;
+}
+
+/* --- A still screen: the same moments, only fading ----------------------------------------------------------------- */
+.hk-cumple.is-quieto .hk-globo,
+.hk-cumple.is-quieto .hk-globo-vaiven,
+.hk-cumple.is-quieto .hk-cumple-tramo,
+.hk-cumple.is-quieto .hk-cumple-adorno {
+    -webkit-animation: none;
+    animation: none;
+}
+.hk-cumple.is-quieto .hk-globo {
+    -webkit-transform: translate3d(0, -22rem, 0);
+    transform: translate3d(0, -22rem, 0);
+}
+.hk-cumple.is-quieto .hk-cumple-guirnalda,
+.hk-cumple.is-quieto .hk-cumple-tira {
+    -webkit-transition: none;
+    transition: none;
+}
+.hk-cumple.is-quieto .hk-cumple-guirnalda,
+.hk-cumple.is-quieto .hk-cumple-cara-grande,
+.hk-cumple.is-quieto .hk-cumple-texto,
+.hk-cumple.is-quieto .hk-cumple-titulo,
+.hk-cumple.is-quieto .hk-cumple-retrato,
+.hk-cumple.is-quieto .is-fuera .hk-cumple-cara-grande,
+.hk-cumple.is-quieto .is-fuera .hk-cumple-texto {
+    -webkit-transform: none;
+    transform: none;
+}
+.hk-cumple.is-quieto .hk-cumple-cara-grande,
+.hk-cumple.is-quieto .hk-cumple-texto,
+.hk-cumple.is-quieto .hk-cumple-titulo,
+.hk-cumple.is-quieto .hk-cumple-retrato {
+    -webkit-transition: opacity .6s;
+    transition: opacity .6s;
+}
+.hk-cumple.is-quieto .hk-cumple-momento {
+    -webkit-transition: opacity .6s, visibility 0s linear .6s;
+    transition: opacity .6s, visibility 0s linear .6s;
+}
+.hk-cumple.is-quieto .hk-cumple-momento.is-dentro {
+    -webkit-transition: opacity .6s, visibility 0s;
+    transition: opacity .6s, visibility 0s;
+}
+@media (prefers-reduced-motion: reduce) {
+    .hk .hk-globo,
+    .hk .hk-globo-vaiven,
+    .hk .hk-cumple-tramo,
+    .hk .hk-cumple-adorno {
+        -webkit-animation: none;
+        animation: none;
+    }
 }

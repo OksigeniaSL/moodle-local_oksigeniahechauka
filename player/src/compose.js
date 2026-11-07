@@ -27,6 +27,8 @@
 // thirds (foto-hoy is foto-sola, a landscape video is foto-completa, «Today» comes one thing at a time) and the
 // ticker's sentences come as slides of their own.
 
+import {birthdaysSeconds, birthdaysShow} from './cumple-turnos.js';
+
 /** How many slides go by between one of the birthdays and the next. */
 const BIRTHDAY_EVERY = 7;
 
@@ -172,10 +174,10 @@ export class Composer {
         // seeing their name; the library, one in sixteen. Each turn the next page, which the slide knows how to show.
         this.sinceBirthday = (this.sinceBirthday === undefined ? BIRTHDAY_EVERY : this.sinceBirthday) + 1;
         this.sinceBooks = (this.sinceBooks === undefined ? BOOKS_EVERY / 2 : this.sinceBooks) + 1;
-        if (o.birthdays && this.sinceBirthday > BIRTHDAY_EVERY) {
+        if (o.birthdays && birthdaysShow(o.birthdays) && this.sinceBirthday > BIRTHDAY_EVERY) {
             this.sinceBirthday = 1;
             this.birthdayPage = (this.birthdayPage === undefined ? -1 : this.birthdayPage) + 1;
-            return pick('cumple', [], 12, {item: o.birthdays, page: this.birthdayPage});
+            return pick('cumple', [], birthdaysSeconds(o.birthdays), {item: o.birthdays, page: this.birthdayPage});
         }
         if (o.books && this.sinceBooks > BOOKS_EVERY) {
             this.sinceBooks = 1;

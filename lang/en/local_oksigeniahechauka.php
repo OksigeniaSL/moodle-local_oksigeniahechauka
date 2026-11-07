@@ -656,6 +656,7 @@ $string['label_allergens'] = 'Allergens:';
 $string['label_also'] = 'Also:';
 $string['label_also_more'] = 'and {n} more';
 $string['label_also_others'] = '{n} more menus';
+$string['label_birthdays_cheers'] = 'Happy birthday!';
 $string['label_birthdays_many'] = 'Birthdays today';
 $string['label_birthdays_one'] = 'Birthday today';
 $string['label_books'] = 'New in the library';
