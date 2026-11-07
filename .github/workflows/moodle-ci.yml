@@ -245,6 +245,6 @@ jobs:
 
       - name: Shell scripts
         run: |
-          for f in device/instala.sh device/imagen/construye.sh device/raiz/usr/local/bin/hechauka-*; do
+          for f in device/instala.sh device/imagen/construye.sh device/samsung/construye.sh device/raiz/usr/local/bin/hechauka-*; do
             if head -1 "$f" | grep -q bash; then bash -n "$f" && echo "ok $f"; fi
           done
