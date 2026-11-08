@@ -31,6 +31,7 @@ use core_privacy\local\request\contextlist;
 use core_privacy\local\request\userlist;
 use core_privacy\local\request\writer;
 use local_oksigeniahechauka\local\birthdays;
+use local_oksigeniahechauka\local\greeting;
 
 /**
  * The only things about a person: who created each piece of content of the screens and who changed it last. Screens and
@@ -39,7 +40,8 @@ use local_oksigeniahechauka\local\birthdays;
 class provider implements
     \core_privacy\local\metadata\provider,
     \core_privacy\local\request\core_userlist_provider,
-    \core_privacy\local\request\plugin\provider {
+    \core_privacy\local\request\plugin\provider,
+    \core_privacy\local\request\user_preference_provider {
     /** Table of the content. */
     const TABLE = 'local_oksigeniahechauka_item';
 
@@ -66,7 +68,29 @@ class provider implements
             'day' => 'privacy:metadata:birthday:day',
             'usermodified' => 'privacy:metadata:birthday:usermodified',
         ], 'privacy:metadata:birthday');
+        $collection->add_user_preference(greeting::CLOSED, 'privacy:metadata:preference:greetclosed');
+        $collection->add_user_preference(greeting::SENT, 'privacy:metadata:preference:greetsent');
         return $collection;
+    }
+
+    /**
+     * The years someone closed their birthday card and got its notification.
+     *
+     * @param int $userid
+     * @return void
+     */
+    public static function export_user_preferences(int $userid): void {
+        $c = 'local_oksigeniahechauka';
+        $preferences = [
+            greeting::CLOSED => 'privacy:metadata:preference:greetclosed',
+            greeting::SENT => 'privacy:metadata:preference:greetsent',
+        ];
+        foreach ($preferences as $name => $what) {
+            $value = get_user_preferences($name, null, $userid);
+            if ($value !== null) {
+                writer::export_user_preference($c, $name, $value, get_string($what, $c));
+            }
+        }
     }
 
     /**

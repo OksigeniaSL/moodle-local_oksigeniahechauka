@@ -194,6 +194,95 @@ class birthdays {
     }
 
     /**
+     * The rows of the list on a date.
+     *
+     * @param string $date YYYY-MM-DD
+     * @return \stdClass[]
+     */
+    protected static function rows_on(string $date): array {
+        global $DB;
+        $rows = [];
+        foreach (self::days_of($date) as [$month, $day]) {
+            $rows = array_merge($rows, array_values($DB->get_records(self::TABLE, ['month' => $month, 'day' => $day], 'id')));
+        }
+        return $rows;
+    }
+
+    /**
+     * The Moodle accounts with a birthday on a date: by the field of the profile, and on the list by the account it was linked
+     * to or by its ID number. Only accounts in use.
+     *
+     * @param \stdClass $config the plugin's
+     * @param string $date YYYY-MM-DD
+     * @return int[] their ids
+     */
+    public static function accounts_on(\stdClass $config, string $date): array {
+        global $DB;
+        $ids = self::users_on((string) ($config->birthdayfield ?? ''), $date);
+        $rows = self::rows_on($date);
+        $users = self::users_by_idnumber(array_map(function ($row) {
+            return empty($row->userid) ? (string) $row->idnumber : '';
+        }, $rows));
+        foreach ($rows as $row) {
+            $id = !empty($row->userid) ? (int) $row->userid : (int) ($users[(string) $row->idnumber]->id ?? 0);
+            if ($id) {
+                $ids[] = $id;
+            }
+        }
+        if (!$ids) {
+            return [];
+        }
+        [$in, $params] = $DB->get_in_or_equal(array_values(array_unique($ids)));
+        $active = $DB->get_fieldset_select('user', 'id', "id $in AND deleted = 0 AND suspended = 0", $params);
+        $active = array_map('intval', $active);
+        sort($active);
+        return $active;
+    }
+
+    /**
+     * Whether a Moodle account has its birthday on a date, and what to greet it with: its first name, the name the bichito
+     * is drawn from, its group and the picture the screens would show of it (none where a no counts).
+     *
+     * @param \stdClass $config the plugin's
+     * @param int $userid
+     * @param string $date YYYY-MM-DD
+     * @return array|null {firstname, name, group, photo: stored_file|null}, or null when it is not their day
+     */
+    public static function of_user(\stdClass $config, int $userid, string $date): ?array {
+        global $DB;
+        $fields = 'id, firstname, lastname, idnumber, department, picture';
+        $user = $DB->get_record('user', ['id' => $userid, 'deleted' => 0, 'suspended' => 0], $fields);
+        if (!$user || isguestuser($user)) {
+            return null;
+        }
+        $row = null;
+        if (!in_array($userid, self::users_on((string) ($config->birthdayfield ?? ''), $date))) {
+            $idnumber = trim((string) $user->idnumber);
+            foreach (self::rows_on($date) as $candidate) {
+                if (!empty($candidate->userid) ? (int) $candidate->userid === $userid :
+                        $idnumber !== '' && (string) $candidate->idnumber === $idnumber
+                        && isset(self::users_by_idnumber([$idnumber])[$idnumber])) {
+                    $row = $candidate;
+                    break;
+                }
+            }
+            if (!$row) {
+                return null;
+            }
+        }
+        [$allowed, $familyphoto] = self::family_photo($row, $userid);
+        $photo = !$allowed ? null : (($row ? self::list_picture((int) $row->id) : null) ?: $familyphoto
+            ?: ($user->picture ? self::user_picture($userid) : null));
+        $surname = preg_split('/\s+/', trim((string) $user->lastname))[0];
+        return [
+            'firstname' => trim((string) $user->firstname),
+            'name' => trim($user->firstname . ' ' . $surname),
+            'group' => trim((string) ($row ? $row->groupname : $user->department)),
+            'photo' => $photo,
+        ];
+    }
+
+    /**
      * Someone, as the screens get them.
      *
      * @param string $name

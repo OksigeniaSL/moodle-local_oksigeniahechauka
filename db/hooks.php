@@ -33,4 +33,10 @@ $callbacks = [
         'hook' => \core_user\hook\extend_user_menu::class,
         'callback' => [\local_oksigeniahechauka\hook_callbacks::class, 'extend_user_menu'],
     ],
+    [
+        // After the cards of other plugins: each goes to the top as it is read, so the birthday stays above them all.
+        'hook' => \core\hook\output\before_footer_html_generation::class,
+        'callback' => [\local_oksigeniahechauka\hook_callbacks::class, 'before_footer'],
+        'priority' => 100,
+    ],
 ];

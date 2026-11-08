@@ -70,4 +70,14 @@ $tasks = [
         'month' => '*',
         'dayofweek' => '*',
     ],
+    [
+        // Every hour: the notification goes from seven, and once a year.
+        'classname' => 'local_oksigeniahechauka\task\greet_birthdays',
+        'blocking' => 0,
+        'minute' => '5',
+        'hour' => '*',
+        'day' => '*',
+        'month' => '*',
+        'dayofweek' => '*',
+    ],
 ];

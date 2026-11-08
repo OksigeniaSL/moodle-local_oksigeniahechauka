@@ -80,6 +80,9 @@ if ($action !== '' && confirm_sesskey()) {
                 }
             }
         }
+    } else if ($action === 'greeting') {
+        set_config('greetcard', optional_param('card', 0, PARAM_BOOL) ? 1 : 0, $c);
+        set_config('greetnotify', optional_param('notify', 0, PARAM_BOOL) ? 1 : 0, $c);
     } else if ($action === 'add') {
         $id = birthdays::add(
             optional_param('name', '', PARAM_TEXT),

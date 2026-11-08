@@ -79,6 +79,8 @@ class birthdayspage {
             'on' => !empty($config->sourcebirthdays),
             'cifra' => self::cifra($config),
             'family' => birthdays::family_available() ? ['on' => ($config->birthdaysfamily ?? '1') !== '0'] : null,
+            'greetcard' => greeting::card_on(),
+            'greetnotify' => greeting::notify_on(),
             'fields' => $fields,
             'hasfields' => count($fields) > 1,
             'days' => range(1, 31),

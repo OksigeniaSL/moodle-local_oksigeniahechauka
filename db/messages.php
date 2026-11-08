@@ -40,6 +40,15 @@ $messageproviders = [
             'email' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_ENABLED,
         ],
     ],
+    // Happy birthday, the morning of the day, when the centre has it on: on the phone as well as in Moodle.
+    'birthday' => [
+        'defaults' => [
+            'popup' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_ENABLED,
+            'airnotifier' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_ENABLED,
+            'oksigeniamarandu' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_ENABLED,
+            'email' => MESSAGE_PERMITTED,
+        ],
+    ],
     // A screen that should be on has stopped giving signs of life, or has come back.
     'screendown' => [
         'capability' => 'local/oksigeniahechauka:managescreens',

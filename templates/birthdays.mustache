@@ -22,7 +22,7 @@
     Example context (json):
     {
         "tabs": [{"url": "#", "label": "Tu centro", "icon": "", "current": true}], "hastabs": true, "centre": "#", "action": "#",
-        "sesskey": "abc", "modelurl": "#", "moodlepictures": "#", "on": true, "fields": [{"value": "", "label": "Ninguno", "selected": true}], "hasfields": false,
+        "sesskey": "abc", "modelurl": "#", "moodlepictures": "#", "on": true, "greetcard": true, "greetnotify": false, "fields": [{"value": "", "label": "Ninguno", "selected": true}], "hasfields": false,
         "days": [1, 2], "months": [{"value": 1, "label": "enero"}], "count": 1, "haspeople": true, "hastoday": true,
         "today": "Lucía Pérez",
         "people": [{"id": 1, "name": "Lucía Pérez", "group": "3.º A", "idnumber": "1024", "date": "15 marzo", "photo": "", "initial": "L"}]
@@ -45,6 +45,16 @@
                 <div class="hkp-foot"><button type="submit" class="btn btn-primary">{{#str}}centre_save, local_oksigeniahechauka{{/str}}</button></div>
             </form>
             <p class="hkp-hint hkp-bd-today">{{#hastoday}}{{#str}}birthdays_today, local_oksigeniahechauka, {{today}}{{/str}}{{/hastoday}}{{^hastoday}}{{#str}}birthdays_today_none, local_oksigeniahechauka{{/str}}{{/hastoday}}</p>
+        </section>
+        <section class="hkp-fs" aria-labelledby="hkp-bd-moodle">
+            <h2 id="hkp-bd-moodle" class="hkp-label hkp-section-label">{{#str}}birthdays_moodle, local_oksigeniahechauka{{/str}}</h2>
+            <p class="hkp-hint hkp-section-hint">{{#str}}birthdays_moodle_help, local_oksigeniahechauka{{/str}}</p>
+            <form method="post" action="{{action}}">
+                <input type="hidden" name="sesskey" value="{{sesskey}}"><input type="hidden" name="action" value="greeting">
+                <div class="form-switch form-check hkp-field"><input class="form-check-input" type="checkbox" role="switch" id="hkp-bd-greetcard" name="card" value="1"{{#greetcard}} checked{{/greetcard}}><label class="form-check-label" for="hkp-bd-greetcard">{{#str}}birthdays_greetcard, local_oksigeniahechauka{{/str}}</label><p class="hkp-hint">{{#str}}birthdays_greetcard_help, local_oksigeniahechauka{{/str}}</p></div>
+                <div class="form-switch form-check hkp-field"><input class="form-check-input" type="checkbox" role="switch" id="hkp-bd-greetnotify" name="notify" value="1"{{#greetnotify}} checked{{/greetnotify}}><label class="form-check-label" for="hkp-bd-greetnotify">{{#str}}birthdays_greetnotify, local_oksigeniahechauka{{/str}}</label><p class="hkp-hint">{{#str}}birthdays_greetnotify_help, local_oksigeniahechauka{{/str}}</p></div>
+                <div class="hkp-foot"><button type="submit" class="btn btn-primary">{{#str}}centre_save, local_oksigeniahechauka{{/str}}</button></div>
+            </form>
         </section>
         <section class="hkp-fs" aria-labelledby="hkp-bd-add">
             <h2 id="hkp-bd-add" class="hkp-label hkp-section-label">{{#str}}birthdays_add, local_oksigeniahechauka{{/str}}</h2>

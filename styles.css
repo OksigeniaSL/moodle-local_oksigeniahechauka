@@ -4547,3 +4547,49 @@ dialog.hkp-dialog > footer {
     color: var(--hkp-bad-ink);
     font-weight: 600;
 }
+.hk-greeting {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding: 1rem 1.25rem;
+    border: 1px solid var(--bs-border-color, #dee2e6);
+    border-radius: var(--bs-border-radius-lg, .5rem);
+    background: var(--bs-body-bg, #fff);
+    color: var(--bs-body-color, #1d2125);
+}
+.hk-greeting-face {
+    flex: none;
+    width: 4rem;
+    height: 4rem;
+    border-radius: 50%;
+    overflow: hidden;
+    display: grid;
+    place-items: center;
+    background: var(--bs-secondary-bg, #e9ecef);
+    font-size: 1.75rem;
+    font-weight: 700;
+}
+.hk-greeting-face img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.hk-greeting-text {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+.hk-greeting-text h2 {
+    margin: 0 0 .25rem;
+    font-size: 1.25rem;
+}
+.hk-greeting-text p {
+    margin: 0;
+}
+.hk-greeting-close {
+    flex: none;
+    align-self: flex-start;
+}
+.hk-greeting.is-closing {
+    opacity: .5;
+}
