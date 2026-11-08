@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.16.1
+
+- «Your work» says «One screen, without a sign of life» when there is only one.
+
 ## 0.16.0
 
 - **The people of the birthday list find their account by themselves**, also those written before the links existed: when every word of the name is in the full name of a single account whose first name starts like it («Yaiza Corujo» is «Yaiza» «Corujo Febles»). Never an account that is already on the list with another birthday, so a teacher never falls on a pupil with a similar name. Every night, when the plugin is updated, and with «Look for their accounts now».

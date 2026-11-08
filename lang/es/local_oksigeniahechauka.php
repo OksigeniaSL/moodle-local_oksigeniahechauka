@@ -1319,6 +1319,7 @@ $string['work_items'] = '{$a} publicaciones en las pantallas';
 $string['work_mine'] = '{$a} publicaciones tuyas en las pantallas';
 $string['work_noscreens'] = 'Todavía sin pantallas';
 $string['work_publish'] = 'Publicar';
+$string['work_screen_down_one'] = 'Una pantalla, sin señal';
 $string['work_screens'] = '{$a} pantallas, todas dan señal';
 $string['work_screens_down'] = '{$a->count} pantallas · {$a->down} sin señal';
 $string['work_screens_one'] = 'Una pantalla, da señal';

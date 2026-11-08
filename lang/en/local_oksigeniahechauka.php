@@ -1319,6 +1319,7 @@ $string['work_items'] = '{$a} things on the screens';
 $string['work_mine'] = '{$a} things of yours on the screens';
 $string['work_noscreens'] = 'No screens yet';
 $string['work_publish'] = 'Publish';
+$string['work_screen_down_one'] = 'One screen, without a sign of life';
 $string['work_screens'] = '{$a} screens, all giving signs of life';
 $string['work_screens_down'] = '{$a->count} screens · {$a->down} without a sign of life';
 $string['work_screens_one'] = 'One screen, giving signs of life';

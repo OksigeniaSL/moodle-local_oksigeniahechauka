@@ -107,9 +107,14 @@ class work {
                 }
             }
             $count = count($screens);
-            $status = !$count ? get_string('work_noscreens', $c) : ($down ?
-                get_string('work_screens_down', $c, (object) ['count' => $count, 'down' => $down]) :
-                get_string($count === 1 ? 'work_screens_one' : 'work_screens', $c, $count));
+            if (!$count) {
+                $status = get_string('work_noscreens', $c);
+            } else if ($count === 1) {
+                $status = get_string($down ? 'work_screen_down_one' : 'work_screens_one', $c);
+            } else {
+                $status = $down ? get_string('work_screens_down', $c, (object) ['count' => $count, 'down' => $down]) :
+                    get_string('work_screens', $c, $count);
+            }
         }
         // An urgent notice left on is worth remembering to whoever can take it off.
         if (access::can('publishall', $userid)) {
