@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.13.0
+
+- **The slides move.** One language for all of them: the old slide goes in 0.3 s, and the new one comes in the order it is read in under 2 s (the frame, the headline, what explains it, the object, the third from the top), then stands still to be read. «Today» serves its plate, puts up the sign of what is important (the only thing that pulses), turns the flaps of a countdown from yesterday's number and stamps the icon of an event; a photo settles slowly; the 8 m headline rises line by line; what falls due comes in by days, with a bar that says how long is left; the library's books arrive along the shelf. How much moves comes from the skin (sober, elegant, playful), and a screen that keeps still gets the same order with fades only. Only transform and opacity, for Chromium 56 and the Raspberry Pi.
+- The countdown at 8 m is a board of flaps as tall as the block, with the words beside it, so the number is read first; what falls due today has a band of the accent.
+- A lead's headline never leaves a short word alone in a line.
+- The urgent notice grows with the distance it is read from, steps down before a long one overflows, and its clock is never under the least size.
+- From 8 m a mixed screen shows the weather alone, and the picture it used to hide keeps its turn.
+- The birthday's kicker and the shine over a name always read at 4.5:1 on the stage.
+
 ## 0.10.2
 
 - The card of a Raspberry Pi screen, built again with what 0.10.1 fixed: a new screen with no hours keeps itself up to date from its first day.

@@ -84,6 +84,33 @@ export function lighter(colour, k) {
     }).join(',') + ')';
 }
 
+/**
+ * The colour, lightened on a dark ground (darkened on a light one) only as much as it takes to read at «least» on it; null when
+ * it would need more than «most» of white or black.
+ *
+ * @param {string} colour
+ * @param {string} ground
+ * @param {number} least the contrast it must reach (4.5 for text)
+ * @param {number} [most] how much it may change, 0 to 1 (all of it, when not given)
+ * @returns {string|null}
+ */
+export function readable(colour, ground, least, most) {
+    const c = rgbOf(colour);
+    const g = rgbOf(ground);
+    if (!c || !g) {
+        return colour;
+    }
+    const top = most === undefined ? 1 : most;
+    const up = luminance(g) < 0.18;
+    for (let k = 0; k <= top + 0.001; k += 0.05) {
+        const x = k === 0 ? colour : (up ? lighter(colour, k) : darker(colour, k));
+        if (contrast(x, ground) >= least) {
+            return x;
+        }
+    }
+    return null;
+}
+
 function darker(colour, k) {
     const c = rgbOf(colour);
     if (!c) {

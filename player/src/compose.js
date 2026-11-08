@@ -41,6 +41,9 @@ const DEADLINES_EVERY = 12;
 /** How many slides go by between one of the tables and the next. */
 const TABLES_EVERY = 8;
 
+/** The seconds of the weather alone, from 8 m. */
+const WEATHER_ALONE = 10;
+
 /** Width over height of an item's picture or video; landscape when it does not say. */
 export function ratio(item) {
     const m = (item && item.media) || {};
@@ -231,8 +234,12 @@ export class Composer {
                 return pick('muro', [], 30, {album: wall.id});
             }
         }
-        // Mixed: every other slide, a picture or video with the weather in a third.
-        if (o.use === 'mixed' && o.weather && this.n % 2 === 0) {
+        // Mixed: every other slide, a picture or video with the weather in a third. From 8 m there are no thirds: the
+        // weather alone, one slide in four, and the picture keeps its turn instead of going by unseen.
+        if (o.use === 'mixed' && o.weather && far && this.n % 4 === 1) {
+            return pick('tiempo-tercio', [], WEATHER_ALONE);
+        }
+        if (o.use === 'mixed' && o.weather && !far && this.n % 2 === 0) {
             const it = queue[this.position(queue)];
             return pick('tiempo-tercio', [it], secondsOf(it));
         }

@@ -1,0 +1,459 @@
+/* Oksigenia Hechauka: how the slides move (Gaudí, 8 November 2026; MOTION.md). Goes after every sheet of the player but
+ * pieles.css, fondos.css and letras.css, which only set variables.
+ *
+ * src/movimiento.js marks each part of a slide with .hk-mv, data-mv-como (how it comes in) and its delay, and the layer with
+ * data-mv (its composition), data-mv-fiesta (sobria, elegante or juguetona) and data-mv-quieta. This sheet says the rest:
+ *   1. the pass from one slide to the next: the old one goes up and fades in 0.3 s, all at once; nothing new shows until then;
+ *   2. how each part comes in: from hidden (here) to its place (.hk-dentro), with transform and opacity only;
+ *   3. what moves while the slide stands: the clock's colon, a sheen over a block of colour, the bar of the time left, the
+ *      important sign's pulse, the flaps of a countdown (those, by script);
+ *   4. a screen that keeps still: fades only, nothing that moves while it stands.
+ * A layer the script does not mark (the agenda, the wall, the full screens) keeps the pass of composiciones.css.
+ *
+ * Chromium 56: transform and opacity only; no custom properties inside @keyframes; flexbox without gap; no inset. */
+
+/* --- 1. The pass ------------------------------------------------------------------------------------------------- */
+.hk-capa[data-mv] {                     /* shown at once when the old one has gone: its parts are still hidden then, and
+                                           a fade of the whole over theirs would cost a second surface on a screen without GPU */
+    opacity: 0;
+    -webkit-transition: opacity 0s linear .3s;
+    transition: opacity 0s linear .3s;
+}
+.hk-capa[data-mv] > * {                  /* the old rise of the direct children gives way to the parts' own */
+    -webkit-transform: none;
+    transform: none;
+    -webkit-transition: none;
+    transition: none;
+}
+.hk-capa.hk-dentro[data-mv] {
+    opacity: 1;
+}
+.hk-capa.hk-fuera[data-mv] {
+    opacity: 0;
+    -webkit-transform: translate3d(0, -1.4rem, 0);
+    transform: translate3d(0, -1.4rem, 0);
+    -webkit-transition: opacity .3s cubic-bezier(.5, 0, .75, 0), -webkit-transform .3s cubic-bezier(.5, 0, .75, 0);
+    transition: opacity .3s cubic-bezier(.5, 0, .75, 0), transform .3s cubic-bezier(.5, 0, .75, 0);
+}
+.hk-capa.hk-fuera[data-mv] .hk-mv,
+.hk-capa.hk-fuera[data-mv] .hk-mv-renglon > span {
+    -webkit-transition: none !important;
+    transition: none !important;
+}
+
+/* --- 2. How each part comes in ------------------------------------------------------------------------------------
+ * Hidden, then in its place. The delay comes from the script (the order of reading); the curve, from the level: «asienta»
+ * cubic-bezier(.2, .7, .2, 1), the house's; juguetona overshoots a little, sobria travels less. */
+.hk-capa[data-mv] .hk-mv {
+    opacity: 0;
+    -webkit-transition-property: none;    /* hidden at once: the transition is only the way in (.hk-dentro) */
+    transition-property: none;
+    -webkit-transition-duration: .45s, .75s;
+    transition-duration: .45s, .75s;
+    -webkit-transition-timing-function: ease, cubic-bezier(.2, .7, .2, 1);
+    transition-timing-function: ease, cubic-bezier(.2, .7, .2, 1);
+}
+.hk-capa.hk-dentro[data-mv] .hk-mv[data-mv-como] {
+    opacity: 1;
+    -webkit-transform: none;
+    transform: none;
+    -webkit-transition-property: opacity, -webkit-transform;
+    transition-property: opacity, transform;
+}
+.hk-capa[data-mv] .hk-mv[data-mv-como="sube"],
+.hk-capa[data-mv] .hk-mv[data-mv-como="dia"],
+.hk-capa[data-mv] .hk-mv[data-mv-como="cifra"] {
+    -webkit-transform: translate3d(0, 2.4rem, 0);
+    transform: translate3d(0, 2.4rem, 0);
+}
+.hk-capa[data-mv] .hk-mv[data-mv-como="linea"],
+.hk-capa[data-mv] .hk-mv[data-mv-como="fila"] {
+    -webkit-transform: translate3d(0, 1.4rem, 0);
+    transform: translate3d(0, 1.4rem, 0);
+    -webkit-transition-duration: .4s, .6s;
+    transition-duration: .4s, .6s;
+}
+.hk-capa[data-mv] .hk-mv[data-mv-como="bloque"] {
+    -webkit-transform: scale(.97);
+    transform: scale(.97);
+    -webkit-transition-duration: .4s, .7s;
+    transition-duration: .4s, .7s;
+}
+/* a block of the whole body (the headline at 8 m, the sheet of what falls due, the library): a fade, and what is inside moves.
+   Growing it would make a screen without GPU redraw the whole body for half a second. */
+.hk-capa[data-mv] .hk-mv[data-mv-como="marco"] {
+    -webkit-transition-duration: .4s, .4s;
+    transition-duration: .4s, .4s;
+}
+.hk-capa[data-mv] .hk-lider[data-tipo="aviso"].hk-mv {
+    -webkit-transform-origin: 10% 100%;  /* the bubble grows from its tail */
+    transform-origin: 10% 100%;
+}
+.hk-capa[data-mv] .hk-mv[data-mv-como="foto"] {        /* a fade: the picture inside does the moving */
+    -webkit-transition-duration: .5s, .5s;
+    transition-duration: .5s, .5s;
+}
+/* the photo settles for the whole slide: it starts a little larger and comes to rest so slowly that, after the first two
+   seconds, it is only seen as the picture being alive (not a video: one decoder, and no scaling of its frames) */
+.hk-capa[data-mv] .hk-medio .hk-diapo img {
+    -webkit-transform: scale(1.07);
+    transform: scale(1.07);
+}
+.hk-capa.hk-dentro[data-mv] .hk-medio .hk-diapo.hk-visible img {
+    -webkit-transform: none;
+    transform: none;
+    -webkit-transition: -webkit-transform 12s cubic-bezier(.15, .55, .3, 1);
+    transition: transform 12s cubic-bezier(.15, .55, .3, 1);
+}
+/* the objects of the leads: each its own gesture */
+.hk-capa[data-mv] .hk-mv[data-mv-como="plato"] {               /* a plate served: it slides in turning */
+    -webkit-transform: translate3d(5rem, 0, 0) rotate(-40deg);
+    transform: translate3d(5rem, 0, 0) rotate(-40deg);
+    -webkit-transition-duration: .5s, 1s;
+    transition-duration: .5s, 1s;
+}
+.hk-capa[data-mv] .hk-mv[data-mv-como="senal"] {               /* the important sign: it is put up at once */
+    -webkit-transform: scale(.45);
+    transform: scale(.45);
+    -webkit-transition-duration: .3s, .7s;
+    transition-duration: .3s, .7s;
+    -webkit-transition-timing-function: ease, cubic-bezier(.3, 1.5, .5, 1);
+    transition-timing-function: ease, cubic-bezier(.3, 1.5, .5, 1);
+}
+.hk-capa[data-mv] .hk-mv[data-mv-como="talon"] {               /* the ticket's stub comes out of the printer */
+    -webkit-transform: translate3d(-4rem, 0, 0);
+    transform: translate3d(-4rem, 0, 0);
+}
+.hk-capa[data-mv] .hk-mv[data-mv-como="hoja"] {                /* the sheet of the calendar swings on its rings */
+    -webkit-transform: translate3d(0, -2rem, 0) rotate(-7deg);
+    transform: translate3d(0, -2rem, 0) rotate(-7deg);
+    -webkit-transform-origin: 50% 0;
+    transform-origin: 50% 0;
+    -webkit-transition-duration: .4s, 1.1s;
+    transition-duration: .4s, 1.1s;
+    -webkit-transition-timing-function: ease, cubic-bezier(.3, 1.4, .5, 1);
+    transition-timing-function: ease, cubic-bezier(.3, 1.4, .5, 1);
+}
+.hk-capa[data-mv] .hk-mv[data-mv-como="sello"] {               /* a stamp: pressed onto the paper */
+    -webkit-transform: scale(1.7) rotate(-16deg);
+    transform: scale(1.7) rotate(-16deg);
+    -webkit-transition-duration: .2s, .45s;
+    transition-duration: .2s, .45s;
+    -webkit-transition-timing-function: ease-in, cubic-bezier(.55, 0, .3, 1.25);
+    transition-timing-function: ease-in, cubic-bezier(.55, 0, .3, 1.25);
+}
+.hk-capa[data-mv] .hk-mv[data-mv-como="marcador"],
+.hk-capa[data-mv] .hk-mv[data-mv-como="qr"] {
+    -webkit-transform: scale(.9);
+    transform: scale(.9);
+}
+.hk-capa[data-mv] .hk-mv[data-mv-como="libro"] {               /* the book is put on the shelf (no turn: a big picture
+                                                                   turned costs a screen without GPU) */
+    -webkit-transform: translate3d(0, 5rem, 0);
+    transform: translate3d(0, 5rem, 0);
+    -webkit-transform-origin: 50% 100%;
+    transform-origin: 50% 100%;
+    -webkit-transition-duration: .5s, 1s;
+    transition-duration: .5s, 1s;
+}
+.hk-capa[data-mv] .hk-mv[data-mv-como="estante"] {             /* the others slide along the plank */
+    -webkit-transform: translate3d(5rem, 0, 0);
+    transform: translate3d(5rem, 0, 0);
+}
+/* a line of a headline rises from under itself (its breaks are the ones the page made: the script measured them) */
+.hk-mv-renglon {
+    display: block;
+    overflow: hidden;
+    padding-bottom: .12em;
+    margin-bottom: -.12em;
+}
+.hk-mv-renglon > span {
+    display: inline-block;
+    vertical-align: top;                  /* the line as tall as before: no strut under it */
+}
+.hk-capa[data-mv] .hk-mv-renglon > span.hk-mv {
+    opacity: 1;
+    -webkit-transform: translate3d(0, 108%, 0);
+    transform: translate3d(0, 108%, 0);
+    -webkit-transition-duration: .01s, .8s;
+    transition-duration: .01s, .8s;
+}
+
+/* the levels: sobria travels less and never overshoots; juguetona travels more, and overshoots a little */
+.hk-capa[data-mv-fiesta="sobria"] .hk-mv[data-mv-como="sube"],
+.hk-capa[data-mv-fiesta="sobria"] .hk-mv[data-mv-como="dia"],
+.hk-capa[data-mv-fiesta="sobria"] .hk-mv[data-mv-como="cifra"] {
+    -webkit-transform: translate3d(0, 1.6rem, 0);
+    transform: translate3d(0, 1.6rem, 0);
+}
+.hk-capa[data-mv-fiesta="sobria"] .hk-mv[data-mv-como="plato"] {
+    -webkit-transform: translate3d(2rem, 0, 0) rotate(-12deg);
+    transform: translate3d(2rem, 0, 0) rotate(-12deg);
+}
+.hk-capa[data-mv-fiesta="sobria"] .hk-mv[data-mv-como="senal"],
+.hk-capa[data-mv-fiesta="sobria"] .hk-mv[data-mv-como="hoja"],
+.hk-capa[data-mv-fiesta="sobria"] .hk-mv[data-mv-como="sello"] {
+    -webkit-transform: scale(.9);
+    transform: scale(.9);
+    -webkit-transition-timing-function: ease, cubic-bezier(.2, .7, .2, 1);
+    transition-timing-function: ease, cubic-bezier(.2, .7, .2, 1);
+}
+.hk-capa[data-mv-fiesta="juguetona"] .hk-mv[data-mv-como="sube"],
+.hk-capa[data-mv-fiesta="juguetona"] .hk-mv[data-mv-como="dia"],
+.hk-capa[data-mv-fiesta="juguetona"] .hk-mv[data-mv-como="cifra"] {
+    -webkit-transform: translate3d(0, 3.2rem, 0);
+    transform: translate3d(0, 3.2rem, 0);
+}
+.hk-capa[data-mv-fiesta="juguetona"] .hk-mv[data-mv-como="sube"],
+.hk-capa[data-mv-fiesta="juguetona"] .hk-mv[data-mv-como="dia"],
+.hk-capa[data-mv-fiesta="juguetona"] .hk-mv[data-mv-como="cifra"],
+.hk-capa[data-mv-fiesta="juguetona"] .hk-mv[data-mv-como="bloque"],
+.hk-capa[data-mv-fiesta="juguetona"] .hk-mv[data-mv-como="plato"],
+.hk-capa[data-mv-fiesta="juguetona"] .hk-mv[data-mv-como="libro"],
+.hk-capa[data-mv-fiesta="juguetona"] .hk-mv[data-mv-como="estante"],
+.hk-capa[data-mv-fiesta="juguetona"] .hk-mv-renglon > span.hk-mv {
+    -webkit-transition-timing-function: ease, cubic-bezier(.3, 1.35, .5, 1);
+    transition-timing-function: ease, cubic-bezier(.3, 1.35, .5, 1);
+}
+.hk-capa[data-mv-fiesta="juguetona"] .hk-mv[data-mv-como="bloque"] {
+    -webkit-transform: scale(.94);
+    transform: scale(.94);
+}
+.hk-capa[data-mv-fiesta="juguetona"] .hk-mv[data-mv-como="plato"] {
+    -webkit-transform: translate3d(8rem, 0, 0) rotate(-80deg);
+    transform: translate3d(8rem, 0, 0) rotate(-80deg);
+}
+
+/* --- 3. What moves while the slide stands --------------------------------------------------------------------- */
+/* the clock beats: its colon breathes once every two seconds (a screen that has hung shows it still) */
+.hk-reloj span {
+    will-change: opacity;
+    -webkit-animation: hk-mv-late 2s cubic-bezier(.45, .05, .55, .95) infinite;
+    animation: hk-mv-late 2s cubic-bezier(.45, .05, .55, .95) infinite;
+}
+@-webkit-keyframes hk-mv-late {
+    0%, 100% { opacity: 1; }
+    50% { opacity: .38; }
+}
+@keyframes hk-mv-late {
+    0%, 100% { opacity: 1; }
+    50% { opacity: .38; }
+}
+/* a sheen passes over a block of colour once it is in, and again every 30 s (25 in juguetona): about once a slide, so that it
+   is not read as an ornament (Gaudí, 8 November 2026); never over a white card */
+.hk .hk-mv-brillo-caja {             /* .hk: over «.hk-tipografica > *», which keeps the words over it */
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    border-radius: inherit;
+    pointer-events: none;
+}
+.hk-mv-brillo {
+    position: absolute;
+    top: -10%;
+    left: 0;
+    width: 30%;
+    height: 120%;
+    background: linear-gradient(100deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, .13) 50%, rgba(255, 255, 255, 0) 100%);
+    -webkit-transform: translate3d(-120%, 0, 0) skewX(-14deg);
+    transform: translate3d(-120%, 0, 0) skewX(-14deg);
+    -webkit-animation: hk-mv-brillo 30s cubic-bezier(.45, .05, .35, 1) infinite both;
+    animation: hk-mv-brillo 30s cubic-bezier(.45, .05, .35, 1) infinite both;
+}
+[data-tema="oscuro"] .hk-mv-brillo {
+    background: linear-gradient(100deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, .08) 50%, rgba(255, 255, 255, 0) 100%);
+}
+.hk-capa[data-mv-fiesta="juguetona"] .hk-mv-brillo {
+    background: linear-gradient(100deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, .2) 50%, rgba(255, 255, 255, 0) 100%);
+    -webkit-animation-duration: 25s;
+    animation-duration: 25s;
+}
+@-webkit-keyframes hk-mv-brillo {          /* the pass takes 2 s of the 30 */
+    0% { -webkit-transform: translate3d(-120%, 0, 0) skewX(-14deg); }
+    7%, 100% { -webkit-transform: translate3d(400%, 0, 0) skewX(-14deg); }
+}
+@keyframes hk-mv-brillo {
+    0% { transform: translate3d(-120%, 0, 0) skewX(-14deg); }
+    7%, 100% { transform: translate3d(400%, 0, 0) skewX(-14deg); }
+}
+/* the lead's block keeps its words over the sheen */
+.hk-lider > .hk-lider-cuerpo,
+.hk-lider > .hk-lider-pieza,
+.hk-tipografica > * {
+    position: relative;
+}
+.hk-libro-grande .hk-mv-brillo-caja {
+    z-index: 2;
+}
+/* the time left: a thin bar under the heading of what is read for long, that fills in the slide's seconds */
+.hk-plazos-cabeza,
+.hk-tabla-cabeza {
+    position: relative;
+}
+.hk-mv-tiempo {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: .7rem;
+    overflow: hidden;
+    background: rgba(255, 255, 255, .2);
+}
+.hk-mv-tiempo > i,
+.hk-mv-punto > i {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background: var(--hk-acento);
+    -webkit-transform: scaleX(0);
+    transform: scaleX(0);
+    -webkit-transform-origin: 0 50%;
+    transform-origin: 0 50%;
+    -webkit-animation: hk-mv-llena 10s linear both;
+    animation: hk-mv-llena 10s linear both;
+}
+@-webkit-keyframes hk-mv-llena {
+    0% { -webkit-transform: scaleX(0); }
+    100% { -webkit-transform: scaleX(1); }
+}
+@keyframes hk-mv-llena {
+    0% { transform: scaleX(0); }
+    100% { transform: scaleX(1); }
+}
+/* on the third, the current page's dot becomes a short bar that fills until its page turns */
+.hk .hk-resto-paginas i.hk-pagina-actual {
+    position: relative;
+    width: calc(var(--hk-t-min) * 1.1);
+    overflow: hidden;
+    border-radius: calc(var(--hk-t-min) * .2);
+    background: transparent;
+    vertical-align: bottom;
+}
+.hk .hk-resto-paginas i.hk-pagina-actual > .hk-mv-punto {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    margin: 0;
+}
+.hk .hk-resto-paginas i.hk-pagina-actual > .hk-mv-punto > i {
+    display: block;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+    background: var(--hk-texto);
+}
+/* the important sign: a slow pulse, the only thing on the slide that calls (never on another kind of lead) */
+.hk-capa[data-mv] .hk-lider-importante .hk-senal svg {
+    -webkit-animation: hk-mv-pulso 3.2s cubic-bezier(.45, .05, .55, .95) 2s infinite;
+    animation: hk-mv-pulso 3.2s cubic-bezier(.45, .05, .55, .95) 2s infinite;
+}
+.hk-capa[data-mv-fiesta="sobria"] .hk-lider-importante .hk-senal svg {
+    -webkit-animation-name: hk-mv-pulso-poco;
+    animation-name: hk-mv-pulso-poco;
+}
+@-webkit-keyframes hk-mv-pulso {
+    0%, 70%, 100% { -webkit-transform: scale(1); }
+    35% { -webkit-transform: scale(1.06); }
+}
+@keyframes hk-mv-pulso {
+    0%, 70%, 100% { transform: scale(1); }
+    35% { transform: scale(1.06); }
+}
+@-webkit-keyframes hk-mv-pulso-poco {
+    0%, 70%, 100% { -webkit-transform: scale(1); }
+    35% { -webkit-transform: scale(1.025); }
+}
+@keyframes hk-mv-pulso-poco {
+    0%, 70%, 100% { transform: scale(1); }
+    35% { transform: scale(1.025); }
+}
+/* the flaps of a countdown while they turn (movimiento.js): halves of the flap, over its digit */
+.hk-paleta {
+    -webkit-perspective: 80rem;
+    perspective: 80rem;
+}
+.hk-mv-media {
+    position: absolute;
+    left: 0;
+    z-index: 1;
+    width: 100%;
+    height: 50%;
+    overflow: hidden;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+}
+.hk-mv-arriba {
+    top: 0;
+    border-radius: calc(2.4rem * var(--hk-esquina)) calc(2.4rem * var(--hk-esquina)) 0 0;
+    background: var(--hk-paleta-claro, #2c333c);
+    -webkit-transform-origin: 50% 100%;
+    transform-origin: 50% 100%;
+}
+.hk-mv-abajo {
+    top: 50%;
+    border-radius: 0 0 calc(2.4rem * var(--hk-esquina)) calc(2.4rem * var(--hk-esquina));
+    background: var(--hk-paleta-oscuro, #1b2027);
+    -webkit-transform-origin: 50% 0;
+    transform-origin: 50% 0;
+}
+.hk-mv-abajo.hk-mv-hoja {
+    z-index: 2;
+}
+.hk-mv-media-cifra {
+    position: absolute;
+    left: 0;
+    top: 0;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-align-items: center;
+    align-items: center;
+    -webkit-justify-content: center;
+    justify-content: center;
+    width: 100%;
+    height: 200%;
+}
+.hk-mv-abajo .hk-mv-media-cifra {
+    top: -100%;
+}
+
+/* --- 4. A screen that keeps still ----------------------------------------------------------------------------------
+ * The same order, closer together, with fades only; nothing moves while the slide stands. */
+.hk-capa[data-mv-quieta] .hk-mv,
+.hk-capa[data-mv-quieta] .hk-mv-renglon > span.hk-mv,
+.hk-capa[data-mv-quieta] .hk-medio .hk-diapo img,
+.hk-capa.hk-fuera[data-mv-quieta] {
+    -webkit-transform: none !important;
+    transform: none !important;
+}
+.hk-capa[data-mv-quieta] .hk-mv {
+    -webkit-transition-duration: .5s;
+    transition-duration: .5s;
+}
+.hk-capa.hk-dentro[data-mv-quieta] .hk-mv[data-mv-como] {
+    -webkit-transition-property: opacity;
+    transition-property: opacity;
+}
+.hk-capa[data-mv-quieta] .hk-mv-renglon > span.hk-mv {
+    opacity: 0;
+}
+.hk-quieto .hk-reloj span,
+.hk-capa[data-mv-quieta] .hk-senal svg {
+    -webkit-animation: none;
+    animation: none;
+}
+@media (prefers-reduced-motion: reduce) {
+    .hk .hk-reloj span {
+        -webkit-animation: none;
+        animation: none;
+    }
+}

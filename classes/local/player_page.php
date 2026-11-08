@@ -159,8 +159,8 @@ class player_page {
         $url = function (string $file) use ($v): string {
             return s((new \moodle_url('/local/oksigeniahechauka/player/' . $file, ['v' => $v]))->out(false));
         };
-        // The templates, the compositions, the weather and the coming days, in this order; the weather icons before
-        // the player, which takes them from the page.
+        // The templates, the compositions, the weather and the coming days, in this order, and how they move the last
+        // of all; the weather icons before the player, which takes them from the page.
         $sheets = '';
         foreach (
             ['hechauka.css', 'composiciones.css', 'tiempo.css', 'semana.css', 'proximos-dias.css', 'urgente.css',
@@ -168,7 +168,8 @@ class player_page {
             'lideres.css', 'agenda-lista.css', 'cumple.css', 'reposo.css', 'plazos.css', 'tabla.css',
             'biblioteca.css', 'alergenos.css',
             'identidad.css',
-            'pieles.css', 'fondos.css', 'letras.css', 'actividad.css'] as $file
+            'pieles.css', 'fondos.css', 'letras.css', 'actividad.css',
+            'movimiento.css'] as $file
         ) {
             $sheets .= '<link rel="stylesheet" href="' . $url($file) . '">';
         }

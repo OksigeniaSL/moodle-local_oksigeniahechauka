@@ -307,3 +307,43 @@
     flex: 1 1 100%;
     margin: .5rem 0 0;
 }
+
+/* --- Today (Gaudí, 8 November 2026, with the movement), a band of the accent across the sheet, and its hours in the accent ----------------------------
+ * From the corridor every day weighed the same; what falls due today is what someone has to see first. The band is the accent
+ * at low opacity (Chromium 56 cannot mix a colour), under the words. And the days share the height of the page, so a page that
+ * is not full does not leave its bottom empty. */
+.hk-plazos-lista {
+    justify-content: space-around;
+}
+.hk .hk-plazos-dia[data-hoy] {
+    position: relative;
+    margin: 0 -4rem;
+    padding-right: 4rem;
+    padding-left: 4rem;
+    border-top-color: transparent;
+}
+.hk .hk-plazos-dia[data-hoy]::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--hk-acento);
+    opacity: .14;
+    pointer-events: none;
+}
+[data-tema="oscuro"] .hk .hk-plazos-dia[data-hoy]::after {
+    opacity: .16;
+}
+.hk .hk-plazos-dia[data-hoy] > * {
+    position: relative;
+    z-index: 1;
+}
+.hk .hk-plazos-dia[data-hoy] + .hk-plazos-dia {
+    border-top-color: transparent;
+}
+.hk .hk-plazos-dia[data-hoy] .hk-plazos-hora {
+    color: var(--hk-acento-texto, var(--hk-texto));
+}

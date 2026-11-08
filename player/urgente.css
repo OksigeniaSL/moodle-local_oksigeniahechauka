@@ -3,6 +3,7 @@
  * rest (flexbox, rem, no grid, no clamp). Red with white, 7.8:1, the same in both themes: it is an alarm, not the
  * school's colour. Striped edges say «urgent» without the colour. Nothing moves. */
 .hk-urgente {
+    --hk-u: var(--hk-t-titular);          /* the title, the lead's headline of the distance: what reads best on the screen */
     position: absolute;
     left: 0;
     top: 0;
@@ -45,14 +46,14 @@
 }
 .hk-urgente h1 {
     margin: 2.8rem 0 0;
-    font-size: 12rem;
+    font-size: var(--hk-u);
     font-weight: 800;
     line-height: 1.02;
 }
 .hk-urgente-texto {
     margin: 3.6rem 0 0;
     font-family: var(--hk-letra-titulos);
-    font-size: 7.2rem;                      /* 60 % of the title: read from 10 m in the middle of a drill */
+    font-size: calc(var(--hk-u) * .6);    /* 60 % of the title: read from 10 m in the middle of a drill */
     font-weight: 700;
     line-height: 1.15;
 }
@@ -61,18 +62,31 @@
     top: 6rem;
     right: 9rem;
     margin: 0;
-    font-size: 5rem;                        /* there, but quieter than what the notice says */
+    font-size: calc(var(--hk-t-min) * 1.25); /* there, but quieter than what the notice says; never under the least */
     font-weight: 700;
     opacity: .72;
 }
 .hk-vertical .hk-urgente {
     padding: 12rem 7rem;
 }
-.hk-vertical .hk-urgente h1 {
-    font-size: 11rem;
+.hk-vertical .hk-urgente {
+    --hk-u: calc(var(--hk-t-titular) * .92);
 }
 .hk-vertical .hk-urgente-texto {
-    font-size: 6.6rem;
+    font-size: calc(var(--hk-u) * .55);
+}
+/* A long notice from afar steps down before it overflows (render.js, fitHeadline), as the leads do. */
+.hk-urgente[data-ajuste="1"] {
+    --hk-u: calc(var(--hk-t-titular) * .84);
+}
+.hk-urgente[data-ajuste="2"] {
+    --hk-u: calc(var(--hk-t-titular) * .7);
+}
+.hk-urgente[data-ajuste="3"] {
+    --hk-u: calc(var(--hk-t-titular) * .58);
+}
+.hk-urgente[data-ajuste="3"] .hk-urgente-texto {
+    font-size: var(--hk-t-min);           /* the least that is read, never under it */
 }
 .hk-vertical .hk-urgente-hora {
     right: 7rem;

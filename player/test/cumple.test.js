@@ -111,3 +111,16 @@ test('who a person is: the id, else the name and the group', () => {
     assert.equal(keyOf({name: ' Ana Ruiz ', group: '3.º A'}), 'nana ruiz|3.º a');
     assert.match(dayOf(new Date(2026, 10, 9)), /^2026-11-09$/);
 });
+
+test('the kicker and the shine of a birthday read at 4.5:1 on the stage, a little lighter if they must', async () => {
+    const {contrast, readable} = await import('../src/confeti.js');
+    // Petróleo: the accent on the light theme's stage gave 3.9:1; lightened a little, it reads.
+    const kicker = readable('#ff8a3d', '#0e4f5c', 4.5, 0.4);
+    assert.ok(kicker && kicker !== '#ff8a3d');
+    assert.ok(contrast(kicker, '#0e4f5c') >= 4.5);
+    // A colour that already reads is left as it is; one that cannot within the limit gives null.
+    assert.equal(readable('#ffffff', '#0e4f5c', 4.5), '#ffffff');
+    assert.equal(readable('#17707f', '#0e4f5c', 4.5, 0.1), null);
+    // On a light ground it darkens.
+    assert.ok(contrast(readable('#ff8a3d', '#ffffff', 4.5), '#ffffff') >= 4.5);
+});

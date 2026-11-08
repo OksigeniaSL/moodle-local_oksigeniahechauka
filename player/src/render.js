@@ -16,6 +16,8 @@ import {even} from './balance.js';
 import {buildAgenda, startAgenda} from './agendaview.js';
 import {buildCarousel, buildWall, buildWallBand, startCarousel, startWall, wallCount} from './photos.js';
 import {buildWeek, fitWeek} from './weekview.js';
+import {motion} from './movimiento.js';
+import {noLoneShortWord} from './retoques.js';
 
 // The share of a wide zone a picture must leave free to have its words on a block beside it.
 const BESIDE_LEAST = 0.3;
@@ -648,7 +650,10 @@ export class Screen {
             return c;
         }
         if (comp === 'tiempo-tercio') {
-            c.appendChild(this.slot(items[0], comp));
+            // From 8 m the weather comes alone, and the picture keeps its turn.
+            if (items[0]) {
+                c.appendChild(this.slot(items[0], comp));
+            }
             if (this.weather && this.sky) {
                 c.appendChild(buildWeatherThird(this.weather, this.labelsFull(), this.sky, this.s.days || []));
             }
@@ -783,6 +788,11 @@ export class Screen {
             // Each person their moment: as long as the people of the day take (Gaudí, 7 November 2026).
             c.hkSeconds = startBirthdays(c, {still: this.keepsStill()});
         }
+        // The parts of the slide in the order they are read, and its life while it stands (Gaudí, 8 November 2026): only the
+        // compositions movimiento.js knows; the others keep their pass.
+        if (!c.hkMotion) {
+            c.hkMotion = motion(c, comp, {still: this.keepsStill(), seconds: c.hkFor || 0});
+        }
     }
 
     /** A sentence or the countdown over the whole body, in the centre's colour (the art direction's «titular»). */
@@ -792,16 +802,24 @@ export class Screen {
         const l = this.labelsLead();
         const c = today && today.countdown;
         if (x.type === 'cuenta' && c) {
-            s.appendChild(el('p', 'hk-tipografica-etiqueta', l.countdown));
-            const n = el('p', 'hk-tipografica-cuenta');
-            n.appendChild(el('b', '', String(c.days)));
-            n.appendChild(el('span', '', l.daysfor));
-            s.appendChild(n);
-            s.appendChild(el('h2', 'hk-tipografica-texto', c.title));
+            // The number is the slide: a board of flaps as tall as the block, «Faltan» over it, and the words beside it
+            // (Gaudí, 8 November 2026), so that from afar the figure is read before the name.
+            const board = el('div', 'hk-tipografica-marcador');
+            board.appendChild(el('p', 'hk-tipografica-etiqueta', l.countdown));
+            const flaps = el('div', 'hk-paletas hk-tipografica-paletas');
+            String(c.days).split('').forEach(function (d) {
+                flaps.appendChild(el('b', 'hk-paleta', d));
+            });
+            board.appendChild(flaps);
+            s.appendChild(board);
+            const side = el('div', 'hk-tipografica-lado');
+            side.appendChild(el('p', 'hk-tipografica-dias', l.daysfor));
+            side.appendChild(el('h2', 'hk-tipografica-texto', c.title));
             const foot = [c.day, c.group].filter(Boolean).join(' · ');
             if (foot) {
-                s.appendChild(el('p', 'hk-tipografica-pie', foot));
+                side.appendChild(el('p', 'hk-tipografica-pie', foot));
             }
+            s.appendChild(side);
         } else {
             s.appendChild(el('p', 'hk-tipografica-etiqueta', this.tickerLabel.textContent));
             s.appendChild(el('h2', 'hk-tipografica-texto', x.text || ''));
@@ -963,6 +981,8 @@ export class Screen {
                 fit();
             }
             even(t);
+            // Never a short word alone in a line: from afar «Teatro / en / inglés» reads «en» as a word of its own.
+            noLoneShortWord(lead);
             const second = lead.querySelector('.hk-lider-entrada');
             if (second) {
                 even(second);
@@ -1442,6 +1462,8 @@ export class Screen {
         }
         const old = this.layer;
         const layer = this.makeLayer(comp, items, today, week, choice.extra);
+        // How long it stays: the bar of the time left fills in it.
+        layer.hkFor = choice.seconds;
         this.stage.appendChild(layer);
         // Where neither the third nor the lead shows the important notice, the ticker does.
         const lead = layer.querySelector('.hk-lider-importante');
@@ -1497,6 +1519,9 @@ export class Screen {
     }
 
     leave(layer) {
+        if (layer.hkMotion) {
+            layer.hkMotion();
+        }
         layer.classList.add('hk-fuera');
         if (layer.hkStop) {
             layer.hkStop();
@@ -1545,6 +1570,18 @@ export class Screen {
         layer.appendChild(this.urgentClock);
         this.frame.appendChild(layer);
         this.urgent = layer;
+        // It grows with the distance; a long one steps down before it overflows, and its title is evened. Its words are
+        // centred, so they overflow at both ends: measured from the label at the top to the last line at the bottom.
+        const title = layer.querySelector('h1');
+        const first = layer.firstChild;
+        const last = this.urgentClock.previousSibling;
+        fitHeadline(layer, title, this.horizontal ? 4 : 6, function () {
+            const box = layer.getBoundingClientRect();
+            const cs = getComputedStyle(layer);
+            return first.getBoundingClientRect().top < box.top + parseFloat(cs.paddingTop) - 1 ||
+                last.getBoundingClientRect().bottom > box.bottom - parseFloat(cs.paddingBottom) + 1;
+        });
+        even(title);
         const videos = this.stage ? this.stage.querySelectorAll('video') : [];
         for (let i = 0; i < videos.length; i++) {
             videos[i].pause();

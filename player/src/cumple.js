@@ -18,7 +18,7 @@
 
 import {even} from './balance.js';
 import {bichito} from './bichito.js';
-import {Confetti, LEVELS, balloonsHtml, coloursOf, contrast, levelOf, lighter} from './confeti.js';
+import {Confetti, LEVELS, balloonsHtml, coloursOf, contrast, levelOf, lighter, readable} from './confeti.js';
 import {ALONE, GROUP, PARADE_EACH, PARADE_INTRO, STAGE_EACH, STAGE_INTRO, birthdaysSeconds, birthdaysShow, dayOf, keepNext,
     modeOf, orderOf, peopleOf, startOf, storeOf} from './cumple-turnos.js';
 
@@ -464,12 +464,18 @@ export function startBirthdays(c, o) {
     const ground = (cs.getPropertyValue('--hk-primario') || '').trim();
     const ink = (cs.getPropertyValue('--hk-sobre-primario') || '#ffffff').trim();
     const accent = (cs.getPropertyValue('--hk-acento') || '').trim();
-    // The kicker in the accent when it reads on the ground; if not, in the text's colour.
-    if (accent && contrast(accent, ground) < 3) {
+    // The kicker in the accent, a little lighter if it takes that to read at 4.5:1 on the ground; if not even so, in the
+    // text's colour.
+    const kicker = accent ? readable(accent, ground, 4.5, 0.4) : null;
+    if (!kicker) {
         s.classList.add('is-antetitulo-claro');
+    } else if (kicker !== accent) {
+        s.style.setProperty('--hk-cumple-antetitulo', kicker);
     }
-    // The shine: the accent, lightened, unless it is too close to the name's own colour.
-    const glint = accent && contrast(accent, ink) >= 1.25 ? lighter(accent, 0.25) : lighter(ground, 0.6);
+    // The shine: the accent, lightened, unless it is too close to the name's own colour; while it crosses the name, the name
+    // still reads at 4.5:1.
+    const glint = readable(accent && contrast(accent, ink) >= 1.25 ? lighter(accent, 0.25) : lighter(ground, 0.6), ground, 4.5) ||
+        ink;
     const shines = [];
     const shine = function (name) {
         if (still || !name) {

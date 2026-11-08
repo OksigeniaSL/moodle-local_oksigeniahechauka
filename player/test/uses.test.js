@@ -57,6 +57,20 @@ test('a mixed screen puts the weather in a third every other slide, when there i
     }
 });
 
+test('from 8 m a mixed screen shows the weather alone, one slide in four, and every picture keeps its turn', () => {
+    const c = new Composer();
+    const queue = [photo('a'), photo('b'), photo('c')];
+    const out = [];
+    for (let i = 0; i < 12; i++) {
+        out.push(c.next(queue, 2, true, {use: 'mixed', weather: true, distance: 8}));
+    }
+    const alone = out.filter((x) => x.comp === 'tiempo-tercio');
+    assert.equal(alone.length, 3);
+    assert.ok(alone.every((x) => x.items.length === 0 && x.seconds > 0));
+    const shown = out.filter((x) => x.comp !== 'tiempo-tercio' && x.items.length).map((x) => x.items[0].id);
+    assert.deepEqual(shown.slice(0, 3), ['a', 'b', 'c']);
+});
+
 test('the QR of a web: a square of dark modules with its three finders, the same for the same text', () => {
     const q = qrPath('https://example.com/summer-camp');
     assert.equal(q.size, 29);

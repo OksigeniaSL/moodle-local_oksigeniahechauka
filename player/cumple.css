@@ -472,7 +472,7 @@
 /* The words */
 .hk .hk-cumple-antetitulo {
     margin-bottom: 1.6rem;
-    color: var(--hk-acento);
+    color: var(--hk-cumple-antetitulo, var(--hk-acento));   /* cumple.js lightens it if it takes that to read at 4.5:1 */
     font-family: var(--hk-letra-titulos);
     font-size: var(--hk-t-min);
     font-weight: 800;

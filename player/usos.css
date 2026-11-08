@@ -441,3 +441,111 @@
 .hk-completa[data-sin-pie] .hk-completa-velo::after {
     opacity: 0;
 }
+
+/* --- The countdown (Gaudí, 8 November 2026, with the movement), its number as a board of flaps beside its words ---------------------
+ * Its figure was the size of its title, top left, with two thirds of the block empty: from 8 m one read «Acampada» before the
+ * «3». Now the number is the slide, as the lead's board: a split-flap of the height of the block, and the words beside it.
+ *
+ *   <section class="hk-tipografica" data-tipo="cuenta">
+ *     <div class="hk-tipografica-marcador"><p class="hk-tipografica-etiqueta">Faltan</p>
+ *       <div class="hk-paletas hk-tipografica-paletas"><b class="hk-paleta">3</b></div></div>
+ *     <div class="hk-tipografica-lado"><p class="hk-tipografica-dias">días para</p>
+ *       <h2 class="hk-tipografica-texto">Acampada</h2><p class="hk-tipografica-pie">Jue 5 · 3.º ESO</p></div> */
+.hk-tipografica[data-tipo="cuenta"] {
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    padding-top: 5rem;
+    padding-bottom: 5rem;
+}
+.hk-tipografica-marcador {
+    display: flex;
+    flex: none;
+    flex-direction: column;
+    margin-right: 8rem;
+}
+.hk .hk-tipografica-marcador .hk-tipografica-etiqueta {
+    margin-bottom: 3rem;
+}
+.hk .hk-tipografica-paletas {
+    display: flex;
+    flex: none;
+    height: 50rem;
+}
+.hk .hk-tipografica-paletas .hk-paleta {
+    width: 36rem;
+    height: 100%;
+    font-size: 45rem;
+    line-height: 1;
+}
+.hk[data-distancia="8"] .hk-tipografica-paletas {
+    height: 42rem;
+}
+.hk[data-distancia="8"] .hk-tipografica-paletas .hk-paleta {
+    width: 31rem;
+    font-size: 38rem;
+}
+.hk .hk-tipografica-paletas .hk-paleta::before {
+    background: var(--hk-primario);    /* the seam, of the block's colour: the board stands on it */
+}
+.hk-tipografica-lado {
+    display: flex;
+    flex: 1 1 0px;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 0;
+}
+.hk-tipografica-lado > * {
+    flex: none;
+}
+.hk .hk-tipografica-dias {
+    margin-bottom: 1.4rem;
+    font-family: var(--hk-letra-titulos);
+    font-size: var(--hk-t-entrada);
+    font-weight: 800;
+    line-height: 1;
+    opacity: .86;
+}
+.hk .hk-tipografica[data-tipo="cuenta"] .hk-tipografica-texto {
+    font-size: var(--hk-t-titular);
+}
+/* a vertical screen: the board on top, the words under it */
+.hk-vertical .hk-tipografica[data-tipo="cuenta"] {
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+}
+.hk.hk-vertical .hk-tipografica-marcador {
+    margin: 0 0 6rem;
+}
+.hk.hk-vertical .hk-tipografica-paletas {
+    height: 64rem;                        /* a tall block: the board as tall as the words under it */
+}
+.hk.hk-vertical .hk-tipografica-paletas .hk-paleta {
+    width: 46rem;
+    font-size: 58rem;
+}
+.hk-tipografica-marcador .hk-tipografica-etiqueta::before {
+    flex: none;
+}
+/* The steps of a long name beside the board (render.js, fitHeadline): over the size above, which the base rule would win. */
+.hk .hk-tipografica[data-tipo="cuenta"] .hk-tipografica-texto[data-ajuste="1"] {
+    font-size: calc(var(--hk-t-titular) * .84);
+}
+.hk .hk-tipografica[data-tipo="cuenta"] .hk-tipografica-texto[data-ajuste="2"] {
+    font-size: calc(var(--hk-t-titular) * .7);
+}
+.hk .hk-tipografica[data-tipo="cuenta"] .hk-tipografica-texto[data-ajuste="3"] {
+    font-size: var(--hk-t-titulo-min);
+}
+.hk .hk-tipografica[data-tipo="cuenta"] .hk-tipografica-texto[data-ajuste="4"] {
+    font-size: var(--hk-t-entrada);
+}
+/* With the important notice in the band the body is lower at 8 m: the board gives up some height, not its figure's place. */
+.hk.hk-horizontal.hk-con-importante[data-distancia="8"] .hk-tipografica-paletas {
+    height: 34rem;
+}
+.hk.hk-horizontal.hk-con-importante[data-distancia="8"] .hk-tipografica-paletas .hk-paleta {
+    width: 26rem;
+    font-size: 31rem;
+}
