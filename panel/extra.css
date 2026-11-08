@@ -2003,3 +2003,1416 @@ dialog.hkp-dialog > footer {
     color: var(--hkp-bad-ink);
     font-weight: 600;
 }
+
+/* The birthday list: who has no account yet, and the button to link someone to theirs. */
+.hkp-bd-tools {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .5rem 1rem;
+    margin: 0 0 .75rem;
+}
+.hkp-bd-tools .hkp-hint,
+.hkp-bd-tools form {
+    margin: 0;
+}
+.hkp-bd-account {
+    white-space: nowrap;
+}
+.hkp-bd-acts {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: .5rem;
+}
+.hkp-bd-row[hidden] {
+    display: none;
+}
+.hkp-bd-current {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .5rem;
+    font-weight: 600;
+}
+.hkp-bd-current[hidden] {
+    display: none;
+}
+/* On a phone the row goes on two lines: the name, then the date and the buttons under it. */
+@media (max-width: 575.98px) {
+    .hkp-bd-row {
+        flex-wrap: wrap;
+        gap: .35rem .5rem;
+    }
+    .hkp-bd-who {
+        flex-basis: calc(100% - 3rem);
+    }
+    .hkp-bd-date {
+        margin-left: 3rem;
+    }
+    .hkp-bd-acts {
+        margin-left: auto;
+    }
+}
+
+/* Oksigenia Hechauka: the birthday card at the top of the dashboard (art direction, 8 November 2026). It replaces the
+ * placeholder .hk-greeting block at the end of styles.css, and needs fonts/Gabarito-700.woff2 and Gabarito-800.woff2.
+ *
+ * The family of the screens' «Hoy cumplen años»: a field of the site's own colour, paper bunting across the top, the
+ * picture in a white ring with a light behind it, the name with a glint, balloons and confetti. Made for a place of
+ * work: a moment on the way in, and then a still, quiet card that does not get in the way of the rest of the page.
+ *
+ *   <section class="hk-greeting [is-seen] [is-still] [is-closing] [is-leaving] [is-light-brand] [is-waiting]">
+ *     .hk-greeting-ground                       the field: the brand colour, deepened, with a light and a grain
+ *     svg.hk-greeting-balloons                  three balloons, bottom right (.hk-greeting-balloon > .hk-greeting-sway)
+ *     svg.hk-greeting-garland                   the bunting (greeting_garland.mustache): .hk-greeting-swag, -flag
+ *     .hk-greeting-body
+ *       .hk-greeting-medal                      .hk-greeting-rays, -orbit, -face (img, or the initial and the creature)
+ *       .hk-greeting-text                       .hk-greeting-kicker, -title, -line
+ *     svg.hk-greeting-spark-0…4                 little four-point stars
+ *     form.hk-greeting-close > .hk-greeting-x   closing it until next year
+ *
+ * The still card is the base: every rule outside the «party» block below draws it as it stays. The way in is a layer of
+ * animations on top, only with motion allowed and only the first time that day (not .is-seen), all of them with
+ * fill-mode backwards, so when they end nothing changes and the way out can use transitions.
+ *
+ * Colours: the theme's variables (Bootstrap 5 in Moodle 5.x, Bootstrap 4 in 4.5, Boost's values last), so the card
+ * wears each site's brand, in light and in dark (<html data-bs-theme>). Text on the card is white, on a field that is
+ * always the brand colour deepened; a very light brand gets a deeper field (.is-light-brand, from js/greeting.js).
+ *
+ * Browsers: Chrome 93 and Firefox 98 and later. No color-mix(), no :has(), no container queries, no individual
+ * transform properties; conic gradients, flex gap, background-clip: text (only inside @supports) and SVG transforms
+ * with transform-box are all there in both. */
+
+@font-face {
+    font-family: "Hk Gabarito";
+    src: url("[[font:local_oksigeniahechauka|Gabarito-800.woff2]]") format("woff2");
+    font-weight: 800;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Hk Gabarito";
+    src: url("[[font:local_oksigeniahechauka|Gabarito-700.woff2]]") format("woff2");
+    font-weight: 700;
+    font-display: swap;
+}
+
+/* --- The card ------------------------------------------------------------------------------------------------------ */
+.hk-greeting {
+    --hkg-grain: url("[[pix:local_oksigeniahechauka|greeting-grain]]");
+    --hkg-main: var(--bs-primary, var(--primary, #0f6cbf));
+    --hkg-gold: var(--bs-warning, var(--warning, #f0ad4e));
+    --hkg-gold-rgb: var(--bs-warning-rgb, 240, 173, 78);
+    --hkg-deep: rgba(3, 8, 24, .3);
+    --hkg-deeper: rgba(3, 8, 24, .56);
+    --hkg-letter: "Hk Gabarito", var(--bs-body-font-family, system-ui), -apple-system, "Segoe UI", Roboto, sans-serif;
+    position: relative;
+    z-index: 0;
+    isolation: isolate;
+    overflow: hidden;
+    min-height: 14.5rem;
+    margin: 0 0 1.5rem;
+    border-radius: 1.125rem;
+    background-color: var(--hkg-main);
+    box-shadow: 0 1px 2px rgba(16, 24, 40, .1), 0 1.25rem 2.5rem -1.5rem rgba(16, 24, 40, .55);
+    color: #fff;
+    -webkit-font-smoothing: antialiased;
+}
+[data-bs-theme="dark"] .hk-greeting {
+    --hkg-deep: rgba(2, 5, 16, .44);
+    --hkg-deeper: rgba(2, 5, 16, .68);
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, .08), 0 1.5rem 3rem -1.75rem rgba(0, 0, 0, .9);
+}
+.hk-greeting.is-light-brand {
+    --hkg-deep: rgba(30, 14, 2, .5);
+    --hkg-deeper: rgba(30, 14, 2, .74);
+}
+
+/* The field: the brand colour, deepened towards the bottom right; a soft light where the picture is, a sheen from the
+ * top left, a fine grain of paper and, at the back, the out-of-focus lights of a party. */
+.hk-greeting-ground {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: -2;
+    background-image:
+        var(--hkg-grain),
+        radial-gradient(
+            circle at 71% 30%,
+            rgba(var(--hkg-gold-rgb), .2) 0,
+            rgba(var(--hkg-gold-rgb), .14) 1.1rem,
+            rgba(var(--hkg-gold-rgb), 0) 1.25rem
+        ),
+        radial-gradient(
+            circle at 58% 84%,
+            rgba(255, 255, 255, .08) 0,
+            rgba(255, 255, 255, .06) 2.1rem,
+            rgba(255, 255, 255, 0) 2.3rem
+        ),
+        radial-gradient(
+            circle at 84% 64%,
+            rgba(255, 255, 255, .07) 0,
+            rgba(255, 255, 255, .05) 3rem,
+            rgba(255, 255, 255, 0) 3.25rem
+        ),
+        radial-gradient(
+            circle at 93% 22%,
+            rgba(var(--hkg-gold-rgb), .12) 0,
+            rgba(var(--hkg-gold-rgb), .08) 1.7rem,
+            rgba(var(--hkg-gold-rgb), 0) 1.9rem
+        ),
+        radial-gradient(
+            circle at 46% 26%,
+            rgba(255, 255, 255, .07) 0,
+            rgba(255, 255, 255, .05) .8rem,
+            rgba(255, 255, 255, 0) .95rem
+        ),
+        radial-gradient(
+            circle at 64% 52%,
+            rgba(var(--hkg-gold-rgb), .1) 0,
+            rgba(var(--hkg-gold-rgb), .07) .55rem,
+            rgba(var(--hkg-gold-rgb), 0) .7rem
+        ),
+        radial-gradient(
+            circle at 7.4rem 62%,
+            rgba(255, 255, 255, .22) 0,
+            rgba(255, 255, 255, .07) 7rem,
+            rgba(255, 255, 255, 0) 15rem
+        ),
+        linear-gradient(112deg, rgba(255, 255, 255, .09) 0%, rgba(255, 255, 255, 0) 42%),
+        linear-gradient(165deg, var(--hkg-deep) 0%, var(--hkg-deeper) 100%);
+}
+
+/* The paper that stayed: a few bits of confetti resting along the bottom of the card, as on a table after the party. */
+.hk-greeting-ground i {
+    position: absolute;
+    display: block;
+    width: .6rem;
+    height: .26rem;
+    border-radius: 1px;
+    background: var(--hkg-gold);
+    opacity: .8;
+}
+.hk-greeting-ground i:nth-child(3n+2) {
+    background: #fff;
+    opacity: .7;
+}
+.hk-greeting-ground i:nth-child(3n) {
+    width: .34rem;
+    height: .34rem;
+    background: rgba(255, 255, 255, .45);
+    opacity: 1;
+}
+.hk-greeting-ground i:nth-child(1) {
+    bottom: .95rem;
+    left: 4%;
+    -webkit-transform: rotate(24deg);
+    transform: rotate(24deg);
+}
+.hk-greeting-ground i:nth-child(2) {
+    bottom: .65rem;
+    left: 9.5%;
+    -webkit-transform: rotate(-38deg);
+    transform: rotate(-38deg);
+}
+.hk-greeting-ground i:nth-child(3) {
+    bottom: 1.3rem;
+    left: 19%;
+    -webkit-transform: rotate(12deg);
+    transform: rotate(12deg);
+}
+.hk-greeting-ground i:nth-child(4) {
+    bottom: .75rem;
+    left: 27%;
+    -webkit-transform: rotate(-12deg);
+    transform: rotate(-12deg);
+}
+.hk-greeting-ground i:nth-child(5) {
+    bottom: 1.05rem;
+    left: 33%;
+    -webkit-transform: rotate(62deg);
+    transform: rotate(62deg);
+}
+.hk-greeting-ground i:nth-child(6) {
+    bottom: .5rem;
+    left: 39%;
+    -webkit-transform: rotate(30deg);
+    transform: rotate(30deg);
+}
+.hk-greeting-ground i:nth-child(7) {
+    bottom: .85rem;
+    left: 52%;
+    -webkit-transform: rotate(-56deg);
+    transform: rotate(-56deg);
+}
+.hk-greeting-ground i:nth-child(8) {
+    bottom: 1.2rem;
+    left: 58.5%;
+    -webkit-transform: rotate(8deg);
+    transform: rotate(8deg);
+}
+.hk-greeting-ground i:nth-child(9) {
+    bottom: .6rem;
+    left: 64%;
+    -webkit-transform: rotate(40deg);
+    transform: rotate(40deg);
+}
+.hk-greeting-ground i:nth-child(10) {
+    bottom: .95rem;
+    left: 70%;
+    -webkit-transform: rotate(-20deg);
+    transform: rotate(-20deg);
+}
+.hk-greeting-ground i:nth-child(11) {
+    bottom: .5rem;
+    left: 76%;
+    -webkit-transform: rotate(72deg);
+    transform: rotate(72deg);
+}
+.hk-greeting-ground i:nth-child(12) {
+    bottom: 1.05rem;
+    left: 98%;
+    -webkit-transform: rotate(-30deg);
+    transform: rotate(-30deg);
+}
+
+/* --- The bunting --------------------------------------------------------------------------------------------------- */
+.hk-greeting .hk-greeting-garland {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 2;
+    display: block;
+    width: 100%;
+    height: 4.75rem;
+    overflow: visible;
+    pointer-events: none;
+    -webkit-filter: drop-shadow(0 .2rem .14rem rgba(0, 0, 0, .2));
+    filter: drop-shadow(0 .2rem .14rem rgba(0, 0, 0, .2));
+}
+.hk-greeting-string {
+    fill: none;
+    stroke: rgba(255, 255, 255, .92);
+    stroke-width: 2;
+    stroke-linecap: round;
+}
+.hk-greeting-knot {
+    fill: var(--hkg-gold);
+}
+.hk-greeting-swag,
+.hk-greeting-flag {
+    transform-box: fill-box;
+    transform-origin: 50% 0;
+}
+.hk-greeting-flag-0 .hk-greeting-paper {
+    fill: var(--hkg-gold);
+}
+.hk-greeting-flag-1 .hk-greeting-paper {
+    fill: #fff;
+}
+.hk-greeting-flag-2 .hk-greeting-paper {
+    fill: #fff;
+    fill-opacity: .4;
+}
+/* The fold: the right half of each flag a shade darker, as folded paper catching the light from the left. */
+.hk-greeting-fold {
+    fill: #000;
+    fill-opacity: .13;
+}
+.hk-greeting-flag-2 .hk-greeting-fold {
+    fill-opacity: .08;
+}
+
+/* --- The balloons -------------------------------------------------------------------------------------------------- */
+.hk-greeting .hk-greeting-balloons {
+    position: absolute;
+    right: 1.5rem;
+    bottom: -1.75rem;
+    z-index: -1;
+    display: block;
+    width: 8.5rem;
+    height: auto;
+    overflow: visible;
+    pointer-events: none;
+}
+.hk-greeting-balloon,
+.hk-greeting-sway {
+    transform-box: fill-box;
+    transform-origin: 50% 100%;
+}
+.hk-greeting-balloon-0 .hk-greeting-skin {
+    fill: var(--hkg-gold);
+}
+.hk-greeting-balloon-1 .hk-greeting-skin {
+    fill: var(--hkg-main);
+}
+.hk-greeting-balloon-2 .hk-greeting-skin {
+    fill: #f4f1ea;
+}
+.hk-greeting-balloon-2 {
+    opacity: .82;
+}
+.hk-greeting-thread {
+    fill: none;
+    stroke: rgba(255, 255, 255, .55);
+    stroke-width: 2.4;
+}
+
+/* --- Body: the picture and the words ------------------------------------------------------------------------------- */
+.hk-greeting-body {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 2.25rem;
+    min-height: 14.5rem;
+    padding: 4.4rem 8.5rem 2.4rem 2.4rem;
+}
+.hk-greeting-medal {
+    position: relative;
+    z-index: 0;
+    flex: none;
+    width: 8.25rem;
+    height: 8.25rem;
+}
+/* The light behind the picture: thin rays that fade outwards. */
+.hk-greeting-rays {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    z-index: -1;
+    width: 21rem;
+    height: 21rem;
+    margin: -10.5rem 0 0 -10.5rem;
+    border-radius: 50%;
+    background: repeating-conic-gradient(from 4deg, rgba(255, 255, 255, .15) 0deg 4deg, rgba(255, 255, 255, 0) 4deg 15deg);
+    -webkit-mask-image: radial-gradient(closest-side, #000 34%, rgba(0, 0, 0, .45) 62%, rgba(0, 0, 0, 0) 100%);
+    mask-image: radial-gradient(closest-side, #000 34%, rgba(0, 0, 0, .45) 62%, rgba(0, 0, 0, 0) 100%);
+    pointer-events: none;
+}
+/* A thin gold ring around the picture, with two beads on it. */
+.hk-greeting-orbit {
+    position: absolute;
+    top: -.9rem;
+    right: -.9rem;
+    bottom: -.9rem;
+    left: -.9rem;
+    border: 1.5px solid rgba(var(--hkg-gold-rgb), .62);
+    border-radius: 50%;
+    pointer-events: none;
+}
+.hk-greeting-orbit::before,
+.hk-greeting-orbit::after {
+    content: "";
+    position: absolute;
+    width: .5rem;
+    height: .5rem;
+    border-radius: 50%;
+    background: var(--hkg-gold);
+    box-shadow: 0 0 .6rem rgba(var(--hkg-gold-rgb), .8);
+}
+.hk-greeting-orbit::before {
+    top: 12%;
+    right: 9%;
+}
+.hk-greeting-orbit::after {
+    bottom: 3%;
+    left: 30%;
+    width: .32rem;
+    height: .32rem;
+}
+.hk-greeting-face {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    border: .3rem solid #fff;
+    border-radius: 50%;
+    background: #f4f1ea;
+    box-shadow: 0 0 0 .5rem rgba(255, 255, 255, .15), 0 .85rem 1.75rem rgba(0, 0, 0, .32);
+}
+.hk-greeting-face img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+/* Without a picture: the initial, and the creature of the name over it as soon as the script draws it. */
+.hk-greeting-initial {
+    color: var(--hkg-main);
+    font-family: var(--hkg-letter);
+    font-size: 3.25rem;
+    font-weight: 800;
+    line-height: 1;
+    -webkit-transition: opacity .35s;
+    transition: opacity .35s;
+}
+.hk-greeting-creature {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    -webkit-transition: opacity .45s;
+    transition: opacity .45s;
+}
+.hk-greeting-creature svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+.hk-greeting-face.has-creature .hk-greeting-creature {
+    opacity: 1;
+}
+.hk-greeting-face.has-creature .hk-greeting-initial {
+    opacity: 0;
+}
+/* The picture as a button for more confetti, where there is motion (js/greeting.js gives it its role). */
+.hk-greeting-face[role="button"] {
+    cursor: pointer;
+    -webkit-transition: transform .25s cubic-bezier(.3, 1.6, .5, 1), box-shadow .25s;
+    transition: transform .25s cubic-bezier(.3, 1.6, .5, 1), box-shadow .25s;
+}
+
+@media (hover: hover) {
+    .hk-greeting-face[role="button"]:hover {
+        -webkit-transform: scale(1.04) rotate(-2deg);
+        transform: scale(1.04) rotate(-2deg);
+    }
+}
+.hk-greeting-face[role="button"]:active {
+    -webkit-transform: scale(.97);
+    transform: scale(.97);
+}
+.hk-greeting-face[role="button"]:focus-visible {
+    outline: 3px solid var(--hkg-gold);
+    outline-offset: .55rem;
+}
+
+/* The words: they take the width they have, never a measure of their own. */
+.hk-greeting-text {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+.hk-greeting .hk-greeting-kicker {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    margin: 0 0 .5rem;
+    color: var(--hkg-gold);
+    font-family: var(--hkg-letter);
+    font-size: .8125rem;
+    font-weight: 700;
+    letter-spacing: .16em;
+    line-height: 1.2;
+    text-transform: uppercase;
+}
+.hk-greeting-kicker svg {
+    flex: none;
+    width: .8rem;
+    height: .8rem;
+    fill: currentColor;
+}
+.hk-greeting .hk-greeting-title {
+    margin: 0;
+    padding: 0 0 .06em;
+    color: #fff;
+    font-family: var(--hkg-letter);
+    font-size: 2.625rem;
+    font-weight: 800;
+    letter-spacing: -.015em;
+    line-height: 1.04;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    text-shadow: 0 .12rem 0 rgba(0, 0, 0, .14);
+}
+.hk-greeting .hk-greeting-line {
+    margin: .7rem 0 0;
+    color: rgba(255, 255, 255, .88);
+    font-size: 1.0625rem;
+    line-height: 1.45;
+}
+/* Even lines where the browser knows how (newer ones); elsewhere, as it comes. */
+.hk-greeting .hk-greeting-title,
+.hk-greeting .hk-greeting-line {
+    /* stylelint-disable-next-line csstree/validator */
+    text-wrap: balance;
+}
+
+/* The little stars: still, a few around the picture and the balloons. */
+.hk-greeting .hk-greeting-spark {
+    position: absolute;
+    z-index: 1;
+    display: block;
+    width: 1rem;
+    height: 1rem;
+    fill: var(--hkg-gold);
+    pointer-events: none;
+}
+.hk-greeting .hk-greeting-spark-0 {
+    top: -.85rem;
+    right: -1.5rem;
+    width: 1.25rem;
+    height: 1.25rem;
+}
+.hk-greeting .hk-greeting-spark-1 {
+    bottom: .15rem;
+    left: -1.35rem;
+    width: .7rem;
+    height: .7rem;
+    fill: #fff;
+    opacity: .85;
+}
+.hk-greeting .hk-greeting-spark-2 {
+    right: 9.25rem;
+    bottom: 1.6rem;
+    width: .75rem;
+    height: .75rem;
+    fill: #fff;
+    opacity: .7;
+}
+.hk-greeting .hk-greeting-spark-3 {
+    top: 5.1rem;
+    right: 3.6rem;
+    width: .95rem;
+    height: .95rem;
+}
+.hk-greeting .hk-greeting-spark-4 {
+    bottom: 1.1rem;
+    left: 47%;
+    width: .6rem;
+    height: .6rem;
+    fill: #fff;
+    opacity: .55;
+}
+
+/* --- Closing it: a round button on the field ----------------------------------------------------------------------- */
+.hk-greeting .hk-greeting-close {
+    position: absolute;
+    top: 3.6rem;
+    right: .75rem;
+    z-index: 3;
+    margin: 0;
+}
+.hk-greeting .hk-greeting-x {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    margin: 0;
+    padding: 0;
+    border: 1px solid rgba(255, 255, 255, .3);
+    border-radius: 50%;
+    background: rgba(3, 8, 24, .34);
+    color: #fff;
+    cursor: pointer;
+    -webkit-transition: background-color .2s, -webkit-transform .3s cubic-bezier(.3, 1.4, .5, 1);
+    transition: background-color .2s, transform .3s cubic-bezier(.3, 1.4, .5, 1);
+}
+.hk-greeting .hk-greeting-x svg {
+    display: block;
+    width: .8rem;
+    height: .8rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-width: 2.2;
+}
+
+@media (hover: hover) {
+    .hk-greeting .hk-greeting-x:hover {
+        background: rgba(3, 8, 24, .55);
+        -webkit-transform: rotate(90deg);
+        transform: rotate(90deg);
+    }
+}
+.hk-greeting .hk-greeting-x:focus {
+    outline: none;
+}
+.hk-greeting .hk-greeting-x:focus-visible {
+    outline: 3px solid var(--hkg-gold);
+    outline-offset: 2px;
+}
+
+/* --- The glint on the name: a band of gold that crosses it once (only where text can be painted with a gradient) --- */
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+    .hk-greeting .hk-greeting-title {
+        background-image:
+            linear-gradient(
+                100deg,
+                #fff 0%,
+                #fff 38%,
+                rgba(var(--hkg-gold-rgb), 1) 46%,
+                #fffaf0 50%,
+                rgba(var(--hkg-gold-rgb), 1) 54%,
+                #fff 62%,
+                #fff 100%
+            );
+        background-position: 100% 0;
+        background-size: 320% 100%;
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-shadow: none;
+        -webkit-filter: drop-shadow(0 .12rem 0 rgba(0, 0, 0, .14));
+        filter: drop-shadow(0 .12rem 0 rgba(0, 0, 0, .14));
+    }
+}
+
+@media (forced-colors: active) {
+    .hk-greeting .hk-greeting-title {
+        background: none;
+        -webkit-text-fill-color: currentColor;
+    }
+}
+
+/* --- Narrower: from a tablet with the drawer open down to a phone -------------------------------------------------- */
+@media (max-width: 767.98px) {
+    .hk-greeting-body {
+        gap: 1.6rem;
+        padding: 3.75rem 6.5rem 2rem 1.75rem;
+    }
+    .hk-greeting-medal {
+        width: 7rem;
+        height: 7rem;
+    }
+    .hk-greeting .hk-greeting-title {
+        font-size: 2.25rem;
+    }
+    .hk-greeting .hk-greeting-balloons {
+        right: .75rem;
+        width: 6.5rem;
+        opacity: .85;
+    }
+    .hk-greeting .hk-greeting-spark-2 {
+        right: 6.5rem;
+    }
+}
+/* A phone: one column, centred, like a greeting card. */
+@media (max-width: 575.98px) {
+    .hk-greeting {
+        border-radius: 1rem;
+    }
+    .hk-greeting-ground {
+        background-image:
+            var(--hkg-grain),
+            radial-gradient(
+                circle at 14% 30%,
+                rgba(var(--hkg-gold-rgb), .16) 0,
+                rgba(var(--hkg-gold-rgb), .1) 1rem,
+                rgba(var(--hkg-gold-rgb), 0) 1.15rem
+            ),
+            radial-gradient(
+                circle at 86% 72%,
+                rgba(255, 255, 255, .07) 0,
+                rgba(255, 255, 255, .05) 2.4rem,
+                rgba(255, 255, 255, 0) 2.6rem
+            ),
+            radial-gradient(
+                circle at 10% 78%,
+                rgba(255, 255, 255, .06) 0,
+                rgba(255, 255, 255, .04) 1.6rem,
+                rgba(255, 255, 255, 0) 1.8rem
+            ),
+            radial-gradient(
+                circle at 50% 7.5rem,
+                rgba(255, 255, 255, .22) 0,
+                rgba(255, 255, 255, .07) 6rem,
+                rgba(255, 255, 255, 0) 12rem
+            ),
+            linear-gradient(112deg, rgba(255, 255, 255, .09) 0%, rgba(255, 255, 255, 0) 42%),
+            linear-gradient(170deg, var(--hkg-deep) 0%, var(--hkg-deeper) 100%);
+    }
+    .hk-greeting .hk-greeting-garland {
+        height: 3.7rem;
+    }
+    .hk-greeting-body {
+        flex-direction: column;
+        gap: 1.4rem;
+        padding: 3.75rem 1.25rem 1.75rem;
+        text-align: center;
+    }
+    .hk-greeting-medal {
+        width: 6.25rem;
+        height: 6.25rem;
+    }
+    .hk-greeting-rays {
+        width: 17rem;
+        height: 17rem;
+        margin: -8.5rem 0 0 -8.5rem;
+    }
+    .hk-greeting-initial {
+        font-size: 2.5rem;
+    }
+    .hk-greeting .hk-greeting-kicker {
+        justify-content: center;
+        font-size: .75rem;
+    }
+    .hk-greeting .hk-greeting-title {
+        font-size: 1.95rem;
+    }
+    .hk-greeting .hk-greeting-line {
+        font-size: 1rem;
+    }
+    .hk-greeting .hk-greeting-balloons {
+        top: 3.3rem;
+        right: .4rem;
+        bottom: auto;
+        width: 4.6rem;
+        opacity: .7;
+    }
+    .hk-greeting .hk-greeting-spark-2 {
+        top: 9.5rem;
+        right: auto;
+        bottom: auto;
+        left: 1.4rem;
+    }
+    .hk-greeting .hk-greeting-spark-3 {
+        top: 4rem;
+        right: auto;
+        left: 22%;
+    }
+    .hk-greeting .hk-greeting-spark-4 {
+        display: none;
+    }
+    .hk-greeting .hk-greeting-close {
+        top: .5rem;
+        right: .5rem;
+    }
+    .hk-greeting-body {
+        padding-bottom: 2rem;
+    }
+    .hk-greeting-ground i:nth-child(n+4):nth-child(-n+10) {
+        display: none;
+    }
+}
+
+/* Right to left: the balloons and the button change sides. */
+[dir="rtl"] .hk-greeting-body {
+    padding-right: 2.4rem;
+    padding-left: 8.5rem;
+}
+[dir="rtl"] .hk-greeting .hk-greeting-balloons {
+    right: auto;
+    left: 1.5rem;
+}
+[dir="rtl"] .hk-greeting .hk-greeting-close {
+    right: auto;
+    left: .75rem;
+}
+
+/* --- The party: only with motion allowed, only the first time that day -------------------------------------------- */
+@media (prefers-reduced-motion: no-preference) {
+    .hk-greeting:not(.is-seen):not(.is-still) {
+        -webkit-animation: hkg-in .55s cubic-bezier(.2, .8, .2, 1) backwards;
+        animation: hkg-in .55s cubic-bezier(.2, .8, .2, 1) backwards;
+    }
+    .hk-greeting:not(.is-seen):not(.is-still) .hk-greeting-garland {
+        -webkit-animation: hkg-drop 1.05s cubic-bezier(.25, .9, .3, 1) .35s backwards;
+        animation: hkg-drop 1.05s cubic-bezier(.25, .9, .3, 1) .35s backwards;
+    }
+    .hk-greeting:not(.is-seen):not(.is-still) .hk-greeting-swag {
+        -webkit-animation: hkg-sag 2.6s ease-out .95s backwards;
+        animation: hkg-sag 2.6s ease-out .95s backwards;
+    }
+    .hk-greeting:not(.is-seen):not(.is-still) .hk-greeting-swag:nth-of-type(2n) {
+        -webkit-animation-duration: 2.9s;
+        animation-duration: 2.9s;
+        -webkit-animation-delay: 1.02s;
+        animation-delay: 1.02s;
+    }
+    .hk-greeting:not(.is-seen):not(.is-still) .hk-greeting-swag:nth-of-type(3n) {
+        -webkit-animation-duration: 2.3s;
+        animation-duration: 2.3s;
+        -webkit-animation-delay: .9s;
+        animation-delay: .9s;
+    }
+    .hk-greeting:not(.is-seen):not(.is-still) .hk-greeting-flag {
+        -webkit-animation: hkg-flutter 2.5s ease-out 1s backwards;
+        animation: hkg-flutter 2.5s ease-out 1s backwards;
+    }
+    .hk-greeting:not(.is-seen):not(.is-still) .hk-greeting-flag:nth-of-type(2n) {
+        -webkit-animation-name: hkg-flutter-back;
+        animation-name: hkg-flutter-back;
+        -webkit-animation-duration: 2.2s;
+        animation-duration: 2.2s;
+    }
+    .hk-greeting:not(.is-seen):not(.is-still) .hk-greeting-flag:nth-of-type(3n) {
+        -webkit-animation-duration: 2.8s;
+        animation-duration: 2.8s;
+        -webkit-animation-delay: 1.08s;
+        animation-delay: 1.08s;
+    }
+    .hk-greeting:not(.is-seen):not(.is-still) .hk-greeting-knot {
+        -webkit-animation: hkg-fade .4s ease-out 1.1s backwards;
+        animation: hkg-fade .4s ease-out 1.1s backwards;
+    }
+    .hk-greeting:not(.is-seen):not(.is-still) .hk-greeting-rays {
+        -webkit-animation: hkg-rays 6.5s cubic-bezier(.15, .7, .2, 1) .4s backwards;
+        animation: hkg-rays 6.5s cubic-bezier(.15, .7, .2, 1) .4s backwards;
+    }
+    .hk-greeting:not(.is-seen):not(.is-still) .hk-greeting-face {
+        -webkit-animation: hkg-pop .9s cubic-bezier(.3, 1.45, .45, 1) .55s backwards;
+        animation: hkg-pop .9s cubic-bezier(.3, 1.45, .45, 1) .55s backwards;
+    }
+    .hk-greeting:not(.is-seen):not(.is-still) .hk-greeting-orbit {
+        -webkit-animation: hkg-orbit 2.6s cubic-bezier(.2, .8, .2, 1) .8s backwards;
+        animation: hkg-orbit 2.6s cubic-bezier(.2, .8, .2, 1) .8s backwards;
+    }
+    .hk-greeting:not(.is-seen):not(.is-still) .hk-greeting-kicker {
+        -webkit-animation: hkg-rise .65s cubic-bezier(.2, .8, .2, 1) .9s backwards;
+        animation: hkg-rise .65s cubic-bezier(.2, .8, .2, 1) .9s backwards;
+    }
+    .hk-greeting:not(.is-seen):not(.is-still) .hk-greeting-title {
+        -webkit-animation:
+            hkg-rise .75s cubic-bezier(.2, .8, .2, 1) 1.02s backwards,
+            hkg-shine 1.5s cubic-bezier(.45, .05, .35, 1) 1.9s backwards;
+        animation:
+            hkg-rise .75s cubic-bezier(.2, .8, .2, 1) 1.02s backwards,
+            hkg-shine 1.5s cubic-bezier(.45, .05, .35, 1) 1.9s backwards;
+    }
+    .hk-greeting:not(.is-seen):not(.is-still) .hk-greeting-line {
+        -webkit-animation: hkg-rise .75s cubic-bezier(.2, .8, .2, 1) 1.18s backwards;
+        animation: hkg-rise .75s cubic-bezier(.2, .8, .2, 1) 1.18s backwards;
+    }
+    .hk-greeting:not(.is-seen):not(.is-still) .hk-greeting-balloon {
+        -webkit-animation: hkg-float-up 1.9s cubic-bezier(.2, .75, .3, 1.06) 1.05s backwards;
+        animation: hkg-float-up 1.9s cubic-bezier(.2, .75, .3, 1.06) 1.05s backwards;
+    }
+    .hk-greeting:not(.is-seen):not(.is-still) .hk-greeting-balloon-2 {
+        -webkit-animation-delay: 1.25s;
+        animation-delay: 1.25s;
+    }
+    .hk-greeting:not(.is-seen):not(.is-still) .hk-greeting-balloon-1 {
+        -webkit-animation-delay: 1.4s;
+        animation-delay: 1.4s;
+    }
+    .hk-greeting:not(.is-seen):not(.is-still) .hk-greeting-sway {
+        -webkit-animation: hkg-sway 3.6s ease-in-out 2.4s backwards;
+        animation: hkg-sway 3.6s ease-in-out 2.4s backwards;
+    }
+    .hk-greeting:not(.is-seen):not(.is-still) .hk-greeting-balloon-1 .hk-greeting-sway {
+        -webkit-animation-name: hkg-sway-back;
+        animation-name: hkg-sway-back;
+        -webkit-animation-delay: 2.7s;
+        animation-delay: 2.7s;
+    }
+    .hk-greeting:not(.is-seen):not(.is-still) .hk-greeting-spark {
+        -webkit-animation: hkg-twinkle 1.5s cubic-bezier(.3, 1.3, .5, 1) 1.45s backwards;
+        animation: hkg-twinkle 1.5s cubic-bezier(.3, 1.3, .5, 1) 1.45s backwards;
+    }
+    .hk-greeting:not(.is-seen):not(.is-still) .hk-greeting-spark-1 {
+        -webkit-animation-delay: 1.7s;
+        animation-delay: 1.7s;
+    }
+    .hk-greeting:not(.is-seen):not(.is-still) .hk-greeting-spark-2 {
+        -webkit-animation-delay: 2.3s;
+        animation-delay: 2.3s;
+    }
+    .hk-greeting:not(.is-seen):not(.is-still) .hk-greeting-spark-3 {
+        -webkit-animation-delay: 2s;
+        animation-delay: 2s;
+    }
+    .hk-greeting:not(.is-seen):not(.is-still) .hk-greeting-spark-4 {
+        -webkit-animation-delay: 2.6s;
+        animation-delay: 2.6s;
+    }
+    .hk-greeting:not(.is-seen):not(.is-still) .hk-greeting-ground i {
+        -webkit-animation: hkg-land .7s cubic-bezier(.3, 1.3, .5, 1) 3.3s backwards;
+        animation: hkg-land .7s cubic-bezier(.3, 1.3, .5, 1) 3.3s backwards;
+    }
+    .hk-greeting:not(.is-seen):not(.is-still) .hk-greeting-ground i:nth-child(2n) {
+        -webkit-animation-delay: 3.6s;
+        animation-delay: 3.6s;
+    }
+    .hk-greeting:not(.is-seen):not(.is-still) .hk-greeting-ground i:nth-child(3n) {
+        -webkit-animation-delay: 3.9s;
+        animation-delay: 3.9s;
+    }
+    /* A page opened in a tab nobody is looking at: everything waits, and starts when the tab is seen. */
+    .hk-greeting.is-waiting,
+    .hk-greeting.is-waiting * {
+        /* stylelint-disable-next-line declaration-no-important */
+        -webkit-animation-play-state: paused !important;
+        /* stylelint-disable-next-line declaration-no-important */
+        animation-play-state: paused !important;
+    }
+}
+
+/* With reduced motion: no drop, no confetti, no glint; the card only fades in, the first time that day. */
+@media (prefers-reduced-motion: reduce) {
+    .hk-greeting:not(.is-seen):not(.is-still) {
+        -webkit-animation: hkg-fade .7s ease-out backwards;
+        animation: hkg-fade .7s ease-out backwards;
+    }
+}
+
+/* --- Going: the bunting goes up, the balloons fly away, the words fade, and the card folds (js/greeting.js) ------- */
+.hk-greeting.is-closing {
+    pointer-events: none;
+}
+.hk-greeting.is-closing .hk-greeting-garland {
+    -webkit-transform: translate3d(0, -120%, 0);
+    transform: translate3d(0, -120%, 0);
+    -webkit-transition: -webkit-transform .5s cubic-bezier(.55, 0, .75, .2);
+    transition: transform .5s cubic-bezier(.55, 0, .75, .2);
+}
+.hk-greeting.is-closing .hk-greeting-balloons {
+    opacity: 0;
+    -webkit-transform: translate3d(0, -170%, 0) rotate(-4deg);
+    transform: translate3d(0, -170%, 0) rotate(-4deg);
+    -webkit-transition: -webkit-transform 1.1s cubic-bezier(.4, 0, .8, .4), opacity 1.1s ease-in;
+    transition: transform 1.1s cubic-bezier(.4, 0, .8, .4), opacity 1.1s ease-in;
+}
+.hk-greeting.is-closing .hk-greeting-ground i {
+    opacity: 0;
+    -webkit-transition: opacity .3s;
+    transition: opacity .3s;
+}
+.hk-greeting.is-closing .hk-greeting-body,
+.hk-greeting.is-closing .hk-greeting-spark,
+.hk-greeting.is-closing .hk-greeting-close {
+    opacity: 0;
+    -webkit-transform: scale(.97);
+    transform: scale(.97);
+    -webkit-transition: opacity .3s, -webkit-transform .35s;
+    transition: opacity .3s, transform .35s;
+}
+.hk-greeting.is-leaving {
+    margin-bottom: 0;
+    opacity: 0;
+    -webkit-transition:
+        height .45s cubic-bezier(.4, 0, .2, 1),
+        min-height .45s cubic-bezier(.4, 0, .2, 1),
+        margin-bottom .45s cubic-bezier(.4, 0, .2, 1),
+        opacity .4s .1s;
+    transition:
+        height .45s cubic-bezier(.4, 0, .2, 1),
+        min-height .45s cubic-bezier(.4, 0, .2, 1),
+        margin-bottom .45s cubic-bezier(.4, 0, .2, 1),
+        opacity .4s .1s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .hk-greeting.is-closing *,
+    .hk-greeting.is-leaving {
+        /* stylelint-disable-next-line declaration-no-important */
+        -webkit-transition-duration: .2s !important;
+        /* stylelint-disable-next-line declaration-no-important */
+        transition-duration: .2s !important;
+        /* stylelint-disable-next-line declaration-no-important */
+        -webkit-transform: none !important;
+        /* stylelint-disable-next-line declaration-no-important */
+        transform: none !important;
+    }
+}
+
+/* --- The movements -------------------------------------------------------------------------------------------------- */
+@-webkit-keyframes hkg-in {
+    from {
+        opacity: 0;
+        -webkit-transform: translate3d(0, .6rem, 0) scale(.985);
+    }
+}
+
+@keyframes hkg-in {
+    from {
+        opacity: 0;
+        transform: translate3d(0, .6rem, 0) scale(.985);
+    }
+}
+
+@-webkit-keyframes hkg-fade {
+    from {
+        opacity: 0;
+    }
+}
+
+@keyframes hkg-fade {
+    from {
+        opacity: 0;
+    }
+}
+
+@-webkit-keyframes hkg-drop {
+    from {
+        -webkit-transform: translate3d(0, -115%, 0);
+    }
+}
+
+@keyframes hkg-drop {
+    from {
+        transform: translate3d(0, -115%, 0);
+    }
+}
+/* The string takes the fall: its sag stretches and bounces back, less each time. */
+@-webkit-keyframes hkg-sag {
+    0% {
+        -webkit-transform: scaleY(1);
+    }
+    12% {
+        -webkit-transform: scaleY(1.24);
+    }
+    30% {
+        -webkit-transform: scaleY(.9);
+    }
+    48% {
+        -webkit-transform: scaleY(1.08);
+    }
+    66% {
+        -webkit-transform: scaleY(.97);
+    }
+    82% {
+        -webkit-transform: scaleY(1.02);
+    }
+    100% {
+        -webkit-transform: scaleY(1);
+    }
+}
+
+@keyframes hkg-sag {
+    0% {
+        transform: scaleY(1);
+    }
+    12% {
+        transform: scaleY(1.24);
+    }
+    30% {
+        transform: scaleY(.9);
+    }
+    48% {
+        transform: scaleY(1.08);
+    }
+    66% {
+        transform: scaleY(.97);
+    }
+    82% {
+        transform: scaleY(1.02);
+    }
+    100% {
+        transform: scaleY(1);
+    }
+}
+/* Each flag swings on the string and comes to rest. */
+@-webkit-keyframes hkg-flutter {
+    0% {
+        -webkit-transform: rotate(0);
+    }
+    14% {
+        -webkit-transform: rotate(11deg);
+    }
+    32% {
+        -webkit-transform: rotate(-8deg);
+    }
+    50% {
+        -webkit-transform: rotate(5deg);
+    }
+    68% {
+        -webkit-transform: rotate(-2.5deg);
+    }
+    84% {
+        -webkit-transform: rotate(1deg);
+    }
+    100% {
+        -webkit-transform: rotate(0);
+    }
+}
+
+@keyframes hkg-flutter {
+    0% {
+        transform: rotate(0);
+    }
+    14% {
+        transform: rotate(11deg);
+    }
+    32% {
+        transform: rotate(-8deg);
+    }
+    50% {
+        transform: rotate(5deg);
+    }
+    68% {
+        transform: rotate(-2.5deg);
+    }
+    84% {
+        transform: rotate(1deg);
+    }
+    100% {
+        transform: rotate(0);
+    }
+}
+
+@-webkit-keyframes hkg-flutter-back {
+    0% {
+        -webkit-transform: rotate(0);
+    }
+    16% {
+        -webkit-transform: rotate(-9deg);
+    }
+    34% {
+        -webkit-transform: rotate(7deg);
+    }
+    54% {
+        -webkit-transform: rotate(-4deg);
+    }
+    74% {
+        -webkit-transform: rotate(1.8deg);
+    }
+    100% {
+        -webkit-transform: rotate(0);
+    }
+}
+
+@keyframes hkg-flutter-back {
+    0% {
+        transform: rotate(0);
+    }
+    16% {
+        transform: rotate(-9deg);
+    }
+    34% {
+        transform: rotate(7deg);
+    }
+    54% {
+        transform: rotate(-4deg);
+    }
+    74% {
+        transform: rotate(1.8deg);
+    }
+    100% {
+        transform: rotate(0);
+    }
+}
+
+@-webkit-keyframes hkg-rays {
+    from {
+        opacity: 0;
+        -webkit-transform: rotate(-50deg) scale(.55);
+    }
+}
+
+@keyframes hkg-rays {
+    from {
+        opacity: 0;
+        transform: rotate(-50deg) scale(.55);
+    }
+}
+
+@-webkit-keyframes hkg-pop {
+    from {
+        opacity: 0;
+        -webkit-transform: scale(.35) rotate(-14deg);
+    }
+    40% {
+        opacity: 1;
+    }
+}
+
+@keyframes hkg-pop {
+    from {
+        opacity: 0;
+        transform: scale(.35) rotate(-14deg);
+    }
+    40% {
+        opacity: 1;
+    }
+}
+
+@-webkit-keyframes hkg-orbit {
+    from {
+        opacity: 0;
+        -webkit-transform: rotate(-200deg) scale(.7);
+    }
+    30% {
+        opacity: 1;
+    }
+}
+
+@keyframes hkg-orbit {
+    from {
+        opacity: 0;
+        transform: rotate(-200deg) scale(.7);
+    }
+    30% {
+        opacity: 1;
+    }
+}
+
+@-webkit-keyframes hkg-rise {
+    from {
+        opacity: 0;
+        -webkit-transform: translate3d(0, .9rem, 0);
+    }
+}
+
+@keyframes hkg-rise {
+    from {
+        opacity: 0;
+        transform: translate3d(0, .9rem, 0);
+    }
+}
+
+@-webkit-keyframes hkg-shine {
+    from {
+        background-position: 100% 0;
+    }
+    to {
+        background-position: 0 0;
+    }
+}
+
+@keyframes hkg-shine {
+    from {
+        background-position: 100% 0;
+    }
+    to {
+        background-position: 0 0;
+    }
+}
+
+@-webkit-keyframes hkg-float-up {
+    from {
+        opacity: 0;
+        -webkit-transform: translate3d(0, 9rem, 0);
+    }
+    25% {
+        opacity: 1;
+    }
+}
+
+@keyframes hkg-float-up {
+    from {
+        opacity: 0;
+        transform: translate3d(0, 9rem, 0);
+    }
+    25% {
+        opacity: 1;
+    }
+}
+
+@-webkit-keyframes hkg-sway {
+    0% {
+        -webkit-transform: rotate(0);
+    }
+    20% {
+        -webkit-transform: rotate(3.5deg);
+    }
+    45% {
+        -webkit-transform: rotate(-2.5deg);
+    }
+    70% {
+        -webkit-transform: rotate(1.2deg);
+    }
+    100% {
+        -webkit-transform: rotate(0);
+    }
+}
+
+@keyframes hkg-sway {
+    0% {
+        transform: rotate(0);
+    }
+    20% {
+        transform: rotate(3.5deg);
+    }
+    45% {
+        transform: rotate(-2.5deg);
+    }
+    70% {
+        transform: rotate(1.2deg);
+    }
+    100% {
+        transform: rotate(0);
+    }
+}
+
+@-webkit-keyframes hkg-sway-back {
+    0% {
+        -webkit-transform: rotate(0);
+    }
+    22% {
+        -webkit-transform: rotate(-3deg);
+    }
+    48% {
+        -webkit-transform: rotate(2deg);
+    }
+    74% {
+        -webkit-transform: rotate(-.8deg);
+    }
+    100% {
+        -webkit-transform: rotate(0);
+    }
+}
+
+@keyframes hkg-sway-back {
+    0% {
+        transform: rotate(0);
+    }
+    22% {
+        transform: rotate(-3deg);
+    }
+    48% {
+        transform: rotate(2deg);
+    }
+    74% {
+        transform: rotate(-.8deg);
+    }
+    100% {
+        transform: rotate(0);
+    }
+}
+
+@-webkit-keyframes hkg-land {
+    from {
+        opacity: 0;
+        margin-bottom: .9rem;
+    }
+}
+
+@keyframes hkg-land {
+    from {
+        opacity: 0;
+        margin-bottom: .9rem;
+    }
+}
+
+@-webkit-keyframes hkg-twinkle {
+    0% {
+        opacity: 0;
+        -webkit-transform: scale(0) rotate(-90deg);
+    }
+    35% {
+        opacity: 1;
+        -webkit-transform: scale(1.5) rotate(0);
+    }
+    60% {
+        -webkit-transform: scale(.8) rotate(20deg);
+    }
+    100% {
+        -webkit-transform: scale(1) rotate(0);
+    }
+}
+
+@keyframes hkg-twinkle {
+    0% {
+        opacity: 0;
+        transform: scale(0) rotate(-90deg);
+    }
+    35% {
+        opacity: 1;
+        transform: scale(1.5) rotate(0);
+    }
+    60% {
+        transform: scale(.8) rotate(20deg);
+    }
+    100% {
+        transform: scale(1) rotate(0);
+    }
+}

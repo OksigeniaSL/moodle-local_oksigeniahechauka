@@ -31,6 +31,7 @@ class birthdayspage {
      * @return array
      */
     public static function context(int $now): array {
+        global $DB;
         $c = 'local_oksigeniahechauka';
         $config = get_config($c);
         $chosen = (string) ($config->birthdayfield ?? '');
@@ -44,8 +45,19 @@ class birthdayspage {
             $monthlist[] = ['value' => $n, 'label' => $name];
         }
         $people = [];
-        foreach (birthdays::all() as $row) {
+        $rows = birthdays::all();
+        $ids = array_values(array_unique(array_filter(array_map(function ($row) {
+            return (int) $row->userid;
+        }, $rows))));
+        $names = \core_user\fields::for_name()->get_sql('', false, '', '', false)->selects;
+        $accounts = $ids ? $DB->get_records_list('user', 'id', $ids, '', 'id, ' . $names) : [];
+        $unlinked = 0;
+        foreach ($rows as $row) {
             $picture = birthdays::list_picture((int) $row->id);
+            $account = !empty($row->userid) && isset($accounts[(int) $row->userid]) ? fullname($accounts[(int) $row->userid]) : '';
+            if ($account === '') {
+                $unlinked++;
+            }
             $people[] = [
                 'id' => (int) $row->id,
                 'name' => $row->name,
@@ -61,6 +73,9 @@ class birthdayspage {
                     $picture->get_filename()
                 )->out(false) : '',
                 'initial' => \core_text::substr($row->name, 0, 1),
+                'account' => $account,
+                'linked' => $account !== '',
+                'userid' => $account !== '' ? (int) $row->userid : 0,
             ];
         }
         $today = array_map(function ($person) {
@@ -76,6 +91,14 @@ class birthdayspage {
             'moodlepictures' => has_capability('tool/uploaduser:uploaduserpictures', \context_system::instance()) ?
                 (new \moodle_url('/admin/tool/uploaduser/picture.php'))->out(false) : '',
             'sesskey' => sesskey(),
+            'people_url' => (new \moodle_url('/local/oksigeniahechauka/people.php'))->out(false),
+            'icons' => ['x' => icons::svg('x'), 'search' => icons::svg('search')],
+            'unlinked' => $unlinked,
+            'hasunlinked' => $unlinked > 0,
+            'linkstrings' => json_encode([
+                'title' => get_string('birthdays_link_title', $c, '{name}'),
+                'none' => get_string('birthdays_link_none', $c),
+            ], JSON_UNESCAPED_UNICODE),
             'on' => !empty($config->sourcebirthdays),
             'cifra' => self::cifra($config),
             'family' => birthdays::family_available() ? ['on' => ($config->birthdaysfamily ?? '1') !== '0'] : null,

@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.16.0
+
+- **The people of the birthday list find their account by themselves**, also those written before the links existed: when every word of the name is in the full name of a single account whose first name starts like it («Yaiza Corujo» is «Yaiza» «Corujo Febles»). Never an account that is already on the list with another birthday, so a teacher never falls on a pupil with a similar name. Every night, when the plugin is updated, and with «Look for their accounts now».
+- **And by hand**, from «Birthdays»: each person says whose account they have, and a search links them to one or takes it away; «Only those without an account» leaves the ones still to do.
+- **The weekend's birthdays come the day before**, on the screens: the last day before the weekend (as the site's calendar has it) also congratulates whoever has their birthday on Saturday or Sunday, each with their day, under «Birthdays today and this weekend». The card and the notification in Moodle stay on the day itself.
+- **The screens in «Your work»** (Oksigenia Tembiapo), the dashboard of whoever runs something: how many screens, the ones that should be on and give no sign of life, an urgent notice left on, and the way to publish.
+
 ## 0.15.1
 
 - The library's news no longer show the library's name under each book, where it read as a second author. A centre with several libraries still sees where each book is, said as a place («Biblioteca …»).

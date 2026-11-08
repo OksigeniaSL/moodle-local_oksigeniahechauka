@@ -40,7 +40,10 @@ if ($list === 'managers' && !access::may_choose_managers()) {
 }
 $out = [];
 if (core_text::strlen($query) >= 2) {
-    if ($list === 'group') {
+    if ($list === 'any') {
+        // Someone of the birthday list, linked to their account: anyone of the site.
+        $already = [];
+    } else if ($list === 'group') {
         $already = array_map('intval', array_keys(access::editors($group)));
     } else {
         $already = array_map(function ($h) {

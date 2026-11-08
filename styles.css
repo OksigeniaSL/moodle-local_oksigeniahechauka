@@ -4547,6 +4547,57 @@ dialog.hkp-dialog > footer {
     color: var(--hkp-bad-ink);
     font-weight: 600;
 }
+/* The birthday list: who has no account yet, and the button to link someone to theirs. */
+.hkp-bd-tools {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .5rem 1rem;
+    margin: 0 0 .75rem;
+}
+.hkp-bd-tools .hkp-hint,
+.hkp-bd-tools form {
+    margin: 0;
+}
+.hkp-bd-account {
+    white-space: nowrap;
+}
+.hkp-bd-acts {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: .5rem;
+}
+.hkp-bd-row[hidden] {
+    display: none;
+}
+.hkp-bd-current {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .5rem;
+    font-weight: 600;
+}
+.hkp-bd-current[hidden] {
+    display: none;
+}
+/* On a phone the row goes on two lines: the name, then the date and the buttons under it. */
+@media (max-width: 575.98px) {
+    .hkp-bd-row {
+        flex-wrap: wrap;
+        gap: .35rem .5rem;
+    }
+    .hkp-bd-who {
+        flex-basis: calc(100% - 3rem);
+    }
+    .hkp-bd-date {
+        margin-left: 3rem;
+    }
+    .hkp-bd-acts {
+        margin-left: auto;
+    }
+}
+
 /* Oksigenia Hechauka: the birthday card at the top of the dashboard (art direction, 8 November 2026). It replaces the
  * placeholder .hk-greeting block at the end of styles.css, and needs fonts/Gabarito-700.woff2 and Gabarito-800.woff2.
  *

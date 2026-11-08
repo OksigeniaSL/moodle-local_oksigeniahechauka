@@ -31,4 +31,10 @@ $definitions = [
         'simplekeys' => true,
         'ttl' => 3600,
     ],
+    // The door of the screens in «Your work», asked on every load of the dashboard: a minute.
+    'work' => [
+        'mode' => cache_store::MODE_APPLICATION,
+        'simplekeys' => true,
+        'ttl' => 60,
+    ],
 ];

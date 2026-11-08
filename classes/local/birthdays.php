@@ -317,15 +317,60 @@ class birthdays {
             return [];
         }
         $items = [];
+        $c = 'local_oksigeniahechauka';
         foreach ([0, 1] as $add) {
             $date = schedule::day($now, $add);
             $people = self::on($config, $date);
-            if ($people) {
-                $items[] = ['id' => 'birthdays-' . $date, 'type' => 'birthdays', 'zone' => 'extra', 'date' => $date,
-                    'when' => ['from' => $date, 'until' => $date], 'people' => $people];
+            // The last day before the weekend also has the weekend's: nobody would see them in the centre on their day.
+            $weekend = [];
+            foreach (self::weekend_after($date) as $day) {
+                $name = userdate((new \DateTime($day . ' 12:00', \core_date::get_server_timezone_object()))->getTimestamp(), '%A');
+                foreach (self::on($config, $day) as $person) {
+                    $when = get_string('birthdays_weekday', $c, $name);
+                    $person['group'] = isset($person['group']) ? $person['group'] . ' · ' . $when : $when;
+                    $weekend[] = $person;
+                }
             }
+            if (!$people && !$weekend) {
+                continue;
+            }
+            $item = ['id' => 'birthdays-' . $date, 'type' => 'birthdays', 'zone' => 'extra', 'date' => $date,
+                'when' => ['from' => $date, 'until' => $date], 'people' => array_merge($people, $weekend)];
+            if ($weekend) {
+                $item['label'] = get_string($people ? 'label_birthdays_andweekend' :
+                    (count($weekend) === 1 ? 'label_birthdays_weekend_one' : 'label_birthdays_weekend_many'), $c);
+            }
+            $items[] = $item;
         }
         return $items;
+    }
+
+    /**
+     * The days of the weekend right after a day that is not one, by the weekend of the site's calendar (Saturday and
+     * Sunday unless it says otherwise); none after a day of the weekend.
+     *
+     * @param string $date YYYY-MM-DD
+     * @return string[] the dates
+     */
+    public static function weekend_after(string $date): array {
+        $weekend = (int) get_config('core', 'calendar_weekend');
+        $weekend = $weekend ?: 65;
+        $isweekend = function (\DateTime $day) use ($weekend): bool {
+            return (bool) ($weekend & (1 << (int) $day->format('w')));
+        };
+        $day = new \DateTime($date . ' 12:00', new \DateTimeZone('UTC'));
+        if ($isweekend($day)) {
+            return [];
+        }
+        $out = [];
+        for ($k = 0; $k < 3; $k++) {
+            $day->modify('+1 day');
+            if (!$isweekend($day)) {
+                break;
+            }
+            $out[] = $day->format('Y-m-d');
+        }
+        return $out;
     }
 
     /**
@@ -339,9 +384,11 @@ class birthdays {
         if (empty($config->sourcebirthdays) || $file->is_directory()) {
             return false;
         }
-        // Only the photos that the birthdays of yesterday, today or tomorrow show, with every rule already applied.
+        // Only the photos that the birthdays of yesterday, today or the next days show (the weekend's come before it), with
+        // every rule already applied.
         $now = time();
-        foreach ([schedule::day($now, -1), schedule::day($now), schedule::day($now, 1)] as $date) {
+        foreach ([-1, 0, 1, 2, 3, 4] as $add) {
+            $date = schedule::day($now, $add);
             foreach (self::on($config, $date) as $person) {
                 if ((int) ($person['photo']['id'] ?? 0) === (int) $file->get_id()) {
                     return true;
@@ -394,7 +441,7 @@ class birthdays {
         }
         $same = $DB->get_record(self::TABLE, ['name' => $name, 'month' => $month, 'day' => $day], '*', IGNORE_MULTIPLE);
         $idnumber = $idnumber !== '' ? $idnumber : (string) ($same->idnumber ?? '');
-        $userid = self::account($name, $idnumber, $email);
+        $userid = self::account($name, $idnumber, $email, $month, $day);
         if ($same) {
             $update = ['id' => $same->id, 'groupname' => $group, 'usermodified' => $USER->id, 'timemodified' => $now];
             if ($idnumber !== '') {
@@ -453,17 +500,22 @@ class birthdays {
 
     /**
      * The Moodle account of someone on the list: by ID number, else by email, else by a name only one account has (the
-     * first name and the first surname, or the whole name). Never a guess: two accounts that fit are none.
+     * first name and the first surname, or the whole name), else by the words of the name: every one of them in the full name
+     * of a single account whose first name starts like it («Yaiza Corujo» is «Yaiza» «Corujo Febles»). Never a guess: two
+     * accounts that fit are none. By a name, never an account already on the list with another birthday: that is someone
+     * else with a similar name (a pupil, often).
      *
      * @param string $name
      * @param string $idnumber
      * @param string $email
+     * @param int $month of the birthday, for the account already on the list; 0 when it is not known
+     * @param int $day
      * @return int the user id, or 0
      */
-    public static function account(string $name, string $idnumber = '', string $email = ''): int {
+    public static function account(string $name, string $idnumber = '', string $email = '', int $month = 0, int $day = 0): int {
         global $DB, $CFG;
         if (self::$accounts === null) {
-            $index = ['idnumber' => [], 'email' => [], 'name' => []];
+            $index = ['idnumber' => [], 'email' => [], 'name' => [], 'words' => [], 'dates' => []];
             $users = $DB->get_recordset_select(
                 'user',
                 'deleted = 0 AND suspended = 0 AND id <> :guest',
@@ -481,10 +533,24 @@ class birthdays {
                 }
                 $index['name'][self::plain_name($user->firstname . ' ' . self::first_surname((string) $user->lastname))][$id] = $id;
                 $index['name'][self::plain_name($user->firstname . ' ' . $user->lastname)][$id] = $id;
+                $first = self::name_words((string) $user->firstname);
+                if ($first) {
+                    $index['words'][$id] = [$first[0], self::name_words($user->firstname . ' ' . $user->lastname)];
+                }
             }
             $users->close();
+            $rows = $DB->get_recordset_select(self::TABLE, 'userid > 0', [], '', 'id, userid, month, day');
+            foreach ($rows as $row) {
+                $index['dates'][(int) $row->userid][$row->month . '-' . $row->day] = true;
+            }
+            $rows->close();
             self::$accounts = $index;
         }
+        // Whether an account, found by a name, may be this person: not if it is on the list with another birthday.
+        $free = function (int $id) use ($month, $day): bool {
+            $dates = self::$accounts['dates'][$id] ?? [];
+            return !$month || !$dates || isset($dates[$month . '-' . $day]);
+        };
         $keys = ['idnumber' => \core_text::strtolower(trim($idnumber)), 'email' => \core_text::strtolower(trim($email)),
             'name' => self::plain_name($name)];
         foreach ($keys as $kind => $key) {
@@ -492,9 +558,91 @@ class birthdays {
                 continue;
             }
             $ids = self::$accounts[$kind][$key];
+            if ($kind === 'name') {
+                $ids = array_filter($ids, $free);
+            }
             return count($ids) === 1 ? (int) reset($ids) : 0;
         }
-        return 0;
+        // The words of the name, all in one account: at least a first name and a surname.
+        $words = self::name_words($name);
+        if (count($words) < 2) {
+            return 0;
+        }
+        $found = [];
+        foreach (self::$accounts['words'] as $id => [$first, $all]) {
+            if ($first === $words[0] && !array_diff($words, $all) && $free($id)) {
+                $found[] = $id;
+                if (count($found) > 1) {
+                    return 0;
+                }
+            }
+        }
+        return $found ? (int) $found[0] : 0;
+    }
+
+    /**
+     * The words of a name to compare, in order: plain, without the particles of surnames («de», «la»…), each once.
+     *
+     * @param string $name
+     * @return string[]
+     */
+    protected static function name_words(string $name): array {
+        $words = array_filter(explode(' ', self::plain_name($name)), function ($word) {
+            return $word !== '' && !in_array($word, self::PARTICLES, true);
+        });
+        return array_values(array_unique($words));
+    }
+
+    /**
+     * Links to their accounts the people of the list who have none yet, by the same rules as when they are added: the
+     * accounts made after the list, and the list written before the links existed. Every night, and when the plugin is
+     * updated.
+     *
+     * @return int how many were linked
+     */
+    public static function relink(): int {
+        global $DB;
+        self::$accounts = null;
+        self::$batch = true;
+        $done = 0;
+        try {
+            $fields = 'id, name, idnumber, month, day';
+            $rows = $DB->get_records_select(self::TABLE, 'userid IS NULL OR userid = 0', [], 'id', $fields);
+            foreach ($rows as $row) {
+                $userid = self::account((string) $row->name, (string) $row->idnumber, '', (int) $row->month, (int) $row->day);
+                if ($userid) {
+                    $DB->set_field(self::TABLE, 'userid', $userid, ['id' => $row->id]);
+                    // The same account is not given to a second person with another birthday.
+                    self::$accounts['dates'][$userid][$row->month . '-' . $row->day] = true;
+                    $done++;
+                }
+            }
+        } finally {
+            self::$batch = false;
+            self::$accounts = null;
+        }
+        return $done;
+    }
+
+    /**
+     * Links someone of the list to an account by hand, from the panel, or unlinks them (0).
+     *
+     * @param int $id the line of the list
+     * @param int $userid the account, or 0
+     * @return bool whether it was done
+     */
+    public static function link(int $id, int $userid): bool {
+        global $DB, $USER;
+        if (!$DB->record_exists(self::TABLE, ['id' => $id])) {
+            return false;
+        }
+        if ($userid && !$DB->record_exists('user', ['id' => $userid, 'deleted' => 0])) {
+            return false;
+        }
+        $DB->update_record(self::TABLE, (object) ['id' => $id, 'userid' => $userid ?: null, 'usermodified' => $USER->id,
+            'timemodified' => time()]);
+        self::$accounts = null;
+        return true;
     }
 
     /**
@@ -814,7 +962,7 @@ class birthdays {
             $group = \core_text::substr(trim((string) ($person['grupo_academico_principal']['etiqueta'] ?? '')), 0, 60);
             $fields = ['name' => $name, 'groupname' => $group, 'day' => $date[0], 'month' => $date[1],
                 'source' => self::CIFRA, 'sourcekey' => $key, 'usermodified' => $USER->id, 'timemodified' => $now];
-            $userid = self::account($name, '', (string) ($person['email'] ?? ''));
+            $userid = self::account($name, '', (string) ($person['email'] ?? ''), $date[1], $date[0]);
             if ($userid) {
                 $fields['userid'] = $userid;
             }

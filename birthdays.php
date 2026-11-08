@@ -80,6 +80,18 @@ if ($action !== '' && confirm_sesskey()) {
                 }
             }
         }
+    } else if ($action === 'link') {
+        $userid = optional_param('user', 0, PARAM_INT);
+        if (!birthdays::link(required_param('id', PARAM_INT), $userid)) {
+            $message = get_string('birthdays_link_wrong', $c);
+            $kind = notification::NOTIFY_ERROR;
+        } else {
+            $message = $userid ? get_string('birthdays_linked', $c, fullname(core_user::get_user($userid))) :
+                get_string('birthdays_unlinked', $c);
+        }
+    } else if ($action === 'relink') {
+        \core_php_time_limit::raise(300);
+        $message = get_string('birthdays_relinked', $c, birthdays::relink());
     } else if ($action === 'greeting') {
         set_config('greetcard', optional_param('card', 0, PARAM_BOOL) ? 1 : 0, $c);
         set_config('greetnotify', optional_param('notify', 0, PARAM_BOOL) ? 1 : 0, $c);

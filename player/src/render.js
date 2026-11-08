@@ -610,8 +610,10 @@ export class Screen {
             return self0.media.url(ref);
         };
         if (comp === 'cumple') {
+            // The day before the weekend says its own heading: the weekend's birthdays come with it.
+            const own = (extra && extra.item && extra.item.label) || '';
             buildBirthdays(c, extra && extra.item, (extra && extra.page) || 0, {distance: this.distance || 3, horizontal: this.horizontal,
-                glass: !!this.glass, one: this.s.birthdays_one || '', many: this.s.birthdays_many || '', media: mediaOf,
+                glass: !!this.glass, one: own || this.s.birthdays_one || '', many: own || this.s.birthdays_many || '', media: mediaOf,
                 still: this.keepsStill(), cheers: this.s.birthdays_cheers || ''});
             return c;
         }

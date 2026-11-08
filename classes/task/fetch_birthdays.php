@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Scheduled task: the birthdays of the pupils, from Cifra.
+ * Scheduled task: the birthdays of the pupils, from Cifra, and the accounts of the list.
  *
  * @package    local_oksigeniahechauka
  * @copyright  2026 Oksigenia SL <dev@oksigenia.cc>
@@ -27,7 +27,8 @@ namespace local_oksigeniahechauka\task;
 use local_oksigeniahechauka\local\birthdays;
 
 /**
- * Every night, when the birthdays come from Cifra: who is new, who changed and who left.
+ * Every night: when the birthdays come from Cifra, who is new, who changed and who left; and, always, the accounts of whoever
+ * on the list has none yet.
  */
 class fetch_birthdays extends \core\task\scheduled_task {
     /**
@@ -45,5 +46,6 @@ class fetch_birthdays extends \core\task\scheduled_task {
     public function execute(): void {
         \core_php_time_limit::raise(900);
         mtrace('Birthdays from Cifra: ' . birthdays::sync_cifra(time()));
+        mtrace('Birthdays linked to their account: ' . birthdays::relink());
     }
 }

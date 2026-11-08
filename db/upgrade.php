@@ -301,5 +301,11 @@ function xmldb_local_oksigeniahechauka_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026110801, 'local', 'oksigeniahechauka');
     }
 
+    if ($oldversion < 2026110806) {
+        // The list written before people were linked to their accounts: linked now, by the rules of every night.
+        \local_oksigeniahechauka\local\birthdays::relink();
+        upgrade_plugin_savepoint(true, 2026110806, 'local', 'oksigeniahechauka');
+    }
+
     return true;
 }

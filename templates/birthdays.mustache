@@ -22,13 +22,15 @@
     Example context (json):
     {
         "tabs": [{"url": "#", "label": "Tu centro", "icon": "", "current": true}], "hastabs": true, "centre": "#", "action": "#",
-        "sesskey": "abc", "modelurl": "#", "moodlepictures": "#", "on": true, "greetcard": true, "greetnotify": false, "fields": [{"value": "", "label": "Ninguno", "selected": true}], "hasfields": false,
+        "sesskey": "abc", "modelurl": "#", "moodlepictures": "#", "on": true, "greetcard": true, "greetnotify": false,
+        "people_url": "#", "unlinked": 1, "hasunlinked": true, "linkstrings": "{}", "icons": {"x": "", "search": ""}, "fields": [{"value": "", "label": "Ninguno", "selected": true}], "hasfields": false,
         "days": [1, 2], "months": [{"value": 1, "label": "enero"}], "count": 1, "haspeople": true, "hastoday": true,
         "today": "Lucía Pérez",
-        "people": [{"id": 1, "name": "Lucía Pérez", "group": "3.º A", "idnumber": "1024", "date": "15 marzo", "photo": "", "initial": "L"}]
+        "people": [{"id": 1, "name": "Lucía Pérez", "group": "3.º A", "idnumber": "1024", "date": "15 marzo", "photo": "", "initial": "L",
+            "account": "", "linked": false, "userid": 0}]
     }
 }}
-<div class="hkp" id="hkp-birthdays-page">
+<div class="hkp" id="hkp-birthdays-page" data-people="{{people_url}}" data-sesskey="{{sesskey}}" data-strings="{{linkstrings}}">
     <header class="hkp-head"><div class="hkp-head-title"><h1>{{#str}}birthdays_title, local_oksigeniahechauka{{/str}}</h1>{{#howto}}{{> local_oksigeniahechauka/howto_button }}{{/howto}}</div></header>
     {{#hastabs}}<nav class="hkp-tabs" aria-label="{{#str}}tabs_label, local_oksigeniahechauka{{/str}}">{{#tabs}}<a href="{{url}}"{{#current}} aria-current="page"{{/current}}>{{{icon}}}{{label}}</a>{{/tabs}}</nav>{{/hastabs}}
     <div class="hkp-birthdays">
@@ -90,7 +92,161 @@
         <section class="hkp-fs" aria-labelledby="hkp-bd-people">
             <h2 id="hkp-bd-people" class="hkp-label hkp-section-label">{{#str}}birthdays_list, local_oksigeniahechauka, {{count}}{{/str}}</h2>
             {{^haspeople}}<p class="hkp-hint">{{#str}}birthdays_list_empty, local_oksigeniahechauka{{/str}}</p>{{/haspeople}}
-            {{#haspeople}}<ul class="hkp-bd-list">{{#people}}<li class="hkp-bd-row"><span class="hkp-bd-face" aria-hidden="true">{{#photo}}<img src="{{photo}}" alt="">{{/photo}}{{^photo}}{{initial}}{{/photo}}</span><span class="hkp-bd-who"><b>{{name}}</b>{{#group}} <small>{{group}}</small>{{/group}}{{#idnumber}} <small>· {{#str}}birthdays_row_idnumber, local_oksigeniahechauka, {{idnumber}}{{/str}}</small>{{/idnumber}}</span><span class="hkp-bd-date">{{date}}</span><form method="post" action="{{action}}"><input type="hidden" name="sesskey" value="{{sesskey}}"><input type="hidden" name="action" value="delete"><input type="hidden" name="id" value="{{id}}"><button type="submit" class="btn btn-sm btn-outline-secondary" aria-label="{{#str}}birthdays_delete, local_oksigeniahechauka, {{name}}{{/str}}">×</button></form></li>{{/people}}</ul>{{/haspeople}}
+            {{#haspeople}}{{#hasunlinked}}<div class="hkp-bd-tools"><p class="hkp-hint">{{#str}}birthdays_unlinked_count, local_oksigeniahechauka, {{unlinked}}{{/str}}</p><div class="form-switch form-check"><input class="form-check-input" type="checkbox" role="switch" id="hkp-bd-onlyunlinked"><label class="form-check-label" for="hkp-bd-onlyunlinked">{{#str}}birthdays_only_unlinked, local_oksigeniahechauka{{/str}}</label></div><form method="post" action="{{action}}"><input type="hidden" name="sesskey" value="{{sesskey}}"><input type="hidden" name="action" value="relink"><button type="submit" class="btn btn-sm btn-outline-secondary">{{#str}}birthdays_relink, local_oksigeniahechauka{{/str}}</button></form></div>{{/hasunlinked}}<ul class="hkp-bd-list">{{#people}}<li class="hkp-bd-row"{{#linked}} data-linked="1"{{/linked}}><span class="hkp-bd-face" aria-hidden="true">{{#photo}}<img src="{{photo}}" alt="">{{/photo}}{{^photo}}{{initial}}{{/photo}}</span><span class="hkp-bd-who"><b>{{name}}</b>{{#group}} <small>{{group}}</small>{{/group}}{{#idnumber}} <small>· {{#str}}birthdays_row_idnumber, local_oksigeniahechauka, {{idnumber}}{{/str}}</small>{{/idnumber}}{{#linked}} <small class="hkp-bd-account">· {{#str}}birthdays_account, local_oksigeniahechauka, {{account}}{{/str}}</small>{{/linked}}</span><span class="hkp-bd-date">{{date}}</span><span class="hkp-bd-acts"><button type="button" class="btn btn-sm btn-outline-secondary hkp-bd-link" data-hkp-link="{{id}}" data-name="{{name}}" data-user="{{userid}}" data-account="{{account}}" aria-label="{{#cleanstr}}birthdays_link_label, local_oksigeniahechauka, {{name}}{{/cleanstr}}">{{#linked}}{{#str}}birthdays_link_change, local_oksigeniahechauka{{/str}}{{/linked}}{{^linked}}{{#str}}birthdays_link, local_oksigeniahechauka{{/str}}{{/linked}}</button><form method="post" action="{{action}}"><input type="hidden" name="sesskey" value="{{sesskey}}"><input type="hidden" name="action" value="delete"><input type="hidden" name="id" value="{{id}}"><button type="submit" class="btn btn-sm btn-outline-secondary" aria-label="{{#str}}birthdays_delete, local_oksigeniahechauka, {{name}}{{/str}}">×</button></form></span></li>{{/people}}</ul>{{/haspeople}}
         </section>
     </div>
+    <dialog class="hkp-dialog is-narrow" id="hkp-link-dialog" aria-labelledby="hkp-lk-h">
+        <header><h2 id="hkp-lk-h"></h2><button type="button" class="btn btn-icon" data-hkp-close aria-label="{{#str}}closebuttontitle{{/str}}">{{{icons.x}}}</button></header>
+        <div class="hkp-dialog-body">
+            <p class="hkp-hint">{{#str}}birthdays_link_help, local_oksigeniahechauka{{/str}}</p>
+            <p class="hkp-bd-current" hidden><span></span> <button type="button" class="btn btn-sm btn-outline-secondary" data-hkp-unlink>{{#str}}birthdays_unlink, local_oksigeniahechauka{{/str}}</button></p>
+            <div class="hkp-search" data-list="any" data-group="0">{{{icons.search}}}<input class="form-control" role="combobox" aria-expanded="false" aria-controls="hkp-lb-link" aria-autocomplete="list" placeholder="{{#str}}birthdays_link_search, local_oksigeniahechauka{{/str}}" aria-label="{{#str}}birthdays_link_search, local_oksigeniahechauka{{/str}}" autocomplete="off" spellcheck="false"><ul class="hkp-listbox" id="hkp-lb-link" role="listbox" hidden></ul></div>
+        </div>
+        <footer><button type="button" class="btn btn-outline-secondary" data-hkp-close>{{#str}}cancel{{/str}}</button></footer>
+    </dialog>
+    <form method="post" action="{{action}}" id="hkp-link-form" hidden><input type="hidden" name="sesskey" value="{{sesskey}}"><input type="hidden" name="action" value="link"><input type="hidden" name="id" value=""><input type="hidden" name="user" value=""></form>
 </div>
+{{#js}}
+(function() {
+    var page = document.getElementById('hkp-birthdays-page');
+    if (!page) {
+        return;
+    }
+    var words = JSON.parse(page.getAttribute('data-strings') || '{}');
+    var people = page.getAttribute('data-people');
+    var sesskey = page.getAttribute('data-sesskey');
+    var dialog = page.querySelector('#hkp-link-dialog');
+    var form = page.querySelector('#hkp-link-form');
+    if (!dialog || !form) {
+        return;
+    }
+    var send = function(user) {
+        form.querySelector('[name="user"]').value = user;
+        form.submit();
+    };
+    // Only who has no account yet: the ones left to link by hand.
+    var only = page.querySelector('#hkp-bd-onlyunlinked');
+    if (only) {
+        only.addEventListener('change', function() {
+            page.querySelectorAll('.hkp-bd-row[data-linked]').forEach(function(row) {
+                row.hidden = only.checked;
+            });
+        });
+    }
+    // The dialog of a person of the list: their account now, and the search for another.
+    var current = dialog.querySelector('.hkp-bd-current');
+    var input = dialog.querySelector('.hkp-search input');
+    var list = dialog.querySelector('.hkp-listbox');
+    page.querySelectorAll('[data-hkp-link]').forEach(function(b) {
+        b.addEventListener('click', function() {
+            form.querySelector('[name="id"]').value = b.getAttribute('data-hkp-link');
+            dialog.querySelector('#hkp-lk-h').textContent = (words.title || '').replace('{name}', b.getAttribute('data-name'));
+            var account = b.getAttribute('data-account');
+            current.hidden = !account;
+            current.querySelector('span').textContent = account;
+            input.value = '';
+            list.hidden = true;
+            list.textContent = '';
+            dialog.showModal();
+            input.focus();
+        });
+    });
+    dialog.querySelectorAll('[data-hkp-close]').forEach(function(b) {
+        b.addEventListener('click', function() {
+            dialog.close();
+        });
+    });
+    dialog.querySelector('[data-hkp-unlink]').addEventListener('click', function() {
+        send(0);
+    });
+    var timer = null;
+    var options = [];
+    var at = -1;
+    var close = function() {
+        list.hidden = true;
+        input.setAttribute('aria-expanded', 'false');
+        input.removeAttribute('aria-activedescendant');
+        at = -1;
+    };
+    var mark = function(k) {
+        options.forEach(function(o, i) {
+            o.setAttribute('aria-selected', i === k ? 'true' : 'false');
+        });
+        at = k;
+        if (options[k]) {
+            input.setAttribute('aria-activedescendant', options[k].id);
+        }
+    };
+    var show = function(found) {
+        list.textContent = '';
+        options = [];
+        found.forEach(function(p, i) {
+            var li = document.createElement('li');
+            li.id = 'hkp-opt-link-' + i;
+            li.setAttribute('role', 'option');
+            li.setAttribute('data-user', p.id);
+            li.setAttribute('aria-selected', 'false');
+            var av = document.createElement('span');
+            av.className = 'hkp-av';
+            av.setAttribute('aria-hidden', 'true');
+            av.textContent = p.initials;
+            var text = document.createElement('span');
+            text.textContent = p.name;
+            var small = document.createElement('small');
+            small.textContent = p.detail;
+            text.appendChild(small);
+            li.appendChild(av);
+            li.appendChild(text);
+            li.addEventListener('mousedown', function(e) {
+                e.preventDefault();
+                send(p.id);
+            });
+            list.appendChild(li);
+            options.push(li);
+        });
+        if (!found.length) {
+            var none = document.createElement('li');
+            none.setAttribute('aria-disabled', 'true');
+            none.textContent = words.none;
+            list.appendChild(none);
+        }
+        list.hidden = false;
+        input.setAttribute('aria-expanded', 'true');
+    };
+    input.addEventListener('input', function() {
+        clearTimeout(timer);
+        if (input.value.trim().length < 2) {
+            close();
+            return;
+        }
+        timer = setTimeout(function() {
+            fetch(people + '?q=' + encodeURIComponent(input.value.trim()) + '&list=any&sesskey=' + sesskey,
+                {credentials: 'same-origin'}).then(function(r) {
+                return r.json();
+            }).then(show).catch(close);
+        }, 250);
+    });
+    input.addEventListener('keydown', function(e) {
+        if (list.hidden) {
+            return;
+        }
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            mark(Math.min(options.length - 1, at + 1));
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            mark(Math.max(0, at - 1));
+        } else if (e.key === 'Enter') {
+            e.preventDefault();
+            if (options[at]) {
+                send(options[at].getAttribute('data-user'));
+            }
+        } else if (e.key === 'Escape') {
+            close();
+        }
+    });
+    input.addEventListener('blur', function() {
+        setTimeout(close, 150);
+    });
+})();
+{{/js}}
