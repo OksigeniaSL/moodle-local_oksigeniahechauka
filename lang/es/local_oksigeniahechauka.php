@@ -157,6 +157,7 @@ $string['birthdays_today_none'] = 'Hoy no cumple años nadie.';
 $string['body_event'] = 'Para quién o dónde';
 $string['body_media'] = 'Segunda línea';
 $string['body_notice'] = 'Detalle';
+$string['books_library'] = 'Biblioteca {$a}';
 $string['booksdays'] = 'Novedades de los últimos días';
 $string['booksdays_desc'] = 'Cuántos días atrás se considera nuevo un libro.';
 $string['by'] = 'De {$a}';

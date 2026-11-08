@@ -59,6 +59,21 @@ final class sources_test extends \advanced_testcase {
     }
 
     /**
+     * The library of each book: nothing when they are all in one (it would read as a second author); with several, said as
+     * a place, unless its name already says it is a library.
+     */
+    public function test_book_places(): void {
+        $this->assertSame(['', '', ''], sources::book_places(['Carmita Sabina', 'Carmita Sabina', '']));
+        $this->assertSame([], sources::book_places([]));
+        // A name with the word of the language («Biblioteca», «Library») is left as it is.
+        $named = trim(get_string('books_library', 'local_oksigeniahechauka', '')) . ' North';
+        $places = sources::book_places(['Carmita Sabina', $named, '']);
+        $this->assertSame([get_string('books_library', 'local_oksigeniahechauka', 'Carmita Sabina'), $named, ''], $places);
+        $this->assertStringContainsString('Carmita Sabina', $places[0]);
+        $this->assertNotSame('Carmita Sabina', $places[0]);
+    }
+
+    /**
      * All-day events, the way a calendar subscription leaves them (at midnight and lasting nothing, or from midnight to
      * midnight), last their whole days; an event with hours keeps them.
      */

@@ -257,11 +257,17 @@ class sources {
             return [];
         }
         $books = [];
-        foreach ($list as $book) {
+        $places = self::book_places(array_map(function ($book) {
+            return items::plain((string) $book['library']);
+        }, $list));
+        foreach ($list as $key => $book) {
             $one = ['title' => items::plain((string) $book['title']),
                 'authors' => array_map([items::class, 'plain'], $book['authors']),
                 'colour' => ['bg' => $book['colour']['background'], 'ink' => $book['colour']['ink']],
-                'library' => items::plain((string) $book['library']), 'web' => (string) $book['url']];
+                'web' => (string) $book['url']];
+            if ($places[$key] !== '') {
+                $one['library'] = $places[$key];
+            }
             if ((string) $book['subtitle'] !== '') {
                 $one['subtitle'] = items::plain((string) $book['subtitle']);
             }
@@ -275,6 +281,28 @@ class sources {
         }
         return [['id' => 'books-' . schedule::day($now), 'type' => 'books', 'zone' => 'extra',
             'label' => get_string('label_books', 'local_oksigeniahechauka'), 'books' => $books]];
+    }
+
+    /**
+     * Where each book is, as the shelf says it: nothing when they are all in the same library, where the name under a book
+     * would read as a second author; with several, «Library …», so that it reads as a place.
+     *
+     * @param string[] $libraries the library of each book
+     * @return string[] what to show of each, with the same keys; '' for nothing
+     */
+    public static function book_places(array $libraries): array {
+        $names = array_map('trim', array_map('strval', $libraries));
+        if (count(array_unique(array_filter($names, 'strlen'))) <= 1) {
+            return array_fill_keys(array_keys($names), '');
+        }
+        // The word of the language («Biblioteca», «Library»): a name that already has it is left as it is.
+        $word = \core_text::strtolower(trim(get_string('books_library', 'local_oksigeniahechauka', '')));
+        $out = [];
+        foreach ($names as $key => $name) {
+            $has = $name === '' || ($word !== '' && str_contains(\core_text::strtolower($name), $word));
+            $out[$key] = $has ? $name : get_string('books_library', 'local_oksigeniahechauka', $name);
+        }
+        return $out;
     }
 
     /**
