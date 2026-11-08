@@ -612,10 +612,10 @@ export class Screen {
             return self0.media.url(ref);
         };
         if (comp === 'cumple') {
-            // The day before the weekend says its own heading: the weekend's birthdays come with it.
+            // The day before the weekend says its own heading for all of them; each person's moment, theirs.
             const own = (extra && extra.item && extra.item.label) || '';
             buildBirthdays(c, extra && extra.item, (extra && extra.page) || 0, {distance: this.distance || 3, horizontal: this.horizontal,
-                glass: !!this.glass, one: own || this.s.birthdays_one || '', many: own || this.s.birthdays_many || '', media: mediaOf,
+                glass: !!this.glass, one: this.s.birthdays_one || '', many: own || this.s.birthdays_many || '', media: mediaOf,
                 still: this.keepsStill(), cheers: this.s.birthdays_cheers || ''});
             return c;
         }
@@ -631,7 +631,7 @@ export class Screen {
         }
         if (comp === 'biblioteca') {
             buildBooks(c, extra && extra.item, (extra && extra.page) || 0, {distance: this.distance || 3, horizontal: this.horizontal,
-                media: mediaOf, more: this.s.also_more || '', qr: function (url, image) {
+                media: mediaOf, qr: function (url, image) {
                     return self0.qrBox(url, false, image);
                 }});
             return c;
@@ -766,9 +766,7 @@ export class Screen {
             countdown: s.countdown || '',
             daysfor: s.daysfor || '',
             also: s.also || '',
-            alsoMore: s.also_more || '',
             allergens: s.allergens || '',
-            alsoOthers: s.also_others || '',
             notices: l.notices || s.notices || '',
             upcoming: l.upcoming || s.upcoming || '',
         };
@@ -778,7 +776,7 @@ export class Screen {
     agendaWords() {
         const s = this.s;
         return {months: s.months, letters: s.letters, date_format: s.date_format, agenda_in: s.agenda_in,
-            agenda_more: s.agenda_more, agenda_nomore: s.agenda_nomore, agenda_quiet_title: s.agenda_quiet_title,
+            agenda_nomore: s.agenda_nomore, agenda_quiet_title: s.agenda_quiet_title,
             agenda_quiet: s.agenda_quiet};
     }
 

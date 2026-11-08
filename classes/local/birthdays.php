@@ -326,8 +326,8 @@ class birthdays {
             foreach (self::weekend_after($date) as $day) {
                 $name = userdate((new \DateTime($day . ' 12:00', \core_date::get_server_timezone_object()))->getTimestamp(), '%A');
                 foreach (self::on($config, $day) as $person) {
-                    $when = get_string('birthdays_weekday', $c, $name);
-                    $person['group'] = isset($person['group']) ? $person['group'] . ' · ' . $when : $when;
+                    // Their moment says their day: «El domingo cumple años».
+                    $person['kicker'] = get_string('label_birthday_on', $c, $name);
                     $weekend[] = $person;
                 }
             }

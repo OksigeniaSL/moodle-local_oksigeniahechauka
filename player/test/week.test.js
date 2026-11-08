@@ -1,7 +1,7 @@
 // «La semana» without a page: which days, holidays, bands and their lanes, stages.
 
 import {readFileSync} from 'node:fs';
-import {menuKind} from '../src/lead.js';
+import {fitAlso, menuKind} from '../src/lead.js';
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {afterDayEnd, categoryOf, colourOf, eventsOn, iconOf, upcoming} from '../src/agenda.js';
@@ -150,7 +150,10 @@ test('the kind of a menu, only when it says something', () => {
 });
 
 test('«También» is said in the screens\' own words', () => {
-    assert.ok(readFileSync(new URL('../demo/index.html', import.meta.url), 'utf8').includes('"also_more"'));
+    const demo = readFileSync(new URL('../demo/index.html', import.meta.url), 'utf8');
+    assert.ok(demo.includes('"also"'));
+    // Never «and 2 more»: a screen cannot be asked which.
+    assert.ok(!demo.includes('"also_more"') && !demo.includes('"also_others"'));
 });
 
 test('a day the agenda marks as closed', () => {
@@ -170,4 +173,38 @@ test('the icon of an event: the chosen one, none, or what its words say', () => 
     assert.equal(iconOf({}, 'Reunión'), '');
     delete globalThis.HK_ACTIVIDAD;
     assert.equal(iconOf({}, 'Teatro en inglés'), '');
+});
+
+test('«También» says every other menu or none: never «and 2 more»', () => {
+    // A box of two lines of 40 characters, measured by its text.
+    const lead = function (list, kinds) {
+        const text = {nodeValue: ''};
+        const box = {hkList: list, hkKinds: kinds, lastChild: text, style: {display: ''},
+            get offsetHeight() {
+                return 10 * Math.max(1, Math.ceil(text.nodeValue.length / 40));
+            }};
+        return {box, querySelector: () => box};
+    };
+    const was = globalThis.window;
+    globalThis.window = {getComputedStyle: () => ({paddingTop: '0', borderTopWidth: '0', lineHeight: '10'})};
+    try {
+        let l = lead(['Revuelto (vegetariano)', 'Pollo asado'], ['vegetariano']);
+        fitAlso(l);
+        assert.equal(l.box.lastChild.nodeValue, 'Revuelto (vegetariano) · Pollo asado');
+        assert.equal(l.box.style.display, '');
+        // Too long by name, every one with a kind: all of them by kind.
+        l = lead(['Revuelto con queso y setas (vegetariano)', 'Pollo con verduras de temporada (sin gluten)',
+            'Lentejas estofadas con verduras (sin cerdo)'], ['vegetariano', 'sin gluten', 'sin cerdo']);
+        fitAlso(l);
+        assert.equal(l.box.lastChild.nodeValue, 'vegetariano · sin gluten · sin cerdo');
+        assert.equal(l.box.style.display, '');
+        // Too long, and one without a kind: the line goes, rather than a count of what is not said.
+        l = lead(['Revuelto con queso y setas (vegetariano)', 'Pollo asado con verduras de temporada',
+            'Lentejas estofadas con chorizo y verduras'], ['vegetariano']);
+        fitAlso(l);
+        assert.equal(l.box.style.display, 'none');
+        assert.ok(!/más|more/.test(l.box.lastChild.nodeValue));
+    } finally {
+        globalThis.window = was;
+    }
 });

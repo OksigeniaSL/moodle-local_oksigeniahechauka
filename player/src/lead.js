@@ -300,8 +300,6 @@ export function buildLead(p, today, l) {
                 also.appendChild(document.createTextNode(m.also.join(' · ')));
                 also.hkList = m.also;
                 also.hkKinds = m.alsoKinds || [];
-                also.hkMore = l.alsoMore || '';
-                also.hkOthers = l.alsoOthers || '';
                 b.appendChild(also);
             }
         }
@@ -654,8 +652,9 @@ export function turnFixed(a, turn, l) {
 }
 
 /**
- * «También» takes two lines at most: the first ones and how many more; if not even one fits, only the kinds («vegetariano y 2 más») or how
- * many («3 menús más»). It goes before the headline's fit, which then has its room.
+ * «También» takes two lines at most, and says every other menu or none: all of them by name; if they do not fit, all of them by
+ * their kind («vegetariano · sin gluten»), when each one has a kind; else the line goes. Never «and 2 more»: nobody can ask a
+ * screen which. It goes before the headline's fit, which then has its room.
  *
  * @param {HTMLElement} lead
  */
@@ -667,9 +666,6 @@ export function fitAlso(lead) {
     const list = box.hkList;
     const kinds = box.hkKinds;
     const text = box.lastChild;
-    const more = function (n) {
-        return box.hkMore.replace('{n}', String(n));
-    };
     const tall = function () {
         const cs = window.getComputedStyle(box);
         const inside = box.offsetHeight - parseFloat(cs.paddingTop) - parseFloat(cs.borderTopWidth);
@@ -677,21 +673,16 @@ export function fitAlso(lead) {
     };
     box.style.display = '';
     text.nodeValue = list.join(' · ');
-    for (let n = list.length - 1; n >= 1 && tall(); n--) {
-        text.nodeValue = list.slice(0, n).join(' · ') + ' ' + more(list.length - n);
-    }
     if (!tall()) {
         return;
     }
-    const rest = list.length - kinds.length;
-    if (kinds.length) {
-        text.nodeValue = kinds.join(' · ') + (rest ? ' ' + more(rest) : '');
-    } else if (list.length > 1) {
-        text.nodeValue = box.hkOthers.replace('{n}', String(list.length));
+    if (kinds.length && kinds.length === list.length) {
+        text.nodeValue = kinds.join(' · ');
+        if (!tall()) {
+            return;
+        }
     }
-    if (tall() || (!kinds.length && list.length < 2)) {
-        box.style.display = 'none';
-    }
+    box.style.display = 'none';
 }
 
 // --- Headlines --------------------------------------------------------------------------------------------------

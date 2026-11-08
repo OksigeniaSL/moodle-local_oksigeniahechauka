@@ -79,6 +79,9 @@ test('the QR of a web: a square of dark modules with its three finders, the same
     assert.notDeepEqual(qrPath('https://example.com/other').d, q.d);
     assert.equal(shortWeb('https://www.example.com/camp/'), 'example.com/camp');
     assert.equal(shortWeb('http://example.com'), 'example.com');
+    // A mark of where the visit comes from is not for reading, and does not make a short address look long.
+    assert.equal(shortWeb('https://t.me/CanalEjemplo?utm_source=pantallas'), 't.me/CanalEjemplo');
+    assert.equal(shortWeb('https://example.com/a#b'), 'example.com/a');
 });
 
 const S = {

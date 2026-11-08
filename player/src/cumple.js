@@ -199,7 +199,7 @@ function moment(p, o, kicker) {
  * Builds the slide in the layer.
  *
  * @param {HTMLElement} c the layer
- * @param {object} item {people: [{id, name, group, photo}]}
+ * @param {object} item {people: [{id, name, group, photo, kicker}]}
  * @param {number} page the composer's turn (used only when the device keeps nothing)
  * @param {object} o {distance, horizontal, glass, one, many, cheers, media: function (ref): url, still, party, today,
  *     store}
@@ -236,7 +236,8 @@ export function buildBirthdays(c, item, page, o) {
         s.appendChild(g);
         plan.order = orderOf(n, 0);
         plan.order.forEach(function (i) {
-            scene.appendChild(moment(people[i], o, n === 1 ? o.one : o.many));
+            // Each moment is one person's: the heading in the singular, or the one of their day (the weekend's, on Friday).
+            scene.appendChild(moment(people[i], o, people[i].kicker || o.one));
         });
         if (n > 1) {
             // The group photo: all of them together, each with their name.
@@ -289,7 +290,7 @@ export function buildBirthdays(c, item, page, o) {
         cord.appendChild(strip);
         s.appendChild(cord);
         plan.order.forEach(function (i) {
-            scene.appendChild(moment(people[i], o, o.many));
+            scene.appendChild(moment(people[i], o, people[i].kicker || o.one));
         });
     }
     const canvas = el('canvas', 'hk-cumple-confeti');

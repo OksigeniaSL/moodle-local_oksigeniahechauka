@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.17.1
+
+- **No «and 2 more» on a screen**: nobody can ask it which. The menu's «Also» says every other menu by name or, when they do
+  not fit, every one by its kind («vegetarian · gluten free»), or nothing; the books name their authors without a count of
+  the rest; the agenda no longer ends with «+5 more in the coming days».
+- **A birthday's heading is in the singular over one person** («Birthday today»), as each moment shows one; the group photo
+  keeps its cheer. On the day before the weekend, those of Saturday and Sunday say their day («Birthday on Sunday»).
+- **The address under a QR leaves out what follows «?»**, a mark of where the visit comes from: «t.me/OurChannel», not
+  only «t.me».
+
 ## 0.17.0
 
 - **«Follow us»: the organisation's public channel on the screens**, a slide of its own when Oksigenia Marandu has a

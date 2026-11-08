@@ -74,10 +74,10 @@ export function buildBooks(c, item, page, o) {
     if (b.subtitle) {
         words.appendChild(el('p', 'hk-biblio-subtitulo', b.subtitle));
     }
-    // Up to two authors; beyond them, how many more.
+    // Up to two authors (one at 8 m), by name: a count of the rest would say nothing on a screen.
     const authors = b.authors || [];
     const named = o.distance === 8 ? 1 : 2;
-    const said = authors.slice(0, named).join(', ') + (authors.length > named ? ' ' + String(o.more || '').replace('{n}', String(authors.length - named)) : '');
+    const said = authors.slice(0, named).join(', ');
     if (said) {
         words.appendChild(el('p', 'hk-biblio-autor', said));
     }

@@ -201,10 +201,9 @@ export function buildAgenda(c, data, s) {
         b.appendChild(buildDay(d, few, s));
         track.appendChild(b);
     });
+    // What comes after the days in sight is not counted at the foot: a number without what it is says nothing.
     let foot = '';
-    if (a.more > 0 && s.agenda_more) {
-        foot = s.agenda_more.replace('%d', String(a.more));
-    } else if (few && s.agenda_nomore) {
+    if (!(a.more > 0) && few && s.agenda_nomore) {
         const month = parseInt(a.last.slice(5, 7), 10) - 1;
         const written = (s.date_format || '{d} {m}').replace('{d}', parseInt(a.last.slice(8, 10), 10))
             .replace('{m}', (s.months || [])[month] || '');

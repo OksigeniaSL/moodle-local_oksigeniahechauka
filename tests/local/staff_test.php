@@ -119,7 +119,10 @@ final class staff_test extends \advanced_testcase {
         $this->assertSame('birthdays-2026-11-13', $items[0]['id']);
         $this->assertSame(get_string('label_birthdays_andweekend', 'local_oksigeniahechauka'), $items[0]['label']);
         $this->assertSame(['Luis Viernes', 'Sara Domingo'], array_column($items[0]['people'], 'name'));
-        $this->assertStringContainsString(' ', $items[0]['people'][1]['group']);
+        // Each one's moment says their day; today's, nothing of their own.
+        $sunday = userdate((new \DateTime('2026-11-15 12:00', \core_date::get_server_timezone_object()))->getTimestamp(), '%A');
+        $this->assertSame(get_string('label_birthday_on', 'local_oksigeniahechauka', $sunday), $items[0]['people'][1]['kicker']);
+        $this->assertArrayNotHasKey('kicker', $items[0]['people'][0]);
         $this->assertSame('2.º B', $items[0]['people'][0]['group']);
         // On Thursday, tomorrow's item has them too, so that a screen without network knows them.
         $thursday = $friday - DAYSECS;
