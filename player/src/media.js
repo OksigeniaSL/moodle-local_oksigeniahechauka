@@ -209,15 +209,24 @@ export function mediaOf(manifest) {
         add(manifest.theme.logo);
         add(manifest.theme.logo_dark);
     }
+    // The QR codes the site's link shortener draws, beside each web.
+    if (manifest.idle) {
+        add(manifest.idle.qrimage);
+    }
     (manifest.items || []).forEach(function (it) {
         add(it.media);
         add(it.poster);
         add(it.backdrop);
+        add(it.webqr);
+        if (it.album) {
+            add(it.album.webqr);
+        }
         (it.people || []).forEach(function (person) {
             add(person.photo);
         });
         (it.books || []).forEach(function (book) {
             add(book.cover);
+            add(book.webqr);
         });
     });
     return out;

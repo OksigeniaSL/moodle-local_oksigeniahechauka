@@ -35,4 +35,6 @@ use local_oksigeniahechauka\local\screens;
 endpoint::method('POST');
 $body = endpoint::body();
 $device = is_array($body['device'] ?? null) ? $body['device'] : [];
-endpoint::send(screens::start_pairing($device, time()));
+// The token of the code it had, to keep it while it waits.
+$token = is_string($body['token'] ?? null) ? $body['token'] : '';
+endpoint::send(screens::start_pairing($device, time(), $token));

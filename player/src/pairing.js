@@ -1,5 +1,6 @@
 // A new screen: a big code and a QR code, until someone gives it a name on the server. Then the key arrives and the
-// screen starts. A code lasts a few minutes; when it expires, a new one comes.
+// screen starts. A code lasts a few minutes; when it expires, the screen asks again with the token it had and keeps its
+// code (and its short link) while it waits.
 
 function el(tag, cls, text) {
     const e = document.createElement(tag);
@@ -33,7 +34,7 @@ export function pair(root, api, strings) {
             };
         }
 
-        function show(code, qr, url) {
+        function show(code, qr, url, image) {
             while (root.firstChild) {
                 root.removeChild(root.firstChild);
             }
@@ -48,7 +49,15 @@ export function pair(root, api, strings) {
                 text.appendChild(el('p', 'hk-emparejar-url', url.replace(/^https?:\/\//, '').split('?')[0]));
             }
             box.appendChild(text);
-            if (qr) {
+            if (image) {
+                // The QR the site's link shortener draws, as a picture: nothing in it runs.
+                const q = el('div', 'hk-emparejar-qr');
+                const img = el('img');
+                img.alt = '';
+                img.src = image;
+                q.appendChild(img);
+                box.appendChild(q);
+            } else if (qr) {
                 const q = el('div', 'hk-emparejar-qr');
                 // The QR comes from the server of this screen as SVG markup.
                 q.innerHTML = qr;
@@ -63,9 +72,12 @@ export function pair(root, api, strings) {
             timer = setTimeout(start, 15000);
         }
 
+        let last = '';
+
         function start() {
-            api.pair(device()).then(function (p) {
-                show(p.code, p.qr_svg, p.claim_url);
+            api.pair(device(), last).then(function (p) {
+                last = p.token || '';
+                show(p.code, p.qr_svg, p.claim_url, p.qr_image || '');
                 // How long the code lasts, in seconds from now: a device with its clock wrong still waits the
                 // whole time (servers before expires_in only gave the moment).
                 const left = p.expires_in > 0 ? p.expires_in : (p.expires || 0) - Math.floor(Date.now() / 1000);

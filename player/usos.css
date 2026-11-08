@@ -184,7 +184,8 @@
     -webkit-transform: none;
     transform: none;
 }
-.hk-completa .hk-qr svg {
+.hk-completa .hk-qr svg,
+.hk-completa .hk-qr img {
     display: block;
     width: 32rem;
     height: 32rem;
@@ -212,7 +213,8 @@
     bottom: 8rem;
     width: 42.4rem;
 }
-.hk-vertical .hk-completa .hk-qr svg {
+.hk-vertical .hk-completa .hk-qr svg,
+.hk-vertical .hk-completa .hk-qr img {
     width: 35.2rem;
     height: 35.2rem;
 }

@@ -68,8 +68,9 @@ export function makeApi(endpoints, key, session) {
     }
 
     return {
-        pair: function (device) {
-            return postJson(endpoints.pair, {device: device});
+        /** A code to be named with; with the token of the code it had, the same code while it waits. */
+        pair: function (device, token) {
+            return postJson(endpoints.pair, token ? {device: device, token: token} : {device: device});
         },
         poll: function (token) {
             return postJson(endpoints.poll, {token: token});

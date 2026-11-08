@@ -298,6 +298,10 @@ test('with nothing at all to show, a screen at rest, with its code only while th
     assert.equal(one.comp, 'reposo');
     assert.deepEqual(one.extra, {qr: 'https://example.org/panel'});
     assert.equal(new Composer().next([], 0, true, {distance: 3}).extra.qr, null);
+    // With the QR the site's link shortener draws for it, that picture too.
+    const drawn = {id: 9, url: 'https://example.org/qr', sha1: 'abc'};
+    assert.deepEqual(new Composer().next([], 0, true, {distance: 3, idleQr: 'https://s.example/x', idleQrImage: drawn}).extra,
+        {qr: 'https://s.example/x', qrimage: drawn});
     // A sentence for the ticker, or anything for «Today», and it is no longer at rest.
     assert.equal(new Composer().next([], 0, true, {distance: 3, phrases: ['Hola']}).comp, 'solo-hoy');
     assert.equal(new Composer().next([], 1, true, {distance: 3}).comp, 'solo-hoy');
@@ -312,4 +316,18 @@ test('the tables take turns, each with its own page', () => {
     }
     const shown = seen.filter((x) => x.comp === 'tabla').map((x) => x.extra.item.id + x.extra.page);
     assert.deepEqual(shown.slice(0, 4), ['a0', 'b0', 'a1', 'b1']);
+});
+
+test('the QR codes the site\'s link shortener draws are kept like any picture', async () => {
+    const {mediaOf} = await import('../src/media.js');
+    const qr = (n) => ({id: n, url: 'https://example.org/qr/' + n, sha1: 'q' + n});
+    const shas = mediaOf({
+        idle: {qr: 'https://s.example/start', qrimage: qr(1)},
+        items: [
+            {id: 'p', media: {id: 2, url: 'https://example.org/p', sha1: 'p'}, web: 'https://s.example/a', webqr: qr(3),
+                album: {id: 'a1', web: 'https://s.example/b', webqr: qr(4)}},
+            {id: 'b', type: 'books', books: [{title: 'Uno', web: 'https://s.example/c', webqr: qr(5)}]},
+        ],
+    }).map((m) => m.sha1).sort();
+    assert.deepEqual(shas, ['p', 'q1', 'q3', 'q4', 'q5']);
 });

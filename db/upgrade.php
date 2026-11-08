@@ -280,5 +280,26 @@ function xmldb_local_oksigeniahechauka_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026110704, 'local', 'oksigeniahechauka');
     }
 
+    if ($oldversion < 2026110801) {
+        // The short link of each web a screen shows as a QR code, and its QR when the shortener draws them.
+        $table = new xmldb_table('local_oksigeniahechauka_link');
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('urlhash', XMLDB_TYPE_CHAR, '40', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('url', XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL, null, null);
+        $table->add_field('short', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+        $table->add_field('qrsvg', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('qrdone', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timeseen', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('timetried', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_index('urlhash', XMLDB_INDEX_UNIQUE, ['urlhash']);
+        $table->add_index('timeseen', XMLDB_INDEX_NOTUNIQUE, ['timeseen']);
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+        upgrade_plugin_savepoint(true, 2026110801, 'local', 'oksigeniahechauka');
+    }
+
     return true;
 }

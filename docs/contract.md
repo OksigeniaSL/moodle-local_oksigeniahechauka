@@ -51,7 +51,9 @@ its own:
 A new screen shows a short code and a QR code. Someone with the right permission opens the QR (or types the code) on
 the server, names the screen and chooses its groups and template. The screen then receives its key.
 
-1. `POST pair` with `{"device": {"ua": "…", "width": 1920, "height": 1080, "dpr": 1}}` answers:
+1. `POST pair` with `{"device": {"ua": "…", "width": 1920, "height": 1080, "dpr": 1}}` answers (when its code has
+   expired, the screen asks again with `"token"`, the token of the code it had, and while it waits, up to half a day, it
+   keeps the same code, the same short link and the same QR):
 
    ```json
    {"code": "KM7Q4X", "token": "…", "claim_url": "https://…/claim.php?code=KM7Q4X", "qr_svg": "<svg …>",
@@ -60,9 +62,12 @@ the server, names the screen and chooses its groups and template. The screen the
 
    - `code`: six characters from an alphabet without look-alikes (no `0 O 1 I L`).
    - `token`: the secret of this pairing; only the screen has it.
-   - `claim_url`: what the QR opens.
+   - `claim_url`: what the QR opens; short, when the site has a link shortener (`nur.click/AbC1`), so it can be typed.
    - `qr_svg`: the QR of `claim_url` as SVG markup, made by the server, so the player needs no QR library.
      Optional: without it the screen shows the code and the address.
+   - `qr_image`: optional, the QR the site's link shortener draws for `claim_url` (in the centre's colours and with its
+     logo), as a `data:` address of an SVG picture. The player shows it as a picture (`img`), never in the page; without
+     it, `qr_svg`.
    - `expires_in`: seconds the code lasts from now. The player counts with it, not with `expires`, so a device with
      its clock wrong waits the whole time.
    - `poll`: seconds between polls.
@@ -177,7 +182,13 @@ changed, or the manifest with its `ETag` header:
 - `weather`: optional. The sky as a `symbol_code` of MET Norway (the player has an icon for each), temperatures in
   degrees Celsius, `rain` the chance of rain in percent only where the source gives it, `text` the sky in words, and
   the `credit` the source asks to show. `now` is the current hour; `today` and `tomorrow`, days of the site's calendar. `days`: the next three days, each with its `date` (for the weather in a third).
-- `idle`: `{"qr": "https://…"}`, only while the centre has put nothing at all: where to start, for the corner of a screen at rest.
+- `idle`: `{"qr": "https://…", "qrimage": {media}}`, only while the centre has put nothing at all: where to start, for the corner of a screen at rest.
+
+  **Every web shown as a QR** (`web` of a picture, a video, an album or a book, and `idle.qr`) is the short address when the
+  site has a link shortener and it has already given one (the server asks for it in the background; until then, the long
+  one). When the shortener draws QR codes (as nur.click does), the picture of that QR goes beside it, as any media: `webqr`
+  (`idle.qrimage` for where to start), an SVG on white that the player shows as a picture, with the address written under
+  it. Without it, the player draws its own.
 - Items of `zone: "extra"`, which have slides of their own and no place in «Today»:
   - `{"type": "birthdays", "date": "YYYY-MM-DD", "when": {…}, "people": [{"name": "…", "group": "…", "photo": {media}}]}`: `group` and `photo` may be missing. Never an age or a year.
   - `{"type": "books", "label": "…", "books": [{"title": "…", "subtitle": "…", "authors": ["…"], "cover": {media}, "colour": {"bg": "#rrggbb", "ink": "#rrggbb"}, "library": "…", "web": "https://…"}]}`: without `cover`, a drawn cover in `colour`.

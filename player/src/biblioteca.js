@@ -86,7 +86,7 @@ export function buildBooks(c, item, page, o) {
     }
     top.appendChild(words);
     if (b.web) {
-        top.appendChild(o.qr(b.web));
+        top.appendChild(o.qr(b.web, b.webqr));
     }
     side.appendChild(el('p', 'hk-biblio-etiqueta', item.label || ''));
     side.appendChild(top);

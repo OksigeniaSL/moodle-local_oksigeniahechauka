@@ -202,5 +202,25 @@
         <INDEX NAME="started" UNIQUE="false" FIELDS="started"/>
       </INDEXES>
     </TABLE>
+    <TABLE NAME="local_oksigeniahechauka_link" COMMENT="The short link of a web a screen shows as a QR code, from the site's link shortener, and whether its QR was brought">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="urlhash" TYPE="char" LENGTH="40" NOTNULL="true" SEQUENCE="false" COMMENT="SHA-1 of the long address"/>
+        <FIELD NAME="url" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="The long address"/>
+        <FIELD NAME="short" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Empty until the shortener gives it"/>
+        <FIELD NAME="qrsvg" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Where the shortener draws its QR, when it draws them"/>
+        <FIELD NAME="qrdone" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Its QR is kept as a file"/>
+        <FIELD NAME="timeseen" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Last time a screen was given it, within a day"/>
+        <FIELD NAME="timetried" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="urlhash" UNIQUE="true" FIELDS="urlhash"/>
+        <INDEX NAME="timeseen" UNIQUE="false" FIELDS="timeseen"/>
+      </INDEXES>
+    </TABLE>
   </TABLES>
 </XMLDB>

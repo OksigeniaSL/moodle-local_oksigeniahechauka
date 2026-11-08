@@ -25,6 +25,7 @@
 namespace local_oksigeniahechauka\task;
 
 use local_oksigeniahechauka\local\alerts;
+use local_oksigeniahechauka\local\links;
 use local_oksigeniahechauka\local\playerlink;
 use local_oksigeniahechauka\local\report;
 use local_oksigeniahechauka\local\screens;
@@ -53,5 +54,6 @@ class check_screens extends \core\task\scheduled_task {
         screens::purge_pairings(time());
         mtrace('Screens down: ' . $done['down'] . '; back: ' . $done['back']);
         mtrace('Short address of the player: ' . playerlink::refresh(time()));
+        mtrace('Short links of the QR codes: ' . links::refresh(time()));
     }
 }

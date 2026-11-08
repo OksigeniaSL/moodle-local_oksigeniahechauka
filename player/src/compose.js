@@ -223,7 +223,11 @@ export class Composer {
             }
             // Nothing at all to show: a screen at rest, not an empty «Today». Its own QR only until the centre has put anything.
             if (!h && !(o.phrases || []).length) {
-                return pick('reposo', [], 60, {qr: o.idleQr || null});
+                const idle = {qr: o.idleQr || null};
+                if (o.idleQrImage) {
+                    idle.qrimage = o.idleQrImage;
+                }
+                return pick('reposo', [], 60, idle);
             }
             return pick('solo-hoy', [], o.menu ? 15 : 12);
         }

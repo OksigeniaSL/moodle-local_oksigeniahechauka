@@ -626,8 +626,8 @@ export class Screen {
         }
         if (comp === 'biblioteca') {
             buildBooks(c, extra && extra.item, (extra && extra.page) || 0, {distance: this.distance || 3, horizontal: this.horizontal,
-                media: mediaOf, more: this.s.also_more || '', qr: function (url) {
-                    return self0.qrBox(url, false);
+                media: mediaOf, more: this.s.also_more || '', qr: function (url, image) {
+                    return self0.qrBox(url, false, image);
                 }});
             return c;
         }
@@ -1036,7 +1036,7 @@ export class Screen {
      * The screen with nothing to show: it stays as it is from turn to turn, or it would blink. The code to add the first thing comes
      * and goes with extra.qr.
      *
-     * @param {object} [extra] {qr: url or null}
+     * @param {object} [extra] {qr: url or null, qrimage: the picture of its QR, from the site's shortener, or null}
      */
     fillIdle(extra) {
         const qr = (extra && extra.qr) || '';
@@ -1045,7 +1045,7 @@ export class Screen {
         }
         this.clearFull();
         const head = this.header();
-        const box = qr ? this.qrBox(qr, false) : null;
+        const box = qr ? this.qrBox(qr, false, extra.qrimage) : null;
         // Each of the centre's two colours, as they end up: a theme, a skin or its own.
         const full = this.full;
         const colour = function (name) {
@@ -1149,25 +1149,35 @@ export class Screen {
      *
      * @param {string} url
      * @param {boolean} wrap its words in one box beside it (the poster's)
+     * @param {object} [image] the picture of its QR, when the site's link shortener draws them (nur.click): kept by the
+     *     screen as any picture, shown as one (nothing in it runs); without it, or until it is here, the code drawn here
      * @returns {HTMLElement}
      */
-    qrBox(url, wrap) {
+    qrBox(url, wrap, image) {
         const box = el('div', 'hk-qr');
-        let q;
-        try {
-            q = qrPath(url);
-        } catch (e) {
-            // An address too long for a code: the slide goes on without it.
-            return document.createDocumentFragment();
+        const src = image ? this.media.url(image) : null;
+        if (src) {
+            const img = el('img');
+            img.alt = '';
+            img.src = src;
+            box.appendChild(img);
+        } else {
+            let q;
+            try {
+                q = qrPath(url);
+            } catch (e) {
+                // An address too long for a code: the slide goes on without it.
+                return document.createDocumentFragment();
+            }
+            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.setAttribute('viewBox', '0 0 ' + q.size + ' ' + q.size);
+            svg.setAttribute('shape-rendering', 'crispEdges');
+            svg.setAttribute('aria-hidden', 'true');
+            const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            path.setAttribute('d', q.d);
+            svg.appendChild(path);
+            box.appendChild(svg);
         }
-        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-        svg.setAttribute('viewBox', '0 0 ' + q.size + ' ' + q.size);
-        svg.setAttribute('shape-rendering', 'crispEdges');
-        svg.setAttribute('aria-hidden', 'true');
-        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-        path.setAttribute('d', q.d);
-        svg.appendChild(path);
-        box.appendChild(svg);
         const words = wrap ? el('div', 'hk-qr-textos') : box;
         // The short address may break after «/» or «.», never in the middle of a word.
         const web = el('p', 'hk-qr-web');
@@ -1225,7 +1235,7 @@ export class Screen {
         }
         bill.appendChild(text);
         if (album.web) {
-            bill.appendChild(this.qrBox(album.web, true));
+            bill.appendChild(this.qrBox(album.web, true, album.webqr));
         }
         canvas.appendChild(bill);
         full.appendChild(canvas);
@@ -1340,7 +1350,7 @@ export class Screen {
             full.setAttribute('data-sin-pie', '1');
         }
         if (item.web) {
-            put(this.qrBox(item.web, false));
+            put(this.qrBox(item.web, false, item.webqr));
         }
         const h2 = pie && pie.querySelector('h2');
         if (h2) {

@@ -114,6 +114,8 @@ class manifest {
         if (!$DB->record_exists('local_oksigeniahechauka_item', [])) {
             $m['idle'] = ['qr' => (new \moodle_url('/local/oksigeniahechauka/edit.php', ['type' => 'notice']))->out(false)];
         }
+        // Each web with its short link and the QR the shortener draws, when the site has one.
+        $m = links::apply($m, $now);
         $m['etag'] = self::etag($m);
         return $m;
     }

@@ -34,44 +34,67 @@ class screens {
     /** Pairings waiting at once, at most: a code is cheap to ask for, the table must not grow without end. */
     const PAIR_MAX = 100;
 
+    /** Seconds an expired code that nobody claimed is kept, so that its screen, asking again, keeps it. */
+    const PAIR_GRACE = 600;
+
+    /**
+     * Seconds a screen keeps the same code while it waits: its short link and its QR stay the same, and the shortener does
+     * not get a new link every quarter of an hour from a screen left waiting for a weekend.
+     */
+    const PAIR_KEEP = 12 * HOURSECS;
+
     /** A screen without a heartbeat for longer than this is off. */
     const OFFLINE_AFTER = 180;
 
     /**
-     * A new pairing for a screen that asks for a code.
+     * A pairing for a screen that asks for a code: a new one, or the one it had, renewed, while it keeps waiting.
      *
      * @param array $device what the screen says about itself
      * @param int $now
+     * @param string $token the token of the code the screen had, which it asks to keep
      * @return array the answer of the contract
      */
-    public static function start_pairing(array $device, int $now): array {
+    public static function start_pairing(array $device, int $now, string $token = ''): array {
         global $DB;
         self::purge_pairings($now);
-        if ($DB->count_records('local_oksigeniahechauka_pair') >= self::PAIR_MAX) {
-            endpoint::fail(429, 'busy', 'Too many screens waiting to be paired');
-        }
-        do {
-            $code = keys::new_code();
-        } while ($DB->record_exists('local_oksigeniahechauka_pair', ['code' => $code]));
-        $token = keys::new_key();
         $expires = $now + self::PAIR_MINUTES * MINSECS;
-        $DB->insert_record('local_oksigeniahechauka_pair', (object) [
-            'code' => $code,
-            'tokenhash' => keys::hash($token),
-            'device' => substr(json_encode($device), 0, 2000),
-            'timecreated' => $now,
-            'timeexpires' => $expires,
-        ]);
-        $url = new \moodle_url('/local/oksigeniahechauka/claim.php', ['code' => $code]);
-        return [
+        $pair = $token !== '' ? $DB->get_record('local_oksigeniahechauka_pair', ['tokenhash' => keys::hash($token)]) : null;
+        if ($pair && !$pair->screenid && $pair->timecreated >= $now - self::PAIR_KEEP) {
+            $DB->set_field('local_oksigeniahechauka_pair', 'timeexpires', $expires, ['id' => $pair->id]);
+            $code = $pair->code;
+        } else {
+            if ($DB->count_records('local_oksigeniahechauka_pair') >= self::PAIR_MAX) {
+                endpoint::fail(429, 'busy', 'Too many screens waiting to be paired');
+            }
+            do {
+                $code = keys::new_code();
+            } while ($DB->record_exists('local_oksigeniahechauka_pair', ['code' => $code]));
+            $token = keys::new_key();
+            $DB->insert_record('local_oksigeniahechauka_pair', (object) [
+                'code' => $code,
+                'tokenhash' => keys::hash($token),
+                'device' => substr(json_encode($device), 0, 2000),
+                'timecreated' => $now,
+                'timeexpires' => $expires,
+            ]);
+        }
+        // Short, when the site has a shortener: the phone that reads it opens it, and a person can type it.
+        $long = (new \moodle_url('/local/oksigeniahechauka/claim.php', ['code' => $code]))->out(false);
+        $link = links::now($long, $now, get_string('claim_title', 'local_oksigeniahechauka'));
+        $answer = [
             'code' => $code,
             'token' => $token,
-            'claim_url' => $url->out(false),
-            'qr_svg' => self::qr($url->out(false)),
+            'claim_url' => $link['url'],
+            'qr_svg' => self::qr($link['url']),
             'expires' => $expires,
             'expires_in' => $expires - $now,
             'poll' => 5,
         ];
+        if ($link['qrsvg'] !== '') {
+            // The QR the shortener draws, as a picture: the screen shows it in an «img», never in the page.
+            $answer['qr_image'] = 'data:image/svg+xml;base64,' . base64_encode($link['qrsvg']);
+        }
+        return $answer;
     }
 
     /**
@@ -220,7 +243,12 @@ class screens {
                 ['id' => $pair->screenid, 'keyhash' => keys::hash($pair->screenkey)]
             );
         }
-        $DB->delete_records_select('local_oksigeniahechauka_pair', 'timeexpires < :now', ['now' => $now]);
+        // A code nobody claimed stays a little after it expires, so that its screen, asking again, keeps it.
+        $DB->delete_records_select(
+            'local_oksigeniahechauka_pair',
+            'timeexpires < :now AND (screenid > 0 OR timeexpires < :grace)',
+            ['now' => $now, 'grace' => $now - self::PAIR_GRACE]
+        );
     }
 
     /**

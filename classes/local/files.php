@@ -124,7 +124,8 @@ class files {
      * @return bool
      */
     public static function is_logo(\stored_file $file): bool {
-        return $file->get_component() === 'core_admin' || in_array($file->get_filearea(), [self::LOGO, self::LOGODARK]);
+        // The QR of a public link, too: any screen may show it.
+        return $file->get_component() === 'core_admin' || in_array($file->get_filearea(), [self::LOGO, self::LOGODARK, links::QR]);
     }
 
     /**
@@ -160,7 +161,7 @@ class files {
         return $file->get_component() === self::COMPONENT
             && (int) $file->get_contextid() === (int) self::context()->id
             && in_array($file->get_filearea(), [self::MEDIA, self::VIDEO, self::POSTER, self::BACKDROP, self::LOGO,
-                self::LOGODARK])
+                self::LOGODARK, links::QR])
             && !$file->is_directory();
     }
 }
