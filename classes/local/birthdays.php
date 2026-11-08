@@ -259,9 +259,11 @@ class birthdays {
         if (!in_array($userid, self::users_on((string) ($config->birthdayfield ?? ''), $date))) {
             $idnumber = trim((string) $user->idnumber);
             foreach (self::rows_on($date) as $candidate) {
-                if (!empty($candidate->userid) ? (int) $candidate->userid === $userid :
-                        $idnumber !== '' && (string) $candidate->idnumber === $idnumber
-                        && isset(self::users_by_idnumber([$idnumber])[$idnumber])) {
+                // The account it was linked to, or else an ID number only one account has.
+                $mine = !empty($candidate->userid) ? (int) $candidate->userid === $userid :
+                    $idnumber !== '' && (string) $candidate->idnumber === $idnumber
+                    && isset(self::users_by_idnumber([$idnumber])[$idnumber]);
+                if ($mine) {
                     $row = $candidate;
                     break;
                 }

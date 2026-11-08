@@ -67,7 +67,7 @@ final class greeting_test extends \advanced_testcase {
      * @param int $hour
      * @return int
      */
-    protected function at(int $year, int $month, int $day, int $hour = 12): int {
+    protected function moment(int $year, int $month, int $day, int $hour = 12): int {
         $text = sprintf('%04d-%02d-%02d %02d:00', $year, $month, $day, $hour);
         return (new \DateTime($text, \core_date::get_server_timezone_object()))->getTimestamp();
     }
@@ -81,7 +81,7 @@ final class greeting_test extends \advanced_testcase {
         $this->field();
         $lucia = $this->born('Lucía', 2014, 3, 15);
         $other = $this->born('Otro', 2014, 4, 20);
-        $day = $this->at(2026, 3, 15);
+        $day = $this->moment(2026, 3, 15);
 
         $card = greeting::card((int) $lucia->id, $day);
         $this->assertSame('Lucía', $card['firstname']);
@@ -89,7 +89,7 @@ final class greeting_test extends \advanced_testcase {
         $this->assertSame('L', $card['initial']);
         $this->assertFalse($card['hasphoto']);
         $this->assertStringNotContainsString('2014', json_encode($card));
-        $this->assertNull(greeting::card((int) $lucia->id, $this->at(2026, 3, 16)));
+        $this->assertNull(greeting::card((int) $lucia->id, $this->moment(2026, 3, 16)));
         $this->assertNull(greeting::card((int) $other->id, $day));
 
         set_config('greetcard', 0, 'local_oksigeniahechauka');
@@ -98,7 +98,7 @@ final class greeting_test extends \advanced_testcase {
 
         greeting::close((int) $lucia->id, $day);
         $this->assertNull(greeting::card((int) $lucia->id, $day + HOURSECS));
-        $this->assertNotNull(greeting::card((int) $lucia->id, $this->at(2027, 3, 15)));
+        $this->assertNotNull(greeting::card((int) $lucia->id, $this->moment(2027, 3, 15)));
     }
 
     /**
@@ -108,10 +108,10 @@ final class greeting_test extends \advanced_testcase {
         $this->resetAfterTest();
         $this->field();
         $user = $this->born('Bisiesto', 2012, 2, 29);
-        $this->assertNotNull(greeting::card((int) $user->id, $this->at(2026, 2, 28)));
-        $this->assertNull(greeting::card((int) $user->id, $this->at(2026, 3, 1)));
-        $this->assertNotNull(greeting::card((int) $user->id, $this->at(2028, 2, 29)));
-        $this->assertNull(greeting::card((int) $user->id, $this->at(2028, 2, 28)));
+        $this->assertNotNull(greeting::card((int) $user->id, $this->moment(2026, 2, 28)));
+        $this->assertNull(greeting::card((int) $user->id, $this->moment(2026, 3, 1)));
+        $this->assertNotNull(greeting::card((int) $user->id, $this->moment(2028, 2, 29)));
+        $this->assertNull(greeting::card((int) $user->id, $this->moment(2028, 2, 28)));
     }
 
     /**
@@ -132,27 +132,27 @@ final class greeting_test extends \advanced_testcase {
         birthdays::add('Gemelo', '', 15, 3, 'E-2');
         $twin = $this->getDataGenerator()->create_user(['idnumber' => 'E-2']);
         $this->getDataGenerator()->create_user(['idnumber' => 'E-2']);
-        $day = $this->at(2026, 3, 15);
+        $day = $this->moment(2026, 3, 15);
 
         $card = greeting::card((int) $linked->id, $day);
         $this->assertSame('Ana', $card['firstname']);
         $this->assertSame('3.º A', $card['group']);
         $this->assertSame('1.º B', greeting::card((int) $later->id, $day)['group']);
         $this->assertNull(greeting::card((int) $twin->id, $day));
-        $this->assertSame([(int) $linked->id, (int) $later->id], birthdays::accounts_on(get_config('local_oksigeniahechauka'),
-            '2026-03-15'));
+        $config = get_config('local_oksigeniahechauka');
+        $this->assertSame([(int) $linked->id, (int) $later->id], birthdays::accounts_on($config, '2026-03-15'));
 
         // The picture of the list goes first, and only to them, on their day.
         $file = get_file_storage()->create_file_from_string(['contextid' => files::context()->id, 'component' => files::COMPONENT,
             'filearea' => files::BIRTHDAY, 'itemid' => $id, 'filepath' => '/', 'filename' => 'ana.png'], base64_decode(self::PNG));
         $this->assertTrue(greeting::card((int) $linked->id, $day)['hasphoto']);
         $this->assertEquals($file->get_id(), greeting::photo((int) $linked->id, $day)->get_id());
-        $this->assertNull(greeting::photo((int) $linked->id, $this->at(2026, 3, 16)));
+        $this->assertNull(greeting::photo((int) $linked->id, $this->moment(2026, 3, 16)));
         $this->assertNull(greeting::photo((int) $later->id, $day));
 
         $DB->set_field('user', 'suspended', 1, ['id' => $later->id]);
         $this->assertNull(greeting::card((int) $later->id, $day));
-        $this->assertSame([(int) $linked->id], birthdays::accounts_on(get_config('local_oksigeniahechauka'), '2026-03-15'));
+        $this->assertSame([(int) $linked->id], birthdays::accounts_on($config, '2026-03-15'));
     }
 
     /**
@@ -166,20 +166,20 @@ final class greeting_test extends \advanced_testcase {
         $this->born('Otro', 2014, 4, 20);
         $sink = $this->redirectMessages();
 
-        $this->assertSame('off', greeting::send($this->at(2026, 3, 15, 9)));
+        $this->assertSame('off', greeting::send($this->moment(2026, 3, 15, 9)));
         set_config('greetnotify', 1, 'local_oksigeniahechauka');
-        $this->assertSame('not yet', greeting::send($this->at(2026, 3, 15, 6)));
+        $this->assertSame('not yet', greeting::send($this->moment(2026, 3, 15, 6)));
         $this->assertSame(0, $sink->count());
 
-        $this->assertSame('1 sent', greeting::send($this->at(2026, 3, 15, 8)));
+        $this->assertSame('1 sent', greeting::send($this->moment(2026, 3, 15, 8)));
         $messages = $sink->get_messages();
         $this->assertCount(1, $messages);
         $this->assertSame((int) $lucia->id, (int) $messages[0]->useridto);
         $this->assertSame('birthday', $messages[0]->eventtype);
         $this->assertStringContainsString('Lucía', $messages[0]->subject);
 
-        $this->assertSame('0 sent', greeting::send($this->at(2026, 3, 15, 9)));
-        $this->assertSame('1 sent', greeting::send($this->at(2027, 3, 15, 8)));
+        $this->assertSame('0 sent', greeting::send($this->moment(2026, 3, 15, 9)));
+        $this->assertSame('1 sent', greeting::send($this->moment(2027, 3, 15, 8)));
         $sink->close();
     }
 }
