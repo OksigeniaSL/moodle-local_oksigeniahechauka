@@ -575,6 +575,7 @@ export class Screen {
             this.posterStop = null;
         }
         this.full.removeAttribute('data-muro');
+        this.full.removeAttribute('data-con-qr');
         this.stopSlides(this.full);
         clear(this.full);
         this.idle = null;
@@ -1118,6 +1119,12 @@ export class Screen {
         this.full.appendChild(d);
         this.full.appendChild(el('div', 'hk-completa-velo'));
         this.full.appendChild(this.header());
+        // Its web, as on the showcase: the QR on its white card on the right, and the caption beside it.
+        const qr = item.web ? this.qrBox(item.web, false, item.webqr) : null;
+        if (qr && qr.nodeType === 1) {
+            this.full.setAttribute('data-con-qr', '');
+            this.full.appendChild(qr);
+        }
         if (pie) {
             this.full.appendChild(pie);
             const h2 = pie.querySelector('h2');
@@ -1125,7 +1132,9 @@ export class Screen {
                 const full = this.full;
                 pie.hkShort = 'hk-pie-corto';
                 fitHeadline(pie, h2, 3, function () {
-                    return pie.offsetHeight > full.clientHeight * 0.6;
+                    // What the words take: on a vertical screen with a QR, the room kept under them for it does not count.
+                    const kept = qr && qr.nodeType === 1 ? parseFloat(getComputedStyle(pie).paddingBottom) || 0 : 0;
+                    return pie.offsetHeight - kept > full.clientHeight * 0.6;
                 });
                 even(h2);
             }
@@ -1293,6 +1302,7 @@ export class Screen {
         }
         full.removeAttribute('data-muro');
         full.removeAttribute('data-sin-pie');
+        full.removeAttribute('data-con-qr');
         if (!item) {
             this.clearFull();
             full.appendChild(el('div', 'hk-completa-velo'));

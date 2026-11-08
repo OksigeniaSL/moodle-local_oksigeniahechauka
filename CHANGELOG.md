@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.14.1
+
+- **A picture over the whole screen shows its QR too**, as the showcase does: a picture with a web and «over the whole screen» showed only the picture on an informative screen. The QR goes on its white card at the bottom right, over the important notice's band when there is one, and the caption leaves it room.
+
 ## 0.14.0
 
 - **The QR codes go through the site's link shortener.** Every web a screen shows as a QR (a picture's or a video's, an album's, a book's, where to start, the page that names a new screen) becomes its short address when the site has a shortener compatible with YOURLS, written whole under the code. The server asks for it in the background, so a screen never waits; until then, the long one. When the shortener draws its own QR codes (as nur.click does, in the centre's colours and with its logo), the screens show that one, kept like any picture so it shows without network; otherwise, the code the player draws.

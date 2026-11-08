@@ -551,3 +551,15 @@
     width: 26rem;
     font-size: 31rem;
 }
+
+/* --- A photo over the whole screen with its web, on any screen: its QR as on the showcase, and the caption beside it ---- */
+.hk .hk-completa[data-con-qr] > .hk-pie {
+    padding-right: 51rem;                 /* the QR's column on the right */
+}
+.hk.hk-vertical .hk-completa[data-con-qr] > .hk-pie {
+    padding-right: 5rem;
+    padding-bottom: 62rem;                /* its shade down to the edge, its words over the QR (some 51 rem from 8) */
+}
+.hk.hk-con-importante .hk-completa[data-con-qr] > .hk-qr {
+    bottom: calc(var(--hk-cinta-alto) + 3.6rem);   /* over the important notice's band */
+}
