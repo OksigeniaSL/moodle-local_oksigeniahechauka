@@ -70,13 +70,20 @@ class links {
      * @return array
      */
     public static function apply(array $m, int $now): array {
-        if (!shortener::of_site()) {
+        $shortener = shortener::of_site();
+        if (!$shortener) {
             return $m;
         }
         $urls = [];
         self::collect($m, $urls);
         if (!empty($m['idle']['qr']) && is_string($m['idle']['qr'])) {
             $urls[$m['idle']['qr']] = true;
+        }
+        // An address that is already short (nur.click/telegram) stays as it is.
+        foreach (array_keys($urls) as $url) {
+            if ($shortener->owns($url)) {
+                unset($urls[$url]);
+            }
         }
         if (!$urls) {
             return $m;

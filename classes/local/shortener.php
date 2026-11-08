@@ -91,6 +91,17 @@ class shortener {
     }
 
     /**
+     * Whether an address is already one of this shortener's (the host of its API): it is not shortened again.
+     *
+     * @param string $url
+     * @return bool
+     */
+    public function owns(string $url): bool {
+        $host = strtolower((string) parse_url($this->api, PHP_URL_HOST));
+        return $host !== '' && strtolower((string) parse_url($url, PHP_URL_HOST)) === $host;
+    }
+
+    /**
      * The short address of a long one: a new one, or the one it already had.
      *
      * @param string $url The long address.

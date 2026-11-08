@@ -64,6 +64,7 @@ final class links_test extends \advanced_testcase {
         $now = time();
         $m = [
             'items' => [
+                ['id' => 'i0', 'web' => 'https://short.example/telegram'],
                 ['id' => 'i1', 'web' => 'https://example.org/campus'],
                 ['id' => 'p1', 'album' => ['id' => 'a1', 'web' => 'https://example.org/album']],
                 ['id' => 'b', 'books' => [['title' => 'Uno', 'web' => 'https://example.org/libro/1']]],
@@ -83,6 +84,9 @@ final class links_test extends \advanced_testcase {
         $this->assertSame('4 asked, 4 made, 0 forgotten', links::refresh($now));
 
         $second = links::apply($m, $now);
+        // One already short stays as it is, and is not asked for.
+        $this->assertSame('https://short.example/telegram', $second['items'][0]['web']);
+        array_shift($second['items']);
         $webs = [$second['items'][0]['web'], $second['items'][1]['album']['web'], $second['items'][2]['books'][0]['web'],
             $second['idle']['qr']];
         foreach ($webs as $web) {
