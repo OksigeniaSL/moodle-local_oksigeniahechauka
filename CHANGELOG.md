@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.16.2
+
+- The icon of the plugin is the mark at two colours, as the start of a screen shows it: the two white screens and the cyan band on navy. Moodle, the start of a screen and «Your work» say the same.
+
 ## 0.16.1
 
 - «Your work» says «One screen, without a sign of life» when there is only one.
