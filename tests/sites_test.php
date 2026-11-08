@@ -83,7 +83,9 @@ final class sites_test extends \advanced_testcase {
         // The weather of its place, not the centre's.
         $c = 'local_oksigeniahechauka';
         set_config('sourceweather', 1, $c);
-        $hour = ['t' => $now - 600, 'temp' => 31.0, 'sky' => 'clearsky_day', 'rain' => 0];
+        // Ten minutes ago, but never yesterday: run just after midnight, the hour would not be today's.
+        $midnight = usergetmidnight($now, \core_date::get_server_timezone());
+        $hour = ['t' => max($now - 600, $midnight), 'temp' => 31.0, 'sky' => 'clearsky_day', 'rain' => 0];
         set_config('weatherdata', json_encode(['hours' => [['temp' => 18.0] + $hour], 'updated' => $now]), $c);
         set_config('lat' . sites::suffix($site), 28.48, $c);
         set_config('lon' . sites::suffix($site), -16.42, $c);
