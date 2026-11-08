@@ -11,7 +11,7 @@ import {buildDeadlines, fitDeadlines} from './plazos.js';
 import {buildIdle} from './reposo.js';
 import {buildTable, fitTable} from './tabla.js';
 import {buildBooks, fitBooks} from './biblioteca.js';
-import {qrPath, shortWeb} from './qr.js';
+import {qrSvg, shortWeb} from './qr.js';
 import {even} from './balance.js';
 import {buildAgenda, startAgenda} from './agendaview.js';
 import {buildCarousel, buildWall, buildWallBand, startCarousel, startWall, wallCount} from './photos.js';
@@ -1162,21 +1162,14 @@ export class Screen {
             img.src = src;
             box.appendChild(img);
         } else {
-            let q;
             try {
-                q = qrPath(url);
+                // nur.click's drawing, in black, drawn here: what every decoder reads as well as the plain code (art
+                // direction, 8 November 2026).
+                box.innerHTML = qrSvg(url);
             } catch (e) {
                 // An address too long for a code: the slide goes on without it.
                 return document.createDocumentFragment();
             }
-            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-            svg.setAttribute('viewBox', '0 0 ' + q.size + ' ' + q.size);
-            svg.setAttribute('shape-rendering', 'crispEdges');
-            svg.setAttribute('aria-hidden', 'true');
-            const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-            path.setAttribute('d', q.d);
-            svg.appendChild(path);
-            box.appendChild(svg);
         }
         const words = wrap ? el('div', 'hk-qr-textos') : box;
         // The short address may break after «/» or «.», never in the middle of a word.

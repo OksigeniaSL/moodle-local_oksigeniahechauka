@@ -2,6 +2,8 @@
 // screen starts. A code lasts a few minutes; when it expires, the screen asks again with the token it had and keeps its
 // code (and its short link) while it waits.
 
+import {HECHAUKA_EMBLEM, qrSvg} from './qr.js';
+
 function el(tag, cls, text) {
     const e = document.createElement(tag);
     if (cls) {
@@ -57,11 +59,21 @@ export function pair(root, api, strings) {
                 img.src = image;
                 q.appendChild(img);
                 box.appendChild(q);
-            } else if (qr) {
-                const q = el('div', 'hk-emparejar-qr');
-                // The QR comes from the server of this screen as SVG markup.
-                q.innerHTML = qr;
-                box.appendChild(q);
+            } else {
+                let markup = '';
+                try {
+                    // Drawn here, as every QR of the player; with Hechauka's mark when the address is short enough.
+                    markup = url ? qrSvg(url, {emblem: HECHAUKA_EMBLEM}) : '';
+                } catch (e) {
+                    markup = '';
+                }
+                // The server's own SVG, if the address does not fit (older servers send only that).
+                markup = markup || qr;
+                if (markup) {
+                    const q = el('div', 'hk-emparejar-qr');
+                    q.innerHTML = markup;
+                    box.appendChild(q);
+                }
             }
             root.appendChild(box);
         }

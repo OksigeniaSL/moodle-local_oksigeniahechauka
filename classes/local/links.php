@@ -52,11 +52,12 @@ class links {
     const QR_MOST = 300 * 1024;
 
     /**
-     * How the QR of a screen is drawn: the centre's main colour, rounded dots and corners, its logo in the middle, on white
-     * (a phone does not read one on a dark skin's ground), with no frame; the short address goes under it, written by the
-     * player.
+     * How the QR of a screen is drawn, the same as the player draws its own (qr.js, qrSvg): round dots, square corners, in
+     * black, with nothing in the middle, on white (a phone does not read one on a dark skin's ground), with no frame. It is
+     * what every decoder read as well as the plain code in the art direction's bench (8 November 2026); rounded corners or
+     * colours cost readings. The short address goes under it, written by the player.
      */
-    const STYLE = ['color' => 'principal', 'puntos' => 'redondeados', 'esquinas' => 'redondeadas', 'centro' => 'logo',
+    const STYLE = ['puntos' => 'circulos', 'esquinas' => 'cuadradas', 'color' => 'oscuro', 'centro' => 'nada',
         'fondo' => 'blanco', 'marco' => 'no'];
 
     /**

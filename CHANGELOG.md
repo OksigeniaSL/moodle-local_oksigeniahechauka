@@ -3,6 +3,7 @@
 ## 0.14.0
 
 - **The QR codes go through the site's link shortener.** Every web a screen shows as a QR (a picture's or a video's, an album's, a book's, where to start, the page that names a new screen) becomes its short address when the site has a shortener compatible with YOURLS, written whole under the code. The server asks for it in the background, so a screen never waits; until then, the long one. When the shortener draws its own QR codes (as nur.click does, in the centre's colours and with its logo), the screens show that one, kept like any picture so it shows without network; otherwise, the code the player draws.
+- **A new drawing for the QR codes the player draws itself**: round dots with square corners, in black, the one that read as well as the plain code with every decoder in the art direction's bench; on the page that names a new screen, Hechauka's mark in the middle when the address is short. The same look is asked of nur.click. The code at rest is bigger (200 px at 1080p), and an address with «ñ» or «€» is encoded right.
 - A screen waiting to be named keeps its code while it waits, up to half a day, instead of a new one every quarter of an hour: whoever is typing it is not cut short, and the shortener gets one link, not dozens.
 
 ## 0.13.0

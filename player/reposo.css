@@ -392,8 +392,8 @@
     display: block;
     flex: none;
     box-sizing: content-box;
-    width: 14rem;
-    height: 14rem;
+    width: 20rem;                       /* 200 px at 1080p: at 14 rem a phone missed it from 1.5 m (art direction, 8-11) */
+    height: 20rem;
     margin: 0 2rem 0 0;
     padding: .8rem;
     border-radius: calc(1rem * var(--hk-esquina));
