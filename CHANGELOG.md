@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.15.0
+
+- **The birthday in Moodle itself.** On their day, whoever has a birthday and a Moodle account (the date in their profile, or on the list linked to their account) finds a card at the top of their dashboard, also on the front page and on «My courses»: their name, their picture (the one the screens would show) or their creature, the site's own colour with a paper bunting, balloons and confetti. A short party the first time that day, then a still, quiet card; with reduced motion or Access's «pause animations», only a fade. It closes until next year, without leaving the page. The look is all CSS, so it is whole without JavaScript; the confetti and the way out are a plain script, not an AMD module, so Firefox 98 runs it too.
+- **A morning notification**, when the centre turns it on: from seven, once a year, in each person's language, wherever the site sends notifications (the phone too). Off until the centre wants it.
+- Both in «Birthdays», under «In Moodle»: the card is on, the notification off.
+
 ## 0.14.1
 
 - **A picture over the whole screen shows its QR too**, as the showcase does: a picture with a web and «over the whole screen» showed only the picture on an informative screen. The QR goes on its white card at the bottom right, over the important notice's band when there is one, and the caption leaves it room.

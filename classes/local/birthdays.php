@@ -246,7 +246,7 @@ class birthdays {
      * @param \stdClass $config the plugin's
      * @param int $userid
      * @param string $date YYYY-MM-DD
-     * @return array|null {firstname, name, group, photo: stored_file|null}, or null when it is not their day
+     * @return array|null {firstname, name, group, student, photo: stored_file|null}, or null when it is not their day
      */
     public static function of_user(\stdClass $config, int $userid, string $date): ?array {
         global $DB;
@@ -280,6 +280,8 @@ class birthdays {
             'firstname' => trim((string) $user->firstname),
             'name' => trim($user->firstname . ' ' . $surname),
             'group' => trim((string) ($row ? $row->groupname : $user->department)),
+            // A pupil, when the school's records say so; otherwise nobody says.
+            'student' => $row && ($row->source ?? '') === self::CIFRA,
             'photo' => $photo,
         ];
     }

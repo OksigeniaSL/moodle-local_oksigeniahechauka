@@ -19,20 +19,87 @@
 
     The birthday card at the top of the dashboard of whoever has a birthday today, until they close it.
 
+    A moment on the way in (the garland drops and settles, the picture opens out of a light, the words rise, a glint
+    crosses the name, the balloons come up, a burst of paper from behind the picture) and then a still, quiet card. With
+    reduced motion, or the Access panel's «pause animations», it only fades in. The look is all CSS (greeting.css, in
+    styles.css), so the card is complete without JavaScript; js/greeting.js adds the confetti, the creature of a name
+    without a picture and the way out (HkGreeting.leave).
+
+    Classes required for JS:
+    * hk-greeting, hk-greeting-close (the form), hk-greeting-face
+
+    Data attributes required for JS:
+    * data-hk-bichito - on the initial, the name the creature is drawn from
+    * data-more - on the card, what the picture says when it is a button for more confetti
+
+    Context variables required for this template:
+    * firstname - the first name, in the title
+    * name - the name the creature is drawn from, when there is no picture
+    * photo, hasphoto - the picture (an address only for that person and that day)
+    * initial - the first letter, in the circle until the creature is drawn
+    * student, staff - optional: the line under the title for a pupil or for the staff; with neither, the general one
+    * seen - optional: the card was already shown today, so it is just there, without the party
+    * action, sesskey, back - closing it until next year (a form, so it works without JavaScript)
+    * group, hasgroup - not shown: it is the person themself who reads it
+
     Example context (json):
     {
         "firstname": "Lucía", "name": "Lucía Pérez", "group": "3.º A", "hasgroup": true, "photo": "", "hasphoto": false,
-        "initial": "L", "action": "#", "sesskey": "abc", "back": "/my/"
+        "initial": "L", "student": true, "staff": false, "seen": false, "action": "#", "sesskey": "abc", "back": "/my/"
     }
 }}
-<section class="hk-greeting" aria-labelledby="hk-greeting-title">
-    <div class="hk-greeting-face" aria-hidden="true">{{#hasphoto}}<img src="{{photo}}" alt="">{{/hasphoto}}{{^hasphoto}}<span data-hk-bichito="{{name}}">{{initial}}</span>{{/hasphoto}}</div>
-    <div class="hk-greeting-text">
-        <h2 id="hk-greeting-title">{{#str}}greeting_title, local_oksigeniahechauka, {{firstname}}{{/str}}</h2>
-        <p>{{#str}}greeting_body, local_oksigeniahechauka{{/str}}</p>
+<section class="hk-greeting{{#seen}} is-seen{{/seen}}" aria-labelledby="hk-greeting-{{uniqid}}-title" data-more="{{#cleanstr}}greeting_more, local_oksigeniahechauka{{/cleanstr}}">
+    <div class="hk-greeting-ground" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    <svg class="hk-greeting-balloons" viewBox="0 0 150 214" aria-hidden="true" focusable="false">
+        <defs>
+            <radialGradient id="hk-greeting-{{uniqid}}-shine" cx=".34" cy=".3" r=".75">
+                <stop offset="0" stop-color="#fff" stop-opacity=".62"/>
+                <stop offset=".38" stop-color="#fff" stop-opacity=".08"/>
+                <stop offset="1" stop-color="#000" stop-opacity=".2"/>
+            </radialGradient>
+        </defs>
+        <g class="hk-greeting-balloon hk-greeting-balloon-2"><g class="hk-greeting-sway"><g transform="translate(6 62) scale(.5)">
+            <path class="hk-greeting-thread" d="M50 122C40 160 66 196 52 236C44 262 70 280 60 304"/>
+            <path class="hk-greeting-skin" d="M50 4C75 4 93 25 93 53C93 84 71 108 53 115L47 115C29 108 7 84 7 53C7 25 25 4 50 4Z"/>
+            <path class="hk-greeting-skin" d="M43 122L50 113L57 122Z"/>
+            <path fill="url(#hk-greeting-{{uniqid}}-shine)" d="M50 4C75 4 93 25 93 53C93 84 71 108 53 115L47 115C29 108 7 84 7 53C7 25 25 4 50 4Z"/>
+            <ellipse cx="32" cy="34" rx="7" ry="14" transform="rotate(-24 32 34)" fill="#fff" opacity=".5"/>
+        </g></g></g>
+        <g class="hk-greeting-balloon hk-greeting-balloon-0"><g class="hk-greeting-sway"><g transform="translate(36 4) scale(.66)">
+            <path class="hk-greeting-thread" d="M50 122C62 150 38 176 54 206C66 228 46 250 56 318"/>
+            <path class="hk-greeting-skin" d="M50 4C75 4 93 25 93 53C93 84 71 108 53 115L47 115C29 108 7 84 7 53C7 25 25 4 50 4Z"/>
+            <path class="hk-greeting-skin" d="M43 122L50 113L57 122Z"/>
+            <path fill="url(#hk-greeting-{{uniqid}}-shine)" d="M50 4C75 4 93 25 93 53C93 84 71 108 53 115L47 115C29 108 7 84 7 53C7 25 25 4 50 4Z"/>
+            <ellipse cx="32" cy="34" rx="7" ry="14" transform="rotate(-24 32 34)" fill="#fff" opacity=".55"/>
+        </g></g></g>
+        <g class="hk-greeting-balloon hk-greeting-balloon-1"><g class="hk-greeting-sway"><g transform="translate(88 34) scale(.56)">
+            <path class="hk-greeting-thread" d="M50 122C36 146 58 170 44 200C34 224 52 250 30 330"/>
+            <path class="hk-greeting-skin" d="M50 4C75 4 93 25 93 53C93 84 71 108 53 115L47 115C29 108 7 84 7 53C7 25 25 4 50 4Z"/>
+            <path class="hk-greeting-skin" d="M43 122L50 113L57 122Z"/>
+            <path fill="url(#hk-greeting-{{uniqid}}-shine)" d="M50 4C75 4 93 25 93 53C93 84 71 108 53 115L47 115C29 108 7 84 7 53C7 25 25 4 50 4Z"/>
+            <ellipse cx="32" cy="34" rx="7" ry="14" transform="rotate(-24 32 34)" fill="#fff" opacity=".5"/>
+        </g></g></g>
+    </svg>
+    {{> local_oksigeniahechauka/greeting_garland }}
+    <div class="hk-greeting-body">
+        <div class="hk-greeting-medal">
+            <span class="hk-greeting-rays" aria-hidden="true"></span>
+            <span class="hk-greeting-orbit" aria-hidden="true"></span>
+            <div class="hk-greeting-face">{{#hasphoto}}<img src="{{photo}}" alt="" width="128" height="128">{{/hasphoto}}{{^hasphoto}}<span class="hk-greeting-initial" data-hk-bichito="{{name}}">{{initial}}</span>{{/hasphoto}}</div>
+            <svg class="hk-greeting-spark hk-greeting-spark-0" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 0C13 7 17 11 24 12C17 13 13 17 12 24C11 17 7 13 0 12C7 11 11 7 12 0Z"/></svg>
+            <svg class="hk-greeting-spark hk-greeting-spark-1" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 0C13 7 17 11 24 12C17 13 13 17 12 24C11 17 7 13 0 12C7 11 11 7 12 0Z"/></svg>
+        </div>
+        <div class="hk-greeting-text">
+            <p class="hk-greeting-kicker"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 0C13 7 17 11 24 12C17 13 13 17 12 24C11 17 7 13 0 12C7 11 11 7 12 0Z"/></svg>{{#str}}greeting_kicker, local_oksigeniahechauka{{/str}}</p>
+            <h2 class="hk-greeting-title" id="hk-greeting-{{uniqid}}-title">{{#str}}greeting_title, local_oksigeniahechauka, {{firstname}}{{/str}}</h2>
+            <p class="hk-greeting-line">{{#student}}{{#str}}greeting_body_student, local_oksigeniahechauka{{/str}}{{/student}}{{^student}}{{#staff}}{{#str}}greeting_body_staff, local_oksigeniahechauka{{/str}}{{/staff}}{{^staff}}{{#str}}greeting_body, local_oksigeniahechauka{{/str}}{{/staff}}{{/student}}</p>
+        </div>
     </div>
+    <svg class="hk-greeting-spark hk-greeting-spark-2" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 0C13 7 17 11 24 12C17 13 13 17 12 24C11 17 7 13 0 12C7 11 11 7 12 0Z"/></svg>
+    <svg class="hk-greeting-spark hk-greeting-spark-3" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 0C13 7 17 11 24 12C17 13 13 17 12 24C11 17 7 13 0 12C7 11 11 7 12 0Z"/></svg>
+    <svg class="hk-greeting-spark hk-greeting-spark-4" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 0C13 7 17 11 24 12C17 13 13 17 12 24C11 17 7 13 0 12C7 11 11 7 12 0Z"/></svg>
     <form class="hk-greeting-close" method="post" action="{{action}}">
         <input type="hidden" name="sesskey" value="{{sesskey}}"><input type="hidden" name="close" value="1"><input type="hidden" name="back" value="{{back}}">
-        <button type="submit" class="btn-close" aria-label="{{#str}}greeting_close, local_oksigeniahechauka{{/str}}" title="{{#str}}greeting_close, local_oksigeniahechauka{{/str}}"></button>
+        <button type="submit" class="hk-greeting-x" aria-label="{{#cleanstr}}greeting_close, local_oksigeniahechauka{{/cleanstr}}" title="{{#cleanstr}}greeting_close, local_oksigeniahechauka{{/cleanstr}}"><svg viewBox="0 0 14 14" aria-hidden="true" focusable="false"><path d="M2 2L12 12M12 2L2 12"/></svg></button>
     </form>
 </section>

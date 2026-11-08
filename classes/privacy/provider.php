@@ -70,6 +70,7 @@ class provider implements
         ], 'privacy:metadata:birthday');
         $collection->add_user_preference(greeting::CLOSED, 'privacy:metadata:preference:greetclosed');
         $collection->add_user_preference(greeting::SENT, 'privacy:metadata:preference:greetsent');
+        $collection->add_user_preference(greeting::SEEN, 'privacy:metadata:preference:greetseen');
         return $collection;
     }
 
@@ -84,6 +85,7 @@ class provider implements
         $preferences = [
             greeting::CLOSED => 'privacy:metadata:preference:greetclosed',
             greeting::SENT => 'privacy:metadata:preference:greetsent',
+            greeting::SEEN => 'privacy:metadata:preference:greetseen',
         ];
         foreach ($preferences as $name => $what) {
             $value = get_user_preferences($name, null, $userid);

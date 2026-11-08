@@ -35,6 +35,9 @@ class greeting {
     /** @var string The year someone got the notification: one a year. */
     const SENT = 'local_oksigeniahechauka_greetsent';
 
+    /** @var string The day someone first saw their card: the party plays once, then the card is just there. */
+    const SEEN = 'local_oksigeniahechauka_greetseen';
+
     /** @var int The hour of the centre from which the notification goes: nobody gets one at night. */
     const FROM_HOUR = 7;
 
@@ -76,7 +79,7 @@ class greeting {
      *
      * @param int $userid
      * @param int $now
-     * @return array|null {firstname, name, group, photo, year}
+     * @return array|null {firstname, name, group, student, photo, date, year}
      */
     public static function of(int $userid, int $now): ?array {
         if (!$userid || !self::card_on()) {
@@ -87,7 +90,7 @@ class greeting {
             return null;
         }
         $person = birthdays::of_user(get_config('local_oksigeniahechauka'), $userid, $date);
-        return $person ? $person + ['year' => $year] : null;
+        return $person ? $person + ['date' => $date, 'year' => $year] : null;
     }
 
     /**
@@ -113,10 +116,25 @@ class greeting {
             'hasphoto' => (bool) $photo,
             'initial' => \core_text::strtoupper(\core_text::substr($person['firstname'] !== '' ? $person['firstname'] :
                 $person['name'], 0, 1)),
+            'student' => $person['student'],
+            'staff' => false,
+            'seen' => get_user_preferences(self::SEEN, '', $userid) === $person['date'],
+            'date' => $person['date'],
             'action' => $url->out(false),
             'sesskey' => sesskey(),
             'back' => qualified_me() ?: '',
         ];
+    }
+
+    /**
+     * Notes that someone has seen their card today: the next time that day it is there without the party.
+     *
+     * @param int $userid
+     * @param string $date YYYY-MM-DD, the day of the card
+     * @return void
+     */
+    public static function seen(int $userid, string $date): void {
+        set_user_preference(self::SEEN, $date, $userid);
     }
 
     /**
@@ -174,7 +192,8 @@ class greeting {
             set_user_preference(self::SENT, $year, $user);
             $old = force_current_language($user->lang);
             try {
-                $message = self::message($user, $person['firstname'] !== '' ? $person['firstname'] : $person['name']);
+                $called = $person['firstname'] !== '' ? $person['firstname'] : $person['name'];
+                $message = self::message($user, $called, $person['student']);
             } finally {
                 force_current_language($old);
             }
@@ -190,12 +209,13 @@ class greeting {
      *
      * @param \stdClass $user
      * @param string $firstname
+     * @param bool $student whether they are a pupil, for its own line
      * @return \core\message\message
      */
-    protected static function message(\stdClass $user, string $firstname): \core\message\message {
+    protected static function message(\stdClass $user, string $firstname, bool $student): \core\message\message {
         $c = 'local_oksigeniahechauka';
         $subject = get_string('greeting_subject', $c, $firstname);
-        $text = get_string('greeting_text', $c, $firstname);
+        $text = get_string($student ? 'greeting_text_student' : 'greeting_text', $c);
         $message = new \core\message\message();
         $message->component = $c;
         $message->name = 'birthday';

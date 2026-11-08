@@ -137,6 +137,16 @@ final class greeting_test extends \advanced_testcase {
         $card = greeting::card((int) $linked->id, $day);
         $this->assertSame('Ana', $card['firstname']);
         $this->assertSame('3.º A', $card['group']);
+        // The party once a day: seen today, the card is just there; next year, the party again.
+        $this->assertFalse($card['seen']);
+        greeting::seen((int) $linked->id, '2026-03-15');
+        $this->assertTrue(greeting::card((int) $linked->id, $day)['seen']);
+        $this->assertFalse(greeting::card((int) $linked->id, $this->moment(2027, 3, 15))['seen']);
+        // A pupil, only when the school's records say so.
+        $this->assertFalse($card['student']);
+        $DB->set_field(birthdays::TABLE, 'source', birthdays::CIFRA, ['id' => $id]);
+        $this->assertTrue(greeting::card((int) $linked->id, $day)['student']);
+        $DB->set_field(birthdays::TABLE, 'source', null, ['id' => $id]);
         $this->assertSame('1.º B', greeting::card((int) $later->id, $day)['group']);
         $this->assertNull(greeting::card((int) $twin->id, $day));
         $config = get_config('local_oksigeniahechauka');

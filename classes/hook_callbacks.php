@@ -112,6 +112,17 @@ class hook_callbacks {
         if (!$card) {
             return '';
         }
+        if (!$card['seen']) {
+            // The party plays once a day; the next time, the card is just there.
+            greeting::seen((int) $USER->id, $card['date']);
+        }
+        // What CSS cannot do (the confetti, the creature, the way out): plain scripts, because Firefox 98 does not start
+        // AMD modules in Moodle 5.3. Without them the card is whole, and closes by its form.
+        $v = ['v' => (string) get_config('local_oksigeniahechauka', 'version')];
+        if (!$card['hasphoto']) {
+            $PAGE->requires->js(new \moodle_url('/local/oksigeniahechauka/player/src/bichito-hechauka.js', $v));
+        }
+        $PAGE->requires->js(new \moodle_url('/local/oksigeniahechauka/js/greeting.js', $v));
         $id = 'local-oksigeniahechauka-greeting';
         return '<template id="' . $id . '">' . $OUTPUT->render_from_template('local_oksigeniahechauka/greeting', $card)
             . '</template>' . \html_writer::script('(function() {
@@ -135,7 +146,7 @@ class hook_callbacks {
             if (!r.ok) {
                 throw new Error(r.status);
             }
-            card.remove();
+            return window.HkGreeting ? window.HkGreeting.leave(card) : card.remove();
         }).catch(function() {
             form.submit();
         });

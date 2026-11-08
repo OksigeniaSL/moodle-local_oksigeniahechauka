@@ -501,4 +501,16 @@
             <copyright>Copyright 2020 The Grandstander Project Authors (https://github.com/Etcetera-Type-Co/Grandstander)</copyright>
         </copyrights>
     </library>
+    <library>
+        <location>fonts/Gabarito-800.woff2</location>
+        <name>Gabarito</name>
+        <description>The title of the birthday card on the dashboard. Also Gabarito-700.woff2; the licence in OFL-Gabarito.txt.</description>
+        <version>1.000</version>
+        <license>OFL</license>
+        <licenseversion>1.1</licenseversion>
+        <repository>https://github.com/naipefoundry/gabarito</repository>
+        <copyrights>
+            <copyright>2023 The Gabarito Project Authors</copyright>
+        </copyrights>
+    </library>
 </libraries>
