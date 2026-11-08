@@ -1314,6 +1314,7 @@ $string['where_one'] = '1 pantalla';
 $string['where_some'] = 'Solo en…';
 $string['work_allscreens'] = 'Pantallas y grupos';
 $string['work_down'] = '«{$a->name}» no da señal desde {$a->since}';
+$string['work_down_many'] = '{$a} pantallas no dan señal';
 $string['work_items'] = '{$a} publicaciones en las pantallas';
 $string['work_mine'] = '{$a} publicaciones tuyas en las pantallas';
 $string['work_noscreens'] = 'Todavía sin pantallas';

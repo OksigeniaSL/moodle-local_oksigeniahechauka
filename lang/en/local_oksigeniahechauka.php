@@ -1314,6 +1314,7 @@ $string['where_one'] = '1 screen';
 $string['where_some'] = 'Only on…';
 $string['work_allscreens'] = 'Screens and groups';
 $string['work_down'] = '«{$a->name}» has given no sign of life since {$a->since}';
+$string['work_down_many'] = '{$a} screens give no sign of life';
 $string['work_items'] = '{$a} things on the screens';
 $string['work_mine'] = '{$a} things of yours on the screens';
 $string['work_noscreens'] = 'No screens yet';

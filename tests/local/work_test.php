@@ -85,5 +85,15 @@ final class work_test extends \advanced_testcase {
         \cache::make('local_oksigeniahechauka', 'work')->purge();
         $levels = array_column(work::cards((int) $manager->id, $now)[0]['alerts'], 'level');
         $this->assertSame(['urgent', 'today'], $levels);
+
+        // Three without a sign of life are one alert, to the panel.
+        foreach (['Patio', 'Biblioteca'] as $name) {
+            $DB->insert_record('local_oksigeniahechauka_screen', (object) ['name' => $name, 'keyhash' => sha1($name),
+                'lastseen' => $now - 2 * HOURSECS, 'alerts' => 1, 'timecreated' => $now]);
+        }
+        \cache::make('local_oksigeniahechauka', 'work')->purge();
+        $alerts = work::cards((int) $manager->id, $now)[0]['alerts'];
+        $this->assertSame(get_string('work_down_many', 'local_oksigeniahechauka', 3), $alerts[0]['text']);
+        $this->assertCount(2, $alerts);
     }
 }

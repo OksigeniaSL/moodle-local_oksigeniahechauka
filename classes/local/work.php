@@ -29,6 +29,9 @@ class work {
     /** @var int Seconds a door is kept: it is asked on every load of the dashboard. */
     const KEEP = 60;
 
+    /** @var int Screens without a sign of life named one by one; more are one alert. */
+    const ONE_BY_ONE = 2;
+
     /**
      * The door of the screens for someone, as the block takes it; none without a permission.
      *
@@ -72,6 +75,7 @@ class work {
                 'id, name, lastseen, lastinfo, power, alerts'
             );
             $down = 0;
+            $silent = [];
             foreach ($screens as $screen) {
                 $info = json_decode((string) ($screen->lastinfo ?? ''), true) ?: [];
                 // As the warning by notification: one that has never been seen is still being set up.
@@ -81,13 +85,21 @@ class work {
                 }
                 $down++;
                 if ($screen->alerts) {
+                    $silent[] = $screen;
+                }
+            }
+            if (count($silent) > self::ONE_BY_ONE) {
+                // Many at once is one thing to look at: the panel shows which.
+                $alerts[] = ['text' => get_string('work_down_many', $c, count($silent)),
+                    'url' => (new \moodle_url('/local/oksigeniahechauka/index.php'))->out(false), 'level' => 'urgent'];
+            } else {
+                foreach ($silent as $screen) {
+                    $today = (int) $screen->lastseen >= usergetmidnight($now);
+                    $format = get_string($today ? 'strftimetime' : 'strftimedatetimeshort', 'langconfig');
                     $alerts[] = [
                         'text' => get_string('work_down', $c, (object) [
                             'name' => items::plain((string) $screen->name),
-                            'since' => userdate($screen->lastseen, get_string(
-                                (int) $screen->lastseen >= usergetmidnight($now) ? 'strftimetime' : 'strftimedaydatetime',
-                                'langconfig'
-                            )),
+                            'since' => userdate($screen->lastseen, $format),
                         ]),
                         'url' => (new \moodle_url('/local/oksigeniahechauka/screen.php', ['id' => $screen->id]))->out(false),
                         'level' => 'urgent',
