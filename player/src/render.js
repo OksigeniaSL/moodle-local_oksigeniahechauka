@@ -11,6 +11,7 @@ import {buildDeadlines, fitDeadlines} from './plazos.js';
 import {buildIdle} from './reposo.js';
 import {buildTable, fitTable} from './tabla.js';
 import {buildBooks, fitBooks} from './biblioteca.js';
+import {buildChannel, fitChannel, startChannel, stopChannel} from './canal.js';
 import {qrSvg, shortWeb} from './qr.js';
 import {even} from './balance.js';
 import {buildAgenda, startAgenda} from './agendaview.js';
@@ -25,7 +26,8 @@ const PHRASE_WAITS_MS = 25000;
 const CAPTION_MS = 2800;
 
 /** The compositions that are made anew each time, never only their pictures changed. */
-const NEW_EACH = {'solo-hoy': true, semana: true, titular: true, agenda: true, muro: true, 'fotos-tercio': true, cumple: true, biblioteca: true, plazos: true, tabla: true};
+const NEW_EACH = {'solo-hoy': true, semana: true, titular: true, agenda: true, muro: true, 'fotos-tercio': true, cumple: true, biblioteca: true, canal: true, plazos: true,
+    tabla: true};
 
 /** The compositions over the whole screen, in their own layer. */
 const FULL = {'foto-completa': true, 'escaparate': true, 'reposo': true};
@@ -634,6 +636,13 @@ export class Screen {
                 }});
             return c;
         }
+        if (comp === 'canal') {
+            // The centre's channel: its words, and its QR on a white card, the picture of the site's shortener or drawn here.
+            buildChannel(c, extra && extra.item, {s: this.s, qr: function (url, image) {
+                return self0.qrBox(url, false, image);
+            }});
+            return c;
+        }
         if (comp === 'semana') {
             const l = this.labelsFull();
             // What comes next and matters, in a strip in the centre's colour; the five days under it.
@@ -790,6 +799,12 @@ export class Screen {
         } else if (comp === 'cumple') {
             // Each person their moment: as long as the people of the day take (Gaudí, 7 November 2026).
             c.hkSeconds = startBirthdays(c, {still: this.keepsStill()});
+        } else if (comp === 'canal') {
+            // The paper plane crosses where nothing is read; leave() stops it.
+            startChannel(c, {still: this.keepsStill()});
+            c.hkStop = function () {
+                stopChannel(c);
+            };
         }
         // The parts of the slide in the order they are read, and its life while it stands (Gaudí, 8 November 2026): only the
         // compositions movimiento.js knows; the others keep their pass.
@@ -1003,6 +1018,7 @@ export class Screen {
         this.fitCaptions(c, comp);
         fitBirthdays(c);
         fitBooks(c, this.horizontal);
+        fitChannel(c, this.horizontal);
         fitDeadlines(c);
         fitTable(c);
         const shelfTitle = c.querySelector('.hk-biblio-titulo');

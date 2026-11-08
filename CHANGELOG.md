@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.17.0
+
+- **«Follow us»: the organisation's public channel on the screens**, a slide of its own when Oksigenia Marandu has a
+  public channel: the headline and a line in the colour of the skin, how many already follow it, and the channel's last
+  message as a white card with its name and a big QR (never under 32 rem), its short address and «Open it on your phone».
+  A paper plane crosses the empty part of the poster. One slide in fourteen, never on a showcase screen. The address says
+  it comes from the screens, so the shortener counts who arrives from them. It can be turned off in the settings.
+
 ## 0.16.2
 
 - The icon of the plugin is the mark at two colours, as the start of a screen shows it: the two white screens and the cyan band on navy. Moodle, the start of a screen and «Your work» say the same.

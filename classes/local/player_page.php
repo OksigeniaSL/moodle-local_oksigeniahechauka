@@ -74,6 +74,8 @@ class player_page {
             'countdown' => get_string('label_countdown', $c),
             'daysfor' => get_string('label_daysfor', $c),
             'scan' => get_string('label_scan', $c),
+            'channel_members' => get_string('label_channel_members', $c),
+            'channel_members_one' => get_string('label_channel_members_one', $c),
             'thisweek' => get_string('label_thisweek', $c),
             'letters' => explode(',', get_string('days_letters', $c)),
             'until_tomorrow' => get_string('agenda_until_tomorrow', $c),
@@ -166,7 +168,7 @@ class player_page {
             ['hechauka.css', 'composiciones.css', 'tiempo.css', 'semana.css', 'proximos-dias.css', 'urgente.css',
             'distancia.css', 'jerarquia.css', 'tercios.css', 'cinta.css', 'usos.css', 'agenda.css', 'fotos.css',
             'lideres.css', 'agenda-lista.css', 'cumple.css', 'reposo.css', 'plazos.css', 'tabla.css',
-            'biblioteca.css', 'alergenos.css',
+            'biblioteca.css', 'canal.css', 'alergenos.css',
             'identidad.css',
             'pieles.css', 'fondos.css', 'letras.css', 'actividad.css',
             'movimiento.css'] as $file

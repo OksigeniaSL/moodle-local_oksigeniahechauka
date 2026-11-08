@@ -82,6 +82,14 @@ const PARTS = {
         ['.hk-biblio-cabeza .hk-qr', 'qr', 5],
         ['.hk-biblio-otros > *', 'estante', 4, 'each'],
     ],
+    // The channel: its words, and then its last message arrives, the card with the QR (Gaudí, 8 November 2026).
+    'canal': [
+        ['.hk-canal', 'marco', 0],
+        ['.hk-canal-titular', 'sube', 1],
+        ['.hk-canal-linea', 'sube', 2],
+        ['.hk-canal-seguidores', 'sube', 3],
+        ['.hk-canal-tarjeta', 'mensaje', 4.5],
+    ],
     'tabla': [
         ['.hk-tabla', 'bloque', 0],
         ['.hk-tabla-cabeza > *', 'sube', 1, 'step'],
@@ -362,9 +370,11 @@ export function motion(c, comp, o) {
     const stops = [];
     const settled = last + 0.8;
     if (level !== 'sobria') {
-        each(c.querySelectorAll('.hk-lider[data-tipo="menu"], .hk-lider[data-tipo="aviso"], .hk-tipografica'), function (b) {
-            addSheen(b, settled + 0.4);
-        });
+        // The channel's block too when its plane has no sky to fly (from 5 m, or on a small screen): then the sheen is its life.
+        each(c.querySelectorAll('.hk-lider[data-tipo="menu"], .hk-lider[data-tipo="aviso"], .hk-tipografica, .hk-canal-sin-cielo'),
+            function (b) {
+                addSheen(b, settled + 0.4);
+            });
         each(c.querySelectorAll('.hk-libro-grande'), function (b) {
             addSheen(b, settled + 0.2);
         });

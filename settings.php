@@ -185,6 +185,14 @@ if ($hassiteconfig) {
                 1
             ));
         }
+        if (\local_oksigeniahechauka\local\sources::has_channel()) {
+            $settings->add(new admin_setting_configcheckbox(
+                "$p/sourcechannel",
+                get_string('sourcechannel', $p),
+                get_string('sourcechannel_desc', $p),
+                1
+            ));
+        }
         if (\local_oksigeniahechauka\local\sources::has_books()) {
             $settings->add(new admin_setting_configcheckbox(
                 "$p/sourcebooks",

@@ -231,6 +231,62 @@ class sources {
     }
 
     /**
+     * Whether the site has a public channel of its own to follow (Oksigenia Marandu, with a public Telegram channel): the
+     * source is offered only then.
+     *
+     * @return bool
+     */
+    public static function has_channel(): bool {
+        return (bool) self::the_channel();
+    }
+
+    /**
+     * The organisation's public channel, as Marandu gives it; null without Marandu, without a channel or with a private one.
+     *
+     * @return array|null {url, title, members}
+     */
+    protected static function the_channel(): ?array {
+        $api = '\\local_oksigeniamarandu\\api';
+        if (!class_exists($api) || !method_exists($api, 'channel')) {
+            return null;
+        }
+        try {
+            $channel = $api::channel();
+        } catch (\Throwable $e) {
+            debugging('Hechauka: the channel of Marandu failed: ' . $e->getMessage(), DEBUG_DEVELOPER);
+            return null;
+        }
+        $url = is_array($channel) ? (string) ($channel['url'] ?? '') : '';
+        return preg_match('#^https://#', $url) ? $channel : null;
+    }
+
+    /**
+     * «Follow us»: the organisation's public channel, with its QR, as an item of the contract. The address says it comes from
+     * the screens, so the shortener counts who arrives from them.
+     *
+     * @return array items of the contract
+     */
+    public static function channel(): array {
+        $channel = self::the_channel();
+        if (!$channel) {
+            return [];
+        }
+        $c = 'local_oksigeniahechauka';
+        $url = (string) $channel['url'];
+        $url .= (strpos($url, '?') === false ? '?' : '&') . 'utm_source=pantallas';
+        $network = preg_match('#^https://(t\.me|telegram\.me)/#i', (string) $channel['url']) ? 'telegram' : 'other';
+        $item = ['id' => 'channel', 'type' => 'channel', 'zone' => 'extra', 'network' => $network,
+            'title' => get_string($network === 'telegram' ? 'label_channel_telegram' : 'label_channel', $c),
+            'text' => get_string('label_channel_text', $c),
+            'name' => items::plain((string) ($channel['title'] ?? '')),
+            'web' => $url];
+        if (isset($channel['members']) && is_numeric($channel['members']) && (int) $channel['members'] > 0) {
+            $item['members'] = (int) $channel['members'];
+        }
+        return [$item];
+    }
+
+    /**
      * Whether the site has the library's function.
      *
      * @return bool

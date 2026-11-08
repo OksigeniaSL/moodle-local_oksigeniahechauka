@@ -47,6 +47,7 @@ one before; the lines of a list, one **line** after.
 | stamp | the icon of an event | is stamped: big and turned, and falls into place |
 | book | the library's cover | rises to its place on the shelf (without turning: turning a big picture costs without a graphics card) |
 | shelf | the next books | slide along the shelf |
+| message | the channel's card with the QR, its last message | arrives from its tail: rises a little and grows, as a chat shows a new message |
 
 ## What moves while the slide stands
 
@@ -57,6 +58,7 @@ one before; the lines of a list, one **line** after.
 | The bar of the time left | under the heading of what is read for long (what falls due, tables), and on the third's page dot, a bar that fills in the slide's time | whoever is reading knows how long is left |
 | The sign pulses | the sign of what is important grows 6 % and back, every 3.2 s | it is the only thing that must call |
 | The photo settles | the one of the entrance, through its 12 s | a still photo looks like a capture; this one breathes |
+| A paper plane crosses | on the channel's slide, once its entrance is over: 11 s from the left edge across the part of the block where nothing is read, leaving dots of the accent that fade; again every 20 s (`src/canal.js`). With no room for it (from 5 m on a wide screen), the sheen instead | the channel's message flies; it never crosses the words or the card with the QR |
 
 Nothing else. No confetti outside the birthdays, nothing that crosses a text, nothing that repeats faster than every 2 s.
 

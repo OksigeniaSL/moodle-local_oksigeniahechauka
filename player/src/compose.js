@@ -19,6 +19,7 @@
 // muro            three to five photos of an album, one changing at a time; on a showcase, with a poster and its QR
 // cumple          whose birthday it is today, with their pictures, by pages
 // biblioteca      what has come to the library: a book at a time with its QR, the next ones on the shelf
+// canal           the centre's messaging channel: follow it from the screen, with its QR
 // plazos          what falls due in the courses in the coming days, by days and by pages
 // tabla           a table of the centre: a spreadsheet or a list, by pages
 // reposo          nothing at all to show: the centre, the hour, the date and the weather, under a sky that goes by
@@ -34,6 +35,9 @@ const BIRTHDAY_EVERY = 7;
 
 /** How many slides go by between one of the library and the next. */
 const BOOKS_EVERY = 16;
+
+/** How many slides go by between one of the channel and the next; the first comes soon, for whoever passes. */
+const CHANNEL_EVERY = 14;
 
 /** How many slides go by between one of the deadlines and the next. */
 const DEADLINES_EVERY = 12;
@@ -186,6 +190,11 @@ export class Composer {
             this.sinceBooks = 1;
             this.bookPage = (this.bookPage === undefined ? -1 : this.bookPage) + 1;
             return pick('biblioteca', [], 15, {item: o.books, page: this.bookPage});
+        }
+        this.sinceChannel = (this.sinceChannel === undefined ? CHANNEL_EVERY - 4 : this.sinceChannel) + 1;
+        if (o.channel && this.sinceChannel > CHANNEL_EVERY) {
+            this.sinceChannel = 1;
+            return pick('canal', [], 15, {item: o.channel});
         }
         this.sinceDeadlines = (this.sinceDeadlines === undefined ? DEADLINES_EVERY / 2 : this.sinceDeadlines) + 1;
         if (o.deadlines && this.sinceDeadlines > DEADLINES_EVERY) {

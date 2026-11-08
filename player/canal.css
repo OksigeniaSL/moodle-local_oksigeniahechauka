@@ -1,0 +1,297 @@
+/* Oksigenia Hechauka: «Síguenos en el canal», a slide of its own (Gaudí, 8 November 2026). Goes after biblioteca.css, before
+ * alergenos.css; its entrance and the way «mensaje» are in movimiento.css (movimiento-canal.css, its part).
+ *
+ *   <div class="hk-cuerpo hk-capa" data-composicion="canal">
+ *     <section class="hk-canal" data-ajuste="0–3">
+ *       <div class="hk-canal-cielo"><div class="hk-canal-estela"><i>…</i></div><div class="hk-canal-avion"><svg/></div></div>
+ *       <div class="hk-canal-texto"><h2 class="hk-canal-titular"/><p class="hk-canal-linea"/><p class="hk-canal-seguidores"/></div>
+ *       <div class="hk-canal-lado">
+ *         <div class="hk-canal-tarjeta"><p class="hk-canal-nombre"/><div class="hk-qr">(render.js's qrBox)</div></div>
+ *
+ * A poster in the centre's main colour: the words on one side; on the other, the channel's last message, a white card with the
+ * QR in black and the short address. The QR never on the colour: a phone reads it on white, in the light theme and in the dark
+ * one. Nothing crosses the words or the card: the plane flies in its sky (canal.js measures it where nothing is read), clipped
+ * to it. canal.js sets --hk-canal-qr when the card needs a smaller QR, and --hk-canal-tinta, the name's colour on white.
+ *
+ * Chromium 56: flexbox only, margins instead of gap, no clamp, no aspect-ratio, no inset. */
+.hk-cuerpo[data-composicion="canal"] {
+    flex-direction: column;
+}
+.hk .hk-canal {
+    --hk-canal-qr: 42rem;               /* the side of the QR: read from 1 to 2.5 m by a phone, on any screen */
+    --hk-canal-cola: 3.2rem;            /* the tail of the card, a message that arrives */
+    position: relative;
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: row;
+    align-items: stretch;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+    padding: 4.4rem 4.4rem 4rem 7.2rem;
+    border-radius: calc(2.8rem * var(--hk-esquina));
+    background-color: var(--hk-primario);
+    background-image: radial-gradient(circle at 14% 12%, rgba(255, 255, 255, .13), rgba(255, 255, 255, 0) 46%);
+    color: var(--hk-sobre-primario);
+}
+
+/* --- The words ---------------------------------------------------------------------------------------------------- */
+.hk .hk-canal-texto {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex: 1 1 0px;
+    flex-direction: column;
+    justify-content: flex-end;            /* low, so the sky above them is the plane's */
+    min-width: 0;
+    min-height: 0;
+    padding-bottom: 1.6rem;
+}
+.hk-canal-texto > * {
+    flex: none;
+}
+.hk .hk-canal-titular {
+    padding-bottom: .08em;                /* the descenders of a tight line, inside its box */
+    font-family: var(--hk-letra-titulos);
+    font-size: var(--hk-t-titular);
+    font-weight: 800;
+    letter-spacing: -.02em;
+    line-height: 1;
+}
+.hk .hk-canal[data-ajuste="1"] .hk-canal-titular { font-size: calc(var(--hk-t-titular) * .88); }
+.hk .hk-canal[data-ajuste="2"] .hk-canal-titular { font-size: calc(var(--hk-t-titular) * .76); }
+.hk .hk-canal[data-ajuste="3"] .hk-canal-titular { font-size: calc(var(--hk-t-titular) * .64); }
+.hk[data-distancia="8"] .hk-canal[data-ajuste="3"] .hk-canal-titular {
+    font-size: calc(var(--hk-t-titular) * .76);  /* from 8 m never under the least title */
+}
+.hk .hk-canal-linea {
+    margin-top: 2.8rem;
+    font-size: var(--hk-t-entrada);
+    font-weight: 700;
+    line-height: 1.12;
+    opacity: .92;
+}
+.hk .hk-canal-seguidores {              /* how many follow it, after a dot of the accent, as a channel says it */
+    margin-top: 2.4rem;
+    font-size: var(--hk-t-lista);
+    font-weight: 700;
+    line-height: 1.1;
+    opacity: .92;
+}
+.hk .hk-canal-seguidores::before {
+    content: "";
+    display: inline-block;
+    width: .58em;
+    height: .58em;
+    margin-right: .42em;
+    border-radius: 50%;
+    background: var(--hk-acento);
+    vertical-align: .06em;
+}
+.hk[data-cristal] .hk-canal-linea,
+.hk[data-cristal] .hk-canal-seguidores {
+    opacity: 1;
+}
+
+/* --- The card's column ----------------------------------------------------------------------------------------- */
+.hk .hk-canal-lado {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex: none;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-end;
+    min-height: 0;
+    margin-left: 6rem;
+    padding-bottom: var(--hk-canal-cola);
+}
+.hk .hk-canal.hk-canal-sin-linea .hk-canal-linea,
+.hk .hk-canal.hk-canal-sin-seguidores .hk-canal-seguidores,
+.hk .hk-canal.hk-canal-sin-nombre .hk-canal-nombre,
+.hk .hk-canal.hk-canal-sin-cielo .hk-canal-cielo {
+    display: none;
+}
+
+/* --- The card: the last message, white in both themes, with the QR in black ------------------------------------------ */
+.hk .hk-canal-tarjeta {
+    position: relative;
+    flex: none;
+    padding: 3rem 3rem 2.6rem;
+    border-radius: 3.2rem 3.2rem 3.2rem .8rem;
+    background: #fff;
+    box-shadow: 0 1rem 3rem rgba(0, 0, 0, .2);
+    color: #16191d;
+}
+.hk .hk-canal-tarjeta::after {            /* the tail, on the left: a message that arrives */
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: calc(var(--hk-canal-cola) * -1 + .2rem);
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: var(--hk-canal-cola) var(--hk-canal-cola) 0 0;
+    border-color: #fff transparent transparent transparent;
+}
+.hk .hk-canal-nombre {                    /* who writes, as over a message in a group: the centre's colour, deep enough */
+    width: var(--hk-canal-qr);
+    margin-bottom: 2rem;
+    overflow-wrap: break-word;
+    color: var(--hk-canal-tinta, #16191d);
+    font-size: 3.6rem;
+    font-weight: 800;
+    line-height: 1.08;
+}
+.hk .hk-canal .hk-qr {
+    width: var(--hk-canal-qr);
+    margin: 0;
+    padding: 0;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+    color: #16191d;
+    text-align: center;
+}
+.hk .hk-canal .hk-qr svg,
+.hk .hk-canal .hk-qr img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+.hk .hk-canal .hk-qr.hk-qr-imagen img {   /* the shortener's picture brings its own white margin: as big as the card lets it,
+                                              and square before it arrives, so the card is measured with it */
+    width: 110%;
+    height: calc(var(--hk-canal-qr) * 1.1);
+    margin: -5% -5% -3%;
+    object-fit: contain;
+}
+.hk .hk-canal .hk-qr-web {
+    margin-top: 2.4rem;
+    color: #16191d;
+    font-size: 4.4rem;
+    font-weight: 800;
+    letter-spacing: -.01em;
+    line-height: 1.05;
+    overflow-wrap: break-word;
+}
+.hk .hk-canal .hk-qr-llamada {
+    margin-top: .8rem;
+    color: #4b5563;
+    font-size: 3.2rem;
+    font-weight: 700;
+    line-height: 1.08;
+}
+
+/* --- The sky and the plane ---------------------------------------------------------------------------------------- */
+.hk .hk-canal-cielo {                    /* placed by canal.js; a plain clip, no corners, so it costs nothing to keep */
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 0;
+    width: 0;
+    height: 0;
+    overflow: hidden;
+    pointer-events: none;
+}
+.hk .hk-canal-avion {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 13rem;
+    height: 8.06rem;
+    -webkit-transform: translate3d(-40rem, 0, 0);   /* out of sight until it flies */
+    transform: translate3d(-40rem, 0, 0);
+    -webkit-transform-origin: 50% 55%;
+    transform-origin: 50% 55%;
+    will-change: transform;
+}
+.hk .hk-canal-avion svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}
+.hk-canal-ala {
+    fill: #fff;
+}
+.hk-canal-ala-lejos {
+    fill: #fff;
+    opacity: .74;
+}
+.hk-canal-quilla {
+    fill: #fff;
+    opacity: .5;
+}
+.hk .hk-canal-estela i {                 /* a dot of its trail, in the accent */
+    position: absolute;
+    top: -.6rem;
+    left: -.6rem;
+    width: 1.2rem;
+    height: 1.2rem;
+    border-radius: 50%;
+    background: var(--hk-acento);
+    opacity: 0;
+}
+.hk[data-distancia="8"] .hk-canal-avion {
+    width: 15rem;
+    height: 9.3rem;
+}
+.hk[data-distancia="8"] .hk-canal-estela i {
+    top: -.75rem;
+    left: -.75rem;
+    width: 1.5rem;
+    height: 1.5rem;
+}
+
+/* --- By the distance ---------------------------------------------------------------------------------------------- */
+.hk[data-distancia="5"] .hk-canal-linea {
+    margin-top: 2.4rem;
+}
+.hk[data-distancia="8"] .hk-canal {
+    --hk-canal-qr: 40rem;
+    padding: 4rem 4rem 3.6rem 6.4rem;
+}
+.hk[data-distancia="8"] .hk-canal-lado {
+    margin-left: 4.8rem;
+}
+.hk[data-distancia="8"] .hk-canal-seguidores {
+    margin-top: 2rem;
+}
+.hk[data-distancia="8"] .hk-canal-linea {
+    margin-top: 2rem;
+}
+
+/* --- Vertical: the words on top, the sky across, the conversation under it --------------------------------------- */
+.hk.hk-vertical .hk-canal {
+    --hk-canal-qr: 48rem;
+    flex-direction: column;
+    padding: 5.6rem 5.6rem 4.8rem;
+}
+.hk.hk-vertical .hk-canal-texto {
+    flex: none;
+    justify-content: flex-start;
+    padding-bottom: 0;
+}
+.hk.hk-vertical .hk-canal-lado {
+    flex: 1 1 auto;
+    align-self: center;
+    margin-left: 0;
+    padding-top: 4rem;
+}
+.hk.hk-vertical[data-distancia="5"] .hk-canal {
+    --hk-canal-qr: 46rem;
+}
+.hk.hk-vertical[data-distancia="8"] .hk-canal {
+    --hk-canal-qr: 44rem;
+    padding: 4.8rem 4.8rem 4.4rem;
+}
+.hk.hk-vertical .hk-canal-nombre {
+    font-size: 4rem;
+}
+.hk.hk-vertical .hk-canal .hk-qr-web {
+    font-size: 5rem;
+}
+.hk.hk-vertical .hk-canal .hk-qr-llamada {
+    font-size: 3.6rem;
+}
