@@ -196,23 +196,23 @@ class access {
         }
         foreach (array_diff($want, $have) as $userid) {
             role_assign($roleid, $userid, $contextid, self::COMPONENT, $groupid);
-            self::tell($userid, 'group', $groupid);
         }
     }
 
     /**
-     * Tells someone what they can do now in the screens, with the way to the panel and to the guide.
+     * Tells someone what they can do now in the screens, with the way to the panel and to the guide. Never on its own
+     * when a permission is given: whoever gives it decides when the person should know, and the notice comes from them.
      *
      * @param int $userid
      * @param string $what group, everywhere or manager
      * @param int $groupid for a group
-     * @return void
+     * @return bool whether it went
      */
-    public static function tell(int $userid, string $what, int $groupid = 0): void {
-        global $DB;
+    public static function tell(int $userid, string $what, int $groupid = 0): bool {
+        global $DB, $USER;
         $user = \core_user::get_user($userid);
         if (!$user || $user->deleted || $user->suspended || isguestuser($user)) {
-            return;
+            return false;
         }
         $c = self::COMPONENT;
         $strings = get_string_manager();
@@ -227,7 +227,7 @@ class access {
         $message = new \core\message\message();
         $message->component = $c;
         $message->name = 'permission';
-        $message->userfrom = \core_user::get_noreply_user();
+        $message->userfrom = isloggedin() && !isguestuser() ? $USER : \core_user::get_noreply_user();
         $message->userto = $user;
         $message->subject = $strings->get_string('permission_' . $what . '_subject', $c, $a, $lang);
         $message->fullmessage = $strings->get_string('permission_' . $what . '_body', $c, $a, $lang);
@@ -237,7 +237,7 @@ class access {
         $message->notification = 1;
         $message->contexturl = $panel->out(false);
         $message->contexturlname = $strings->get_string('panel_title', $c, null, $lang);
-        message_send($message);
+        return (bool) message_send($message);
     }
 
     /**
@@ -311,11 +311,7 @@ class access {
         }
         $contextid = \context_system::instance()->id;
         if ($give) {
-            $had = user_has_role_assignment($userid, $roleid, $contextid);
             role_assign($roleid, $userid, $contextid);
-            if (!$had) {
-                self::tell($userid, $shortname === self::MANAGER ? 'manager' : 'everywhere');
-            }
         } else {
             role_unassign($roleid, $userid, $contextid);
         }

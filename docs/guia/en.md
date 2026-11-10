@@ -263,6 +263,9 @@ people search:
 - **Publish in a group**: only on the screens of that group, and they only see those screens and what they publish
   themselves. For example, whoever runs a club, a department or a site.
 
+Giving a permission tells nobody. When you want the person to know, the envelope beside their name sends them a notice
+from you, with the panel and this guide.
+
 </div>
 
 <div class="junto-imagen ficha" markdown="1">

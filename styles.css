@@ -1745,6 +1745,11 @@
         background: var(--hkp-chip);
     }
 }
+.hkp-person-tools {
+    display: flex;
+    align-items: center;
+    gap: .35rem;
+}
 .hkp-person small {
     display: block;
     color: var(--hkp-muted);

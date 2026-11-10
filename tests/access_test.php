@@ -185,22 +185,28 @@ final class access_test extends \advanced_testcase {
     }
 
     /**
-     * Whoever gets a permission hears about it, once, in their language, with the way to the panel.
+     * Giving a permission tells nobody; the notice goes when whoever gives it says so, from them, in the person's language,
+     * with the way to the panel.
      */
-    public function test_told_of_a_permission(): void {
+    public function test_told_of_a_permission_only_when_asked(): void {
         $this->resetAfterTest();
         $group = $this->group('Club de baloncesto');
         $user = (int) $this->getDataGenerator()->create_user(['firstname' => 'Ana', 'lastname' => 'Alonso'])->id;
         $sink = $this->redirectMessages();
         access::set_editors($group, [$user]);
-        access::set_editors($group, [$user]);
         access::set_site_role(access::EVERYWHERE, $user, true);
-        access::set_site_role(access::EVERYWHERE, $user, true);
+        access::set_site_role(access::MANAGER, $user, true);
+        $this->assertCount(0, $sink->get_messages());
+        $giver = $this->getDataGenerator()->create_user(['firstname' => 'Luis', 'lastname' => 'Medina']);
+        $this->setUser($giver);
+        $this->assertTrue(access::tell($user, 'group', $group));
+        $this->assertTrue(access::tell($user, 'everywhere'));
         $messages = $sink->get_messages();
         $this->assertCount(2, $messages);
         $this->assertStringContainsString('Club de baloncesto', $messages[0]->subject);
         $this->assertStringContainsString('local/oksigeniahechauka/index.php', $messages[0]->fullmessage);
         $this->assertSame('permission', $messages[1]->eventtype);
+        $this->assertEquals($giver->id, $messages[0]->useridfrom);
     }
 
     /**

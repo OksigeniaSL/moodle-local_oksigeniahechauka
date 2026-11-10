@@ -164,7 +164,8 @@ class groupspage {
             'admin' => has_capability('moodle/site:config', \context_system::instance()) ?
                 (new \moodle_url('/admin/settings.php', ['section' => 'local_oksigeniahechauka_settings']))->out(false) : '',
             'icons' => ['qr' => icons::svg('qr'), 'x' => icons::svg('x'), 'plus' => icons::svg('plus'), 'pin' => icons::svg('pin'),
-                'search' => icons::svg('search'), 'sliders' => icons::svg('sliders'), 'copy' => icons::svg('copy')],
+                'search' => icons::svg('search'), 'sliders' => icons::svg('sliders'), 'copy' => icons::svg('copy'),
+                'mail' => icons::svg('mail')],
             'strings' => json_encode(
                 ['already' => get_string('groups_already', $c),
                     'none' => get_string(people::by_email() ? 'groups_nobody_email' : 'groups_nobody', $c),
@@ -187,6 +188,7 @@ class groupspage {
         return [
             'userid' => (int) $user->id,
             'name' => fullname($user),
+            'telllabel' => get_string('groups_tell', 'local_oksigeniahechauka', fullname($user)),
             'initials' => \core_text::strtoupper(\core_text::substr($words[0] ?? '', 0, 1) .
                 \core_text::substr(end($words) ?: '', 0, 1)),
             'detail' => $note !== '' ? $note : (string) ($user->department ?? ''),
@@ -247,6 +249,7 @@ class groupspage {
                 if ($exists && $DB->record_exists('user', ['id' => $user, 'deleted' => 0])) {
                     $now = array_map('intval', array_keys(access::editors($group)));
                     access::set_editors($group, array_merge($now, [$user]));
+                    return self::given($user);
                 }
                 return null;
             case 'removeeditor':
@@ -266,11 +269,45 @@ class groupspage {
                 }
                 $user = optional_param('user', 0, PARAM_INT);
                 if ($DB->record_exists('user', ['id' => $user, 'deleted' => 0]) && !isguestuser($user)) {
-                    access::set_site_role($manager ? access::MANAGER : access::EVERYWHERE, $user, strpos($action, 'add') === 0);
+                    $give = strpos($action, 'add') === 0;
+                    access::set_site_role($manager ? access::MANAGER : access::EVERYWHERE, $user, $give);
+                    return $give ? self::given($user) : null;
+                }
+                return null;
+            case 'telleditor':
+            case 'telleverywhere':
+            case 'tellmanager':
+                // The notice of a permission goes only when whoever gives it says so, and only to someone who has it.
+                $user = optional_param('user', 0, PARAM_INT);
+                $system = \context_system::instance();
+                if ($action === 'telleditor') {
+                    $has = $exists && array_key_exists($user, access::editors($group));
+                    $what = 'group';
+                } else {
+                    $manager = $action === 'tellmanager';
+                    $has = $DB->record_exists('user', ['id' => $user, 'deleted' => 0]) && has_capability(
+                        'local/oksigeniahechauka:' . ($manager ? 'managescreens' : 'publishall'),
+                        $system,
+                        $user
+                    );
+                    $what = $manager ? 'manager' : 'everywhere';
+                }
+                if ($has && access::tell($user, $what, $action === 'telleditor' ? $group : 0)) {
+                    return get_string('groups_told', $c, fullname(\core_user::get_user($user)));
                 }
                 return null;
         }
         return null;
+    }
+
+    /**
+     * What is said once a permission is given: that nobody has been told, and how to tell them.
+     *
+     * @param int $userid
+     * @return string
+     */
+    protected static function given(int $userid): string {
+        return get_string('groups_given', self::C, fullname(\core_user::get_user($userid)));
     }
 
     /**

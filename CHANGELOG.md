@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.17.2
+
+- **Giving a permission tells nobody.** Until now, whoever was given a permission on the screens got a notice by email and in
+  Moodle at once, before the centre had decided to tell them. Now «Screens and groups» says that the person has not been
+  told, and an envelope beside each name sends the notice when whoever gives it wants: from them, not from the site's
+  no-reply address, with the panel and the guide. Only someone who has that permission can be told of it.
+
 ## 0.17.1
 
 - **No «and 2 more» on a screen**: nobody can ask it which. The menu's «Also» says every other menu by name or, when they do

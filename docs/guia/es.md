@@ -261,6 +261,9 @@ buscador de personas:
 - **Publican en un grupo**: solo en las pantallas de ese grupo, y solo ven esas pantallas y lo que publican ellos. Por
   ejemplo, quien lleva un club, un departamento o una sede.
 
+Dar un permiso no avisa a nadie. Cuando quieras que esa persona lo sepa, el sobre junto a su nombre le manda un aviso de
+tu parte, con el panel y esta guía.
+
 </div>
 
 <div class="junto-imagen ficha" markdown="1">

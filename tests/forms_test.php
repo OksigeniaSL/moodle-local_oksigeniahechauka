@@ -106,6 +106,39 @@ final class forms_test extends \advanced_testcase {
     }
 
     /**
+     * In «Screens and groups», giving a permission tells nobody and says so; the envelope beside the person tells them,
+     * and only someone who has that permission.
+     */
+    public function test_permission_told_from_the_panel(): void {
+        global $DB, $OUTPUT;
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        $now = time();
+        $group = (int) $DB->insert_record('local_oksigeniahechauka_group', (object) ['name' => 'Infantil', 'sortorder' => 0,
+            'timecreated' => $now, 'timemodified' => $now]);
+        $user = $this->getDataGenerator()->create_user(['firstname' => 'Ana', 'lastname' => 'Alonso']);
+        $other = $this->getDataGenerator()->create_user();
+        $sink = $this->redirectMessages();
+        $_POST = ['user' => $user->id, 'group' => 0];
+        $this->assertStringContainsString('Ana Alonso', groupspage::act('addeverywhere', $now));
+        $_POST['group'] = $group;
+        $this->assertStringContainsString('Ana Alonso', groupspage::act('addeditor', $now));
+        $this->assertCount(0, $sink->get_messages());
+        $html = $OUTPUT->render_from_template('local_oksigeniahechauka/groups', groupspage::context($now));
+        $this->assertStringContainsString('data-tell-user="' . $user->id . '"', $html);
+        $this->assertNotNull(groupspage::act('telleditor', $now));
+        $_POST['group'] = 0;
+        $this->assertNotNull(groupspage::act('telleverywhere', $now));
+        $_POST['user'] = $other->id;
+        $this->assertNull(groupspage::act('telleverywhere', $now));
+        $this->assertNull(groupspage::act('tellmanager', $now));
+        $_POST['group'] = $group;
+        $this->assertNull(groupspage::act('telleditor', $now));
+        $this->assertCount(2, $sink->get_messages());
+        $_POST = [];
+    }
+
+    /**
      * A file that uses the file constants of the repositories, or Moodle's curl class, loads their library itself: a
      * page or a task does not always have them, and the tests always do, so running the code here would not catch it
      * (it broke «Picture or video» on a real site, and the weather task).

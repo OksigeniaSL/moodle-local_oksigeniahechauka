@@ -89,6 +89,7 @@ class icons {
             '<circle cx="10.5" cy="7.4" r="1.2" fill="currentColor"/>' .
             '<circle cx="15" cy="7.6" r="1.2" fill="currentColor"/>',
         'menu' => '<path d="M4 7h16M4 12h16M4 17h16"/>',
+        'mail' => '<rect x="3" y="5.5" width="18" height="13" rx="2"/><path d="M3.8 7.2l8.2 6 8.2-6"/>',
         'msg' => '<path d="M4.5 5h15a1.5 1.5 0 0 1 1.5 1.5v9a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17h-1A1.5 1.5' .
             ' 0 0 1 3 15.5v-9A1.5 1.5 0 0 1 4.5 5z"/>',
         'grip' => '<circle cx="9" cy="6.5" r="1.3" fill="currentColor"/>' .
