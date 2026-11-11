@@ -307,5 +307,13 @@ function xmldb_local_oksigeniahechauka_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026110806, 'local', 'oksigeniahechauka');
     }
 
+    if ($oldversion < 2026111100) {
+        // Someone of the list linked to another person with the same surnames the other way round: unlinked, and the list
+        // looks again for the right account.
+        \local_oksigeniahechauka\local\birthdays::unlink_misread();
+        \local_oksigeniahechauka\local\birthdays::relink();
+        upgrade_plugin_savepoint(true, 2026111100, 'local', 'oksigeniahechauka');
+    }
+
     return true;
 }

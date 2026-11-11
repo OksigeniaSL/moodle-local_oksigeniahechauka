@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.17.3
+
+- **Someone of the birthday list no longer falls on another person with the same surnames the other way round.** Linking by
+  the words of a name now asks for them in their order, with the first surname written as the account's first surname:
+  «Adrián García» is «Adrián» «García Rodríguez», never «Adrián» «Rodríguez García», often a former pupil whose picture went
+  on the screens on someone else's day. The update takes away the links made that way and looks again for the right account.
+
 ## 0.17.2
 
 - **Giving a permission tells nobody.** Until now, whoever was given a permission on the screens got a notice by email and in

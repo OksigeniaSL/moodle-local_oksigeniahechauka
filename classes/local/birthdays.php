@@ -500,10 +500,11 @@ class birthdays {
 
     /**
      * The Moodle account of someone on the list: by ID number, else by email, else by a name only one account has (the
-     * first name and the first surname, or the whole name), else by the words of the name: every one of them in the full name
-     * of a single account whose first name starts like it («Yaiza Corujo» is «Yaiza» «Corujo Febles»). Never a guess: two
-     * accounts that fit are none. By a name, never an account already on the list with another birthday: that is someone
-     * else with a similar name (a pupil, often).
+     * first name and the first surname, or the whole name), else by the words of the name: all of them, in their order, in the
+     * full name of a single account whose first name starts like it, and the first surname written is the account's first
+     * surname («Yaiza Corujo» is «Yaiza» «Corujo Febles»; «Adrián García» is not «Adrián» «Rodríguez García», often a former
+     * pupil). Never a guess: two accounts that fit are none. By a name, never an account already on the list with another
+     * birthday: that is someone else with a similar name (a pupil, often).
      *
      * @param string $name
      * @param string $idnumber
@@ -535,7 +536,7 @@ class birthdays {
                 $index['name'][self::plain_name($user->firstname . ' ' . $user->lastname)][$id] = $id;
                 $first = self::name_words((string) $user->firstname);
                 if ($first) {
-                    $index['words'][$id] = [$first[0], self::name_words($user->firstname . ' ' . $user->lastname)];
+                    $index['words'][$id] = [$first, self::name_words((string) $user->lastname)];
                 }
             }
             $users->close();
@@ -569,8 +570,8 @@ class birthdays {
             return 0;
         }
         $found = [];
-        foreach (self::$accounts['words'] as $id => [$first, $all]) {
-            if ($first === $words[0] && !array_diff($words, $all) && $free($id)) {
+        foreach (self::$accounts['words'] as $id => [$first, $last]) {
+            if ($first[0] === $words[0] && self::words_fit($words, $first, $last) && $free($id)) {
                 $found[] = $id;
                 if (count($found) > 1) {
                     return 0;
@@ -578,6 +579,85 @@ class birthdays {
             }
         }
         return $found ? (int) $found[0] : 0;
+    }
+
+    /**
+     * Whether the words of a name on the list are those of an account: the first name first, all of them in their order,
+     * and at least one surname, the first one written being the account's first surname. «Ana López» is not «Ana» «Pérez
+     * López»: the surnames of two people are often the same two the other way round.
+     *
+     * @param string[] $words of the name on the list, as name_words() gives them
+     * @param string[] $first of the account's first name
+     * @param string[] $last of the account's surnames
+     * @return bool
+     */
+    protected static function words_fit(array $words, array $first, array $last): bool {
+        if (count($words) < 2 || !$first || !$last || $words[0] !== $first[0]) {
+            return false;
+        }
+        $all = array_merge($first, $last);
+        $at = 0;
+        $surname = false;
+        foreach ($words as $word) {
+            $found = array_search($word, array_slice($all, $at), true);
+            if ($found === false) {
+                return false;
+            }
+            $at += $found;
+            if (!$surname && $at >= count($first)) {
+                if ($at !== count($first)) {
+                    return false;
+                }
+                $surname = true;
+            }
+            $at++;
+        }
+        return $surname;
+    }
+
+    /**
+     * Takes away the links that the words of a name made before they had to be in order (until 0.17.2): someone of the list
+     * linked to another person with the same surnames the other way round, whose picture went on their day. A link that the
+     * ID number or the name itself explains stays, and so does one made by hand to another account. Each night, Cifra and
+     * the list look for their right account again.
+     *
+     * @return int how many were taken away
+     */
+    public static function unlink_misread(): int {
+        global $DB;
+        $done = 0;
+        $rows = $DB->get_records_select(self::TABLE, 'userid > 0', [], 'id', 'id, name, idnumber, userid');
+        $ids = array_unique(array_column($rows, 'userid'));
+        $users = $ids ? $DB->get_records_list('user', 'id', $ids, '', 'id, idnumber, firstname, lastname') : [];
+        foreach ($rows as $row) {
+            $user = $users[(int) $row->userid] ?? null;
+            if (!$user) {
+                continue;
+            }
+            $idnumber = trim((string) $row->idnumber);
+            $name = self::plain_name((string) $row->name);
+            $own = \core_text::strtolower(trim((string) $user->idnumber));
+            if ($idnumber !== '' && \core_text::strtolower($idnumber) === $own) {
+                continue;
+            }
+            $names = [
+                self::plain_name($user->firstname . ' ' . self::first_surname((string) $user->lastname)),
+                self::plain_name($user->firstname . ' ' . $user->lastname),
+            ];
+            if (in_array($name, $names, true)) {
+                continue;
+            }
+            $words = self::name_words((string) $row->name);
+            $first = self::name_words((string) $user->firstname);
+            $last = self::name_words((string) $user->lastname);
+            $before = count($words) >= 2 && $first && $first[0] === $words[0] && !array_diff($words, array_merge($first, $last));
+            if ($before && !self::words_fit($words, $first, $last)) {
+                $DB->set_field(self::TABLE, 'userid', null, ['id' => $row->id]);
+                $done++;
+            }
+        }
+        self::$accounts = null;
+        return $done;
     }
 
     /**

@@ -254,6 +254,37 @@ final class birthdays_test extends \advanced_testcase {
     }
 
     /**
+     * By the words of a name, in their order: the first surname written is the account's first surname, so someone of the
+     * list never falls on a person with the same surnames the other way round. The update takes such links away and keeps
+     * the rest, also one made by hand.
+     */
+    public function test_linked_by_the_words_in_their_order(): void {
+        global $DB;
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        $gen = $this->getDataGenerator();
+        $nerea = $gen->create_user(['firstname' => 'Nerea Isabel', 'lastname' => 'Mesa Luis']);
+        $former = $gen->create_user(['firstname' => 'Óscar Iván', 'lastname' => 'Pérez Trujillo']);
+        $other = $gen->create_user(['firstname' => 'Carmen', 'lastname' => 'Ramos Díaz']);
+        $link = fn(int $id) => (int) $DB->get_field(birthdays::TABLE, 'userid', ['id' => $id]);
+        $mesa = birthdays::add('Nerea Mesa', '', 4, 5);
+        $this->assertSame((int) $nerea->id, $link($mesa));
+        $oscar = birthdays::add('Óscar Trujillo', '', 6, 7);
+        $this->assertSame(0, $link($oscar));
+        $this->assertSame(0, $link(birthdays::add('Nerea Luis Mesa', '', 8, 9)));
+
+        // As the words linked before 0.17.2, and one made by hand: only the first goes.
+        $DB->set_field(birthdays::TABLE, 'userid', $former->id, ['id' => $oscar]);
+        $pilar = birthdays::add('Pilar Ramos', '', 1, 2);
+        $this->assertTrue(birthdays::link($pilar, (int) $other->id));
+        $this->assertSame(1, birthdays::unlink_misread());
+        $this->assertSame(0, $link($oscar));
+        $this->assertSame((int) $nerea->id, $link($mesa));
+        $this->assertSame((int) $other->id, $link($pilar));
+        $this->assertSame(0, birthdays::relink());
+    }
+
+    /**
      * The pupils of Cifra: who is new comes in, who was there by hand is taken over, who changed is put right, who left goes,
      * and an empty list does not empty the screens. The same person twice is shown once.
      */
