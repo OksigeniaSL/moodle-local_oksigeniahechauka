@@ -27,6 +27,13 @@ class centre {
     /** @var string */
     const C = 'local_oksigeniahechauka';
 
+    /** @var int How long the centre's sentence can be: what fits in two lines of the ticker of any horizontal screen read
+     * from 5 m, also behind glass. */
+    const PHRASE = 90;
+
+    /** @var int What fits of it in the ticker of an upright screen read from 5 m: a longer one is not said there. */
+    const PHRASE_UPRIGHT = 30;
+
     /** @var array The colours the screens use when the centre has not chosen its own. */
     const DEFAULTS = [
         'colourprimary' => '#1f5f8b',
@@ -151,6 +158,9 @@ class centre {
             'max' => categories::MAX,
             'logos' => $logos,
             'dayend' => sources::day_end(),
+            'phrase' => ['value' => self::phrase($config), 'max' => self::PHRASE, 'upright' => self::PHRASE_UPRIGHT,
+                'uprightscreens' => self::upright_far(), 'left' => get_string('centre_phrase_left', $c, '{$a}'),
+                'leftone' => get_string('centre_phrase_left_one', $c)],
             'surprises' => surprises::centre_context($config),
             'frame' => (new \moodle_url('/local/oksigeniahechauka/preview.php', ['frame' => 1, 'screen' => $first]))->out(false),
             'placename' => $place['name'] ?? '',
@@ -192,6 +202,32 @@ class centre {
     }
 
     /**
+     * The centre's own sentence (its motto), said whole in the ticker every few sentences, and as a headline from 8 m.
+     *
+     * @param \stdClass $config
+     * @return string
+     */
+    public static function phrase(\stdClass $config): string {
+        return items::plain((string) ($config->centrephrase ?? ''));
+    }
+
+    /**
+     * Whether the centre has an upright screen read from 5 m or more, where only a short sentence fits in the ticker.
+     *
+     * @return bool
+     */
+    protected static function upright_far(): bool {
+        global $DB;
+        foreach ($DB->get_records('local_oksigeniahechauka_screen', null, '', 'id, lastinfo, distance') as $screen) {
+            $display = (json_decode((string) $screen->lastinfo, true) ?: [])['display'] ?? [];
+            if ((int) ($display['height'] ?? 0) > (int) ($display['width'] ?? 0) && (int) $screen->distance >= 5) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Saves the colours and the logos sent.
      *
      * @return void
@@ -223,6 +259,11 @@ class centre {
             if (colours::valid($value)) {
                 set_config($setting, $value === $auto[$setting] ? '' : $value, $c);
             }
+        }
+        // The centre's sentence, on one line and no longer than what fits.
+        $phrase = optional_param('centrephrase', null, PARAM_TEXT);
+        if ($phrase !== null) {
+            set_config('centrephrase', \core_text::substr(trim(preg_replace('/\s+/u', ' ', $phrase)), 0, self::PHRASE), $c);
         }
         // When the day ends: from then «Today» shows tomorrow.
         $dayend = optional_param('dayend', '', PARAM_RAW_TRIMMED);

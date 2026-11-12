@@ -2993,6 +2993,48 @@ dialog.hkp-dialog > footer {
     inline-size: auto;
 }
 
+/* The sheet: where it is, each row of opening hours with its days and its two times, and the days it closes. */
+#hkp-place-box {
+    margin-top: 1rem;
+}
+
+.hkp-place-row {
+    display: grid;
+    justify-items: start;
+    gap: .5rem;
+    margin: .5rem 0 1rem;
+    padding: 0;
+    border: 0;
+}
+
+.hkp-closed {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+    margin: 0 0 .5rem;
+    padding: 0;
+    list-style: none;
+}
+
+.hkp-closed:empty {
+    display: none;
+}
+
+.hkp-closed li {
+    display: flex;
+    align-items: center;
+    gap: .25rem;
+}
+
+.hkp .hkp-closed .form-control {
+    inline-size: auto;
+}
+
+/* «Tu centro»: the centre's sentence, two lines to write it as it will be read. */
+.hkp .hkp-phrase {
+    resize: none;
+}
+
 /* The sheet: what the screen is for, three choices as small cards. */
 .hkp-uses {
     display: grid;

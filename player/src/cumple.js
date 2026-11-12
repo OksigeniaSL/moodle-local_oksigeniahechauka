@@ -70,8 +70,9 @@ export function partyOf(chosen) {
 
 let copies = 0;
 
-// The face: the photo, or the creature of their name when there is none or it does not arrive. Never an empty circle.
-function face(p, media, cls) {
+// The face: the photo, or the creature of their name when there is none or it does not arrive. Never an empty circle. Also
+// the birthday strip's (franja.js).
+export function face(p, media, cls) {
     const f = el('div', 'hk-cumple-cara' + (cls ? ' ' + cls : ''));
     const src = p.photo ? (media ? media(p.photo) : null) || p.photo.url || (typeof p.photo === 'string' ? p.photo : null) : null;
     const creature = function () {

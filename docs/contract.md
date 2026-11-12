@@ -166,6 +166,13 @@ changed, or the manifest with its `ETag` header:
 - `screen.glass`: true behind glass: everything a bit bigger, and no secondary grey in what has to be read.
 - `screen.sound`: whether its videos play with their sound (most screens are muted: behind glass, or in a room that
   would hear the same thing forty times an hour).
+- `screen.place`: optional, the place the screen is in when it has opening hours (a library, a canteen, an office):
+  `{"name": "Library", "hours": [{"days": [1, 2, 3, 4], "from": "08:00", "until": "17:00"}, {"days": [5], "from": "08:00",
+  "until": "14:00"}], "closed": ["2026-12-08"], "words": {"open": "…", "closed": "…"}}`. `days` are ISO (1 Monday … 7
+  Sunday); `until` may be `24:00`, or earlier than `from` to go past midnight; ranges that touch are one. `closed`: the days
+  it closes, from today on. `words`, optional: the two words of its state when they agree with the place's name (Spanish
+  «Abierta» for «Biblioteca»); without them, the labels. The player works out from its own clock whether it is open and
+  until when, or when it opens, and says it beside the clock and on a card of its own.
 - `screen.timezone`: the time zone the screen should be in. The player reports its own offset in the heartbeat, so
   the panel can warn when a device clock or zone is wrong.
 - `template`: `zones` (the compositions of each slide, with «Today») or `full` (the pictures alone, never «Today»).
@@ -205,7 +212,9 @@ changed, or the manifest with its `ETag` header:
   main colour, the second colour written as text). It goes in a sheet after the skins': a variable on the page would hold on both themes.
 - `theme.vars` may also carry `--hk-letra-titulos` and `--hk-letra-texto` (a letter of the closed list, `player/letras.css`, `letras.json`) and
   `--hk-esquina` (how round the corners go, a multiple of each piece's own: `0`, `.5` or `1`).
-- `centre`: `{"name": "…"}`, what stands in for the logo while there is none. `screen.name` is for the panel, and the screen
+- `centre`: `{"name": "…", "phrase": "…"}`. `name` stands in for the logo while there is none. `phrase`, optional: the
+  centre's own sentence (its motto), said whole in the ticker every few sentences with the centre's logo, and as a headline
+  from 8 m; never cut, so a screen where it does not fit does not say it in the ticker. `screen.name` is for the panel, and the screen
   does not show it.
 - `power`: when the screen should be on. Outside these hours the player shows black and a device agent may turn the
   display off. Without `power`, always on.

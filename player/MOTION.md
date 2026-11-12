@@ -21,8 +21,8 @@ One language of movement for every slide of the player (art direction, 8 Novembe
 | 0.3 s | The new one appears, with its parts still hidden: an instant of empty stage between the two, felt as a breath. |
 | 0.3 – 2 s | Its parts come in one after the other (below). |
 
-The header (logo, weather, clock) and the ticker do not pass: they are the frame and stay. The ticker's sentence changes
-with the slide, in the same movement. The full screens (full photo, showcase, idle), the agenda, the wall, the photos in a
+The header (logo, weather, clock), the birthday strip and the ticker do not pass: they are the frame and stay. The ticker's
+sentence changes with the slide, in the same movement. The full screens (full photo, showcase, idle), the agenda, the wall, the photos in a
 third and the birthdays keep the pass they had and their own movement.
 
 ## How the parts come in
@@ -58,9 +58,13 @@ one before; the lines of a list, one **line** after.
 | The bar of the time left | under the heading of what is read for long (what falls due, tables), and on the third's page dot, a bar that fills in the slide's time | whoever is reading knows how long is left |
 | The sign pulses | the sign of what is important grows 6 % and back, every 3.2 s | it is the only thing that must call |
 | The photo settles | the one of the entrance, through its 12 s | a still photo looks like a capture; this one breathes |
+| The column of the two zones turns | every 7 to 9 s (`src/zonas.js`): a picture dissolves over a picture in 1.2 s; between texts (the weather, the coming days) the old one goes first, in 0.45 s, and then the new one; the title under it never crosses another. Each picture moves slowly while it is on: from 112 % and a little to one side, to rest, in 11 s | a column of its own beside the wide zone, as the useful screens of other makers have, but one thing at a time and never a text over a text |
+| The birthday strip turns | the next person every 8 s (`src/franja.js`): the old one rises a little and fades (0.45 s), the new one comes from a little below (0.8 s); never in the same moment as a slide comes in or the column changes (it waits 2.5 s). With one person it stays as it came | whoever has their birthday is on the screen all day, without calling |
+| A person's moment | once, as each person comes (and the first when the strip appears): their portrait comes in with a small bounce (scale 0.85 → 1.05 → 1 in 0.45 s, the bounce curve; in sober 0.9 → 1, no overshoot) and the garland's swags sway once (1 s, a turn of 1.6° each way and back, each swag a little after the one before; 0.7° in sober, 2.6° in playful), then all is still until the next person, 8 s later. Each swag is an element of its own, so it moves without painting the strip again | a party, not one more band (Gaudí's review, 12 November 2026); once, so it is never read as a blink |
 | A paper plane crosses | on the channel's slide, once its entrance is over: 11 s from the left edge across the part of the block where nothing is read, leaving dots of the accent that fade; again every 20 s (`src/canal.js`). With no room for it (from 5 m on a wide screen), the sheen instead | the channel's message flies; it never crosses the words or the card with the QR |
 
-Nothing else. No confetti outside the birthdays, nothing that crosses a text, nothing that repeats faster than every 2 s.
+Nothing else. No confetti outside the birthdays (the strip has none either), nothing that crosses a text, nothing that repeats
+faster than every 2 s.
 
 ## Times and curves
 
@@ -86,7 +90,9 @@ Nothing else. No confetti outside the birthdays, nothing that crosses a text, no
 | Pulse of the sign | 2.5 % | 6 % | 6 % |
 
 **A still screen** (the screen's card, or the system's «reduced motion»: `keepsStill()`): the same order, closer, **with
-fades only** of 0.5 s. No travel, no turns, no flaps, no sheen, no pulses, no bar; the clock with its colon still.
+fades only** of 0.5 s. No travel, no turns, no flaps, no sheen, no pulses, no bar; the clock with its colon still. The column
+of the two zones and the birthday strip still change, by fades; the pictures of the column do not move, the portraits of the
+strip do not bounce and its garland does not sway.
 
 **Distance:** the same language at 3, 5 and 8 m, in rem, so it grows with the letter. At 8 m there are fewer parts (no
 third) and the entrance shows more; at 8 m the headline also comes, by its lines.

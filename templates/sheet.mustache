@@ -76,6 +76,18 @@
                     <div class="form-switch form-check"><input class="form-check-input" type="checkbox" role="switch" id="hkp-glass" name="glass" value="1"{{#glass}} checked{{/glass}}><div><label class="form-check-label" for="hkp-glass"><b>{{#str}}sheet_glass, local_oksigeniahechauka{{/str}}</b></label><p class="hkp-hint">{{#str}}sheet_glass_help, local_oksigeniahechauka{{/str}}</p></div></div>
                     <p class="hkp-hint">{{#str}}sheet_distance_help, local_oksigeniahechauka{{/str}}</p>
                 </section>
+                <section class="hkp-card"><h2>{{#str}}sheet_place, local_oksigeniahechauka{{/str}}</h2>
+                    <p class="hkp-hint">{{#str}}sheet_place_help, local_oksigeniahechauka{{/str}}</p>
+                    <div class="hkp-field"><label class="form-label" for="hkp-placename">{{#str}}sheet_place_name, local_oksigeniahechauka{{/str}}</label><input class="form-control" id="hkp-placename" name="placename" maxlength="{{place.maxlength}}" value="{{place.name}}" placeholder="{{#str}}sheet_place_name_placeholder, local_oksigeniahechauka{{/str}}" autocomplete="off"></div>
+                    <div id="hkp-place-box"{{^place.on}} hidden{{/place.on}}>
+                        {{#place.asks}}<div class="hkp-field"><span class="hkp-label" id="hkp-pw-l">{{#str}}sheet_place_words, local_oksigeniahechauka{{/str}}</span><div class="hkp-chips" role="radiogroup" aria-labelledby="hkp-pw-l"><label class="hkp-chip is-small"><input type="radio" name="placewords" value="f"{{#place.feminine}} checked{{/place.feminine}}>{{#str}}sheet_place_words_f, local_oksigeniahechauka{{/str}}</label><label class="hkp-chip is-small"><input type="radio" name="placewords" value="m"{{#place.masculine}} checked{{/place.masculine}}>{{#str}}sheet_place_words_m, local_oksigeniahechauka{{/str}}</label></div></div>{{/place.asks}}
+                        <div class="hkp-field"><span class="hkp-label">{{#str}}sheet_place_hours, local_oksigeniahechauka{{/str}}</span>
+                        {{#place.rows}}<fieldset class="hkp-place-row" data-place-row="{{i}}"{{#hidden}} hidden{{/hidden}}><legend class="visually-hidden sr-only">{{#str}}sheet_place_row, local_oksigeniahechauka, {{n}}{{/str}}</legend><div class="hkp-days" role="group" aria-label="{{#str}}compose_days, local_oksigeniahechauka{{/str}}">{{#days}}<button type="button" aria-pressed="{{#on}}true{{/on}}{{^on}}false{{/on}}" data-place-day="{{n}}" aria-label="{{name}}">{{letter}}</button>{{/days}}</div><div data-place-inputs="{{i}}">{{#days}}{{#on}}<input type="hidden" name="placedays{{i}}[]" value="{{n}}">{{/on}}{{/days}}</div><div class="hkp-time"><label for="hkp-plf{{i}}">{{#str}}compose_hour_from, local_oksigeniahechauka{{/str}}</label><input class="form-control" type="time" id="hkp-plf{{i}}" name="placefrom[{{i}}]" value="{{from}}"><label for="hkp-plu{{i}}">{{#str}}compose_hour_to, local_oksigeniahechauka{{/str}}</label><input class="form-control" type="time" id="hkp-plu{{i}}" name="placeuntil[{{i}}]" value="{{until}}">{{#removable}}<button type="button" class="btn btn-sm btn-outline-secondary btn-icon" data-place-remove aria-label="{{remove}}" title="{{remove}}">{{{place.xicon}}}</button>{{/removable}}</div></fieldset>{{/place.rows}}
+                        <button type="button" class="btn btn-sm btn-outline-secondary" id="hkp-place-more">+ {{#str}}sheet_place_more, local_oksigeniahechauka{{/str}}</button></div>
+                        <div class="hkp-field"><span class="hkp-label" id="hkp-pc-l">{{#str}}sheet_place_closed, local_oksigeniahechauka{{/str}}</span><p class="hkp-hint">{{#str}}sheet_place_closed_help, local_oksigeniahechauka{{/str}}</p><ul class="hkp-closed" id="hkp-closed" aria-labelledby="hkp-pc-l">{{#place.closed}}<li><input class="form-control" type="date" name="placeclosed[]" value="{{day}}" aria-label="{{#str}}sheet_place_closed_day, local_oksigeniahechauka{{/str}}"><button type="button" class="btn btn-sm btn-outline-secondary btn-icon" data-closed-remove aria-label="{{#str}}sheet_place_closed_remove, local_oksigeniahechauka{{/str}}" title="{{#str}}sheet_place_closed_remove, local_oksigeniahechauka{{/str}}">{{{place.xicon}}}</button></li>{{/place.closed}}</ul><template id="hkp-closed-new"><li><input class="form-control" type="date" name="placeclosed[]" value="" aria-label="{{#str}}sheet_place_closed_day, local_oksigeniahechauka{{/str}}"><button type="button" class="btn btn-sm btn-outline-secondary btn-icon" data-closed-remove aria-label="{{#str}}sheet_place_closed_remove, local_oksigeniahechauka{{/str}}" title="{{#str}}sheet_place_closed_remove, local_oksigeniahechauka{{/str}}">{{{place.xicon}}}</button></li></template><button type="button" class="btn btn-sm btn-outline-secondary" id="hkp-closed-add">+ {{#str}}sheet_place_closed_add, local_oksigeniahechauka{{/str}}</button></div>
+                        {{#errors.place}}<p class="hkp-hint"><b class="text-danger">{{errors.place}}</b></p>{{/errors.place}}
+                    </div>
+                </section>
                 <section class="hkp-card"><h2>{{#str}}power, local_oksigeniahechauka{{/str}}</h2>
                     <div class="form-switch form-check"><input class="form-check-input" type="checkbox" role="switch" id="hkp-always" name="always" value="1"{{#always}} checked{{/always}}><label class="form-check-label" for="hkp-always"><b>{{#str}}sheet_always, local_oksigeniahechauka{{/str}}</b></label></div>
                     <div id="hkp-power-hours"{{#always}} hidden{{/always}}>
@@ -198,6 +210,88 @@
     });
     page.querySelector('#hkp-plan').addEventListener('change', function() {
         page.querySelector('#hkp-plan-box').hidden = !this.checked;
+    });
+    // Where it is: the rest of the section only with a name, the days of each row of hours in hidden inputs (as the
+    // power's), up to three rows, and the days it closes.
+    var place = page.querySelector('#hkp-placename');
+    var placebox = page.querySelector('#hkp-place-box');
+    var guessed = !place.value;
+    place.addEventListener('input', function() {
+        placebox.hidden = !place.value.trim();
+        var feminine = page.querySelector('input[name="placewords"][value="f"]');
+        if (guessed && feminine) {
+            var first = place.value.trim().split(/\s+/)[0].toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+            var f = /(a|cion|sion|dad|tad)$/.test(first);
+            feminine.checked = f;
+            page.querySelector('input[name="placewords"][value="m"]').checked = !f;
+        }
+    });
+    page.querySelectorAll('input[name="placewords"]').forEach(function(input) {
+        input.addEventListener('change', function() {
+            guessed = false;
+        });
+    });
+    var placeinputs = function(row) {
+        var box = row.querySelector('[data-place-inputs]');
+        var i = box.getAttribute('data-place-inputs');
+        box.textContent = '';
+        row.querySelectorAll('[data-place-day][aria-pressed="true"]').forEach(function(x) {
+            var input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'placedays' + i + '[]';
+            input.value = x.getAttribute('data-place-day');
+            box.appendChild(input);
+        });
+    };
+    var more = page.querySelector('#hkp-place-more');
+    var showmore = function() {
+        more.hidden = !page.querySelector('[data-place-row][hidden]');
+    };
+    page.querySelectorAll('[data-place-row]').forEach(function(row) {
+        row.querySelectorAll('[data-place-day]').forEach(function(b) {
+            b.addEventListener('click', function() {
+                b.setAttribute('aria-pressed', b.getAttribute('aria-pressed') === 'true' ? 'false' : 'true');
+                placeinputs(row);
+                changed();
+            });
+        });
+        var remove = row.querySelector('[data-place-remove]');
+        if (remove) {
+            remove.addEventListener('click', function() {
+                row.querySelectorAll('[data-place-day]').forEach(function(b) {
+                    b.setAttribute('aria-pressed', 'false');
+                });
+                placeinputs(row);
+                row.querySelectorAll('input[type="time"]').forEach(function(input) {
+                    input.value = '';
+                });
+                row.hidden = true;
+                showmore();
+                more.focus();
+                changed();
+            });
+        }
+    });
+    more.addEventListener('click', function() {
+        var row = page.querySelector('[data-place-row][hidden]');
+        if (row) {
+            row.hidden = false;
+            row.querySelector('[data-place-day]').focus();
+        }
+        showmore();
+    });
+    showmore();
+    var closed = page.querySelector('#hkp-closed');
+    closed.addEventListener('click', function(e) {
+        var button = e.target.closest('[data-closed-remove]');
+        if (button) {
+            button.closest('li').remove();
+            changed();
+        }
+    });
+    page.querySelector('#hkp-closed-add').addEventListener('click', function() {
+        closed.appendChild(page.querySelector('#hkp-closed-new').content.cloneNode(true));
+        closed.lastElementChild.querySelector('input').focus();
     });
     form.addEventListener('input', changed);
     form.addEventListener('change', changed);

@@ -1,6 +1,6 @@
 {
   "contract": 1,
-  "etag": "demo-4",
+  "etag": "demo-5",
   "generated": 1793577600,
   "horizon": "2026-11-15",
   "dayend": "16:00",
@@ -13,7 +13,20 @@
     "timezone": "Atlantic/Canary",
     "lang": "es",
     "distance": 3,
-    "glass": false
+    "glass": false,
+    "place": {
+      "name": "Biblioteca",
+      "hours": [
+        {"days": [1, 2, 3, 4], "from": "08:00", "until": "17:00"},
+        {"days": [5], "from": "08:00", "until": "14:00"}
+      ],
+      "closed": ["2026-11-04"],
+      "words": {"open": "Abierta", "closed": "Cerrada"}
+    }
+  },
+  "centre": {
+    "name": "Centro de ejemplo",
+    "phrase": "Aprender juntos, crecer juntos"
   },
   "template": "zones",
   "theme": {

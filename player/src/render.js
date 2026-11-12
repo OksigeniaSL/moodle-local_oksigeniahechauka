@@ -19,6 +19,11 @@ import {buildCarousel, buildWall, buildWallBand, startCarousel, startWall, wallC
 import {buildWeek, fitWeek} from './weekview.js';
 import {motion} from './movimiento.js';
 import {noLoneShortWord} from './retoques.js';
+import {buildPlaceCard, buildZones, fitZones, startZones} from './zonas.js';
+import {hasPlace, placeLine, placeState, placeWords} from './sitio.js';
+import {buildStrip, fitStrip as fitBirthdayStrip, startStrip, stripKey} from './franja.js';
+import {centreAfter, centreDue, centreState} from './lema.js';
+import {wallOf} from './rules.js';
 
 // The share of a wide zone a picture must leave free to have its words on a block beside it.
 const BESIDE_LEAST = 0.3;
@@ -27,7 +32,13 @@ const CAPTION_MS = 2800;
 
 /** The compositions that are made anew each time, never only their pictures changed. */
 const NEW_EACH = {'solo-hoy': true, semana: true, titular: true, agenda: true, muro: true, 'fotos-tercio': true, cumple: true, biblioteca: true, canal: true, plazos: true,
-    tabla: true};
+    tabla: true, zonas: true};
+
+/** The width over the height of each slot shape, to measure a portrait slot when the body is lower than the sheet expects. */
+const SHAPES = {'9x16': 9 / 16, '2x3': 2 / 3, '3x4': 3 / 4, '1x1': 1};
+
+/** The languages that write a weekday in lower case in the middle of a sentence: the rest keep it as the site writes it. */
+const CAPITAL_DAYS = {en: true, de: true};
 
 /** The compositions over the whole screen, in their own layer. */
 const FULL = {'foto-completa': true, 'escaparate': true, 'reposo': true};
@@ -113,10 +124,16 @@ export class Screen {
         this.bandLine = el('p', 'hk-cinta-aviso');
         this.ticker.insertBefore(this.bandLabel, this.tickerTrack);
         this.ticker.appendChild(this.bandLine);
+        // The centre's own sentence takes the place of the label with the centre's logo, or its initial (showTicker).
+        this.tickerSeal = el('span', 'hk-cinta-sello');
+        this.ticker.insertBefore(this.tickerSeal, this.tickerTrack);
+        // Whose birthday it is today, above the ticker all day (showBirthdayStrip).
+        this.birthdayStrip = el('section', 'hk-cumple-franja');
         this.full = el('div', 'hk-completa hk-sobre-foto');
         this.credit = el('p', 'hk-credito-tiempo');
         this.sample = el('span', 'hk-muestra', this.s.sample || 'Sample data');
         this.frame.appendChild(this.stage);
+        this.frame.appendChild(this.birthdayStrip);
         this.frame.appendChild(this.ticker);
         this.frame.appendChild(this.full);
         this.dark = el('div', 'hk-apagada');
@@ -135,6 +152,13 @@ export class Screen {
         logo.addEventListener('load', () => this.fitHeaders());
         logoDark.addEventListener('load', () => this.fitHeaders());
         const place = el('p', 'hk-lugar');
+        // The place of the screen, open or closed now (paintPlace): beside the clock, the first to go when there is no room.
+        const sitio = el('div', 'hk-sitio');
+        sitio.appendChild(el('i', 'hk-sitio-punto'));
+        const sitioWords = el('p');
+        sitioWords.appendChild(el('b'));
+        sitioWords.appendChild(el('span'));
+        sitio.appendChild(sitioWords);
         const weather = el('div', 'hk-tiempo');
         const hour = el('div', 'hk-hora');
         const date = el('p', 'hk-fecha');
@@ -149,9 +173,10 @@ export class Screen {
         h.appendChild(logo);
         h.appendChild(logoDark);
         h.appendChild(place);
+        h.appendChild(sitio);
         h.appendChild(weather);
         h.appendChild(hour);
-        const parts = {node: h, logo, logoDark, place, weather, day, rest, clock};
+        const parts = {node: h, logo, logoDark, place, sitio, weather, day, rest, clock};
         this.headers.push(parts);
         if (this.identity) {
             this.paintHeader(parts);
@@ -169,6 +194,11 @@ export class Screen {
     tickerTop() {
         if (FULL[this.frame.getAttribute('data-composicion')]) {
             return null;
+        }
+        // Over the birthday strip when it is there: it is the edge that is in sight.
+        const strip = this.birthdayStrip.getBoundingClientRect();
+        if (strip.height > 0 && strip.top < window.innerHeight) {
+            return strip.top;
         }
         const box = this.ticker.getBoundingClientRect();
         return box.height > 0 && box.top < window.innerHeight ? box.top : null;
@@ -205,6 +235,10 @@ export class Screen {
         }
         // The name of the screen is for the panel: whoever passes knows where they are. The centre's stands in for a logo.
         this.identity = {name: (manifest.centre && manifest.centre.name) || ''};
+        // Where the screen is (a library, a canteen): open or closed now, in the header and in the two zones.
+        this.place = hasPlace(scr.place) ? scr.place : null;
+        this.placeWords = placeWords(this.labels, this.s, this.place);
+        this.placeKey = '';
         this.applyTheme(manifest.theme || {});
         this.setWeather(manifest.weather || null);
         this.todayKey = '';
@@ -243,6 +277,7 @@ export class Screen {
         this.identity.dark = this.media.url(theme.logo_dark) || this.identity.light;
         this.frame.classList.toggle('hk-sin-logo', !this.identity.light);
         this.headers.forEach((p) => this.paintHeader(p));
+        this.paintSeal();
         this.fonts(theme.fonts || []);
         this.loadLetters();
     }
@@ -317,7 +352,52 @@ export class Screen {
         this.paintWeather(p);
         if (this.lastDate) {
             this.paintClock(p, this.lastDate);
+            this.paintPlace(p, this.lastDate);
         }
+    }
+
+    /** The names the place's words need: the weekdays, how they go in a sentence, a date. */
+    placeNames() {
+        const s = this.s;
+        const lang = (document.documentElement.lang || 'es').slice(0, 2);
+        return {days: s.days || [], lower: !CAPITAL_DAYS[lang], date: function (ymd) {
+            const d = new Date(ymd + 'T12:00:00Z');
+            const month = (s.months || [])[d.getUTCMonth()] || '';
+            return (s.date_format || '{d} {m}').replace('{d}', d.getUTCDate()).replace('{m}', month);
+        }};
+    }
+
+    /**
+     * The place of the screen in its header: a lit dot and «Biblioteca · Abierta» over «hasta las 17:00», or a hollow one and
+     * when it opens; from 5 m without the name. A chip of two lines, as narrow as it can be: the clock needs the room. Nothing
+     * without a place.
+     *
+     * @param {object} p a header's parts
+     * @param {Date} d the screen's clock
+     * @returns {boolean} whether what it says changed
+     */
+    paintPlace(p, d) {
+        if (!p.sitio) {
+            return false;
+        }
+        const line = this.place ? placeLine(placeState(this.place, wallOf(d)), this.placeWords, this.placeNames()) : null;
+        const key = line ? (this.place.name || '') + '|' + line.state + '|' + line.more : '';
+        if (p.sitioKey === key) {
+            return false;
+        }
+        p.sitioKey = key;
+        p.node.classList.toggle('hk-con-sitio', !!line);
+        if (!line) {
+            return true;
+        }
+        p.sitio.setAttribute('data-estado', line.state === this.placeWords.place_open ? 'abierto' : 'cerrado');
+        const words = p.sitio.querySelector('p');
+        // From 5 m the chip says only the state, so that it stays beside the clock (the coordinator, 12 November 2026).
+        const named = this.place.name && this.distance !== 5;
+        words.firstChild.textContent = named ? this.place.name + ' · ' + line.state : line.state;
+        words.lastChild.textContent = line.more;
+        words.lastChild.style.display = line.more ? '' : 'none';
+        return true;
     }
 
     // The client's fonts, from the media cache, so they work without a network too.
@@ -410,6 +490,13 @@ export class Screen {
         const first = !this.lastDate;
         this.lastDate = d;
         this.headers.forEach((p) => this.paintClock(p, d));
+        let placeMoved = false;
+        this.headers.forEach((p) => {
+            placeMoved = this.paintPlace(p, d) || placeMoved;
+        });
+        if (placeMoved && !first) {
+            this.fitHeaders();
+        }
         if (first) {
             // The headers were measured with no clock in them, and the body with what they left it.
             this.fitHeaders();
@@ -446,11 +533,15 @@ export class Screen {
 
     /**
      * The clock is never cut. It depends on the centre's letter, on the screen's and on the day («Miércoles 30 de
-     * septiembre»), so it is measured: when the header does not fit, it gives way by steps: the date in two lines, the
-     * clock and the degrees a bit smaller, and at last the weather leaves the header.
+     * septiembre»), so it is measured: when the header does not fit, it gives way by steps: the place's chip leaves (the
+     * weather's highest, lowest and rain make room for it first), the date in two lines, the clock and the degrees a bit
+     * smaller, and at last the weather leaves the header.
      */
     fitHeaders() {
-        const steps = ['hk-fecha-larga', 'hk-cab-justa', 'hk-cab-sin-tiempo', 'hk-cab-sin-nombre'];
+        // The place's chip is the first to go: the clock, the date and the weather are what a header is for. Before it goes, the
+        // weather keeps only the degrees of now to leave it room (only while the chip is there).
+        const steps = ['hk-cab-tiempo-justo', 'hk-cab-sin-sitio', 'hk-fecha-larga', 'hk-cab-justa', 'hk-cab-sin-tiempo',
+            'hk-cab-sin-nombre'];
         this.headers.forEach(function (p) {
             steps.forEach(function (c) {
                 p.node.classList.remove(c);
@@ -471,9 +562,18 @@ export class Screen {
 
     // --- The slides -------------------------------------------------------------------------------------------------
 
-    /** A picture or a video with its caption. A video shows its caption over the still, then plays clean. */
-    slide(item) {
+    /**
+     * A picture or a video with its caption. A video shows its caption over the still, then plays clean.
+     *
+     * @param {object} item
+     * @param {function} [failed] what to do when its file does not play (by default, the player's mediaFailed)
+     */
+    slide(item, failed) {
         const d = el('div', 'hk-diapo');
+        const self0 = this;
+        const fail = failed || function () {
+            self0.hooks.mediaFailed(item);
+        };
         d.hkItem = item;
         const contain = item.fit === 'contain' || item.fit === 'blur';
         const src = this.media.url(item.media);
@@ -508,18 +608,13 @@ export class Screen {
             v.addEventListener('ended', function () {
                 self.hooks.videoEnded(item);
             });
-            v.addEventListener('error', function () {
-                self.hooks.mediaFailed(item);
-            });
+            v.addEventListener('error', fail);
             d.appendChild(v);
             d.hkVideo = v;
         } else {
             const img = el('img');
             img.alt = '';
-            const self = this;
-            img.onerror = function () {
-                self.hooks.mediaFailed(item);
-            };
+            img.onerror = fail;
             img.src = src;
             img.style.objectFit = contain ? 'contain' : 'cover';
             if (!contain && item.focus && item.focus.length === 2) {
@@ -587,14 +682,14 @@ export class Screen {
         });
     }
 
-    slot(item, comp) {
+    slot(item, comp, failed) {
         const s = el('section', 'hk-medio' + (item.fit === 'contain' || item.fit === 'blur' ? ' hk-medio-contener' : ''));
         const shape = shapeOf(item);
         if (shape && comp !== 'foto-hoy' && comp !== 'foto-sola') {
             s.setAttribute('data-forma', shape);
         }
         s.hkRatio = ratio(item);
-        const d = this.slide(item);
+        const d = this.slide(item, failed);
         d.classList.add('hk-visible');
         s.appendChild(d);
         this.startVideo(d, comp);
@@ -659,6 +754,10 @@ export class Screen {
             c.hkWeek = buildWeek(week, {today: l.today, tomorrow: l.tomorrow, none: this.s.week_none || '',
                 more: this.s.week_more || '+{n}'});
             c.appendChild(c.hkWeek);
+            return c;
+        }
+        if (comp === 'zonas') {
+            this.buildZonesLayer(c, items, extra || {});
             return c;
         }
         if (comp === 'tiempo-tercio') {
@@ -755,6 +854,81 @@ export class Screen {
         return c;
     }
 
+    /**
+     * The two zones (zonas.js): the wide one with its picture or video, or the place's card; the column with the portrait
+     * pictures, the weather and the coming days. What fails goes, and what stays grows: a wide picture that does not load
+     * leaves the place's card in its stead, or the whole body to the column.
+     *
+     * @param {HTMLElement} c the layer
+     * @param {object[]} items the wide picture first (when extra.wide), then the column's portraits
+     * @param {object} extra {wide, weather, agenda, place, days: the coming days, today left out}
+     */
+    buildZonesLayer(c, items, extra) {
+        const self = this;
+        const wideItem = extra.wide ? items[0] : null;
+        const photos = extra.wide ? items.slice(1) : items.slice();
+        const card = function () {
+            if (!self.place) {
+                return null;
+            }
+            const n = buildPlaceCard(self.place, wallOf(self.lastDate || new Date()), self.placeWords, self.placeNames());
+            n.classList.add('hk-zonas-ancha');
+            return n;
+        };
+        const empty = function () {
+            const nothing = !c.querySelector('.hk-zonas-col') && !c.querySelector('.hk-zonas-ancha');
+            if (nothing && self.layer === c && self.hooks.emptied) {
+                self.hooks.emptied();
+            }
+        };
+        let wide = null;
+        if (wideItem) {
+            wide = this.slot(wideItem, 'zonas', function () {
+                if (wide && wide.parentNode) {
+                    self.stopSlides(wide);
+                    const instead = card();
+                    if (instead) {
+                        wide.parentNode.replaceChild(instead, wide);
+                        fitZones(c);
+                    } else {
+                        wide.parentNode.removeChild(wide);
+                    }
+                }
+                // Out of the page first: the player notes it and goes on with this slide.
+                self.hooks.mediaFailed(wideItem);
+                empty();
+            });
+            // A video goes round while the column turns: its end is not the slide's.
+            const v = wide.querySelector('video');
+            if (v) {
+                v.loop = true;
+            }
+        } else if (extra.place) {
+            wide = card();
+        }
+        const l = this.labels || {};
+        buildZones(c, {
+            wide,
+            photos,
+            weather: extra.weather && this.weather && this.sky ? buildWeatherThird(this.weather, this.labelsFull(), this.sky,
+                this.s.days || []) : null,
+            agenda: extra.agenda ? extra.days || [] : null,
+            media: function (ref) {
+                return self.media.url(ref);
+            },
+            words: {
+                weather: l.zones_weather || this.s.zones_weather || 'El tiempo',
+                upcoming: l.upcoming || this.s.upcoming || 'Próximos días',
+                holiday: this.s.week_holiday || '',
+                lower: this.placeNames().lower,
+            },
+            photoFailed: function (it) {
+                self.hooks.mediaFailed(it);
+            },
+            failed: empty,
+        });
+    }
+
     /** The words of what leads and the rest. */
     labelsLead() {
         const l = this.labels || {};
@@ -794,6 +968,12 @@ export class Screen {
             }, linesOf);
         } else if (comp === 'muro') {
             c.hkSeconds = startWall(c, c.hkAlbum, false);
+        } else if (comp === 'zonas') {
+            // The column's carousel: as long as its items take, about 45 s.
+            const self = this;
+            c.hkSeconds = startZones(c, {still: this.keepsStill(), moved: function () {
+                self.movedAt = Date.now();
+            }});
         } else if (comp === 'cumple') {
             // Each person their moment: as long as the people of the day take (Gaudí, 7 November 2026).
             c.hkSeconds = startBirthdays(c, {still: this.keepsStill()});
@@ -836,6 +1016,21 @@ export class Screen {
                 side.appendChild(el('p', 'hk-tipografica-pie', foot));
             }
             s.appendChild(side);
+        } else if (x.centre) {
+            // The centre's own sentence: its logo for the dark (the block is in its colour), or its name, over it.
+            s.classList.add('hk-tipografica-centro');
+            const label = el('p', 'hk-tipografica-etiqueta');
+            const id = this.identity || {};
+            if (id.dark && id.dark !== id.light) {
+                const im = el('img', 'hk-tipografica-logo');
+                im.alt = '';
+                im.src = id.dark;
+                label.appendChild(im);
+            } else {
+                label.textContent = id.name || this.tickerLabel.textContent;
+            }
+            s.appendChild(label);
+            s.appendChild(el('h2', 'hk-tipografica-texto', x.text || ''));
         } else {
             s.appendChild(el('p', 'hk-tipografica-etiqueta', this.tickerLabel.textContent));
             s.appendChild(el('h2', 'hk-tipografica-texto', x.text || ''));
@@ -859,6 +1054,7 @@ export class Screen {
         this.frame.classList.toggle('hk-con-importante', !!n);
         clear(this.bandLine);
         if (!n) {
+            this.liftFull();
             return;
         }
         this.bandLabel.innerHTML = MARK;
@@ -886,6 +1082,7 @@ export class Screen {
             line.classList.add('hk-solo-titulo');
             band.setAttribute('data-lineas', '2');
         }
+        this.liftFull();
     }
 
     /**
@@ -930,9 +1127,13 @@ export class Screen {
                 // rather than covering the picture.
                 pie.classList.remove('hk-pie-corto');
                 pie.style.display = '';
-                if (pie.offsetHeight > m.clientHeight * 0.6) {
+                // A word wider than its picture would be cut at the edge: rather no caption (Jujol, 12 November 2026).
+                const cut = function () {
+                    return !!h2 && h2.scrollWidth > h2.clientWidth + 1;
+                };
+                if (pie.offsetHeight > m.clientHeight * 0.6 || cut()) {
                     pie.classList.add('hk-pie-corto');
-                    if (pie.offsetHeight > m.clientHeight * 0.6) {
+                    if (pie.offsetHeight > m.clientHeight * 0.6 || cut()) {
                         pie.style.display = 'none';
                     }
                 }
@@ -954,7 +1155,7 @@ export class Screen {
                 continue;
             }
             pie.hkShort = 'hk-pie-corto';
-            fitHeadline(pie, h2, comp === 'foto-hoy' && !vertical ? 2 : 3, function () {
+            fitHeadline(pie, h2, (comp === 'foto-hoy' && !vertical) || comp === 'zonas' ? 2 : 3, function () {
                 return pie.offsetHeight > m.clientHeight * 0.62;
             });
             even(h2);
@@ -1013,7 +1214,9 @@ export class Screen {
                 }
             }
         }
+        this.fitShapes(c, comp);
         this.fitCaptions(c, comp);
+        fitZones(c);
         fitBirthdays(c);
         fitBooks(c, this.horizontal);
         fitChannel(c, this.horizontal);
@@ -1033,6 +1236,32 @@ export class Screen {
             even(type);
         }
         paginateRest(c.hkRest, this.turn || 0);
+    }
+
+    /**
+     * A portrait slot beside «Today» keeps its shape when the body is lower than the sheet's widths expect (the birthday
+     * strip above the ticker): its width from its height. Without the strip, the sheet's.
+     *
+     * @param {HTMLElement} c the layer
+     * @param {string} comp
+     */
+    fitShapes(c, comp) {
+        if (comp !== 'vertical-hoy' && comp !== 'dos-verticales') {
+            return;
+        }
+        const f = this.frame;
+        const on = this.horizontal && f.classList.contains('hk-con-franja') && !f.classList.contains('hk-sin-franja');
+        const slots = c.querySelectorAll('.hk-medio[data-forma]');
+        for (let i = 0; i < slots.length; i++) {
+            const m = slots[i];
+            m.style.width = '';
+            const shape = SHAPES[m.getAttribute('data-forma')];
+            if (on && shape && m.clientHeight) {
+                // Two portraits are never wider than a pair of 2:3 (composiciones.css).
+                const most = comp === 'dos-verticales' ? Math.min(shape, 2 / 3) : shape;
+                m.style.width = Math.round(m.clientHeight * most) + 'px';
+            }
+        }
     }
 
     labelsFull() {
@@ -1423,15 +1652,23 @@ export class Screen {
         const comp = choice.comp;
         const items = choice.items;
         // One clock: the sentence of the ticker changes with the slide, in the same movement.
-        if (this.phrases && this.phrases.length > 1) {
+        if (this.tickerTurns()) {
             clearTimeout(this.phraseTimer);
             this.nextPhrase();
+        }
+        // The birthday strip steps aside for the big birthday slide and for what covers the whole screen, before anything is
+        // measured: the body is as high as what is left.
+        const poster0 = comp === 'muro' && choice.extra && choice.extra.poster;
+        this.frame.classList.toggle('hk-sin-franja', comp === 'cumple' || comp === 'reposo' || comp === 'escaparate' || !!poster0);
+        if (this.stripKey && !this.stripFitted) {
+            this.stripFitted = fitBirthdayStrip(this.birthdayStrip, {vertical: !this.horizontal});
         }
         this.pendingBand = today && today.notices ? today.notices.filter(function (n) {
             return n.tone === 'important';
         })[0] || null : null;
         // Each slide turns the page of the rest and the important notice in the fixed place.
         this.turn = (this.turn || 0) + 1;
+        this.movedAt = Date.now();
         const wasFull = !!FULL[this.frame.getAttribute('data-composicion')];
         const poster = comp === 'muro' && choice.extra && choice.extra.poster;
         if (FULL[comp] || poster) {
@@ -1455,6 +1692,7 @@ export class Screen {
             }
             this.fitHeaders();
             this.importantBand(comp === 'foto-completa' ? this.pendingBand : null);
+            this.liftFull();
             return seconds;
         }
         this.fitHeaders();
@@ -1620,26 +1858,110 @@ export class Screen {
     /**
      * The ticker, one sentence at a time (the art direction's «cinta.css»): each in one line at --hk-t-lista; if not,
      * in two at --hk-t-min; if not even so, cut at a comma or a colon near the middle into two that come one after the
-     * other. A sentence stays 6 s, or 2 s and 0.35 s a word, up to 12 s; a counter says which.
+     * other. A sentence stays 6 s, or 2 s and 0.35 s a word, up to 12 s; a counter says which. The centre's own sentence
+     * (centre.phrase) is one more, said whole and set apart, every few of them (lema.js); alone when there are no others.
      *
      * @param {string[]} texts
+     * @param {string} [phrase] the centre's own sentence
      */
-    showTicker(texts) {
-        const text = texts.join('\u0000');
+    showTicker(texts, phrase) {
+        const centre = phrase || '';
+        const text = texts.join('\u0000') + '\u0001' + centre;
         if (text === this.tickerText) {
             return;
         }
         this.tickerText = text;
-        this.frame.classList.toggle('hk-sin-cinta', !texts.length);
+        this.frame.classList.toggle('hk-sin-cinta', !texts.length && !centre);
         clearTimeout(this.phraseTimer);
         clear(this.tickerTrack);
         clear(this.tickerCount);
+        this.ticker.classList.remove('hk-cinta-centro');
         this.phraseNode = null;
         this.phraseAt = 0;
+        this.centreText = centre;
+        this.centreCount = centreState();
         this.phrases = texts.length ? this.preparePhrases(texts) : [];
+        this.centreLine = centre ? this.measureCentre(centre) : null;
         this.tickerTexts = texts;
-        if (this.phrases.length) {
+        if (this.phrases.length || this.centreLine) {
             this.nextPhrase();
+        }
+    }
+
+    /** Whether the ticker changes its sentence with each slide: more than one to say. */
+    tickerTurns() {
+        const n = (this.phrases || []).length;
+        return n > 1 || (n === 1 && !!this.centreLine);
+    }
+
+    /**
+     * The centre's sentence measured in the ticker, with the seal in place of the label: one line at --hk-t-lista, or two at
+     * --hk-t-min. Never cut: null when it does not fit even so, and then it is not said in the ticker (the panel keeps it short
+     * enough: LEEME); from 8 m it is a headline of its own.
+     *
+     * @param {string} text
+     * @returns {{text: string, lines: number, centre: true}|null}
+     */
+    measureCentre(text) {
+        const track = this.tickerTrack;
+        if (!track.offsetWidth) {
+            this.phrasesStale = true;
+            return null;
+        }
+        this.phrasesStale = false;
+        const had = this.ticker.classList.contains('hk-cinta-centro');
+        this.ticker.classList.add('hk-cinta-centro');
+        const p = el('p', 'hk-frase hk-frase-centro');
+        p.appendChild(el('span', '', text));
+        p.style.visibility = 'hidden';
+        track.appendChild(p);
+        const span = p.firstChild;
+        let r = null;
+        if (linesOf(span) <= 1 && span.offsetWidth <= p.clientWidth + 1) {
+            r = {text, lines: 1, centre: true};
+        } else {
+            p.setAttribute('data-lineas', '2');
+            if (linesOf(span) <= 2 && span.offsetHeight <= p.clientHeight + 1) {
+                r = {text, lines: 2, centre: true};
+            }
+        }
+        track.removeChild(p);
+        if (!had) {
+            this.ticker.classList.remove('hk-cinta-centro');
+        }
+        return r;
+    }
+
+    /** The seal of the centre's sentence: the logo of each theme on its card, or the centre's initial. */
+    paintSeal() {
+        const seal = this.tickerSeal;
+        if (!seal) {
+            return;
+        }
+        const id = this.identity || {};
+        const key = (id.light || '') + '|' + (id.dark || '') + '|' + (id.name || '');
+        if (key === this.sealKey) {
+            return;
+        }
+        this.sealKey = key;
+        clear(seal);
+        seal.removeAttribute('data-inicial');
+        if (id.light) {
+            [['hk-logo-claro', id.light], ['hk-logo-oscuro', id.dark || id.light]].forEach(function (l) {
+                const im = el('img', l[0]);
+                im.alt = '';
+                im.src = l[1];
+                seal.appendChild(im);
+            });
+        } else if (id.name) {
+            seal.setAttribute('data-inicial', '');
+            seal.appendChild(el('span', '', id.name.trim().charAt(0).toUpperCase()));
+        }
+        // Without either, the label of the ticker stays in its place.
+        this.ticker.classList.toggle('hk-cinta-sin-sello', !seal.firstChild);
+        if (this.centreText) {
+            this.phrasesStale = true;
+            this.refreshPhrases();
         }
     }
 
@@ -1703,6 +2025,7 @@ export class Screen {
             tryOne(t, 0);
         });
         clear(this.tickerCount);
+        this.phrasesStale = !track.offsetWidth;
         return out;
     }
 
@@ -1714,9 +2037,13 @@ export class Screen {
             this.bandKey = null;
             this.importantBand(this.pendingBand);
         }
-        if (this.tickerTexts && this.tickerTexts.length) {
+        if ((this.tickerTexts && this.tickerTexts.length) || this.centreText) {
             this.phrasesStale = true;
             this.refreshPhrases();
+        }
+        if (this.stripKey) {
+            this.stripFitted = fitBirthdayStrip(this.birthdayStrip, {vertical: !this.horizontal});
+            this.liftFull();
         }
     }
 
@@ -1725,7 +2052,8 @@ export class Screen {
      * without it are measured again, and the one on show goes at once, or it would stay cut until the next one comes.
      */
     refreshPhrases() {
-        if (!this.phrasesStale || !this.tickerTrack.offsetWidth || !this.tickerTexts || !this.tickerTexts.length) {
+        if (!this.phrasesStale || !this.tickerTrack.offsetWidth || ((!this.tickerTexts || !this.tickerTexts.length) &&
+                !this.centreText)) {
             return;
         }
         clearTimeout(this.phraseTimer);
@@ -1738,17 +2066,39 @@ export class Screen {
     }
 
     nextPhrase() {
-        if (this.phrasesStale && this.tickerTrack.offsetWidth && this.tickerTexts && this.tickerTexts.length) {
-            this.phrases = this.preparePhrases(this.tickerTexts);
+        if (this.phrasesStale && this.tickerTrack.offsetWidth) {
+            const texts = this.tickerTexts || [];
+            this.phrases = texts.length ? this.preparePhrases(texts) : [];
+            this.centreLine = this.centreText ? this.measureCentre(this.centreText) : null;
         }
         const list = this.phrases || [];
-        if (!list.length) {
+        const centre = this.centreLine;
+        let f = null;
+        let i = -1;
+        if (centre && centreDue(this.centreCount || centreState(), list.length, Date.now())) {
+            f = centre;
+        } else if (list.length) {
+            i = this.phraseAt % list.length;
+            f = list[i];
+            this.phraseAt++;
+        }
+        if (!f) {
             return;
         }
-        const i = this.phraseAt % list.length;
-        const f = list[i];
+        this.centreCount = centreAfter(this.centreCount || centreState(), f === centre, Date.now());
+        const self = this;
         const track = this.tickerTrack;
         const old = this.phraseNode;
+        const turns = this.tickerTurns();
+        if (old && old.hkPhrase === f) {
+            // The same one again (one sentence, and the centre's not due yet): it stays as it is.
+            if (turns) {
+                this.phraseTimer = setTimeout(function () {
+                    self.nextPhrase();
+                }, PHRASE_WAITS_MS);
+            }
+            return;
+        }
         if (old) {
             old.classList.remove('hk-frase-dentro');
             old.classList.add('hk-frase-fuera');
@@ -1758,16 +2108,25 @@ export class Screen {
                 }
             }, 600);
         }
-        const fresh = el('p', 'hk-frase');
+        const fresh = el('p', 'hk-frase' + (f.centre ? ' hk-frase-centro' : ''));
+        fresh.hkPhrase = f;
         fresh.appendChild(el('span', '', f.text));
         if (f.lines === 2) {
             fresh.setAttribute('data-lineas', '2');
         }
-        const self = this;
+        const count = this.tickerCount;
+        const ticker = this.ticker;
         setTimeout(function () {
             // The ticker may have changed in the meantime, and this phrase with it.
             if (self.phraseNode !== fresh) {
                 return;
+            }
+            // The centre's seal and the counter change while nothing is written: the old one has gone.
+            ticker.classList.toggle('hk-cinta-centro', !!f.centre);
+            clear(count);
+            if (!f.centre && list.length > 1) {
+                count.appendChild(el('b', '', String(i + 1)));
+                count.appendChild(document.createTextNode('/' + list.length));
             }
             track.appendChild(fresh);
             void fresh.offsetWidth;
@@ -1776,18 +2135,59 @@ export class Screen {
             });
         }, old ? 700 : 0);
         this.phraseNode = fresh;
-        clear(this.tickerCount);
-        if (list.length > 1) {
-            this.tickerCount.appendChild(el('b', '', String(i + 1)));
-            this.tickerCount.appendChild(document.createTextNode('/' + list.length));
-        }
-        this.phraseAt++;
-        if (list.length > 1) {
+        if (turns) {
             // Usually the next slide changes it; this is for the long ones.
             this.phraseTimer = setTimeout(function () {
                 self.nextPhrase();
             }, PHRASE_WAITS_MS);
         }
+    }
+
+    /**
+     * Whose birthday it is today, in a strip above the ticker all day (franja.js), over every composition but the big
+     * birthday slide and what covers the whole screen; null takes it away. The body is measured again with what it leaves.
+     *
+     * @param {object|null} item today's birthdays, {people: [...]}
+     */
+    showBirthdayStrip(item) {
+        const self = this;
+        const url = function (ref) {
+            return self.media.url(ref);
+        };
+        const key = stripKey(item, url);
+        if (key === (this.stripKey || '')) {
+            return;
+        }
+        this.stripKey = key;
+        if (this.stripStop) {
+            this.stripStop();
+            this.stripStop = null;
+        }
+        this.frame.classList.toggle('hk-con-franja', !!key);
+        if (key) {
+            buildStrip(this.birthdayStrip, item, {one: this.s.birthdays_one || '', media: url});
+            this.stripFitted = fitBirthdayStrip(this.birthdayStrip, {vertical: !this.horizontal});
+            // Its next person never in the same moment as a slide comes in or the column of the two zones changes.
+            this.stripStop = startStrip(this.birthdayStrip, {still: this.keepsStill(), busy: function () {
+                return Date.now() - (self.movedAt || 0) < 2000;
+            }});
+        } else {
+            clear(this.birthdayStrip);
+            this.stripFitted = false;
+        }
+        this.liftFull();
+        if (this.layer && !FULL[this.comp]) {
+            this.adjustLayer(this.layer);
+        }
+    }
+
+    /** What sits at the bottom over a full-screen picture (the strip, the important band): its caption and QR go over it. */
+    liftFull() {
+        const f = this.frame;
+        const shown = f.classList.contains('hk-con-franja') && !f.classList.contains('hk-sin-franja');
+        const strip = shown ? this.birthdayStrip.offsetHeight : 0;
+        const band = f.classList.contains('hk-con-importante') ? this.ticker.offsetHeight : 0;
+        f.style.setProperty('--hk-pie-abajo', (strip + band) + 'px');
     }
 
     /** What the screen is for now, on the frame: a showcase hides the ticker (nothing in detail). */

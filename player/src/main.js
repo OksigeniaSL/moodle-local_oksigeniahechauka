@@ -109,6 +109,10 @@ class Player {
                     self.next();
                 }
             },
+            // A slide whose every part failed (the two zones with nothing left): the next one.
+            emptied: function () {
+                self.next();
+            },
         });
         this.media.onSynced = function () {
             if (self.themeWaits && self.manifest) {
@@ -148,6 +152,11 @@ class Player {
                 }
                 if (ev.data.hkDraft !== undefined) {
                     self.setDraft(ev.data.hkDraft);
+                }
+                if (typeof ev.data.hkPhrase === 'string') {
+                    // «Tu centro»: the centre's sentence as it is being written, in the ticker.
+                    self.draftPhrase = ev.data.hkPhrase;
+                    self.tick();
                 }
                 if (ev.data.hkSurprise) {
                     // «Tu centro»: to see what a character does before choosing it.
@@ -560,6 +569,12 @@ class Player {
             return media.url(ref);
         });
         const agenda = this.agendaOfNow(wall, m);
+        // The coming days without today, for the column of the two zones: today's are in «Today».
+        const nextDays = agenda.days.filter(function (d) {
+            return !d.today && (d.events.length || d.holiday);
+        });
+        const distance = (m.screen && m.screen.distance) || 3;
+        const phrase = (m.centre && m.centre.phrase) || '';
         const turns = this.albumTurns;
         const choice = this.composer.next(oneOfEachAlbum(queue, turns), countToday(today) + coming, this.screen.horizontal,
             {menu: !!today.menu, noToday: m.template === 'full', use,
@@ -567,6 +582,10 @@ class Player {
                 distance: (m.screen && m.screen.distance) || 3,
                 countdown: !!today.countdown,
                 agenda: agenda.count > 0,
+                agendaNext: nextDays.length > 0,
+                place: !!(m.screen && m.screen.place && m.screen.place.hours && m.screen.place.hours.length),
+                // The centre's sentence in slides of its own from 8 m, where there is no ticker.
+                centre: phrase && distance === 8 ? phrase : null,
                 idleQr: (m.idle && m.idle.qr) || null,
                 idleQrImage: (m.idle && m.idle.qrimage) || null,
                 birthdays: liveItems(m.items || [], 'extra', wall).filter(function (it) {
@@ -599,6 +618,8 @@ class Player {
         });
         if (choice.comp === 'agenda') {
             choice.extra = {data: this.agendaData(wall, m)};
+        } else if (choice.comp === 'zonas') {
+            choice.extra = Object.assign({}, choice.extra, {days: nextDays});
         } else if (choice.extra && choice.extra.album) {
             choice.extra.albumData = albums.filter(function (a) {
                 return a.id === choice.extra.album;
@@ -643,6 +664,10 @@ class Player {
         }
         this.screen.setDark(this.forcedTheme !== undefined ? this.forcedTheme : isDark(m.theme, wall));
         this.screen.setClock(this.clock.date());
+        // Whose birthday it is today, all day above the ticker; never on a showcase. Before a first slide is measured.
+        this.screen.showBirthdayStrip(useOf(m, wall) === 'showcase' ? null : liveItems(m.items || [], 'extra', wall).filter(function (it) {
+            return it.type === 'birthdays' && it.people && it.people.length;
+        })[0] || null);
         // Just on, not with what it had yesterday; and a turn that never came is not waited for.
         const lost = this.turnDue && Date.now() > this.turnDue + 60000;
         if ((was && !urgent) || wasOn === false || lost || !this.screen.comp) {
@@ -654,7 +679,7 @@ class Player {
         }
         this.screen.showTicker(liveItems(m.items || [], 'ticker', wall).map(function (it) {
             return it.text;
-        }).filter(Boolean));
+        }).filter(Boolean), typeof this.draftPhrase === 'string' ? this.draftPhrase : (m.centre && m.centre.phrase) || '');
     }
 
     // Once a day, in the small hours, a screen reloads itself: weeks of a page open wear any browser down.

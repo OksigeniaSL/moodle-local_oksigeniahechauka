@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.18.0
+
+- **«Zones», one more composition in the turn**: a column with its own carousel (upright photos, the weather, the coming
+  days) beside the wide part, which takes a landscape photo or video or the card of the screen's place. It comes now and
+  then on informative and mixed screens, never stays, and never leaves an empty box: what has nothing to show gives its room
+  to the rest.
+- **On the day someone has a birthday, a band congratulates them all day long**, in every composition of informative and
+  mixed screens: a garland in the four colours, confetti on the paper and one face at a time, with a small bounce when it
+  changes and then still. Never on a showcase screen, nor during the big celebration of its turn.
+- **The place of each screen**, in its sheet: a library, a canteen, an office, with its hours by days and the days it
+  closes. The screen says beside the clock whether it is open and until when («Open · until 17:00», «Closed · opens on
+  Monday at 8:00»), and the zones show the week's hours. In Spanish, the centre chooses «Abierta» or «Abierto».
+- **The centre's sentence**, in «Your centre»: its motto, said whole in the ticker every few sentences with the centre's
+  logo, never typed letter by letter; from 8 m, a headline of its own. Up to 90 characters, what fits on any horizontal
+  screen read from 5 m.
+- Three upright photos keep the gap of the rest, and a caption with a word wider than its photo goes instead of being cut.
+- The important notice no longer disappears at 3 and 5 m when the ticker has no sentences.
+
 ## 0.17.3
 
 - **Someone of the birthday list no longer falls on another person with the same surnames the other way round.** Linking by

@@ -32,15 +32,22 @@ test('no browser API newer than Chromium 56 in the player', () => {
 });
 
 test('the styles stay with what Chromium 56 understands', () => {
-    const css = readFileSync(new URL('../hechauka.css', import.meta.url), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
-    for (const [re, what] of [
+    // Every sheet of the player, not only the first one.
+    const dir = new URL('../', import.meta.url);
+    const sheets = readdirSync(dir).filter((f) => /\.css$/.test(f));
+    assert.ok(sheets.indexOf('zonas.css') !== -1);
+    const rules = [
         [/display:\s*grid/, 'CSS Grid (Chrome 57)'],
         [/\bgap:/, 'gap in flex (Chrome 84)'],
         [/clamp\(|min\(|max\(/, 'clamp/min/max (Chrome 79)'],
         [/aspect-ratio|inset:|:is\(|:where\(|color-mix/, 'newer CSS'],
         [/@container|cq[whib]/, 'container queries (Chrome 105)'],
         [/prefers-color-scheme/, 'prefers-color-scheme (Chrome 76)'],
-    ]) {
-        assert.equal(re.test(css), false, 'hechauka.css uses ' + what);
+    ];
+    for (const sheet of sheets) {
+        const css = readFileSync(new URL(sheet, dir), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+        for (const [re, what] of rules) {
+            assert.equal(re.test(css), false, sheet + ' uses ' + what);
+        }
     }
 });

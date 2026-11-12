@@ -89,6 +89,14 @@ class manifest {
             ],
             'items' => [],
         ];
+        $place = screenplace::contract($screen, $now);
+        if ($place) {
+            $m['screen']['place'] = $place;
+        }
+        $phrase = centre::phrase($config);
+        if ($phrase !== '') {
+            $m['centre']['phrase'] = $phrase;
+        }
         $power = schedule::power($screen->power);
         if ($power) {
             $m['power'] = $power;

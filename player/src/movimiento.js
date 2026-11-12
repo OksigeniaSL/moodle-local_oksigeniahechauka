@@ -90,6 +90,16 @@ const PARTS = {
         ['.hk-canal-seguidores', 'sube', 3],
         ['.hk-canal-tarjeta', 'mensaje', 4.5],
     ],
+    // The two zones: the wide one first (the picture, or the place's card and its words), then the column as a block, its
+    // band last; the column's carousel and its pictures' slow move are its life (zonas.js, zonas.css).
+    'zonas': [
+        ['.hk-zonas-ancha', 'foto', 0],
+        ['.hk-zonas-ancha .hk-pie h2', 'sube', 2.5],
+        ['.hk-zonas-ancha .hk-pie p', 'sube', 3.5],
+        ['.hk-sitio-ficha-cuerpo > *', 'sube', 1, 'step'],
+        ['.hk-zonas-col', 'bloque', 2],
+        ['.hk-zonas-pie', 'sube', 4],
+    ],
     'tabla': [
         ['.hk-tabla', 'bloque', 0],
         ['.hk-tabla-cabeza > *', 'sube', 1, 'step'],

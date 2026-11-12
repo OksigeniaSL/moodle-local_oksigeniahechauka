@@ -81,6 +81,19 @@ class player_page {
             'agenda_nomore' => get_string('agenda_nomore', $c),
             'agenda_quiet_title' => get_string('agenda_quiet_title', $c),
             'agenda_quiet' => get_string('agenda_quiet', $c),
+            'zones_weather' => get_string('zones_weather', $c),
+            'place_open' => get_string('place_open', $c),
+            'place_closed' => get_string('place_closed', $c),
+            'place_until' => get_string('place_until', $c),
+            'place_opens_today' => get_string('place_opens_today', $c),
+            'place_opens_tomorrow' => get_string('place_opens_tomorrow', $c),
+            'place_opens_day' => get_string('place_opens_day', $c),
+            'place_opens_date' => get_string('place_opens_date', $c),
+            'place_hours' => get_string('place_hours', $c),
+            'place_today' => get_string('place_today', $c),
+            'place_days_range' => get_string('place_days_range', $c),
+            'place_days_pair' => get_string('place_days_pair', $c),
+            'place_time_range' => get_string('place_time_range', $c),
         ];
     }
 
@@ -166,7 +179,7 @@ class player_page {
             'distancia.css', 'jerarquia.css', 'tercios.css', 'cinta.css', 'usos.css', 'agenda.css', 'fotos.css',
             'lideres.css', 'agenda-lista.css', 'cumple.css', 'reposo.css', 'plazos.css', 'tabla.css',
             'biblioteca.css', 'canal.css', 'alergenos.css',
-            'identidad.css',
+            'identidad.css', 'zonas.css',
             'pieles.css', 'fondos.css', 'letras.css', 'actividad.css',
             'movimiento.css'] as $file
         ) {

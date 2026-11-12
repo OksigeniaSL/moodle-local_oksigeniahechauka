@@ -23,6 +23,8 @@
 // plazos          what falls due in the courses in the coming days, by days and by pages
 // tabla           a table of the centre: a spreadsheet or a list, by pages
 // reposo          nothing at all to show: the centre, the hour, the date and the weather, under a sky that goes by
+// zonas           two zones at once, now and then: a column with a carousel of its own (portrait pictures, the weather, the
+//                 coming days) and a wide zone (a landscape picture or video, or the card of the screen's place)
 //
 // By the distance it is read from (the art direction's 0.7.0): at 3 m, all; at 5 m, all but «semana»; at 8 m, no
 // thirds (foto-hoy is foto-sola, a landscape video is foto-completa, «Today» comes one thing at a time) and the
@@ -47,6 +49,15 @@ const TABLES_EVERY = 8;
 
 /** The seconds of the weather alone, from 8 m. */
 const WEATHER_ALONE = 10;
+
+/** How many slides go by between one of the two zones and the next, and before the first. */
+export const ZONES_EVERY = 9;
+
+/** The seconds of the two zones, before the page measures them (zonas.js says the real ones). */
+export const ZONES_SECONDS = 45;
+
+/** The most portrait pictures in the column of the two zones. */
+const ZONES_PORTRAITS = 4;
 
 /** Width over height of an item's picture or video; landscape when it does not say. */
 export function ratio(item) {
@@ -88,6 +99,34 @@ export function secondsOf(item) {
     return 10;
 }
 
+/**
+ * What the two zones would have now, or null when one of them would be empty: the column needs a portrait picture, the
+ * weather or the coming days; the wide zone a landscape picture or video, or the screen's place.
+ *
+ * @param {object[]} queue
+ * @param {number} start where the queue goes on
+ * @param {object} o {weather, agendaNext: the days after today have something, place: the screen has a place}
+ * @returns {{items: object[], wide: object|null, extra: object}|null}
+ */
+export function zonesOf(queue, start, o) {
+    let wide = null;
+    const portraits = [];
+    for (let k = 0; k < queue.length; k++) {
+        const it = queue[(start + k) % queue.length];
+        if (!wide && ratio(it) >= 1.2 && it.layout !== 'full') {
+            wide = it;
+        } else if (it.type === 'image' && isPortrait(it) && portraits.length < ZONES_PORTRAITS) {
+            portraits.push(it);
+        }
+    }
+    const column = portraits.length + (o.weather ? 1 : 0) + (o.agendaNext ? 1 : 0);
+    if (!column || (!wide && !o.place)) {
+        return null;
+    }
+    return {items: (wide ? [wide] : []).concat(portraits), wide,
+        extra: {wide: !!wide, weather: !!o.weather, agenda: !!o.agendaNext, place: !wide && !!o.place}};
+}
+
 // How much the week has to have to come out, and to come out often.
 const WEEK_FULL = 4;
 
@@ -122,6 +161,8 @@ export class Composer {
      *     use: info, showcase or mixed (what the screen is for now), weather: the weather has the coming days,
      *     distance: 3, 5 or 8 (metres), phrases: the ticker's sentences (slides of their own at 8 m),
      *     countdown: «Today» has a countdown, agenda: the next thirty days have something,
+     *     agendaNext: the days after today have something, place: the screen has a place with its hours,
+     *     centre: the centre's sentence, when it goes in slides of its own (from 8 m, where there is no ticker),
      *     albums: [{id, count}], the albums that can be shown}
      * @returns {{comp: string, items: object[], seconds: number}}
      */
@@ -213,16 +254,49 @@ export class Composer {
             this.tablePages[table.id] = page;
             return pick('tabla', [], 15, {item: table, page});
         }
-        // At 8 m the ticker's sentences and the countdown come as slides of their own, one every four.
+        // At 8 m the ticker's sentences and the countdown come as slides of their own, one every four. The centre's own
+        // sentence is one of them every third time (each time, without others).
         if (far && this.n % 4 === 3) {
             const phrases = o.phrases || [];
             this.sinceType = (this.sinceType || 0) + 1;
-            if (o.countdown && (!phrases.length || this.sinceType % 3 === 0)) {
+            const t = this.sinceType;
+            let kind;
+            if (phrases.length) {
+                kind = o.countdown && t % 3 === 0 ? 'cuenta' : (o.centre && t % 3 === 1 ? 'centro' : 'frase');
+            } else if (o.countdown && o.centre) {
+                kind = t % 2 ? 'centro' : 'cuenta';
+            } else {
+                kind = o.countdown ? 'cuenta' : (o.centre ? 'centro' : null);
+            }
+            if (kind === 'cuenta') {
                 return pick('titular', [], 9, {type: 'cuenta'});
             }
-            if (phrases.length) {
+            if (kind === 'centro') {
+                return pick('titular', [], 9, {type: 'frase', text: o.centre, centre: true});
+            }
+            if (kind === 'frase') {
                 this.phrase = ((this.phrase === undefined ? -1 : this.phrase) + 1) % phrases.length;
                 return pick('titular', [], 9, {type: 'frase', text: phrases[this.phrase]});
+            }
+        }
+        // The two zones, now and then and never fixed: a column with its own carousel beside a wide zone (Jujol, 12
+        // November 2026). Only when both have something; never on a showcase, never right after what it repeats.
+        this.sinceZones = (this.sinceZones === undefined ? 0 : this.sinceZones) + 1;
+        if (this.sinceZones > ZONES_EVERY && !o.noToday && this.last !== 'agenda' && this.last !== 'tiempo-tercio') {
+            let z = zonesOf(queue, this.position(queue), o);
+            if (z) {
+                this.sinceZones = 1;
+                // A screen with a place gives the wide zone in turns: the picture one time, the place's card the next
+                // (the coordinator, 12 November 2026).
+                this.zonesTurn = (this.zonesTurn || 0) + 1;
+                if (z.wide && o.place && this.zonesTurn % 2 === 0) {
+                    z = {items: z.items.slice(1), wide: null, extra: Object.assign({}, z.extra, {wide: false, place: true})};
+                }
+                const keep = this.lastId;
+                const r = pick('zonas', z.items, ZONES_SECONDS, z.extra);
+                // The queue goes on after the wide picture; the portraits of the column keep their own turns.
+                this.lastId = z.wide ? z.wide.id : keep;
+                return r;
             }
         }
         if (!queue.length) {

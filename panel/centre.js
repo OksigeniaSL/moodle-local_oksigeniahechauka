@@ -471,6 +471,27 @@
             field.select();
         });
     });
+    // The centre's sentence: how much is left, a note when an upright screen far away will not say it, and the preview's
+    // ticker as it is written.
+    const phrase = page.querySelector('#hkp-phrase');
+    if (phrase) {
+        const count = page.querySelector('#hkp-phrase-count');
+        const upright = page.querySelector('#hkp-phrase-upright');
+        const said = () => {
+            const text = phrase.value.replace(/\s+/g, ' ').trim();
+            const left = Number(phrase.getAttribute('maxlength')) - phrase.value.length;
+            count.textContent = left === 1 ? count.getAttribute('data-left-one') :
+                count.getAttribute('data-left').replace('{$a}', String(left));
+            if (upright) {
+                upright.hidden = text.length <= Number(phrase.getAttribute('data-upright'));
+            }
+            if (frame && frame.contentWindow) {
+                frame.contentWindow.postMessage({hkPhrase: text}, location.origin);
+            }
+        };
+        phrase.addEventListener('input', said);
+        said();
+    }
     // The weather's icon, from the screens' own set.
     if (window.HK_TIEMPO) {
         page.querySelectorAll('[data-hk-sky]').forEach((node) => {

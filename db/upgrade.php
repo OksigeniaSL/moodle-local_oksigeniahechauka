@@ -315,5 +315,15 @@ function xmldb_local_oksigeniahechauka_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026111100, 'local', 'oksigeniahechauka');
     }
 
+    if ($oldversion < 2026111200) {
+        // The place each screen is in (a library, a canteen), with its opening hours: the screen says whether it is open.
+        $table = new xmldb_table('local_oksigeniahechauka_screen');
+        $field = new xmldb_field('place', XMLDB_TYPE_TEXT, null, null, null, null, null, 'useplan');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        upgrade_plugin_savepoint(true, 2026111200, 'local', 'oksigeniahechauka');
+    }
+
     return true;
 }

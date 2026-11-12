@@ -198,6 +198,9 @@ Nunca la edad, y nunca en una pantalla de escaparate. De serie, apagados.
 - **Las fotos** se suben de una vez: cada archivo con el nombre de la persona («Lucía Pérez.jpg») o con su número de ID
   («1024.jpg»). En muchos centros, el número de ID de Moodle es el de matrícula.
 
+El día en que alguien cumple años, además de su turno de fiesta, una franja lo felicita durante todo el día debajo de lo
+que esté saliendo, de uno en uno si son varios.
+
 Se guardan el día y el mes, nunca el año.
 
 ![La página de los cumpleaños.](img/cumpleanos.jpg)
@@ -285,6 +288,9 @@ Hechauka), su estado, su nombre y sus grupos, y:
 - **Desde dónde se lee.** De cerca (unos 3 m), a media distancia (unos 5 m) o de lejos (8 m o más), y si está tras un
   cristal. La letra y lo que cabe a la vez cambian solos.
 - **Su horario de encendido.** Fuera de él, la pantalla se apaga sola si el aparato puede, y no cuenta como caída.
+- **Su sitio y su horario.** Si está en un sitio con horario (la biblioteca, el comedor), la pantalla dice junto a la hora
+  si está abierto y hasta cuándo, o cuándo abre, y de vez en cuando enseña el horario de la semana. Los días que cierra,
+  como los festivos, se apuntan aparte.
 - **Recargar**, si alguna vez hace falta.
 
 ![La ficha de una pantalla.](img/ficha.jpg)
@@ -302,6 +308,7 @@ Lo que hace que las pantallas sean las del centro, y no las de Hechauka:
 - **Los colores del centro** y el **tema**, claro, oscuro o según la hora.
 - **Las categorías**, hasta seis, para dar color a los eventos según a quién van, o traídas de las categorías de cursos.
 - **La jornada**: a qué hora pasan las pantallas a enseñar lo de mañana.
+- **La frase del centro**: su lema, entero en la cinta cada pocas frases y con el logotipo.
 - **Las sorpresas**: de vez en cuando, un personaje cruza la pantalla. De serie, apagadas.
 
 ![Tu centro.](img/centro.jpg)

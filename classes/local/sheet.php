@@ -192,6 +192,7 @@ class sheet {
                     'checked' => $d === uses::distance($screen->distance ?? 3)];
             }, uses::DISTANCES),
             'glass' => !empty($screen->glass),
+            'place' => screenplace::sheet_context($screen, $letters, $names, time()),
             'surprises' => surprises::sheet_context($screen),
             'themes' => array_map(function ($t) use ($theme, $c) {
                 return ['value' => $t, 'label' => get_string('sheet_theme_' . $t, $c), 'checked' => $t === $theme];
@@ -316,6 +317,11 @@ class sheet {
                 $errors['power'] = get_string('wronghour', $c);
             }
         }
+        // Where it is, when it is a place with opening hours.
+        [$place, $placeerror] = screenplace::from_form(time());
+        if ($placeerror !== '') {
+            $errors['place'] = $placeerror;
+        }
         if ($errors) {
             return $errors;
         }
@@ -355,6 +361,7 @@ class sheet {
             'glass' => optional_param('glass', 0, PARAM_BOOL) ? 1 : 0,
             'surprises' => optional_param('surprises', 0, PARAM_BOOL) ? 1 : 0,
             'useplan' => $plan ? json_encode(array_values($plan)) : null,
+            'place' => $place,
             'timemodified' => time(),
         ]);
         screens::set_groups((int) $screen->id, array_map('intval', optional_param_array('groups', [], PARAM_INT)));

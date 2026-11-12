@@ -555,6 +555,10 @@
     flex: 2 1 0px;
     height: auto;
 }
+/* the gutter between the three is the body's, as between any two zones (Jujol, 12 November 2026) */
+.hk .hk-cuerpo[data-composicion="tres-verticales"] > .hk-pareja > .hk-medio + .hk-medio {
+    margin-left: var(--hk-hueco);
+}
 
 /* --- A picture of another shape in a wide zone: whole, on the colour, no blurred copy. Its words on a block beside it when
    it leaves them room (the player says so with data-al-lado); otherwise over it, as on any other picture.

@@ -200,6 +200,9 @@ their photo. Never the age, and never on a showcase screen. Off by default.
 - **The photos** are uploaded all at once: each file with the name of the person («Lucy Parker.jpg») or with their ID
   number («1024.jpg»). In many centres, the ID number in Moodle is the enrolment number.
 
+On the day someone has a birthday, besides their turn of celebration, a band congratulates them all day long under
+whatever is showing, one by one if there are several.
+
 The day and the month are kept, never the year.
 
 ![The birthdays page.](img/en/cumpleanos.jpg)
@@ -287,6 +290,9 @@ its state, its name and its groups, and:
 - **Where it is read from.** Close (about 3 m), middle distance (about 5 m) or from afar (8 m or more), and whether it is
   behind glass. The size of the letter and how much fits at once change by themselves.
 - **Its hours.** Outside them, the screen switches off by itself if the device can, and it does not count as down.
+- **Its place and its hours.** If it is in a place with opening hours (the library, the canteen), the screen says beside
+  the clock whether it is open and until when, or when it opens, and now and then shows the week's hours. The days it
+  closes, such as bank holidays, are added apart.
 - **Reload**, if it is ever needed.
 
 ![The sheet of a screen.](img/en/ficha.jpg)
@@ -304,6 +310,7 @@ What makes the screens the centre's, and not Hechauka's:
 - **The colours of the centre** and the **theme**, light, dark or by the hour.
 - **The categories**, up to six, to colour the events by whom they are for, or brought from the course categories.
 - **The day**: at what time the screens start showing tomorrow.
+- **The centre's sentence**: its motto, whole in the ticker every few sentences and with the logo.
 - **The surprises**: now and then, a character crosses the screen. Off by default.
 
 ![Your centre.](img/en/centro.jpg)
