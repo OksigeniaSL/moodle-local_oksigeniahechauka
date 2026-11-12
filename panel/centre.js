@@ -479,6 +479,9 @@
         const upright = page.querySelector('#hkp-phrase-upright');
         const said = () => {
             const text = phrase.value.replace(/\s+/g, ' ').trim();
+            // As tall as what is written: on a phone the sentence takes more lines than on a desktop.
+            phrase.style.height = 'auto';
+            phrase.style.height = phrase.scrollHeight + 'px';
             const left = Number(phrase.getAttribute('maxlength')) - phrase.value.length;
             count.textContent = left === 1 ? count.getAttribute('data-left-one') :
                 count.getAttribute('data-left').replace('{$a}', String(left));
