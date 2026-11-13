@@ -63,8 +63,8 @@ final class moments_test extends \advanced_testcase {
         $this->assertSame('extra', $item['zone']);
         $this->assertSame(get_string('label_moments', 'local_oksigeniahechauka'), $item['label']);
         $this->assertSame(['loans', 'book', 'record', 'quest'], array_column($item['moments'], 'kind'));
-        $this->assertSame('Este curso ya van 1.000 libros prestados. El número 1.000 fue «El faro».',
-            $item['moments'][0]['text']);
+        $first = 'Este curso ya van 1.000 libros prestados. El número 1.000 fue «El faro».';
+        $this->assertSame($first, $item['moments'][0]['text']);
         $this->assertArrayNotHasKey('cover', $item['moments'][0]);
         $this->assertArrayHasKey('cover', $item['moments'][1]);
         $this->assertArrayNotHasKey('library', $item['moments'][0]);
