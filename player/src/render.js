@@ -1128,9 +1128,9 @@ export class Screen {
             const pies = m.querySelectorAll('.hk-pie');
             const pie = pies[pies.length - 1];
             const h2 = pie && pie.querySelector('h2');
-            if (pie && (comp === 'dos-verticales' || comp === 'tres-verticales')) {
-                // The pair's captions are small: from afar, or when long, without their second line, or none at all,
-                // rather than covering the picture.
+            if (pie && (comp === 'dos-verticales' || comp === 'tres-verticales' || comp === 'vertical-hoy')) {
+                // The captions of a portrait slot are small: from afar, or when long, without their second line, or none
+                // at all, rather than covering the picture. Also one portrait beside «Today», which from 8 m is narrow.
                 pie.classList.remove('hk-pie-corto');
                 pie.style.display = '';
                 // A word wider than its picture would be cut at the edge: rather no caption (Jujol, 12 November 2026).

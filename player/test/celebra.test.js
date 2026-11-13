@@ -3,7 +3,7 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {Composer} from '../src/compose.js';
-import {momentsOf, momentsPages} from '../src/celebra.js';
+import {heldShortWords, momentsOf, momentsPages} from '../src/celebra.js';
 
 const moments = {id: 'm', type: 'moments', label: 'La biblioteca celebra', moments: [
     {kind: 'loans', text: 'Este curso ya van 1.000 libros prestados.'},
@@ -57,4 +57,12 @@ test('four moments at most, and none without its sentence', () => {
     assert.equal(momentsPages(many), 4);
     assert.equal(momentsPages(null), 1);
     assert.deepEqual(momentsOf({}), []);
+});
+
+test('two short words in a row are both held to the next one', () => {
+    const nb = '\u00a0';
+    assert.equal(heldShortWords('El número 1.000 fue «El faro de las ballenas».'),
+        'El' + nb + 'número 1.000 fue' + nb + '«El' + nb + 'faro de' + nb + 'las' + nb + 'ballenas».');
+    // Inside a longer word nothing is held.
+    assert.equal(heldShortWords('Este curso ya'), 'Este curso ya');
 });

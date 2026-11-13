@@ -121,9 +121,20 @@
     display: flex;
     flex: 1 1 0px;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
     align-self: stretch;
     min-width: 0;
+}
+/* Centred by its margins and not by justify-content: what does not fit goes over at the foot, where it is measured, and
+   never over the top, where the label would be cut. */
+.hk .hk-celebra-lado > :first-child {
+    margin-top: auto;
+}
+.hk .hk-celebra-lado > :last-child {
+    margin-bottom: auto;
+}
+.hk.hk-vertical .hk-celebra-lado > :first-child {
+    margin-top: 0;
 }
 .hk .hk-celebra-etiqueta {
     flex: none;
@@ -236,4 +247,8 @@
 }
 .hk.hk-vertical .hk-celebra-sala {
     padding-bottom: 14rem;
+}
+/* A low card (the birthday strip above, from afar): no streamers, which would cross the words; the strip brings the party. */
+.hk .hk-celebra-baja .hk-celebra-serpentina {
+    display: none;
 }

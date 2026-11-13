@@ -23,6 +23,18 @@ export function momentsOf(item) {
     }).slice(0, 4);
 }
 
+/**
+ * The sentence with its short words held to the next one by a no-break space: «El faro», «a las», «de la». From afar an
+ * «El» at the end of a line, apart from what it opens, reads as a word of its own.
+ */
+export function heldShortWords(text) {
+    // Each short word is looked at by itself, so two in a row («fue «El faro») are both held: a match that took the space
+    // before the next one would leave that one loose. Only at the start of a word (no lookbehind in Chrome 56).
+    return String(text || '').replace(/([«¿¡"(]?[A-Za-zÁÉÍÓÚÜÑáéíóúüñ]{1,3})\s+(?=\S)/g, function (all, word, at, whole) {
+        return at === 0 || /\s/.test(whole.charAt(at - 1)) ? word + '\u00a0' : all;
+    });
+}
+
 /** One page per moment. */
 export function momentsPages(item) {
     return Math.max(1, momentsOf(item).length);
@@ -150,7 +162,7 @@ export function buildMoments(c, item, page, o) {
     room.appendChild(thing);
     const side = el('div', 'hk-celebra-lado');
     side.appendChild(el('p', 'hk-celebra-etiqueta', (item && item.label) || ''));
-    side.appendChild(el('h2', 'hk-celebra-texto', m.text));
+    side.appendChild(el('h2', 'hk-celebra-texto', heldShortWords(m.text)));
     if (m.library) {
         side.appendChild(el('p', 'hk-celebra-sitio', m.library));
     }
@@ -189,6 +201,26 @@ export function fitMoments(c, horizontal) {
     const side = party.querySelector('.hk-celebra-lado');
     const most = horizontal ? 4 : 5;
     text.style.fontSize = '';
+    // The rosette, or the cover with it, never taller than the room: a low body (the birthday strip at 8 m) makes them
+    // smaller, from what the room leaves, rather than out of the card.
+    party.style.removeProperty('--hk-escarapela');
+    party.style.removeProperty('--hk-libro-alto');
+    party.classList.remove('hk-celebra-baja');
+    if (horizontal) {
+        const room = party.querySelector('.hk-celebra-sala');
+        const cs = window.getComputedStyle(room);
+        const free = room.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+        const rosette = party.querySelector('.hk-celebra-escarapela:not(.hk-celebra-escarapela-prendida)');
+        const cover = party.querySelector('.hk-celebra-portada');
+        if (rosette && rosette.offsetHeight > free) {
+            party.style.setProperty('--hk-escarapela', Math.floor(free / 1.31) + 'px');
+            party.classList.add('hk-celebra-baja');
+        }
+        if (cover && cover.offsetHeight > free * 0.92) {
+            party.style.setProperty('--hk-libro-alto', Math.floor(free * 0.92) + 'px');
+            party.classList.add('hk-celebra-baja');
+        }
+    }
     const states = [[], ['hk-celebra-sin-sitio'], ['hk-celebra-sin-sitio', 'hk-celebra-menor']];
     for (let n = 0; n < states.length; n++) {
         party.classList.remove('hk-celebra-sin-sitio', 'hk-celebra-menor');
