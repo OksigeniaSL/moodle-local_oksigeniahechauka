@@ -1,0 +1,239 @@
+/* Oksigenia Hechauka: «La biblioteca celebra», a slide of its own (Jujol, 13 November 2026). Goes after biblioteca.css,
+ * whose book it borrows for a cover.
+ *
+ *   <div class="hk-cuerpo hk-capa" data-composicion="celebra">
+ *     <section class="hk-celebra" data-tipo="loans|book|record|quest|challenge|first|anniversary">
+ *       <svg class="hk-celebra-serpentinas">…</svg>             (the streamers, printed and still)
+ *       <div class="hk-celebra-sala">
+ *         <div class="hk-celebra-objeto"><div class="hk-celebra-escarapela">…</div></div>
+ *           or <div class="hk-libro hk-libro-grande hk-celebra-portada"><img></div><div class="hk-celebra-escarapela …-prendida">
+ *         <div class="hk-celebra-lado"><p class="hk-celebra-etiqueta"><h2 class="hk-celebra-texto"><p class="hk-celebra-sitio">
+ *           <p class="hk-celebra-marcas"><i>…</i></p>
+ *
+ * A party, but a small one: the birthdays have the confetti, the garland and the stage; the library, its rosette and three
+ * streamers. Chromium 56: flexbox only, margins instead of gap. */
+.hk-cuerpo[data-composicion="celebra"] {
+    flex-direction: column;
+}
+.hk .hk-celebra {
+    --hk-escarapela: 52rem;
+    position: relative;
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+    border-radius: calc(2.8rem * var(--hk-esquina));
+    background: var(--hk-superficie);
+    color: var(--hk-texto);
+}
+.hk .hk-celebra-serpentinas {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    pointer-events: none;
+}
+.hk .hk-celebra-serpentina {
+    position: absolute;
+    width: 30rem;
+    height: 20rem;
+    fill: none;
+    stroke-width: 9;
+    stroke-linecap: round;
+    opacity: .55;
+}
+.hk .hk-celebra-arriba {
+    top: 0;
+    right: 0;
+}
+.hk .hk-celebra-abajo-izquierda {
+    bottom: 0;
+    left: 0;
+}
+.hk .hk-celebra-abajo-derecha {
+    right: 0;
+    bottom: 0;
+}
+.hk-celebra-serpentina-1 { stroke: var(--hk-marca-1); }
+.hk-celebra-serpentina-2 { stroke: var(--hk-marca-2); }
+.hk-celebra-serpentina-3 { stroke: var(--hk-marca-3); }
+.hk-celebra-serpentina-4 { stroke: var(--hk-marca-4); }
+[data-tema="oscuro"] .hk-celebra-serpentina-1 { stroke: var(--hk-marca-1-oscuro); }
+[data-tema="oscuro"] .hk-celebra-serpentina-2 { stroke: var(--hk-marca-2-oscuro); }
+[data-tema="oscuro"] .hk-celebra-serpentina-3 { stroke: var(--hk-marca-3-oscuro); }
+[data-tema="oscuro"] .hk-celebra-serpentina-4 { stroke: var(--hk-marca-4-oscuro); }
+.hk .hk-celebra-sala {
+    position: relative;
+    display: flex;
+    flex: 1 1 auto;
+    align-items: center;
+    min-height: 0;
+    padding: 4rem 7rem;
+}
+/* --- The rosette of the library --- */
+.hk .hk-celebra-objeto {
+    position: relative;
+    flex: none;
+    margin-right: 6rem;
+}
+.hk .hk-celebra-escarapela {
+    width: var(--hk-escarapela);
+    height: calc(var(--hk-escarapela) * 1.31);
+}
+.hk .hk-celebra-escarapela svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}
+.hk-celebra-pliegues { fill: var(--hk-marca-1); stroke: var(--hk-actividad-trazo); stroke-width: 2.4; stroke-linejoin: round; }
+.hk-celebra-cola-1 { fill: var(--hk-marca-2); stroke: var(--hk-actividad-trazo); stroke-width: 2.4; stroke-linejoin: round; }
+.hk-celebra-cola-2 { fill: var(--hk-marca-3); stroke: var(--hk-actividad-trazo); stroke-width: 2.4; stroke-linejoin: round; }
+.hk-celebra-aro { fill: none; stroke: var(--hk-actividad-crema); stroke-width: 5; stroke-dasharray: 2 7; stroke-linecap: round; }
+.hk-celebra-centro { fill: var(--hk-actividad-crema); stroke: var(--hk-actividad-trazo); stroke-width: 2.4; }
+[data-tema="oscuro"] .hk-celebra-pliegues { fill: var(--hk-marca-1-oscuro); }
+[data-tema="oscuro"] .hk-celebra-cola-1 { fill: var(--hk-marca-2-oscuro); }
+[data-tema="oscuro"] .hk-celebra-cola-2 { fill: var(--hk-marca-3-oscuro); }
+/* The cover of the book a moment is about, with the rosette pinned on its corner. */
+.hk .hk-celebra-con-portada {
+    --hk-libro-alto: 60rem;
+}
+.hk .hk-celebra-portada {
+    margin-right: 0;
+}
+.hk .hk-celebra-escarapela-prendida {
+    position: absolute;
+    top: -4rem;
+    right: -9rem;
+    width: calc(var(--hk-libro-alto) * .36);
+    height: calc(var(--hk-libro-alto) * .36 * 1.31);
+    -webkit-transform: rotate(8deg);
+    transform: rotate(8deg);
+}
+.hk .hk-celebra-con-portada .hk-celebra-objeto {
+    margin-right: 13rem;
+}
+/* --- What it says --- */
+.hk .hk-celebra-lado {
+    display: flex;
+    flex: 1 1 0px;
+    flex-direction: column;
+    justify-content: center;
+    align-self: stretch;
+    min-width: 0;
+}
+.hk .hk-celebra-etiqueta {
+    flex: none;
+    margin-bottom: 2rem;
+    color: var(--hk-acento-texto);
+    font-size: var(--hk-t-min);
+    font-weight: 800;
+    letter-spacing: .05em;
+    line-height: 1.04;
+    text-transform: uppercase;
+}
+.hk .hk-celebra-texto {
+    padding-bottom: .1em;
+    font-family: var(--hk-letra-titulos);
+    font-size: var(--hk-t-titular);
+    font-weight: 800;
+    letter-spacing: -.015em;
+    line-height: 1.06;
+}
+.hk .hk-celebra[data-ajuste="1"] .hk-celebra-texto { font-size: calc(var(--hk-t-titular) * .88); }
+.hk .hk-celebra[data-ajuste="2"] .hk-celebra-texto { font-size: calc(var(--hk-t-titular) * .78); }
+.hk .hk-celebra[data-ajuste="3"] .hk-celebra-texto { font-size: calc(var(--hk-t-titular) * .7); }
+.hk .hk-celebra-sitio {
+    margin-top: 2rem;
+    color: var(--hk-texto-suave);
+    font-size: var(--hk-t-lista);
+    font-weight: 700;
+    line-height: 1.08;
+}
+.hk .hk-celebra.hk-celebra-sin-sitio .hk-celebra-sitio {
+    display: none;
+}
+.hk .hk-celebra.hk-celebra-menor {
+    --hk-escarapela: 40rem;
+}
+.hk .hk-celebra.hk-celebra-menor.hk-celebra-con-portada {
+    --hk-libro-alto: 46rem;
+}
+/* One mark per moment, as the zones' column has: the one of now lit, the rest faint. */
+.hk .hk-celebra-marcas {
+    display: flex;
+    flex: none;
+    margin-top: 3.4rem;
+}
+.hk .hk-celebra-marcas i {
+    display: block;
+    width: 5.6rem;
+    height: 1.2rem;
+    margin-right: 1.4rem;
+    border-radius: .6rem;
+    background: var(--hk-marca-1);
+    opacity: .28;
+}
+.hk .hk-celebra-marcas i[data-n="2"] { background: var(--hk-marca-2); }
+.hk .hk-celebra-marcas i[data-n="3"] { background: var(--hk-marca-3); }
+.hk .hk-celebra-marcas i[data-n="4"] { background: var(--hk-marca-4); }
+[data-tema="oscuro"] .hk .hk-celebra-marcas i[data-n="1"] { background: var(--hk-marca-1-oscuro); }
+[data-tema="oscuro"] .hk .hk-celebra-marcas i[data-n="2"] { background: var(--hk-marca-2-oscuro); }
+[data-tema="oscuro"] .hk .hk-celebra-marcas i[data-n="3"] { background: var(--hk-marca-3-oscuro); }
+[data-tema="oscuro"] .hk .hk-celebra-marcas i[data-n="4"] { background: var(--hk-marca-4-oscuro); }
+.hk .hk-celebra-marcas i.hk-celebra-marca-actual {
+    opacity: 1;
+}
+/* --- From afar: the rosette smaller and the sentence over most of the body; the cover too. --- */
+.hk[data-distancia="5"] .hk-celebra {
+    --hk-escarapela: 44rem;
+}
+.hk[data-distancia="8"] .hk-celebra {
+    --hk-escarapela: 34rem;
+}
+.hk[data-distancia="8"] .hk-celebra-con-portada {
+    --hk-libro-alto: 48rem;
+}
+.hk[data-distancia="8"] .hk-celebra-sala {
+    padding: 3rem 5rem;
+}
+.hk[data-distancia="8"] .hk-celebra-objeto {
+    margin-right: 4.5rem;
+}
+.hk[data-distancia="8"] .hk-celebra-con-portada .hk-celebra-objeto {
+    margin-right: 10rem;
+}
+/* --- Vertical: the rosette on top, the words under it --- */
+.hk.hk-vertical .hk-celebra {
+    --hk-escarapela: 44rem;
+}
+.hk.hk-vertical .hk-celebra-sala {
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 6rem 6rem 7rem;
+}
+.hk.hk-vertical .hk-celebra-objeto {
+    margin: 0 0 5rem;
+}
+.hk.hk-vertical .hk-celebra-lado {
+    flex: 1 1 0px;
+    justify-content: flex-start;
+    min-height: 0;
+}
+.hk.hk-vertical .hk-celebra-con-portada {
+    --hk-libro-alto: 56rem;
+}
+.hk.hk-vertical[data-distancia="8"] .hk-celebra {
+    --hk-escarapela: 36rem;
+}
+/* Upright, the words go down to the foot: only the curls of the top and of the bottom right, with their room kept. */
+.hk.hk-vertical .hk-celebra-abajo-izquierda {
+    display: none;
+}
+.hk.hk-vertical .hk-celebra-sala {
+    padding-bottom: 14rem;
+}

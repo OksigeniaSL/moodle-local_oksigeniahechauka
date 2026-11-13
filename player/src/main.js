@@ -594,6 +594,9 @@ class Player {
                 books: liveItems(m.items || [], 'extra', wall).filter(function (it) {
                     return it.type === 'books';
                 })[0] || null,
+                moments: liveItems(m.items || [], 'extra', wall).filter(function (it) {
+                    return it.type === 'moments' && it.moments && it.moments.length;
+                })[0] || null,
                 deadlines: liveItems(m.items || [], 'extra', wall).filter(function (it) {
                     return it.type === 'deadlines';
                 })[0] || null,

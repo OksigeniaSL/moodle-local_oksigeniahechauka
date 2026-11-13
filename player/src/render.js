@@ -11,6 +11,7 @@ import {buildDeadlines, fitDeadlines} from './plazos.js';
 import {buildIdle} from './reposo.js';
 import {buildTable, fitTable} from './tabla.js';
 import {buildBooks, fitBooks} from './biblioteca.js';
+import {buildMoments, fitMoments} from './celebra.js';
 import {buildChannel, fitChannel, startChannel, stopChannel} from './canal.js';
 import {qrSvg, shortWeb} from './qr.js';
 import {even} from './balance.js';
@@ -31,7 +32,7 @@ const PHRASE_WAITS_MS = 25000;
 const CAPTION_MS = 2800;
 
 /** The compositions that are made anew each time, never only their pictures changed. */
-const NEW_EACH = {'solo-hoy': true, semana: true, titular: true, agenda: true, muro: true, 'fotos-tercio': true, cumple: true, biblioteca: true, canal: true, plazos: true,
+const NEW_EACH = {'solo-hoy': true, semana: true, titular: true, agenda: true, muro: true, 'fotos-tercio': true, cumple: true, biblioteca: true, celebra: true, canal: true, plazos: true,
     tabla: true, zonas: true};
 
 /** The width over the height of each slot shape, to measure a portrait slot when the body is lower than the sheet expects. */
@@ -731,6 +732,11 @@ export class Screen {
                 }});
             return c;
         }
+        if (comp === 'celebra') {
+            buildMoments(c, extra && extra.item, (extra && extra.page) || 0, {distance: this.distance || 3,
+                horizontal: this.horizontal, media: mediaOf});
+            return c;
+        }
         if (comp === 'canal') {
             // The centre's channel: its words, and its QR on a white card, the picture of the site's shortener or drawn here.
             buildChannel(c, extra && extra.item, {s: this.s, qr: function (url, image) {
@@ -1219,6 +1225,7 @@ export class Screen {
         fitZones(c);
         fitBirthdays(c);
         fitBooks(c, this.horizontal);
+        fitMoments(c, this.horizontal);
         fitChannel(c, this.horizontal);
         fitDeadlines(c);
         fitTable(c);
@@ -1239,8 +1246,9 @@ export class Screen {
     }
 
     /**
-     * A portrait slot beside «Today» keeps its shape when the body is lower than the sheet's widths expect (the birthday
-     * strip above the ticker): its width from its height. Without the strip, the sheet's.
+     * A portrait slot beside «Today» keeps its shape: its width from its height, as the body is laid out now. The sheet's
+     * widths (composiciones.css) come from the body of 0.6 and are only where it starts; the body is lower at every
+     * distance since 0.7, and lower still with the birthday strip above the ticker, so a width of the sheet cut the photo.
      *
      * @param {HTMLElement} c the layer
      * @param {string} comp
@@ -1249,8 +1257,7 @@ export class Screen {
         if (comp !== 'vertical-hoy' && comp !== 'dos-verticales') {
             return;
         }
-        const f = this.frame;
-        const on = this.horizontal && f.classList.contains('hk-con-franja') && !f.classList.contains('hk-sin-franja');
+        const on = this.horizontal;
         const slots = c.querySelectorAll('.hk-medio[data-forma]');
         for (let i = 0; i < slots.length; i++) {
             const m = slots[i];

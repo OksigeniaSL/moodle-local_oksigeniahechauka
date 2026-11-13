@@ -82,6 +82,17 @@ const PARTS = {
         ['.hk-biblio-cabeza .hk-qr', 'qr', 5],
         ['.hk-biblio-otros > *', 'estante', 4, 'each'],
     ],
+    // What the library celebrates: the rosette is pinned on as a stamp, or the cover is put in its place and the rosette on
+    // it; then the words, and the marks of the moments last.
+    'celebra': [
+        ['.hk-celebra', 'marco', 0],
+        ['.hk-celebra-portada', 'libro', 1],
+        ['.hk-celebra-escarapela', 'sello', 1.5],
+        ['.hk-celebra-lado > .hk-celebra-etiqueta', 'sube', 2.5],
+        ['.hk-celebra-texto', 'sube', 3],
+        ['.hk-celebra-sitio', 'sube', 4],
+        ['.hk-celebra-marcas', 'sube', 5],
+    ],
     // The channel: its words, and then its last message arrives, the card with the QR (Gaudí, 8 November 2026).
     'canal': [
         ['.hk-canal', 'marco', 0],
