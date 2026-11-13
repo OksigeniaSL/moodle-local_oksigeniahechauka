@@ -23,7 +23,9 @@
     Example context (json):
     {
         "style": "", "title": "Pantallas", "hastabs": false, "tabs": [], "action": "#", "sesskey": "abc",
-        "rows": [], "count": 0, "groups": [], "groupcount": 0, "hasgroups": false, "everywhere": [], "haseverywhere": false, "managers": [],
+        "rows": [], "count": 0, "groups": [], "groupcount": 0, "hasgroups": false,
+        "everywhere": [{"userid": 3, "name": "Marta Gil", "initials": "MG", "detail": "", "tell": true,
+            "telllabel": "Tell Marta Gil", "own": true, "label": "Remove Marta Gil"}], "haseverywhere": true, "managers": [],
         "hasmanagers": false, "choosemanagers": false,
         "player": "https://example.com/local/oksigeniahechauka/player/", "claim": "#", "prepare": "#", "people": "#", "admin": "",
         "icons": {"qr": "", "x": "", "plus": "", "search": "", "sliders": "", "copy": "", "mail": ""}, "strings": "{}"
@@ -66,7 +68,7 @@
                 </div>{{/hascoursecats}}
                 <div><span class="hkp-k">{{#str}}groups_people, local_oksigeniahechauka{{/str}}</span>
                     <ul class="hkp-people">
-                        {{#people}}<li class="hkp-person"><span class="hkp-av" aria-hidden="true">{{initials}}</span><span>{{name}}{{#detail}}<small>{{detail}}</small>{{/detail}}</span><span class="hkp-person-tools"><button type="button" class="btn btn-sm btn-outline-secondary btn-icon" data-tell-user="{{userid}}" aria-label="{{telllabel}}" title="{{telllabel}}">{{{icons.mail}}}</button><a class="btn btn-sm btn-outline-secondary btn-icon" href="#" data-remove-user="{{userid}}" aria-label="{{label}}">{{{icons.x}}}</a></span></li>{{/people}}
+                        {{#people}}<li class="hkp-person"><span class="hkp-av" aria-hidden="true">{{initials}}</span><span>{{name}}{{#detail}}<small>{{detail}}</small>{{/detail}}</span><span class="hkp-person-tools">{{#tell}}<button type="button" class="btn btn-sm btn-outline-secondary btn-icon" data-tell-user="{{userid}}" aria-label="{{telllabel}}" title="{{telllabel}}">{{{icons.mail}}}</button>{{/tell}}<a class="btn btn-sm btn-outline-secondary btn-icon" href="#" data-remove-user="{{userid}}" aria-label="{{label}}">{{{icons.x}}}</a></span></li>{{/people}}
                         {{^haspeople}}<li class="hkp-hint">{{#str}}groups_nobody_yet, local_oksigeniahechauka{{/str}}</li>{{/haspeople}}
                     </ul>
                 </div>
@@ -81,7 +83,7 @@
         <article class="hkp-group is-perm" id="hkp-all" data-list="everywhere" data-group="0">
             <header class="is-stacked"><h3>{{#str}}groups_everywhere, local_oksigeniahechauka{{/str}}</h3><p class="hkp-hint">{{#str}}groups_everywhere_help, local_oksigeniahechauka{{/str}}</p></header>
             <ul class="hkp-people">
-                {{#everywhere}}<li class="hkp-person"><span class="hkp-av" aria-hidden="true">{{initials}}</span><span>{{name}}{{#detail}}<small>{{detail}}</small>{{/detail}}</span><span class="hkp-person-tools"><button type="button" class="btn btn-sm btn-outline-secondary btn-icon" data-tell-user="{{userid}}" aria-label="{{telllabel}}" title="{{telllabel}}">{{{icons.mail}}}</button>{{#own}}<a class="btn btn-sm btn-outline-secondary btn-icon" href="#" data-remove-user="{{userid}}" aria-label="{{label}}">{{{icons.x}}}</a>{{/own}}</span></li>{{/everywhere}}
+                {{#everywhere}}<li class="hkp-person"><span class="hkp-av" aria-hidden="true">{{initials}}</span><span>{{name}}{{#detail}}<small>{{detail}}</small>{{/detail}}</span><span class="hkp-person-tools">{{#tell}}<button type="button" class="btn btn-sm btn-outline-secondary btn-icon" data-tell-user="{{userid}}" aria-label="{{telllabel}}" title="{{telllabel}}">{{{icons.mail}}}</button>{{/tell}}{{#own}}<a class="btn btn-sm btn-outline-secondary btn-icon" href="#" data-remove-user="{{userid}}" aria-label="{{label}}">{{{icons.x}}}</a>{{/own}}</span></li>{{/everywhere}}
                             {{^haseverywhere}}<li class="hkp-hint">{{#str}}groups_nobody_else, local_oksigeniahechauka{{/str}}</li>{{/haseverywhere}}
             </ul>
             <div class="hkp-search" data-list="everywhere" data-group="0">{{{icons.search}}}<input class="form-control" role="combobox" aria-expanded="false" aria-controls="hkp-lb-everywhere" aria-autocomplete="list" placeholder="{{#str}}groups_search, local_oksigeniahechauka{{/str}}" aria-label="{{#str}}groups_everywhere_search_label, local_oksigeniahechauka{{/str}}" autocomplete="off" spellcheck="false"><ul class="hkp-listbox" id="hkp-lb-everywhere" role="listbox" aria-label="{{#str}}groups_found, local_oksigeniahechauka{{/str}}" hidden></ul></div>
@@ -89,7 +91,7 @@
         <article class="hkp-group is-perm" id="hkp-managers" data-list="managers" data-group="0">
             <header class="is-stacked"><h3>{{#str}}groups_managers, local_oksigeniahechauka{{/str}}</h3><p class="hkp-hint">{{#str}}groups_managers_help, local_oksigeniahechauka{{/str}}</p></header>
             <ul class="hkp-people">
-                {{#managers}}<li class="hkp-person"><span class="hkp-av" aria-hidden="true">{{initials}}</span><span>{{name}}{{#detail}}<small>{{detail}}</small>{{/detail}}</span><span class="hkp-person-tools"><button type="button" class="btn btn-sm btn-outline-secondary btn-icon" data-tell-user="{{userid}}" aria-label="{{telllabel}}" title="{{telllabel}}">{{{icons.mail}}}</button>{{#own}}<a class="btn btn-sm btn-outline-secondary btn-icon" href="#" data-remove-user="{{userid}}" aria-label="{{label}}">{{{icons.x}}}</a>{{/own}}</span></li>{{/managers}}
+                {{#managers}}<li class="hkp-person"><span class="hkp-av" aria-hidden="true">{{initials}}</span><span>{{name}}{{#detail}}<small>{{detail}}</small>{{/detail}}</span><span class="hkp-person-tools">{{#tell}}<button type="button" class="btn btn-sm btn-outline-secondary btn-icon" data-tell-user="{{userid}}" aria-label="{{telllabel}}" title="{{telllabel}}">{{{icons.mail}}}</button>{{/tell}}{{#own}}<a class="btn btn-sm btn-outline-secondary btn-icon" href="#" data-remove-user="{{userid}}" aria-label="{{label}}">{{{icons.x}}}</a>{{/own}}</span></li>{{/managers}}
                             {{^hasmanagers}}<li class="hkp-hint">{{#str}}groups_nobody_else, local_oksigeniahechauka{{/str}}</li>{{/hasmanagers}}
             </ul>
             {{#choosemanagers}}<div class="hkp-search" data-list="managers" data-group="0">{{{icons.search}}}<input class="form-control" role="combobox" aria-expanded="false" aria-controls="hkp-lb-managers" aria-autocomplete="list" placeholder="{{#str}}groups_search, local_oksigeniahechauka{{/str}}" aria-label="{{#str}}groups_managers_search_label, local_oksigeniahechauka{{/str}}" autocomplete="off" spellcheck="false"><ul class="hkp-listbox" id="hkp-lb-managers" role="listbox" aria-label="{{#str}}groups_found, local_oksigeniahechauka{{/str}}" hidden></ul></div>{{/choosemanagers}}

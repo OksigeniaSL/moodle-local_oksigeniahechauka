@@ -107,10 +107,10 @@ final class forms_test extends \advanced_testcase {
 
     /**
      * In «Screens and groups», giving a permission tells nobody and says so; the envelope beside the person tells them,
-     * and only someone who has that permission.
+     * and only someone who has that permission; never beside one's own name.
      */
     public function test_permission_told_from_the_panel(): void {
-        global $DB, $OUTPUT;
+        global $DB, $OUTPUT, $USER;
         $this->resetAfterTest();
         $this->setAdminUser();
         $now = time();
@@ -135,6 +135,12 @@ final class forms_test extends \advanced_testcase {
         $_POST['group'] = $group;
         $this->assertNull(groupspage::act('telleditor', $now));
         $this->assertCount(2, $sink->get_messages());
+        // Never an envelope beside one's own name.
+        $_POST = ['user' => $USER->id, 'group' => 0];
+        groupspage::act('addeverywhere', $now);
+        $html = $OUTPUT->render_from_template('local_oksigeniahechauka/groups', groupspage::context($now));
+        $this->assertStringContainsString('data-tell-user="' . $user->id . '"', $html);
+        $this->assertStringNotContainsString('data-tell-user="' . $USER->id . '"', $html);
         $_POST = [];
     }
 

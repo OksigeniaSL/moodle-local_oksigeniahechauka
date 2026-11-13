@@ -177,17 +177,21 @@ class groupspage {
     }
 
     /**
-     * A person as the page draws them: initials, name, and under it a note or their department if any.
+     * A person as the page draws them: initials, name, under it a note or their department if any, and whether the
+     * envelope to tell them goes beside them.
      *
      * @param \stdClass $user
      * @param string $note
      * @return array
      */
     protected static function person(\stdClass $user, string $note = ''): array {
+        global $USER;
         $words = preg_split('/\s+/', trim(($user->firstname ?? '') . ' ' . ($user->lastname ?? '')));
         return [
             'userid' => (int) $user->id,
             'name' => fullname($user),
+            // The envelope tells someone else of their permission: never beside one's own name.
+            'tell' => (int) $user->id !== (int) $USER->id,
             'telllabel' => get_string('groups_tell', 'local_oksigeniahechauka', fullname($user)),
             'initials' => \core_text::strtoupper(\core_text::substr($words[0] ?? '', 0, 1) .
                 \core_text::substr(end($words) ?: '', 0, 1)),
