@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.19.2
+
+- **Birthdays with their photos also right after a screen starts.** When the birthday slide or band came before the
+  photos were on the device (a screen just started or updated, with many files to bring), the player asked for each photo
+  by its address, which needs the screen's key that a picture does not carry: the server refused it and a creature took
+  its place. Now a photo is shown only from the device; the big slide waits for its photos, ten minutes at most, and the
+  band puts each photo in as soon as it arrives.
+
 ## 0.19.1
 
 - **A destination the link shortener refuses for good is not asked for again for a month** (an address outside the

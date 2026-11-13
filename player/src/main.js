@@ -26,6 +26,8 @@ const VERSION = '0.9.1';
 const COMING_DAYS = 7;
 const HEARTBEAT_MS = 60000;
 const REFRESH_MS = 15 * 60000;
+// The longest the big birthday slide waits for its photos to be on the device.
+const BIRTHDAYS_WAIT_MS = 10 * 60000;
 
 function query() {
     const q = {};
@@ -532,6 +534,32 @@ class Player {
         }
     }
 
+    /**
+     * Whether the photos of the birthdays are on the device, or failed: the big celebration waits for them, ten minutes at
+     * most from when the item is first seen, and then comes with the creature for what did not arrive.
+     *
+     * @param {Object|null} item the birthdays of the manifest
+     * @returns {boolean}
+     */
+    birthdaysReady(item) {
+        if (!item || !item.people || !this.media) {
+            return true;
+        }
+        const media = this.media;
+        const waiting = item.people.some(function (p) {
+            return !!(p.photo && p.photo.sha1 && !media.ready(p.photo) && !media.failed[p.photo.sha1]);
+        });
+        if (!waiting) {
+            return true;
+        }
+        const key = item.id || item.date || 'birthdays';
+        this.birthdaysSeen = this.birthdaysSeen || {};
+        if (!this.birthdaysSeen[key]) {
+            this.birthdaysSeen[key] = Date.now();
+        }
+        return Date.now() - this.birthdaysSeen[key] > BIRTHDAYS_WAIT_MS;
+    }
+
     /** The composition the rules choose, shown, and the one after it in its seconds. */
     turn() {
         if (!this.manifest) {
@@ -576,6 +604,9 @@ class Player {
         const distance = (m.screen && m.screen.distance) || 3;
         const phrase = (m.centre && m.centre.phrase) || '';
         const turns = this.albumTurns;
+        const birthdayItem = liveItems(m.items || [], 'extra', wall).filter(function (it) {
+            return it.type === 'birthdays';
+        })[0] || null;
         const choice = this.composer.next(oneOfEachAlbum(queue, turns), countToday(today) + coming, this.screen.horizontal,
             {menu: !!today.menu, noToday: m.template === 'full', use,
                 weather: !!(m.weather && m.weather.days && m.weather.days.length),
@@ -588,9 +619,8 @@ class Player {
                 centre: phrase && distance === 8 ? phrase : null,
                 idleQr: (m.idle && m.idle.qr) || null,
                 idleQrImage: (m.idle && m.idle.qrimage) || null,
-                birthdays: liveItems(m.items || [], 'extra', wall).filter(function (it) {
-                    return it.type === 'birthdays';
-                })[0] || null,
+                birthdays: birthdayItem,
+                birthdaysReady: this.birthdaysReady(birthdayItem),
                 books: liveItems(m.items || [], 'extra', wall).filter(function (it) {
                     return it.type === 'books';
                 })[0] || null,

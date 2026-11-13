@@ -342,3 +342,15 @@ test('from afar, on a landscape screen, two portraits go one at a time, never as
     assert.notEqual(first.comp, 'dos-verticales');
     assert.equal(first.items.length, 1);
 });
+
+test('the big birthday slide waits while its photos are on their way, and comes as soon as they are there', () => {
+    const c = new Composer();
+    const birthdays = {id: 'b', type: 'birthdays', people: [{name: 'A', photo: {sha1: 'x'}}]};
+    const waiting = [];
+    for (let i = 0; i < 10; i++) {
+        waiting.push(c.next([], 4, true, {birthdays, birthdaysReady: false, distance: 3}).comp);
+    }
+    assert.ok(!waiting.includes('cumple'), waiting.join(' '));
+    assert.equal(c.next([], 4, true, {birthdays, birthdaysReady: true, distance: 3}).comp, 'cumple');
+});
+

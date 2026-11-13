@@ -2,7 +2,7 @@
 
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {garland, garlandPlan, paper} from '../src/franja.js';
+import {garland, garlandPlan, paper, stripKey} from '../src/franja.js';
 
 test('the garland hangs from a point every 200 to 250 px at 3 m, with pennants of 22 to 26 px', () => {
     // At 3 m on a 1080 screen the garland is 4.8 rem: 48 px.
@@ -41,3 +41,12 @@ test('the printed confetti is always the same for the same size', () => {
     assert.equal(paper(1920, 140, 17), paper(1920, 140, 17));
     assert.ok((paper(1920, 140, 17).match(/hk-franja-confeti-/g) || []).length > 20);
 });
+
+test('on a screen the strip never takes the photo by its address, which asks for the key: only from the device', () => {
+    const item = {people: [{name: 'A', photo: {sha1: 'x', url: 'https://moodle.example/api/media.php?f=1'}}]};
+    assert.equal(stripKey(item, () => null), 'A|||');
+    assert.equal(stripKey(item, () => 'blob:1'), 'A|||blob:1');
+    // Without a device (the panel's preview), its address.
+    assert.equal(stripKey(item, null), 'A|||https://moodle.example/api/media.php?f=1');
+});
+

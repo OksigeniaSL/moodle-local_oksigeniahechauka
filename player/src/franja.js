@@ -65,7 +65,7 @@ export function stripKey(item, media) {
         return '';
     }
     return item.people.map(function (p) {
-        return [p.name, p.group || '', p.kicker || '', p.photo ? (media ? media(p.photo) : '') || p.photo.url || '' : ''].join('|');
+        return [p.name, p.group || '', p.kicker || '', p.photo ? (media ? media(p.photo) || '' : p.photo.url || '') : ''].join('|');
     }).join('\n');
 }
 

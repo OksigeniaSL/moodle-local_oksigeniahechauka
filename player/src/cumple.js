@@ -74,7 +74,9 @@ let copies = 0;
 // the birthday strip's (franja.js).
 export function face(p, media, cls) {
     const f = el('div', 'hk-cumple-cara' + (cls ? ' ' + cls : ''));
-    const src = p.photo ? (media ? media(p.photo) : null) || p.photo.url || (typeof p.photo === 'string' ? p.photo : null) : null;
+    // On a screen the photo is shown only from the device: its address asks for the screen's key, which an image does not
+    // carry, and the server answers «unauthorised». Until it arrives, the creature; the strip is drawn again when it does.
+    const src = !p.photo ? null : media ? media(p.photo) : p.photo.url || (typeof p.photo === 'string' ? p.photo : null);
     const creature = function () {
         f.classList.add('is-bichito');
         // The creature's ids come from the name, and the same name is on the slide more than once (on the garland, in

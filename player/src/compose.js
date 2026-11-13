@@ -226,7 +226,9 @@ export class Composer {
         // seeing their name; the library, one in sixteen. Each turn the next page, which the slide knows how to show.
         this.sinceBirthday = (this.sinceBirthday === undefined ? BIRTHDAY_EVERY : this.sinceBirthday) + 1;
         this.sinceBooks = (this.sinceBooks === undefined ? BOOKS_EVERY / 2 : this.sinceBooks) + 1;
-        if (o.birthdays && birthdaysShow(o.birthdays) && this.sinceBirthday > BIRTHDAY_EVERY) {
+        // The big celebration waits for its photos (o.birthdaysReady, false while some are still on their way), so that
+        // nobody gets a creature for a face because the screen had just started.
+        if (o.birthdays && birthdaysShow(o.birthdays) && o.birthdaysReady !== false && this.sinceBirthday > BIRTHDAY_EVERY) {
             this.sinceBirthday = 1;
             this.birthdayPage = (this.birthdayPage === undefined ? -1 : this.birthdayPage) + 1;
             return pick('cumple', [], birthdaysSeconds(o.birthdays), {item: o.birthdays, page: this.birthdayPage});
