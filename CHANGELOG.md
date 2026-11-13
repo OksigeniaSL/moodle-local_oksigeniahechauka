@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.19.1
+
+- **A destination the link shortener refuses for good is not asked for again for a month** (an address outside the
+  domains of its key, or none): before, it was asked every hour, spending the limit every plugin of the site shares.
+  The shared client of the shortener says now why it gave nothing, and a «too many at once» waits as long as it asks.
+
 ## 0.19.0
 
 - **«The library celebrates»**, a new source where the site has Oksigenia Ayvurenda: what the library celebrates this week,

@@ -104,9 +104,11 @@ class playerlink {
         }
         $short = $shortener->shorten(self::long(), get_string('playerlink_title', $c), false, self::keyword());
         if ($short === null) {
-            set_config('playershorttried', $now, $c);
+            // A refusal for good (the site's address outside the key's domains) is not asked again for a month.
+            $final = $shortener->is_final();
+            set_config('playershorttried', $final ? $now + links::FINAL_WAIT : $now, $c);
             set_config('playershorttriedfor', $for, $c);
-            return 'the shortener gave none';
+            return 'the shortener gave none' . ($final ? ' (' . $shortener->last_code() . ', for good)' : '');
         }
         set_config('playershort', $short, $c);
         set_config('playershortfor', $for, $c);

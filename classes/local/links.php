@@ -42,6 +42,10 @@ class links {
     /** @var int Seconds before asking again for a link or a QR the shortener did not give. */
     const RETRY = HOURSECS;
 
+    /** @var int Seconds before asking again for a destination the shortener refused for good (shortener::FINAL), not to
+     * spend the limit all the plugins share on an answer that will not change. */
+    const FINAL_WAIT = 30 * DAYSECS;
+
     /** @var int Seconds a link nobody shows is kept. */
     const FORGET = 60 * DAYSECS;
 
@@ -183,6 +187,9 @@ class links {
                 $record->short = $link['short'];
                 $record->qrsvg = $link['qrsvg'] !== '' ? $link['qrsvg'] : null;
                 $record->qrdone = 0;
+            } else if ($shortener->is_final()) {
+                // Noted as tried in the future: neither the task nor a screen asks for it again before then.
+                $record->timetried = $now + self::FINAL_WAIT;
             }
         }
         if ($record->short && $record->qrsvg && !$record->qrdone) {

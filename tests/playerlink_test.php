@@ -82,8 +82,8 @@ final class playerlink_test extends \advanced_testcase {
         set_config('shortenerkey', 'k3y', 'local_oksigeniahechauka');
         $long = playerlink::long();
 
-        // The word is taken and the shortener refuses the address too (another domain): none. The mocks are a stack.
-        \curl::mock_response(json_encode(['status' => 'fail', 'code' => 'error:nourl']));
+        // The word is taken and the shortener is going too fast for now: none. The mocks are a stack.
+        \curl::mock_response(json_encode(['status' => 'fail', 'code' => 'error:limit']));
         \curl::mock_response(json_encode(['status' => 'fail', 'code' => 'error:keyword']));
         $this->assertSame('the shortener gave none', playerlink::refresh(10000));
         $this->assertSame($long, playerlink::shown());
@@ -98,5 +98,21 @@ final class playerlink_test extends \advanced_testcase {
         // Saving the settings forgets it, and the task makes it again.
         playerlink::forget();
         $this->assertSame($long, playerlink::shown());
+    }
+
+    /**
+     * When the shortener refuses the player's address for good (outside the domains of its key), it is not asked again
+     * for a month: an answer that will not change does not spend the limit all the plugins share.
+     */
+    public function test_a_refusal_for_good_waits_a_month(): void {
+        global $CFG;
+        require_once($CFG->libdir . '/filelib.php');
+        $this->resetAfterTest();
+        set_config('shortenerapi', 'https://short.example/yourls-api.php', 'local_oksigeniahechauka');
+        set_config('shortenerkey', 'k3y', 'local_oksigeniahechauka');
+        \curl::mock_response(json_encode(['status' => 'fail', 'code' => 'error:domain']));
+        \curl::mock_response(json_encode(['status' => 'fail', 'code' => 'error:keyword']));
+        $this->assertSame('the shortener gave none (error:domain, for good)', playerlink::refresh(10000));
+        $this->assertSame('waiting to try again', playerlink::refresh(10000 + 29 * DAYSECS));
     }
 }

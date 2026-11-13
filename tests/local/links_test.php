@@ -196,4 +196,30 @@ final class links_test extends \advanced_testcase {
         $gone = $later + screens::PAIR_MINUTES * MINSECS + screens::PAIR_GRACE + 1;
         $this->assertNotSame($first['code'], screens::start_pairing([], $gone, $first['token'])['code']);
     }
+
+    /**
+     * A destination the shortener refuses for good (outside the domains of its key) is not asked for again for a month,
+     * neither by the task nor by a screen; one it refuses for now (too many at once) is, an hour later.
+     */
+    public function test_a_refusal_for_good_is_not_asked_again(): void {
+        global $CFG, $DB;
+        require_once($CFG->libdir . '/filelib.php');
+        $this->resetAfterTest();
+        $this->shortener();
+        shortener::$wait = 0;
+        $now = time();
+        \curl::mock_response(json_encode(['status' => 'fail', 'code' => 'error:domain']));
+        $this->assertSame('https://elsewhere.example/x', links::now('https://elsewhere.example/x', $now)['url']);
+        $byurl = $DB->sql_compare_text('url') . ' = ' . $DB->sql_compare_text(':url');
+        $record = $DB->get_record_select(links::TABLE, $byurl, ['url' => 'https://elsewhere.example/x']);
+        $this->assertGreaterThan($now + 29 * DAYSECS, (int) $record->timetried);
+        // An hour and a day later, nothing is asked: no answer is pushed, and none is taken.
+        $this->assertSame('https://elsewhere.example/x', links::now('https://elsewhere.example/x', $now + DAYSECS)['url']);
+        $this->assertStringStartsWith('0 asked', links::refresh($now + DAYSECS));
+
+        \curl::mock_response(json_encode(['status' => 'fail', 'code' => 'error:limit']));
+        links::now('https://example.org/busy', $now);
+        $busy = $DB->get_record_select(links::TABLE, $byurl, ['url' => 'https://example.org/busy']);
+        $this->assertSame($now, (int) $busy->timetried);
+    }
 }
