@@ -289,6 +289,9 @@ class manifest {
         if (!empty($config->sourcebooks)) {
             $items = array_merge($items, sources::books($now, (int) ($config->booksdays ?? 14) ?: 14));
         }
+        if (!empty($config->sourcemoments)) {
+            $items = array_merge($items, sources::moments($now));
+        }
         if (!empty($config->sourcechannel)) {
             $items = array_merge($items, sources::channel());
         }

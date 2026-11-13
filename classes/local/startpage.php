@@ -29,7 +29,8 @@ class startpage {
         'company' => '18:00', 'other' => '18:00'];
 
     /** @var string[] The sources that can be turned on or off here. */
-    const SOURCES = ['sourcecalendar', 'sourcenews', 'sourcemenu', 'sourcebooks', 'sourcechannel', 'sourcedeadlines'];
+    const SOURCES = ['sourcecalendar', 'sourcenews', 'sourcemenu', 'sourcebooks', 'sourcemoments', 'sourcechannel',
+        'sourcedeadlines'];
 
     /**
      * Whether to send whoever runs the screens here instead of an empty panel: only the first time, with no screen yet.
@@ -115,6 +116,11 @@ class startpage {
         if ($hasbooks) {
             $rows[] = ['setting' => 'sourcebooks', 'name' => get_string('start_source_books', $c), 'available' => true,
                 'now' => self::figure('books', $books)];
+        }
+        if (sources::has_moments()) {
+            $list = sources::moments($now);
+            $rows[] = ['setting' => 'sourcemoments', 'name' => get_string('start_source_moments', $c), 'available' => true,
+                'now' => self::figure('moments', $list ? count($list[0]['moments']) : 0)];
         }
         $channel = sources::channel();
         if ($channel) {
