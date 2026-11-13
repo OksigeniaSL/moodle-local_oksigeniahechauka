@@ -78,10 +78,93 @@ export function walkOf(meta, width, scale, random) {
     // From where it enters: the part of the cell that goes first has to start out of sight.
     const ahead = (meta.cell.w - meta.anchor.x) * scale;
     const behind = meta.anchor.x * scale;
-    const into = width * (0.2 + 0.25 * random());
+    let into = width * (0.2 + 0.25 * random());
+    if (meta.posa) {
+        // What lands (the robin) comes down a good way past where `para` begins and hops on: all of it on the screen.
+        const dx = (state) => meta.estados[state].avance.reduce((total, step) => total + step[0], 0);
+        const most = Math.max.apply(null, meta.gestos.map(dx));
+        const reach = (dx('para') + most + meta.cell.w - meta.anchor.x) * scale;
+        into = Math.max(width * 0.04, Math.min(into, width - reach));
+    }
     const turns = Math.max(1, Math.ceil((into + ahead) / turn));
     const stop = dir > 0 ? into : width - into;
     return {dir, turns, from: stop - dir * turns * turn, exit: dir > 0 ? width + behind : -behind};
+}
+
+/**
+ * The leap of what jumps in from under the bottom edge (the frog's `entra`, with `desde: 'abajo'`): it lands on the floor at
+ * `land`; before its own frames, its first frame again and again continues the parabola back in time with its gravity `g`,
+ * until the whole cell starts out of sight. Null when, on a floor this high, it would show going faster than `tope` px a
+ * frame: a blur, so it hops in from the side instead.
+ *
+ * @param {object} meta the atlas's
+ * @param {number} land the x it lands at
+ * @param {number} floor the y it lands on
+ * @param {number} height of the screen
+ * @param {number} scale
+ * @param {number} dir 1 to the right, -1 to the left
+ * @returns {{x: number, y: number, before: number[][]}|null}
+ */
+export function leapOf(meta, land, floor, height, scale, dir) {
+    const leap = meta.estados.entra;
+    if (!leap || leap.desde !== 'abajo' || !leap.avance || !leap.g) {
+        return null;
+    }
+    let x = land;
+    let y = floor;
+    leap.avance.forEach(function (step) {
+        x -= dir * step[0] * scale;
+        y -= step[1] * scale;
+    });
+    const first = leap.avance[0];
+    const before = [];
+    while (y - meta.anchor.y * scale < height && before.length < 400) {
+        const step = [first[0], first[1] - (before.length + 1) * leap.g];
+        before.unshift(step);
+        x -= dir * step[0] * scale;
+        y -= step[1] * scale;
+    }
+    // How fast it goes where it first shows over the edge.
+    const steps = before.concat(leap.avance);
+    let seen = y;
+    let speed = 0;
+    for (let k = 0; k < steps.length && !speed; k++) {
+        if (seen - (leap.asoma || meta.anchor.y) * scale < height) {
+            speed = -steps[k][1];
+        }
+        seen += steps[k][1] * scale;
+    }
+    if (leap.tope && speed > leap.tope) {
+        return null;
+    }
+    return {x, y, before};
+}
+
+/**
+ * The way of what jumps in (the frog): it leaps up from under the bottom edge near one side, crosses a turn or two of
+ * `cruza` and stops there; null when the leap cannot be (see leapOf), and then it walks in as the others.
+ *
+ * @param {object} meta the atlas's
+ * @param {number} width of the screen
+ * @param {number} height of the screen
+ * @param {number} floor the y it goes on
+ * @param {number} scale
+ * @param {function(): number} random from 0 to 1
+ * @returns {{dir: number, from: number, turns: number, exit: number, leap: object}|null}
+ */
+export function jumpOf(meta, width, height, floor, scale, random) {
+    const dir = random() < 0.5 ? 1 : -1;
+    const cross = meta.estados.cruza;
+    const turn = cross.speed * cross.frames / cross.fps * scale;
+    const inset = width * (0.06 + 0.1 * random());
+    const land = dir > 0 ? inset : width - inset;
+    const turns = Math.max(1, Math.min(1 + Math.floor(random() * 2), Math.floor((width * 0.8 - inset) / turn)));
+    const leap = leapOf(meta, land, floor, height, scale, dir);
+    if (!leap) {
+        return null;
+    }
+    const behind = meta.anchor.x * scale;
+    return {dir, turns, from: land, exit: dir > 0 ? width + behind : -behind, leap};
 }
 
 /**
@@ -482,7 +565,9 @@ class Walk {
         const shadow = m.estados[state].sombra;
         if (shadow) {
             const s = shadow[i];
-            this.shadow.style.transform = 'translate3d(' + (s[0] - s[1] * 0.56) + 'px,0,0) scaleX(' + (s[1] * 1.12 / 100) + ')';
+            // On the floor line, not under the anchor: what jumps or lands is off the floor at times.
+            const below = this.floor === undefined ? 0 : (this.floor - y) / scale;
+            this.shadow.style.transform = 'translate3d(' + (s[0] - s[1] * 0.56) + 'px,' + below + 'px,0) scaleX(' + (s[1] * 1.12 / 100) + ')';
             this.shadow.style.opacity = s[2];
         }
         const hilo = m.estados[state].hilo;
@@ -513,8 +598,19 @@ class Walk {
         const m = this.atlas.meta;
         const steps = [{state: 'cruza', times: plan.turns}, {state: 'para', times: 1}, {state: gesture, times: 1},
             {state: 'huye', times: 0}];
-        let x = plan.from;
-        let y = plan.top === undefined ? height : plan.top;
+        // What jumps in plays `entra` first, after the frames that continue its leap back to under the edge.
+        const before = plan.leap ? plan.leap.before.slice() : [];
+        if (plan.leap) {
+            steps.unshift({state: 'entra', times: 1});
+        }
+        let x = plan.leap ? plan.leap.x : plan.from;
+        let y = plan.leap ? plan.leap.y : (plan.top === undefined ? height : plan.top);
+        // What lands crosses at the height from which `para` sets it down on the floor.
+        if (m.posa) {
+            y = height - m.estados.para.avance.reduce((total, step) => total + step[1], 0) * scale;
+        }
+        this.floor = plan.leap || m.posa ? height : undefined;
+        const below = (m.cell.h - m.anchor.y) * scale;
         // On a whole pixel, for it to be as sharp as it can when still.
         this.threadX = Math.round(plan.from) + 0.5;
         this.threadSeen = false;
@@ -526,15 +622,17 @@ class Walk {
         const frame = () => {
             const now = steps[step];
             const st = m.estados[now.state];
-            this.draw(now.state, i, x, y, scale, plan.dir < 0);
+            const back = before.length && now.state === 'entra' ? before.shift() : null;
+            this.draw(now.state, back ? 0 : i, x, y, scale, plan.dir < 0);
             due += 1000 / st.fps;
-            if (st.avance) {
-                x += plan.dir * st.avance[i][0] * scale;
-                y += st.avance[i][1] * scale;
+            const ahead = back || (st.avance && st.avance[i]);
+            if (ahead) {
+                x += plan.dir * ahead[0] * scale;
+                y += ahead[1] * scale;
             } else {
                 x += plan.dir * (st.speed || 0) * scale / st.fps;
             }
-            i++;
+            i += back ? 0 : 1;
             if (i >= st.frames) {
                 i = 0;
                 time++;
@@ -543,7 +641,8 @@ class Walk {
                     time = 0;
                 }
             }
-            if (now.state === 'huye' && (plan.top !== undefined ? y < plan.exit : (plan.dir > 0 ? x > plan.exit : x < plan.exit))) {
+            const out = plan.top !== undefined ? y < plan.exit : (plan.dir > 0 ? x > plan.exit : x < plan.exit) || (m.posa && y < -below);
+            if (now.state === 'huye' && out) {
                 done();
                 return;
             }
@@ -1041,9 +1140,10 @@ export class Surprises {
             } else {
                 const gestures = atlas.meta.gestos;
                 const gesture = gestures[Math.floor(Math.random() * gestures.length)];
-                walk = new Walk(this.layer, atlas, base, ['cruza', 'para', gesture, 'huye']);
+                walk = new Walk(this.layer, atlas, base, ['cruza', 'para', gesture, 'huye'].concat(atlas.meta.estados.entra ? ['entra'] : []));
                 const stop = heightOf(atlas.meta, height, scale, this.hooks.floor(), Math.random);
                 const plan = atlas.meta.estados.cruza.hilo ? hangOf(atlas.meta, width, stop, scale, Math.random) :
+                    (atlas.meta.estados.entra && jumpOf(atlas.meta, width, height, stop, scale, Math.random)) ||
                     walkOf(atlas.meta, width, scale, Math.random);
                 const run = (end) => walk.run(plan, stop, scale, gesture, end);
                 // What comes with water: the water rises, the creature comes a moment later and, once it is gone, the water goes down.

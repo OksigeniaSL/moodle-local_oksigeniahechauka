@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.21.0
+
+- **Two new Surprises, each moving in a way none of the others does**, from the art direction: the frog leaps in from
+  under the bottom edge, lands right on the floor and crosses in hops, then sticks out its tongue or puffs up its throat;
+  the robin flies in, lands on the edge of the ticker and hops along it, then fluffs up or sings and flies off. On a floor
+  too high for the leap to read, the frog hops in from the side. They join a centre that had chosen every one of the others;
+  one that left someone out keeps its choice.
+
 ## 0.20.0
 
 - **Every menu of the day on one slide**, where the centre serves several: the menus in columns, each headed by its letter

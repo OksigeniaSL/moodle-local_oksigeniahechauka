@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {existsSync, readFileSync} from 'node:fs';
-import {cleanOf, dueAfter, filesOf, hangOf, heightOf, inSeason, isRaining, pagesOf, scaleOf, Surprises, tileOf, walkOf} from '../src/surprises.js';
+import {cleanOf, dueAfter, filesOf, hangOf, heightOf, inSeason, isRaining, jumpOf, leapOf, pagesOf, scaleOf, Surprises, tileOf, walkOf} from '../src/surprises.js';
 
 const atlasOf = (id) => JSON.parse(readFileSync(new URL('../sorpresas/' + id + '/spr.' + id + '.atlas.json', import.meta.url), 'utf8'));
 const atlas = atlasOf('gusanito');
@@ -397,3 +397,48 @@ test('the panel\'s preview only asked', () => {
     s.tick(now, true, true);
     assert.deepEqual(s.gone, ['gusanito']);
 });
+
+test('the frog leaps in from under the bottom edge and lands right on the floor where it was asked to', () => {
+    const meta = atlasOf('rana').meta;
+    const height = 1080;
+    const floor = 1020;
+    const leap = leapOf(meta, 300, floor, height, 1, 1);
+    assert.ok(leap, 'a leap from below');
+    // The whole cell starts out of sight.
+    assert.ok(leap.y - meta.anchor.y >= height, 'starts at ' + leap.y);
+    // Played through, the frames before and its own end on the floor at x = 300.
+    let x = leap.x;
+    let y = leap.y;
+    leap.before.concat(meta.estados.entra.avance).forEach((step) => {
+        x += step[0];
+        y += step[1];
+    });
+    assert.ok(Math.abs(x - 300) < 0.01 && Math.abs(y - floor) < 0.01, x + ', ' + y);
+    // Mirrored, it lands in the same place.
+    const left = leapOf(meta, 1600, floor, height, 1, -1);
+    assert.ok(left.x > 1600);
+});
+
+test('on a floor too high above the edge the frog would be a blur: it hops in from the side', () => {
+    const meta = atlasOf('rana').meta;
+    assert.equal(leapOf(meta, 300, 600, 1080, 1, 1), null);
+    let calls = 0;
+    const random = () => [0.2, 0.5, 0.5][calls++ % 3];
+    assert.equal(jumpOf(meta, 1920, 1080, 600, 1, random), null);
+    const plan = jumpOf(meta, 1920, 1080, 1020, 1, random);
+    assert.ok(plan.leap && plan.turns >= 1 && plan.dir === 1);
+});
+
+test('the robin lands and makes its gesture on the screen, also on a narrow one', () => {
+    const meta = atlasOf('petirrojo').meta;
+    const dx = (state) => meta.estados[state].avance.reduce((total, step) => total + step[0], 0);
+    const most = Math.max.apply(null, meta.gestos.map(dx));
+    for (const [width, height] of [[1920, 1080], [1080, 1920]]) {
+        const plan = walkOf(meta, width, 1, () => 0.99);
+        const stop = plan.dir > 0 ? plan.from + plan.turns * dx('cruza') : plan.from - plan.turns * dx('cruza');
+        const end = plan.dir > 0 ? stop + dx('para') + most : stop - dx('para') - most;
+        assert.ok(end > 0 && end < width, width + ': ends at ' + end);
+        assert.equal(heightOf(meta, height, 1, 900, () => 0.5), 900, 'on the ticker');
+    }
+});
+

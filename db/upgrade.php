@@ -325,5 +325,17 @@ function xmldb_local_oksigeniahechauka_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026111200, 'local', 'oksigeniahechauka');
     }
 
+    if ($oldversion < 2026111304) {
+        // Two new Surprises, the frog and the robin: they join a centre that had chosen every one of the others; one that
+        // left someone out chose, and keeps its choice.
+        $who = get_config('local_oksigeniahechauka', 'surprisewho');
+        $before = ['gusanito', 'abeja', 'mosca', 'arana', 'pulpo', 'pezglobo', 'geco'];
+        if ($who !== false && !array_diff($before, explode(',', (string) $who))) {
+            $all = array_unique(array_merge(explode(',', (string) $who), ['rana', 'petirrojo']));
+            set_config('surprisewho', implode(',', $all), 'local_oksigeniahechauka');
+        }
+        upgrade_plugin_savepoint(true, 2026111304, 'local', 'oksigeniahechauka');
+    }
+
     return true;
 }
