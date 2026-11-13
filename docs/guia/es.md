@@ -175,6 +175,8 @@ Las pantallas no esperan a que alguien publique. Sin teclear nada, enseñan:
 - **Las noticias del sitio.**
 - **El menú del día**, con sus alérgenos, si el centro usa Oksigenia Meals.
 - **Las novedades de la biblioteca**, si el centro usa Oksigenia Ayvurenda.
+- **Lo que celebra la biblioteca** esa semana, con Ayvurenda y sin nombres de nadie: los libros prestados en el curso, un libro
+  que llega a sus cien salidas, el día con más préstamos o los lectores que llegan a la meta de un reto.
 - **Las entregas y los cuestionarios** de los próximos días.
 - **Los cumpleaños**, si se encienden.
 - **El tiempo** de donde está el centro.

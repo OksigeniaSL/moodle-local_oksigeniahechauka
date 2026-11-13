@@ -177,6 +177,8 @@ The screens do not wait for someone to publish. Without typing anything, they sh
 - **The site news.**
 - **The menu of the day**, with its allergens, if the centre uses Oksigenia Meals.
 - **What is new in the library**, if the centre uses Oksigenia Ayvurenda.
+- **What the library celebrates** that week, with Ayvurenda and without anyone's name: the books lent this year, a book
+  reaching its hundredth loan, the busiest day or readers reaching the goal of a challenge.
 - **The assignments and quizzes** due in the coming days.
 - **The birthdays**, if they are switched on.
 - **The weather** where the centre is.

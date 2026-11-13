@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.19.0
+
+- **«The library celebrates»**, a new source where the site has Oksigenia Ayvurenda: what the library celebrates this week,
+  in its own words and never with a person's name (the books lent this year, a book reaching its hundredth loan, the
+  busiest day, readers at the goal of a challenge, a class that met its own), four at most. A slide of its own, one in
+  sixteen: the library's rosette in the colours of the skin, pinned to the cover when the moment is about a book. On by
+  default, off from «Start» or the settings.
+- **Upright photos keep their shape** beside «Today» at every distance, not only with the birthday band; at 8 m on a
+  landscape screen two of them no longer share a slide, where their captions were too small to read: each comes in its turn.
+- **«Screens and groups»: no envelope beside one's own name.**
+- **The guide made again**, with every picture taken anew and its PDFs in Spanish and English.
+
 ## 0.18.0
 
 - **«Zones», one more composition in the turn**: a column with its own carousel (upright photos, the weather, the coming
