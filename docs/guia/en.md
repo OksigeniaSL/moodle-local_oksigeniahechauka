@@ -178,6 +178,8 @@ The screens do not wait for someone to publish. Without typing anything, they sh
 - **The menu of the day**, with its allergens, if the centre uses Oksigenia Meals. With several menus, a slide shows them
   all, each with its letter large, and it comes often while the canteen serves.
 - **What is new in the library**, if the centre uses Oksigenia Ayvurenda.
+- **The picture of the day**: a curious or beautiful picture each day (a galaxy, a bug under the microscope, a painting),
+  chosen by hand by Oksigenia and right for children, with its caption and its author. In «Your centre», its themes.
 - **What the library celebrates** that week, with Ayvurenda and without anyone's name: the books lent this year, a book
   reaching its hundredth loan, the busiest day or readers reaching the goal of a challenge.
 - **The assignments and quizzes** due in the coming days.

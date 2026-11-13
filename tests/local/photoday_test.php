@@ -35,7 +35,7 @@ final class photoday_test extends \advanced_testcase {
      */
     protected function index(): array {
         $one = function (string $id, string $theme) {
-            return ['id' => $id, 'fichero' => $id . '.png', 'categoria' => $theme,
+            return ['id' => $id, 'fichero' => 'imagenes/' . $id . '.png', 'categoria' => $theme,
                 'titulo' => ['es' => 'Título ' . $id, 'en' => 'Title ' . $id], 'pie' => ['es' => 'Pie ' . $id, 'en' => 'Caption ' . $id],
                 'credito' => 'Autor de ' . $id . ', CC BY 4.0'];
         };
@@ -66,8 +66,14 @@ final class photoday_test extends \advanced_testcase {
         $this->assertSame(photoday::of_day($index, $all, '2026-11-20'), photoday::of_day($index, $all, '2026-11-22'));
         $this->assertSame('b', photoday::of_day($index, ['arte'], '2026-11-16')['id']);
         $this->assertNull(photoday::of_day($index, [], '2026-11-16'));
-        // A file that is not a plain name is never asked for.
+        // A file that is not a plain name in its folder is never asked for.
         $this->assertNull(photoday::of_day([['fichero' => '../x.png', 'categoria' => 'arte']], $all, '2026-11-16'));
+        // One of a season only in it, and the seasons the other way round in the south.
+        $snow = [['fichero' => 'copo.jpg', 'categoria' => 'cerca', 'estacion' => 'invierno']];
+        $this->assertNotNull(photoday::of_day($snow, $all, '2026-01-12'));
+        $this->assertNull(photoday::of_day($snow, $all, '2026-07-13'));
+        $this->assertNotNull(photoday::of_day($snow, $all, '2026-07-13', true));
+        $this->assertSame('otono', photoday::season('2026-11-13'));
     }
 
     /**
@@ -84,7 +90,7 @@ final class photoday_test extends \advanced_testcase {
         set_config('sourcephotoday', 1, $c);
         set_config('photodaythemes', 'arte', $c);
         \curl::mock_response($this->png());
-        \curl::mock_response(json_encode(['imagenes' => $this->index()]));
+        \curl::mock_response(json_encode(['tanda' => 1, 'fotos' => $this->index()]));
         $this->assertSame('today: b.png', photoday::refresh(time()));
         $this->assertSame('waiting', photoday::refresh(time() + 60));
         force_current_language('en');

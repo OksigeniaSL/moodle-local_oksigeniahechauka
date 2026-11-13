@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.24.0
+
+- **The picture of the day**: something curious or beautiful each day (a galaxy, a bee under the microscope, a painting),
+  from a collection Oksigenia chooses by hand, right for children, each with a caption for children in Spanish and
+  English and its author's credit beside it. Every centre chooses its themes in «Your centre» (the universe, the Earth,
+  life, up close, art); one a weekday among them, and one of a season only in it, by the hemisphere of the centre. One
+  slide in twelve, and at rest it comes and goes with the screen at rest. From the art direction.
+
 ## 0.23.0
 
 - **A screen by the canteen**, in its sheet, where the site has Oksigenia Meals: while the canteen serves, every menu of

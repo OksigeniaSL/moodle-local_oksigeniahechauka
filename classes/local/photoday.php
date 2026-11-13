@@ -74,16 +74,20 @@ class photoday {
 
     /**
      * Which picture is today's: of those of the chosen themes, in the order of the index (already shuffled, so that ten
-     * galaxies never come in a row), one a weekday; a weekend keeps Friday's.
+     * galaxies never come in a row), one a weekday; a weekend keeps Friday's. One of a season (a snowflake) only in it.
      *
      * @param array[] $entries of the index
      * @param string[] $themes
      * @param string $date «YYYY-MM-DD»
+     * @param bool $south whether the centre is in the southern hemisphere, where the seasons go the other way round
      * @return array|null
      */
-    public static function of_day(array $entries, array $themes, string $date): ?array {
-        $entries = array_values(array_filter($entries, function ($e) use ($themes) {
-            return is_array($e) && in_array((string) ($e['categoria'] ?? ''), $themes, true) && self::file_of($e) !== '';
+    public static function of_day(array $entries, array $themes, string $date, bool $south = false): ?array {
+        $season = self::season($date, $south);
+        $entries = array_values(array_filter($entries, function ($e) use ($themes, $season) {
+            $own = is_array($e) ? (string) ($e['estacion'] ?? '') : '';
+            return is_array($e) && in_array((string) ($e['categoria'] ?? ''), $themes, true) && self::file_of($e) !== '' &&
+                ($own === '' || $own === $season);
         }));
         if (!$entries) {
             return null;
@@ -94,14 +98,38 @@ class photoday {
     }
 
     /**
-     * The file name of an entry: only a plain name, never a path.
+     * The season of a date, as the index names them: winter is December to February in the north and June to August in
+     * the south.
+     *
+     * @param string $date «YYYY-MM-DD»
+     * @param bool $south
+     * @return string invierno, primavera, verano or otono
+     */
+    public static function season(string $date, bool $south = false): string {
+        $seasons = ['invierno', 'primavera', 'verano', 'otono'];
+        $quarter = intdiv(((int) substr($date, 5, 2)) % 12, 3);
+        return $seasons[($quarter + ($south ? 2 : 0)) % 4];
+    }
+
+    /**
+     * Whether the centre is in the southern hemisphere, by the place set in «Your centre».
+     *
+     * @return bool
+     */
+    protected static function south(): bool {
+        $lat = get_config('local_oksigeniahechauka', 'lat');
+        return $lat !== false && $lat !== '' && (float) $lat < 0;
+    }
+
+    /**
+     * The file of an entry, as the collection serves it: a plain name, or one in its folder «imagenes/»; never another path.
      *
      * @param array $entry
      * @return string
      */
     protected static function file_of(array $entry): string {
         $file = (string) ($entry['fichero'] ?? $entry['file'] ?? '');
-        return preg_match('/^[A-Za-z0-9._-]+\.(jpe?g|webp|png)$/', $file) ? $file : '';
+        return preg_match('#^(imagenes/)?[A-Za-z0-9._-]+\.(jpe?g|webp|png)$#', $file) ? $file : '';
     }
 
     /**
@@ -143,20 +171,22 @@ class photoday {
         if (!is_array($index)) {
             return 'no index';
         }
-        $entries = array_values(isset($index['imagenes']) && is_array($index['imagenes']) ? $index['imagenes'] : $index);
+        $list = $index['fotos'] ?? $index['imagenes'] ?? $index;
+        $entries = is_array($list) ? array_values($list) : [];
         $fs = get_file_storage();
         $context = \context_system::instance();
         // The index as a file of its own (item 1): with hundreds of pictures it is too big for a setting.
         $fs->delete_area_files($context->id, files::COMPONENT, self::AREA, self::INDEX_ITEM);
         $fs->create_file_from_string(['contextid' => $context->id, 'component' => files::COMPONENT, 'filearea' => self::AREA,
             'itemid' => self::INDEX_ITEM, 'filepath' => '/', 'filename' => self::INDEX], json_encode($entries));
-        $entry = self::of_day($entries, self::themes(), schedule::day($now));
+        $entry = self::of_day($entries, self::themes(), schedule::day($now), self::south());
         if (!$entry) {
             return 'none for the chosen themes';
         }
-        $name = self::file_of($entry);
+        $path = self::file_of($entry);
+        $name = basename($path);
         if (!$fs->file_exists($context->id, files::COMPONENT, self::AREA, 0, '/', $name)) {
-            $image = self::fetch(self::base() . rawurlencode($name));
+            $image = self::fetch(self::base() . implode('/', array_map('rawurlencode', explode('/', $path))));
             if ($image === null || strlen($image) > self::MOST || !@getimagesizefromstring($image)) {
                 return 'no picture: ' . $name;
             }
@@ -211,7 +241,7 @@ class photoday {
         if (!is_array($index)) {
             return [];
         }
-        $entry = self::of_day($index, self::themes(), schedule::day($now));
+        $entry = self::of_day($index, self::themes(), schedule::day($now), self::south());
         if (!$entry) {
             return [];
         }
@@ -221,7 +251,7 @@ class photoday {
             self::AREA,
             0,
             '/',
-            self::file_of($entry)
+            basename(self::file_of($entry))
         );
         if (!$file) {
             return [];

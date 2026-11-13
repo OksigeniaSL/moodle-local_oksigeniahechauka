@@ -176,6 +176,8 @@ Las pantallas no esperan a que alguien publique. Sin teclear nada, enseñan:
 - **El menú del día**, con sus alérgenos, si el centro usa Oksigenia Meals. Con varios menús, una diapositiva los enseña
   todos, cada uno con su letra en grande, y sale a menudo en las horas del comedor.
 - **Las novedades de la biblioteca**, si el centro usa Oksigenia Ayvurenda.
+- **La foto del día**: una imagen curiosa o bonita cada día (una galaxia, un bicho al microscopio, un cuadro), elegida a
+  mano por Oksigenia y apropiada para niños, con su pie y su autor. En «Tu centro», de qué temas.
 - **Lo que celebra la biblioteca** esa semana, con Ayvurenda y sin nombres de nadie: los libros prestados en el curso, un libro
   que llega a sus cien salidas, el día con más préstamos o los lectores que llegan a la meta de un reto.
 - **Las entregas y los cuestionarios** de los próximos días.
