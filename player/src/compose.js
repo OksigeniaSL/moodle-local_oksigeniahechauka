@@ -20,6 +20,7 @@
 // cumple          whose birthday it is today, with their pictures, by pages
 // biblioteca      what has come to the library: a book at a time with its QR, the next ones on the shelf
 // celebra        what the library celebrates this week: a moment at a time, with its rosette or its cover
+// menus          every menu of the day, the menus in columns and their dishes in rows; often while the canteen serves
 // canal           the centre's messaging channel: follow it from the screen, with its QR
 // plazos          what falls due in the courses in the coming days, by days and by pages
 // tabla           a table of the centre: a spreadsheet or a list, by pages
@@ -38,6 +39,10 @@ const BIRTHDAY_EVERY = 7;
 
 /** How many slides go by between one of the library and the next. */
 const BOOKS_EVERY = 16;
+
+/** How many slides go by between two of every menu of the day: while the canteen serves, and the rest of the day. */
+const MENUS_MEAL_EVERY = 3;
+const MENUS_EVERY = 12;
 
 /** How many go by between two of what the library celebrates: as its books, and half a round away from them. */
 const MOMENTS_EVERY = 16;
@@ -232,6 +237,17 @@ export class Composer {
             this.sinceBirthday = 1;
             this.birthdayPage = (this.birthdayPage === undefined ? -1 : this.birthdayPage) + 1;
             return pick('cumple', [], birthdaysSeconds(o.birthdays), {item: o.birthdays, page: this.birthdayPage});
+        }
+        // Every menu of the day, only when there are several (one is whole in «Today»): often while the canteen serves,
+        // now and then the rest of the day. Not right after «Today» with the menu, unless it has waited two slides for it:
+        // on a screen with little else, «Today» is every other slide.
+        this.sinceMenus = (this.sinceMenus === undefined ? MENUS_EVERY : this.sinceMenus) + 1;
+        const menusEvery = o.mealTime ? MENUS_MEAL_EVERY : MENUS_EVERY;
+        const afterToday = this.last === 'solo-hoy' && o.menu && this.sinceMenus <= menusEvery + 2;
+        if (o.menus && o.menus.menus && o.menus.menus.length > 1 && this.sinceMenus > menusEvery && !afterToday) {
+            this.sinceMenus = 1;
+            this.menusPage = (this.menusPage === undefined ? -1 : this.menusPage) + 1;
+            return pick('menus', [], 15, {item: o.menus, page: this.menusPage});
         }
         if (o.books && this.sinceBooks > BOOKS_EVERY) {
             this.sinceBooks = 1;

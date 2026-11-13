@@ -3,7 +3,8 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {Composer, shapeOf, secondsOf, draftChoice} from '../src/compose.js';
-import {countdown, dayLabel, splitTitle, upcoming} from '../src/agenda.js';
+import {leadsOf} from '../src/lead.js';
+import {countdown, dayLabel, mealTime, splitTitle, upcoming} from '../src/agenda.js';
 
 function pic(id, w, h, type) {
     return {id, type: type || 'image', media: {width: w, height: h}};
@@ -352,5 +353,40 @@ test('the big birthday slide waits while its photos are on their way, and comes 
     }
     assert.ok(!waiting.includes('cumple'), waiting.join(' '));
     assert.equal(c.next([], 4, true, {birthdays, birthdaysReady: true, distance: 3}).comp, 'cumple');
+});
+
+test('every menu of the day: often while the canteen serves, now and then the rest of the day, only with several', () => {
+    const menus = {menus: [{name: 'Menú A'}, {name: 'Menú B'}, {name: 'Menú C'}]};
+    const count = (opts) => {
+        const c = new Composer();
+        let n = 0;
+        for (let i = 0; i < 48; i++) {
+            const pick = c.next([], 4, true, Object.assign({distance: 3}, opts));
+            n += pick.comp === 'menus' ? 1 : 0;
+        }
+        return n;
+    };
+    const meal = count({menus, menu: true, mealTime: true});
+    const rest = count({menus, menu: true, mealTime: false});
+    assert.ok(meal >= 9, 'while serving: ' + meal);
+    assert.ok(rest >= 2 && rest <= 5, 'the rest of the day: ' + rest);
+    assert.equal(count({menus: {menus: [{name: 'Menú'}]}, menu: true, mealTime: true}), 0);
+    assert.equal(count({menus: null, mealTime: true}), 0);
+});
+
+test("the canteen serves by the centre's hours, or from 11:00 to 14:00", () => {
+    assert.equal(mealTime({min: 11 * 60}, null), true);
+    assert.equal(mealTime({min: 14 * 60}, null), false);
+    assert.equal(mealTime({min: 12 * 60 + 30}, {from: '13:00', to: '15:30'}), false);
+    assert.equal(mealTime({min: 15 * 60}, {from: '13:00', to: '15:30'}), true);
+    assert.equal(mealTime({min: 12 * 60}, {from: 'mediodía', to: ''}), true);
+});
+
+test('while the canteen serves with several menus, the menu is no headline of «Today», unless there is nothing else', () => {
+    const notice = {title: 'Fotos de grupo', tone: 'normal'};
+    const types = (today) => leadsOf(today, today.noon).map((lead) => lead.type);
+    assert.deepEqual(types({menu: {}, notices: [notice], noon: true}), ['menu', 'notice']);
+    assert.deepEqual(types({menu: {}, notices: [notice], menusApart: true}), ['notice']);
+    assert.deepEqual(types({menu: {}, notices: [], menusApart: true}), ['menu']);
 });
 

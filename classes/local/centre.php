@@ -158,6 +158,7 @@ class centre {
             'max' => categories::MAX,
             'logos' => $logos,
             'dayend' => sources::day_end(),
+            'meals' => sources::has_meals() ? sources::meal_hours() : false,
             'phrase' => ['value' => self::phrase($config), 'max' => self::PHRASE, 'upright' => self::PHRASE_UPRIGHT,
                 'uprightscreens' => self::upright_far(), 'left' => get_string('centre_phrase_left', $c, '{$a}'),
                 'leftone' => get_string('centre_phrase_left_one', $c)],
@@ -269,6 +270,14 @@ class centre {
         $dayend = optional_param('dayend', '', PARAM_RAW_TRIMMED);
         if (preg_match('/^([01]\d|2[0-3]):[0-5]\d$/', $dayend)) {
             set_config('dayend', $dayend, $c);
+        }
+        // When the canteen serves: only both, and the first before the second.
+        $from = optional_param('mealfrom', '', PARAM_RAW_TRIMMED);
+        $to = optional_param('mealto', '', PARAM_RAW_TRIMMED);
+        $time = '/^([01]\d|2[0-3]):[0-5]\d$/';
+        if (preg_match($time, $from) && preg_match($time, $to) && strcmp($from, $to) < 0) {
+            set_config('mealfrom', $from, $c);
+            set_config('mealto', $to, $c);
         }
         // The categories as they came, in their order (one without a name is taken out); then, if asked, the top
         // course categories of the site not linked yet.

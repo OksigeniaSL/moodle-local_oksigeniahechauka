@@ -173,7 +173,8 @@ Las pantallas no esperan a que alguien publique. Sin teclear nada, enseñan:
 
 - **El calendario del sitio** y, en las pantallas de un grupo atado a una categoría de cursos, también sus eventos.
 - **Las noticias del sitio.**
-- **El menú del día**, con sus alérgenos, si el centro usa Oksigenia Meals.
+- **El menú del día**, con sus alérgenos, si el centro usa Oksigenia Meals. Con varios menús, una diapositiva los enseña
+  todos, cada uno con su letra en grande, y sale a menudo en las horas del comedor.
 - **Las novedades de la biblioteca**, si el centro usa Oksigenia Ayvurenda.
 - **Lo que celebra la biblioteca** esa semana, con Ayvurenda y sin nombres de nadie: los libros prestados en el curso, un libro
   que llega a sus cien salidas, el día con más préstamos o los lectores que llegan a la meta de un reto.
@@ -309,7 +310,8 @@ Lo que hace que las pantallas sean las del centro, y no las de Hechauka:
   centro (colores, fondo, letra y esquinas), siempre con combinaciones probadas que se leen de lejos.
 - **Los colores del centro** y el **tema**, claro, oscuro o según la hora.
 - **Las categorías**, hasta seis, para dar color a los eventos según a quién van, o traídas de las categorías de cursos.
-- **La jornada**: a qué hora pasan las pantallas a enseñar lo de mañana.
+- **La jornada**: a qué hora pasan las pantallas a enseñar lo de mañana y, con Oksigenia Meals, a qué horas sirve el
+  comedor.
 - **La frase del centro**: su lema, entero en la cinta cada pocas frases y con el logotipo.
 - **Las sorpresas**: de vez en cuando, un personaje cruza la pantalla. De serie, apagadas.
 

@@ -10,11 +10,12 @@ import {realClock, simulatedClock} from './clock.js';
 import {MediaStore, mediaOf} from './media.js';
 import {Played} from './played.js';
 import {pair} from './pairing.js';
-import {afterDayEnd, agendaOf, countdown, dayLabel, eventsOn, monthOf, upcoming} from './agenda.js';
+import {afterDayEnd, agendaOf, countdown, dayLabel, eventsOn, mealTime, monthOf, upcoming} from './agenda.js';
 import {AGENDA_DAYS, AGENDA_TOP} from './agendaview.js';
 import {albumsOf, oneOfEachAlbum} from './photos.js';
 import {Composer, draftChoice} from './compose.js';
 import {channelShow} from './canal.js';
+import {menusData} from './menus.js';
 import {dayNumber, isDark, isLive, isPowerOn, liveItems, urgentOf, useOf, weekdayOf} from './rules.js';
 import {Screen} from './render.js';
 import {store} from './store.js';
@@ -360,6 +361,22 @@ class Player {
     }
 
     /**
+     * The day's menus, whole, for the slide of the menus: the first menu item of the side as «Today» takes it.
+     *
+     * @param {object} wall
+     * @returns {object|null}
+     */
+    menusOf(wall) {
+        const item = (this.manifest.items || []).filter(function (it) {
+            return it.zone === 'side' && it.type === 'menu' && isLive(it, wall);
+        }).sort(function (a, b) {
+            return (a.order || 0) - (b.order || 0);
+        })[0];
+        const labels = this.manifest.labels || {};
+        return menusData(item, labels.menu || this.strings.menu || '');
+    }
+
+    /**
      * What «Today» has now: the menu, the notices, today's events, the coming days and the weather. From the hour the
      * day ends for the centre, tomorrow's events instead, under «Tomorrow» (the menu switches on the server).
      */
@@ -411,8 +428,10 @@ class Player {
             // Today in words, for the sheet of a holiday.
             dateWords: dateWordsOf(wall.date, this.strings),
             eventsLabel: over ? names.tomorrow : '',
-            // Around midday the menu leads first.
-            noon: wall.min >= 11 * 60 + 30 && wall.min < 14 * 60 + 30,
+            // While the canteen serves, the menu leads first; but not with several menus, which have their slide then and
+            // whose first, as a headline, would read as «the» menu.
+            noon: mealTime(wall, this.manifest.mealhours) && !(menu && menu.also && menu.also.length),
+            menusApart: mealTime(wall, this.manifest.mealhours) && !!(menu && menu.also && menu.also.length),
             weather: this.manifest.weather || null,
         };
     }
@@ -627,6 +646,9 @@ class Player {
                 moments: liveItems(m.items || [], 'extra', wall).filter(function (it) {
                     return it.type === 'moments' && it.moments && it.moments.length;
                 })[0] || null,
+                // Every menu of the day, for their slide (src/menus.js); none on a day with no canteen.
+                menus: today.menu ? this.menusOf(wall) : null,
+                mealTime: mealTime(wall, this.manifest.mealhours),
                 deadlines: liveItems(m.items || [], 'extra', wall).filter(function (it) {
                     return it.type === 'deadlines';
                 })[0] || null,

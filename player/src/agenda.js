@@ -205,6 +205,23 @@ export function afterDayEnd(wall, dayend) {
 }
 
 /**
+ * Whether the canteen is serving now, by the centre's hours (11:00 to 14:00 when they are not said).
+ *
+ * @param {object} wall {min: minutes since midnight}
+ * @param {object} [hours] {from: «HH:MM», to: «HH:MM»}
+ * @returns {boolean}
+ */
+export function mealTime(wall, hours) {
+    const minutes = function (t, fallback) {
+        return /^\d{1,2}:\d{2}$/.test(String(t || '')) ? parseInt(t.split(':')[0], 10) * 60 + parseInt(t.split(':')[1], 10) :
+            fallback;
+    };
+    const from = minutes(hours && hours.from, 11 * 60);
+    const to = minutes(hours && hours.to, 14 * 60);
+    return wall.min >= from && wall.min < to;
+}
+
+/**
  * Whether an event takes place on a day: from the day it starts to the day it ends (an end at midnight is the day
  * before's).
  *

@@ -16,7 +16,7 @@ const MAX_PAGES = 6;
 
 // The plate of a menu: a plate seen from above, with its fork and knife on it (Gaudí, 2 November 2026). One geometry for
 // every centre; its colours come from the sheet (lideres.css).
-const PLATE = '<svg viewBox="0 0 200 200" aria-hidden="true">' +
+export const PLATE = '<svg viewBox="0 0 200 200" aria-hidden="true">' +
     '<circle class="hk-plato-sombra" cx="100" cy="104" r="96"/>' +
     '<circle class="hk-plato-borde" cx="100" cy="100" r="96"/>' +
     '<circle class="hk-plato-ala" cx="100" cy="100" r="68"/>' +
@@ -58,7 +58,7 @@ const ACCENT_DARK = 'acento-oscuro, var(--hk-acento)';
 
 /**
  * The things of «Today» that can lead, in the order they take the lead: an important notice, the menu, the next event,
- * the countdown, the other notices. At midday the menu goes first.
+ * the countdown, the other notices. While the canteen serves the menu goes first, or, with several menus, not at all.
  *
  * @param {object} today the data of «Today» (todayOf)
  * @param {boolean} [noon] the menu first
@@ -114,6 +114,15 @@ export function leadsOf(today, noon) {
             out.push({type: 'notice', notice: n});
         }
     });
+    // While the canteen serves with several menus, they have their own slide: the first as a headline would read as «the»
+    // menu. It stays in its line, and leads only when «Today» has nothing else.
+    if (today.menusApart && out.some(function (lead) {
+        return lead.type !== 'menu';
+    })) {
+        return out.filter(function (lead) {
+            return lead.type !== 'menu';
+        });
+    }
     return out;
 }
 

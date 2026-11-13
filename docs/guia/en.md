@@ -175,7 +175,8 @@ The screens do not wait for someone to publish. Without typing anything, they sh
 
 - **The site calendar** and, on the screens of a group tied to a course category, its events too.
 - **The site news.**
-- **The menu of the day**, with its allergens, if the centre uses Oksigenia Meals.
+- **The menu of the day**, with its allergens, if the centre uses Oksigenia Meals. With several menus, a slide shows them
+  all, each with its letter large, and it comes often while the canteen serves.
 - **What is new in the library**, if the centre uses Oksigenia Ayvurenda.
 - **What the library celebrates** that week, with Ayvurenda and without anyone's name: the books lent this year, a book
   reaching its hundredth loan, the busiest day or readers reaching the goal of a challenge.
@@ -311,7 +312,7 @@ What makes the screens the centre's, and not Hechauka's:
   your centre (colours, background, letter and corners), always with tested combinations that read from afar.
 - **The colours of the centre** and the **theme**, light, dark or by the hour.
 - **The categories**, up to six, to colour the events by whom they are for, or brought from the course categories.
-- **The day**: at what time the screens start showing tomorrow.
+- **The day**: at what time the screens start showing tomorrow and, with Oksigenia Meals, when the canteen serves.
 - **The centre's sentence**: its motto, whole in the ticker every few sentences and with the logo.
 - **The surprises**: now and then, a character crosses the screen. Off by default.
 

@@ -1,0 +1,385 @@
+/* Oksigenia Hechauka: «Los menús de hoy», every menu of the day on a slide of its own (Jujol, 13 November 2026). Goes after
+ * alergenos.css, whose allergen discs it uses.
+ *
+ *   <div class="hk-cuerpo hk-capa" data-composicion="menus">
+ *     <section class="hk-menus" data-ajuste="0…3" data-paginas="n">
+ *       <div class="hk-menus-cabeza"><div class="hk-menus-pieza">(the plate)</div><h2 class="hk-menus-etiqueta">
+ *         <p class="hk-menus-marcas"><i>…</i></p></div>
+ *       <div class="hk-menus-mesas"><table class="hk-menus-mesa">                 (one; two, one over the other, upright)
+ *         <thead><tr><td class="hk-menus-esquina"><th class="hk-menus-menu"><div class="hk-menus-celda">
+ *           <div class="hk-menus-nombre hk-menus-letra"><small>Menú</small><b>A</b></div><span class="hk-menus-tipo">
+ *         <tbody><tr><th class="hk-menus-curso"><div class="hk-menus-celda">Primero</div></th>
+ *           <td class="hk-menus-plato [hk-menus-junto|hk-menus-todos|hk-menus-igual hk-menus-igual-1…3|hk-menus-nada]"
+ *               colspan="…"><div class="hk-menus-celda"><span class="hk-menus-texto"><span class="hk-menus-alergenos">
+ *               <small class="hk-menus-igual-dice">= D</small>
+ *       <p class="hk-menus-leyenda"><b>Alérgenos</b><span class="hk-menus-leyenda-uno"><i class="hk-alergeno …">Gluten
+ *       <p class="hk-menus-nota">
+ *
+ * The letter of each menu is what is looked for first from afar (the canteen's doors go by it): the biggest thing on the
+ * slide after nothing, in the menu's colour. Chromium 56: a table, flexbox, margins; border-spacing for the gaps. */
+.hk-cuerpo[data-composicion="menus"] {
+    flex-direction: column;
+}
+.hk .hk-menus {
+    --hk-menus-t: var(--hk-t-lista);
+    --hk-menus-letra: var(--hk-t-entrada);
+    --hk-menus-hueco: 1.4rem;
+    position: relative;
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+    padding: 2.8rem 3.6rem 3rem;
+    overflow: hidden;
+    border-radius: calc(2.8rem * var(--hk-esquina));
+    background: var(--hk-superficie);
+    color: var(--hk-texto);
+}
+
+/* --- The head: the plate, «Menú de hoy» and, with several pages, their marks ------------------------------------------ */
+.hk .hk-menus-cabeza {
+    display: flex;
+    flex: none;
+    align-items: center;
+    margin-bottom: 1.2rem;
+}
+.hk .hk-menus-pieza {
+    flex: none;
+    width: calc(var(--hk-t-entrada) * 1.3);
+    height: calc(var(--hk-t-entrada) * 1.3);
+    margin-right: 2.4rem;
+    padding: 1rem;
+    border-radius: 50%;
+    background: var(--hk-menu);
+}
+.hk .hk-menus-pieza svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}
+.hk .hk-menus-etiqueta {
+    flex: 1 1 auto;
+    min-width: 0;
+    margin: 0;
+    font-family: var(--hk-letra-titulos);
+    font-size: var(--hk-t-entrada);
+    font-weight: 800;
+    line-height: 1.05;
+}
+.hk .hk-menus-marcas {
+    display: flex;
+    flex: none;
+    margin: 0 0 0 2.4rem;
+}
+.hk .hk-menus-marcas i {
+    display: block;
+    width: 5.6rem;
+    height: 1.2rem;
+    margin-left: 1.4rem;
+    border-radius: .6rem;
+    background: var(--hk-marca-1);
+    opacity: .3;
+}
+.hk .hk-menus-marcas i[data-n="2"] { background: var(--hk-marca-2); }
+.hk .hk-menus-marcas i[data-n="3"] { background: var(--hk-marca-3); }
+.hk .hk-menus-marcas i[data-n="4"] { background: var(--hk-marca-4); }
+[data-tema="oscuro"] .hk .hk-menus-marcas i[data-n="1"] { background: var(--hk-marca-1-oscuro); }
+[data-tema="oscuro"] .hk .hk-menus-marcas i[data-n="2"] { background: var(--hk-marca-2-oscuro); }
+[data-tema="oscuro"] .hk .hk-menus-marcas i[data-n="3"] { background: var(--hk-marca-3-oscuro); }
+[data-tema="oscuro"] .hk .hk-menus-marcas i[data-n="4"] { background: var(--hk-marca-4-oscuro); }
+.hk .hk-menus-marcas i.hk-menus-marca-actual {
+    opacity: 1;
+}
+
+/* --- The tables -------------------------------------------------------------------------------------------------------- */
+.hk .hk-menus-mesas {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-height: 0;
+}
+/* Centred in the room left, with two springs that give way to nothing when the tables need it all: never over the head. */
+.hk .hk-menus-mesas::before,
+.hk .hk-menus-mesas::after {
+    flex: 1 1 0px;
+    content: "";
+}
+.hk .hk-menus-mesa {
+    width: calc(100% + var(--hk-menus-hueco) * 2);
+    margin: calc(var(--hk-menus-hueco) * -1);
+    border-collapse: separate;
+    border-spacing: var(--hk-menus-hueco);
+    table-layout: fixed;
+    font-size: var(--hk-menus-t);
+}
+.hk.hk-vertical .hk-menus-mesa + .hk-menus-mesa {
+    margin-top: 2rem;
+}
+.hk .hk-menus-esquina {
+    width: calc(var(--hk-t-min) * 4.6);
+    padding: 0;
+}
+.hk .hk-menus-mesa th,
+.hk .hk-menus-mesa td {
+    padding: 0;
+    vertical-align: middle;
+    text-align: left;
+}
+.hk .hk-menus-celda {
+    position: relative;
+}
+
+/* Each menu's head: the letter, big, on its disc in the colour of the menu; «Menú» small over it and the kind under it. */
+.hk .hk-menus-menu {
+    padding-bottom: .4rem;
+}
+.hk .hk-menus-menu .hk-menus-celda {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+.hk .hk-menus-nombre {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1;
+}
+.hk .hk-menus-nombre small {
+    margin-bottom: .6rem;
+    font-size: var(--hk-t-min);
+    font-weight: 800;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    color: var(--hk-texto-suave);
+}
+.hk .hk-menus-letra b {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: calc(var(--hk-menus-letra) * 1.32);
+    height: calc(var(--hk-menus-letra) * 1.32);
+    padding: 0 .3em;
+    border-radius: calc(var(--hk-menus-letra) * .66);
+    background: var(--hk-menu);
+    color: var(--hk-sobre-menu);
+    font-family: var(--hk-letra-titulos);
+    font-size: var(--hk-menus-letra);
+    font-weight: 900;
+}
+.hk .hk-menus-palabra b {
+    padding: .2em .55em .25em;
+    border-radius: 1em;
+    background: var(--hk-menu);
+    color: var(--hk-sobre-menu);
+    font-family: var(--hk-letra-titulos);
+    font-size: var(--hk-t-entrada);
+    font-weight: 900;
+    line-height: 1.05;
+}
+.hk .hk-menus-tipo {
+    display: block;
+    margin-top: .8rem;
+    font-size: var(--hk-t-min);
+    font-weight: 800;
+    line-height: 1.1;
+}
+
+/* The course, at the start of each row. */
+.hk .hk-menus-curso {
+    font-size: var(--hk-t-min);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: .02em;
+    color: var(--hk-texto-suave);
+    overflow-wrap: break-word;
+}
+
+/* The dish: on a panel, the tint under it, the words over it. */
+.hk .hk-menus-plato {
+    position: relative;
+    border-radius: calc(1.6rem * var(--hk-esquina));
+    background: var(--hk-fondo);
+}
+.hk .hk-menus-plato::before {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    border-radius: inherit;
+    content: "";
+    opacity: 0;
+}
+.hk .hk-menus-plato .hk-menus-celda {
+    padding: 1.4rem 1.8rem;
+}
+.hk .hk-menus-plato .hk-menus-celda {
+    font-weight: 700;
+    line-height: 1.12;
+}
+/* The allergens after the dish, on its line while they fit; all of them together, never one alone on the next. */
+.hk .hk-menus-alergenos {
+    --hk-alergeno: calc(var(--hk-t-min) * .9);
+    display: inline-flex;
+    margin-left: .35em;
+    vertical-align: -.1em;
+}
+.hk .hk-menus-alergenos .hk-alergeno {
+    margin: 0 .4rem 0 0;
+    box-shadow: 0 0 0 .2rem var(--hk-linea);
+}
+
+/* Shared side by side: one cell over both, in the menu's colour, softly. Shared by every menu: the same, a little more. */
+.hk .hk-menus-junto::before,
+.hk .hk-menus-todos::before {
+    background: var(--hk-menu);
+    opacity: .14;
+}
+.hk .hk-menus-todos::before {
+    opacity: .22;
+}
+.hk .hk-menus-junto .hk-menus-celda,
+.hk .hk-menus-todos .hk-menus-celda {
+    text-align: center;
+}
+
+/* Shared by menus apart: the same tint and its edge in each, and who else has it. */
+.hk .hk-menus-igual {
+    box-shadow: inset 1rem 0 0 var(--hk-menus-igual);
+}
+.hk .hk-menus-igual::before {
+    background: var(--hk-menus-igual);
+    opacity: .16;
+}
+.hk .hk-menus-igual-1 { --hk-menus-igual: var(--hk-marca-1); }
+.hk .hk-menus-igual-2 { --hk-menus-igual: var(--hk-marca-2); }
+.hk .hk-menus-igual-3 { --hk-menus-igual: var(--hk-marca-3); }
+[data-tema="oscuro"] .hk .hk-menus-igual-1 { --hk-menus-igual: var(--hk-marca-1-oscuro); }
+[data-tema="oscuro"] .hk .hk-menus-igual-2 { --hk-menus-igual: var(--hk-marca-2-oscuro); }
+[data-tema="oscuro"] .hk .hk-menus-igual-3 { --hk-menus-igual: var(--hk-marca-3-oscuro); }
+.hk .hk-menus-igual .hk-menus-celda {
+    padding-left: 2.8rem;
+}
+.hk .hk-menus-igual-dice {
+    display: inline-block;
+    margin: .5rem 0 0 .4em;
+    vertical-align: .1em;
+    padding: .2rem 1rem .3rem;
+    border-radius: 1em;
+    background: var(--hk-superficie);
+    font-size: var(--hk-t-min);
+    font-weight: 900;
+    line-height: 1.1;
+}
+
+/* A course the menu does not have: an empty place, said by nothing. */
+.hk .hk-menus-nada {
+    background: transparent;
+    box-shadow: inset 0 0 0 .3rem var(--hk-linea);
+}
+
+/* --- The allergens with their names, and the note ----------------------------------------------------------------------- */
+.hk .hk-menus-leyenda {
+    display: flex;
+    flex: none;
+    flex-wrap: wrap;
+    align-items: center;
+    margin: 1.2rem 0 0;
+    font-size: var(--hk-t-min);
+    line-height: 1.1;
+}
+.hk .hk-menus-leyenda b {
+    margin-right: 2rem;
+    font-weight: 800;
+}
+.hk .hk-menus-leyenda-uno {
+    display: flex;
+    align-items: center;
+    margin: .3rem 2.4rem .3rem 0;
+}
+.hk .hk-menus-leyenda-uno .hk-alergeno {
+    --hk-alergeno: var(--hk-t-min);
+    margin: 0 .8rem 0 0;
+    box-shadow: 0 0 0 .2rem var(--hk-linea);
+}
+.hk .hk-menus-nota {
+    flex: none;
+    margin: 1rem 0 0;
+    font-size: var(--hk-t-min);
+    color: var(--hk-texto-suave);
+}
+.hk .hk-menus-sin-leyenda .hk-menus-leyenda {
+    display: none;
+}
+
+/* --- The fit: the dishes and the letters come down by steps, never under the least that is read ------------------------- */
+.hk .hk-menus[data-ajuste="1"] {
+    --hk-menus-t: calc(var(--hk-t-lista) * .92);
+}
+.hk .hk-menus[data-ajuste="2"] {
+    --hk-menus-t: calc(var(--hk-t-lista) * .86);
+    --hk-menus-hueco: 1rem;
+}
+.hk .hk-menus[data-ajuste="3"] {
+    --hk-menus-t: var(--hk-t-min);
+    --hk-menus-letra: calc(var(--hk-t-entrada) * .9);
+    --hk-menus-hueco: .8rem;
+}
+.hk .hk-menus[data-ajuste="3"] .hk-menus-plato .hk-menus-celda {
+    padding: 1rem 1.4rem;
+}
+
+/* The letter: the size of the screen's titles at every distance (the distance already scales them), a little over the
+ * dishes and never more: it is found by its disc and its place at the head of the column, not by being huge. */
+.hk[data-distancia="8"] .hk-menus-etiqueta {
+    font-size: var(--hk-t-lista);
+}
+.hk[data-distancia="8"] .hk-menus-pieza {
+    width: calc(var(--hk-t-lista) * 1.5);
+    height: calc(var(--hk-t-lista) * 1.5);
+}
+
+/* --- 8 m: one menu, as the sign of its door ---------------------------------------------------------------------------- */
+.hk .hk-menus-cartel {
+    display: flex;
+    flex: 1 1 auto;
+    align-items: center;
+    min-height: 0;
+}
+.hk .hk-menus-puerta {
+    display: flex;
+    flex: none;
+    justify-content: center;
+    width: 32%;
+    margin-right: 3rem;
+}
+.hk .hk-menus-puerta .hk-menus-celda {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+.hk .hk-menus-cartel .hk-menus-letra b {
+    --hk-menus-letra: calc(var(--hk-t-entrada) * 1.3);
+}
+.hk .hk-menus-mesa-cartel {
+    flex: 1 1 auto;
+    width: auto;
+    min-width: 0;
+}
+.hk.hk-vertical .hk-menus-cartel {
+    flex-direction: column;
+    align-items: stretch;
+}
+.hk.hk-vertical .hk-menus-puerta {
+    width: auto;
+    margin: 0 0 2rem;
+}
+
+/* --- Upright: the head stays, the tables one over the other ------------------------------------------------------------- */
+.hk.hk-vertical .hk-menus {
+    padding: 2.8rem 2.8rem 3rem;
+}

@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.20.0
+
+- **Every menu of the day on one slide**, where the centre serves several: the menus in columns, each headed by its letter
+  (or the word that names it) large, as people look for it from afar, and the dishes in rows; a dish they all share
+  runs across, the allergens beside each dish, and pages by distance (at 8 m, one menu at a time). From the art direction.
+- **The canteen's hours**, in «Your centre» beside the end of the day, when the site has Oksigenia Meals (11:00 to 14:00
+  by default): the slide of every menu comes often then and now and then the rest of the day; with several menus,
+  «Today» does not take the first as its headline then. They replace the fixed midday of the player.
+
 ## 0.19.2
 
 - **Birthdays with their photos also right after a screen starts.** When the birthday slide or band came before the

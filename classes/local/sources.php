@@ -40,6 +40,9 @@ class sources {
     /** @var int The most deadlines a screen gets: a screen is not the place for all of a big site's. */
     const DEADLINES_MOST = 60;
 
+    /** @var string[] When the canteen serves, if the centre has not said: the menus come often then. */
+    const MEAL_HOURS = ['from' => '11:00', 'to' => '14:00'];
+
     /** After this hour the screens show tomorrow's menu, as the canteen's own board does. */
     /** @var string When the day ends for the screens if the centre has not said (then «Today» shows tomorrow). */
     const DAY_END = '16:00';
@@ -53,6 +56,23 @@ class sources {
     public static function day_end(): string {
         $value = (string) get_config('local_oksigeniahechauka', 'dayend');
         return preg_match('/^([01]\d|2[0-3]):[0-5]\d$/', $value) ? $value : self::DAY_END;
+    }
+
+    /**
+     * When the canteen serves: the screens show every menu of the day often then, and «Today» does not take one of them
+     * for its headline. Each centre sets it in «Tu centro»; a centre that serves later or longer moves it.
+     *
+     * @return string[] ['from' => «HH:MM», 'to' => «HH:MM»]
+     */
+    public static function meal_hours(): array {
+        $c = 'local_oksigeniahechauka';
+        $time = '/^([01]\d|2[0-3]):[0-5]\d$/';
+        $from = (string) get_config($c, 'mealfrom');
+        $to = (string) get_config($c, 'mealto');
+        if (!preg_match($time, $from) || !preg_match($time, $to) || strcmp($from, $to) >= 0) {
+            return self::MEAL_HOURS;
+        }
+        return ['from' => $from, 'to' => $to];
     }
 
     /**

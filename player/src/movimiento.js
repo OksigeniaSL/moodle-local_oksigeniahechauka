@@ -84,6 +84,19 @@ const PARTS = {
     ],
     // What the library celebrates: the rosette is pinned on as a stamp, or the cover is put in its place and the rosette on
     // it; then the words, and the marks of the moments last.
+    // The day's menus: the plate is served, the label, each menu's letter one after the other, the rows of dishes, and
+    // last the legend and the marks.
+    'menus': [
+        ['.hk-menus', 'marco', 0],
+        ['.hk-menus-pieza', 'plato', 1],
+        ['.hk-menus-etiqueta', 'sube', 1.5],
+        ['.hk-menus-menu .hk-menus-celda', 'sube', 2.5, 'step'],
+        ['.hk-menus-puerta .hk-menus-celda', 'sello', 2.5],
+        ['.hk-menus-mesa tbody .hk-menus-celda', 'linea', 4, 'each'],
+        ['.hk-menus-leyenda', 'sube', 7],
+        ['.hk-menus-nota', 'sube', 7],
+        ['.hk-menus-marcas', 'sube', 7.5],
+    ],
     'celebra': [
         ['.hk-celebra', 'marco', 0],
         ['.hk-celebra-portada', 'libro', 1],

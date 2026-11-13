@@ -42,4 +42,20 @@ final class dayend_test extends \advanced_testcase {
             $this->assertSame('16:00', sources::day_end(), $wrong);
         }
     }
+
+    /**
+     * When the canteen serves: each centre's, and 11:00 to 14:00 when it is missing, wrong or backwards.
+     */
+    public function test_meal_hours(): void {
+        $this->resetAfterTest();
+        $c = 'local_oksigeniahechauka';
+        $this->assertSame(['from' => '11:00', 'to' => '14:00'], sources::meal_hours());
+        set_config('mealfrom', '12:30', $c);
+        set_config('mealto', '15:30', $c);
+        $this->assertSame(['from' => '12:30', 'to' => '15:30'], sources::meal_hours());
+        set_config('mealto', '12:00', $c);
+        $this->assertSame(['from' => '11:00', 'to' => '14:00'], sources::meal_hours());
+        set_config('mealfrom', 'mediodía', $c);
+        $this->assertSame(['from' => '11:00', 'to' => '14:00'], sources::meal_hours());
+    }
 }
