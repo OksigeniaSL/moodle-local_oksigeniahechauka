@@ -1,0 +1,159 @@
+/* Oksigenia Hechauka: «La foto del día» (Jujol, 13 November 2026). Goes after the other slides' sheets (after menus.css).
+ *
+ *   <div class="hk-cuerpo hk-capa" data-composicion="fotodia">
+ *     <section class="hk-fdd" data-forma="h|v" data-categoria="cielo|tierra|vida|cerca|arte" data-ajuste="0…3">
+ *       <figure class="hk-fdd-marco"><div class="hk-fdd-lamina"><img class="hk-fdd-img"></div>
+ *         <figcaption class="hk-fdd-credito">…</figcaption></figure>
+ *       <div class="hk-fdd-lado"><p class="hk-fdd-etiqueta"><span class="hk-fdd-icono"><svg></span>La foto del día</p>
+ *         <h2 class="hk-fdd-titulo"><p class="hk-fdd-pie">
+ *
+ * The frame's size is set by fitPhotoday() from the picture's shape. Chromium 56: flexbox, margins instead of gap. */
+.hk-cuerpo[data-composicion="fotodia"] {
+    flex-direction: column;
+}
+.hk .hk-fdd {
+    --hk-fdd-titulo: var(--hk-t-entrada);
+    --hk-fdd-pie: var(--hk-t-lista);
+    display: flex;
+    flex: 1 1 auto;
+    align-items: center;
+    min-width: 0;
+    min-height: 0;
+    padding: 2.8rem 3.2rem;
+    overflow: hidden;
+    border-radius: calc(2.8rem * var(--hk-esquina));
+    background: var(--hk-superficie);
+    color: var(--hk-texto);
+}
+.hk.hk-vertical .hk-fdd {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 2.8rem;
+}
+
+/* The picture, whole, on its plate; the credit under it. */
+.hk .hk-fdd-marco {
+    display: flex;
+    flex: none;
+    flex-direction: column;
+    margin: 0;
+}
+.hk.hk-vertical .hk-fdd-marco {
+    align-self: center;
+}
+.hk .hk-fdd-lamina {
+    overflow: hidden;
+    border-radius: calc(1.4rem * var(--hk-esquina));
+    background: var(--hk-fondo);
+    box-shadow: 0 1.6rem 3.2rem -2rem rgba(0, 0, 0, .55);
+}
+.hk .hk-fdd-img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+/* Legal, read by whoever comes close, not from afar: small and the same at every distance, but there, beside the
+   picture. */
+.hk .hk-fdd-credito {
+    margin-top: .8rem;
+    font-size: 2.4rem;
+    line-height: 1.25;
+    color: var(--hk-texto-suave);
+}
+
+/* The words: the label with its pictogram, the title, and the «did you know…?». */
+.hk .hk-fdd-lado {
+    display: flex;
+    flex: 1 1 0px;
+    flex-direction: column;
+    justify-content: center;
+    align-self: stretch;
+    min-width: 0;
+    min-height: 0;
+    margin-left: 4.4rem;
+    overflow: hidden;
+}
+.hk.hk-vertical .hk-fdd-lado {
+    margin-top: 3rem;
+    margin-left: 0;
+    justify-content: flex-start;
+}
+.hk .hk-fdd-etiqueta {
+    display: flex;
+    flex: none;
+    align-items: center;
+    margin: 0 0 1.8rem;
+    font-size: var(--hk-t-min);
+    font-weight: 800;
+    line-height: 1.1;
+    color: var(--hk-acento-texto);
+}
+.hk .hk-fdd-icono {
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: calc(var(--hk-t-min) * 1.8);
+    height: calc(var(--hk-t-min) * 1.8);
+    margin-right: 1.4rem;
+    border-radius: 50%;
+    background: var(--hk-acento);
+    color: var(--hk-sobre-acento);
+}
+.hk .hk-fdd-icono svg {
+    width: 58%;
+    height: 58%;
+}
+.hk .hk-fdd-titulo {
+    flex: none;
+    margin: 0 0 1.8rem;
+    font-family: var(--hk-letra-titulos);
+    font-size: var(--hk-fdd-titulo);
+    font-weight: 800;
+    line-height: 1.05;
+}
+.hk .hk-fdd-pie {
+    margin: 0;
+    font-size: var(--hk-fdd-pie);
+    line-height: 1.28;
+}
+
+/* The fit: with room to spare the words grow a little (the picture keeps its size); without, they come down by steps,
+   never under the least that is read. */
+.hk .hk-fdd[data-ajuste="-2"] {
+    --hk-fdd-titulo: calc(var(--hk-t-entrada) * 1.5);
+    --hk-fdd-pie: calc(var(--hk-t-lista) * 1.35);
+}
+.hk .hk-fdd[data-ajuste="-1"] {
+    --hk-fdd-titulo: calc(var(--hk-t-entrada) * 1.25);
+    --hk-fdd-pie: calc(var(--hk-t-lista) * 1.18);
+}
+.hk .hk-fdd[data-ajuste="1"] {
+    --hk-fdd-titulo: calc(var(--hk-t-entrada) * .92);
+    --hk-fdd-pie: calc(var(--hk-t-lista) * .92);
+}
+.hk .hk-fdd[data-ajuste="2"] {
+    --hk-fdd-titulo: calc(var(--hk-t-entrada) * .84);
+    --hk-fdd-pie: calc(var(--hk-t-lista) * .84);
+}
+.hk .hk-fdd[data-ajuste="3"] {
+    --hk-fdd-titulo: calc(var(--hk-t-entrada) * .76);
+    --hk-fdd-pie: var(--hk-t-min);
+}
+
+/* The picture settles for the whole slide, as the photos do: a little larger at first, at rest after a few seconds. */
+.hk-capa[data-mv] .hk-fdd-img {
+    -webkit-transform: scale(1.05);
+    transform: scale(1.05);
+}
+.hk-capa.hk-dentro[data-mv] .hk-fdd-img {
+    -webkit-transform: none;
+    transform: none;
+    -webkit-transition: -webkit-transform 12s cubic-bezier(.1, .6, .2, 1);
+    transition: transform 12s cubic-bezier(.1, .6, .2, 1);
+}
+.hk-capa[data-mv-quieta] .hk-fdd-img {
+    -webkit-transform: none;
+    transform: none;
+}

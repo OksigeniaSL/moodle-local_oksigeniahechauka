@@ -160,6 +160,10 @@ class centre {
             'dayend' => sources::day_end(),
             'meals' => sources::has_meals() ? sources::meal_hours() : false,
             'videosperday' => sources::videos_per_day(),
+            'photoday' => empty($config->sourcephotoday) ? false : ['themes' => array_map(function ($t) use ($c) {
+                return ['value' => $t, 'label' => get_string('photoday_' . $t, $c),
+                    'checked' => in_array($t, photoday::themes(), true)];
+            }, photoday::THEMES)],
             'videosmost' => sources::VIDEOS_MOST,
             'phrase' => ['value' => self::phrase($config), 'max' => self::PHRASE, 'upright' => self::PHRASE_UPRIGHT,
                 'uprightscreens' => self::upright_far(), 'left' => get_string('centre_phrase_left', $c, '{$a}'),
@@ -272,6 +276,11 @@ class centre {
         $dayend = optional_param('dayend', '', PARAM_RAW_TRIMMED);
         if (preg_match('/^([01]\d|2[0-3]):[0-5]\d$/', $dayend)) {
             set_config('dayend', $dayend, $c);
+        }
+        // The themes of the picture of the day, when the form brings them.
+        if (optional_param('photodaysent', 0, PARAM_BOOL)) {
+            $themes = array_intersect(photoday::THEMES, optional_param_array('photodaythemes', [], PARAM_ALPHA));
+            set_config('photodaythemes', implode(',', $themes), $c);
         }
         // How many videos a day each screen shows, in turn; 0, all of them.
         $videos = optional_param('videosperday', null, PARAM_RAW_TRIMMED);

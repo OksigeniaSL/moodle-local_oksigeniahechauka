@@ -135,6 +135,9 @@ class files {
      * @return bool
      */
     public static function from_source(\stored_file $file): bool {
+        if ($file->get_component() === self::COMPONENT && $file->get_filearea() === photoday::AREA) {
+            return !$file->is_directory() && (int) $file->get_itemid() === 0;
+        }
         if ($file->get_component() === sources::BOOKS && $file->get_filearea() === 'cover') {
             return !$file->is_directory() && sources::has_books();
         }

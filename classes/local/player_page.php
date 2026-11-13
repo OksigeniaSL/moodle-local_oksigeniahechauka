@@ -178,7 +178,7 @@ class player_page {
             ['hechauka.css', 'composiciones.css', 'tiempo.css', 'semana.css', 'proximos-dias.css', 'urgente.css',
             'distancia.css', 'jerarquia.css', 'tercios.css', 'cinta.css', 'usos.css', 'agenda.css', 'fotos.css',
             'lideres.css', 'agenda-lista.css', 'cumple.css', 'reposo.css', 'plazos.css', 'tabla.css',
-            'biblioteca.css', 'celebra.css', 'canal.css', 'alergenos.css', 'menus.css',
+            'biblioteca.css', 'celebra.css', 'canal.css', 'alergenos.css', 'menus.css', 'fotodia.css',
             'identidad.css', 'zonas.css',
             'pieles.css', 'fondos.css', 'letras.css', 'actividad.css',
             'movimiento.css'] as $file

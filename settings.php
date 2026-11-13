@@ -218,6 +218,19 @@ if ($hassiteconfig) {
             ));
         }
         $settings->add(new admin_setting_configcheckbox(
+            "$p/sourcephotoday",
+            get_string('sourcephotoday', $p),
+            get_string('sourcephotoday_desc', $p),
+            1
+        ));
+        $settings->add(new admin_setting_configtext(
+            "$p/photodaybase",
+            get_string('photodaybase', $p),
+            get_string('photodaybase_desc', $p, \local_oksigeniahechauka\local\photoday::BASE),
+            '',
+            PARAM_URL
+        ));
+        $settings->add(new admin_setting_configcheckbox(
             "$p/sourcedeadlines",
             get_string('sourcedeadlines', $p),
             get_string('sourcedeadlines_desc', $p),

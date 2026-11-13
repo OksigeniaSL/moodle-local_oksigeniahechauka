@@ -649,6 +649,10 @@ class Player {
                 moments: liveItems(m.items || [], 'extra', wall).filter(function (it) {
                     return it.type === 'moments' && it.moments && it.moments.length;
                 })[0] || null,
+                // The picture of the day (src/fotodia.js): the first one live, the same all day.
+                photoday: (m.items || []).filter(function (it) {
+                    return it.type === 'photoday' && it.image && isLive(it, wall);
+                })[0] || null,
                 // Every menu of the day, for their slide (src/menus.js); none on a day with no canteen.
                 menus: today.menu ? this.menusOf(wall) : null,
                 mealTime: mealTime(wall, this.manifest.mealhours),

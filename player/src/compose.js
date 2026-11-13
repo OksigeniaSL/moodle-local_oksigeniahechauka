@@ -20,6 +20,7 @@
 // cumple          whose birthday it is today, with their pictures, by pages
 // biblioteca      what has come to the library: a book at a time with its QR, the next ones on the shelf
 // celebra        what the library celebrates this week: a moment at a time, with its rosette or its cover
+// fotodia        the picture of the day, a curious or beautiful one with its caption and its credit
 // menus          every menu of the day, the menus in columns and their dishes in rows; often while the canteen serves
 // canal           the centre's messaging channel: follow it from the screen, with its QR
 // plazos          what falls due in the courses in the coming days, by days and by pages
@@ -39,6 +40,9 @@ const BIRTHDAY_EVERY = 7;
 
 /** How many slides go by between one of the library and the next. */
 const BOOKS_EVERY = 16;
+
+/** How many slides go by between two of the picture of the day. */
+const PHOTODAY_EVERY = 12;
 
 /** How many slides go by between two of every menu of the day: while the canteen serves, and the rest of the day. */
 const MENUS_MEAL_EVERY = 3;
@@ -304,6 +308,12 @@ export class Composer {
             this.momentPage = (this.momentPage === undefined ? -1 : this.momentPage) + 1;
             return pick('celebra', [], 12, {item: o.moments, page: this.momentPage});
         }
+        // The picture of the day, one slide in twelve: never right after a picture over the whole screen.
+        this.sincePhotoday = (this.sincePhotoday === undefined ? PHOTODAY_EVERY - 3 : this.sincePhotoday) + 1;
+        if (o.photoday && this.sincePhotoday > PHOTODAY_EVERY && this.last !== 'foto-completa') {
+            this.sincePhotoday = 1;
+            return pick('fotodia', [], 15, {item: o.photoday});
+        }
         this.sinceChannel = (this.sinceChannel === undefined ? CHANNEL_EVERY - 4 : this.sinceChannel) + 1;
         if (o.channel && this.sinceChannel > CHANNEL_EVERY) {
             this.sinceChannel = 1;
@@ -378,6 +388,11 @@ export class Composer {
             }
             // Nothing at all to show: a screen at rest, not an empty «Today». Its own QR only until the centre has put anything.
             if (!h && !(o.phrases || []).length) {
+                // At rest, the picture of the day comes and goes with the screen at rest: a whole night with one picture
+                // tires more than one that leaves and comes back.
+                if (o.photoday && this.last === 'reposo') {
+                    return pick('fotodia', [], 30, {item: o.photoday});
+                }
                 const idle = {qr: o.idleQr || null};
                 if (o.idleQrImage) {
                     idle.qrimage = o.idleQrImage;

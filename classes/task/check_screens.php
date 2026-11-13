@@ -55,5 +55,6 @@ class check_screens extends \core\task\scheduled_task {
         mtrace('Screens down: ' . $done['down'] . '; back: ' . $done['back']);
         mtrace('Short address of the player: ' . playerlink::refresh(time()));
         mtrace('Short links of the QR codes: ' . links::refresh(time()));
+        mtrace('The picture of the day: ' . \local_oksigeniahechauka\local\photoday::refresh(time()));
     }
 }

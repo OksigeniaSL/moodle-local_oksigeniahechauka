@@ -13,6 +13,7 @@ import {buildTable, fitTable} from './tabla.js';
 import {buildBooks, fitBooks} from './biblioteca.js';
 import {buildMoments, fitMoments} from './celebra.js';
 import {buildMenus, fitMenus} from './menus.js';
+import {buildPhotoday, fitPhotoday} from './fotodia.js';
 import {buildChannel, fitChannel, startChannel, stopChannel} from './canal.js';
 import {qrSvg, shortWeb} from './qr.js';
 import {even} from './balance.js';
@@ -33,7 +34,7 @@ const PHRASE_WAITS_MS = 25000;
 const CAPTION_MS = 2800;
 
 /** The compositions that are made anew each time, never only their pictures changed. */
-const NEW_EACH = {'solo-hoy': true, semana: true, titular: true, agenda: true, muro: true, 'fotos-tercio': true, cumple: true, biblioteca: true, celebra: true, menus: true, canal: true, plazos: true,
+const NEW_EACH = {'solo-hoy': true, semana: true, titular: true, agenda: true, muro: true, 'fotos-tercio': true, cumple: true, biblioteca: true, celebra: true, menus: true, fotodia: true, canal: true, plazos: true,
     tabla: true, zonas: true};
 
 /** The width over the height of each slot shape, to measure a portrait slot when the body is lower than the sheet expects. */
@@ -738,6 +739,12 @@ export class Screen {
                 horizontal: this.horizontal, media: mediaOf});
             return c;
         }
+        if (comp === 'fotodia') {
+            // The picture of the day: big and whole, its credit under it, and its «did you know…?» (src/fotodia.js).
+            buildPhotoday(c, extra && extra.item, {distance: this.distance || 3, horizontal: this.horizontal, media: mediaOf,
+                label: this.s.photoday || ''});
+            return c;
+        }
         if (comp === 'menus') {
             // Every menu of the day: one page each turn (src/menus.js).
             buildMenus(c, extra && extra.item, (extra && extra.page) || 0, {distance: this.distance || 3,
@@ -1234,6 +1241,7 @@ export class Screen {
         fitBooks(c, this.horizontal);
         fitMoments(c, this.horizontal);
         fitMenus(c);
+        fitPhotoday(c, this.horizontal);
         fitChannel(c, this.horizontal);
         fitDeadlines(c);
         fitTable(c);

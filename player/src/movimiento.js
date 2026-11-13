@@ -97,6 +97,16 @@ const PARTS = {
         ['.hk-menus-nota', 'sube', 7],
         ['.hk-menus-marcas', 'sube', 7.5],
     ],
+    // The picture of the day: its plate appears and the picture settles; then the label, the title, the caption and
+    // the credit.
+    'fotodia': [
+        ['.hk-fdd', 'marco', 0],
+        ['.hk-fdd-lamina', 'foto', 0.5],
+        ['.hk-fdd-etiqueta', 'sube', 2],
+        ['.hk-fdd-titulo', 'sube', 2.6],
+        ['.hk-fdd-pie', 'sube', 3.4],
+        ['.hk-fdd-credito', 'fundido', 4.5],
+    ],
     'celebra': [
         ['.hk-celebra', 'marco', 0],
         ['.hk-celebra-portada', 'libro', 1],

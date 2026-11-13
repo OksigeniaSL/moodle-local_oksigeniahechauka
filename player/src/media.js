@@ -231,6 +231,7 @@ export function mediaOf(manifest) {
         (it.moments || []).forEach(function (moment) {
             add(moment.cover);
         });
+        add(it.image);
     });
     return out;
 }

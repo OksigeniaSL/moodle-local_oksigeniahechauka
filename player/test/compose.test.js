@@ -436,3 +436,21 @@ test('a screen by the canteen shows every menu every other slide while it serves
     assert.ok(n >= 8, comps.join(' '));
 });
 
+test('the picture of the day: one slide in twelve, and at rest it comes and goes with the screen at rest', () => {
+    const photoday = {id: 'photoday-1', type: 'photoday', image: {sha1: 'x'}};
+    const c = new Composer();
+    const queue = [{id: 'p1', type: 'image', width: 1920, height: 1080}, {id: 'p2', type: 'image', width: 1080, height: 1920}];
+    const comps = [];
+    for (let i = 0; i < 36; i++) {
+        comps.push(c.next(queue, 2, true, {photoday, distance: 3}).comp);
+    }
+    const n = comps.filter((comp) => comp === 'fotodia').length;
+    assert.ok(n >= 2 && n <= 4, comps.join(' '));
+    const rest = new Composer();
+    const idle = [];
+    for (let i = 0; i < 4; i++) {
+        idle.push(rest.next([], 0, true, {photoday, distance: 3}).comp);
+    }
+    assert.deepEqual(idle, ['reposo', 'fotodia', 'reposo', 'fotodia']);
+});
+
