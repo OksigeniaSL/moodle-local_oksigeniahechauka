@@ -64,6 +64,7 @@ class manifest {
             'horizon' => schedule::day($now, self::HORIZON),
             'dayend' => sources::day_end(),
             'mealhours' => sources::meal_hours(),
+            'videosperday' => sources::videos_per_day(),
             'screen' => [
                 'id' => (int) $screen->id,
                 'name' => items::plain((string) $screen->name),

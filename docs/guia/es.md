@@ -310,8 +310,8 @@ Lo que hace que las pantallas sean las del centro, y no las de Hechauka:
   centro (colores, fondo, letra y esquinas), siempre con combinaciones probadas que se leen de lejos.
 - **Los colores del centro** y el **tema**, claro, oscuro o según la hora.
 - **Las categorías**, hasta seis, para dar color a los eventos según a quién van, o traídas de las categorías de cursos.
-- **La jornada**: a qué hora pasan las pantallas a enseñar lo de mañana y, con Oksigenia Meals, a qué horas sirve el
-  comedor.
+- **La jornada**: a qué hora pasan las pantallas a enseñar lo de mañana; con Oksigenia Meals, a qué horas sirve el
+  comedor; y cuántos vídeos salen al día en cada pantalla (de serie, dos): si hay más, se turnan, cada día otros.
 - **La frase del centro**: su lema, entero en la cinta cada pocas frases y con el logotipo.
 - **Las sorpresas**: de vez en cuando, un personaje cruza la pantalla. De serie, apagadas.
 

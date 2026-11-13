@@ -58,4 +58,21 @@ final class dayend_test extends \advanced_testcase {
         set_config('mealfrom', 'mediodía', $c);
         $this->assertSame(['from' => '11:00', 'to' => '14:00'], sources::meal_hours());
     }
+
+    /**
+     * How many videos a day: two if the centre has not said, what it says from 0 (all) to the most, and never more.
+     */
+    public function test_videos_per_day(): void {
+        $this->resetAfterTest();
+        $c = 'local_oksigeniahechauka';
+        $this->assertSame(2, sources::videos_per_day());
+        set_config('videosperday', '0', $c);
+        $this->assertSame(0, sources::videos_per_day());
+        set_config('videosperday', '5', $c);
+        $this->assertSame(5, sources::videos_per_day());
+        set_config('videosperday', '99', $c);
+        $this->assertSame(sources::VIDEOS_MOST, sources::videos_per_day());
+        set_config('videosperday', 'muchos', $c);
+        $this->assertSame(2, sources::videos_per_day());
+    }
 }

@@ -159,6 +159,8 @@ class centre {
             'logos' => $logos,
             'dayend' => sources::day_end(),
             'meals' => sources::has_meals() ? sources::meal_hours() : false,
+            'videosperday' => sources::videos_per_day(),
+            'videosmost' => sources::VIDEOS_MOST,
             'phrase' => ['value' => self::phrase($config), 'max' => self::PHRASE, 'upright' => self::PHRASE_UPRIGHT,
                 'uprightscreens' => self::upright_far(), 'left' => get_string('centre_phrase_left', $c, '{$a}'),
                 'leftone' => get_string('centre_phrase_left_one', $c)],
@@ -270,6 +272,11 @@ class centre {
         $dayend = optional_param('dayend', '', PARAM_RAW_TRIMMED);
         if (preg_match('/^([01]\d|2[0-3]):[0-5]\d$/', $dayend)) {
             set_config('dayend', $dayend, $c);
+        }
+        // How many videos a day each screen shows, in turn; 0, all of them.
+        $videos = optional_param('videosperday', null, PARAM_RAW_TRIMMED);
+        if ($videos !== null && preg_match('/^\d{1,2}$/', $videos)) {
+            set_config('videosperday', max(0, min(sources::VIDEOS_MOST, (int) $videos)), $c);
         }
         // When the canteen serves: only both, and the first before the second.
         $from = optional_param('mealfrom', '', PARAM_RAW_TRIMMED);

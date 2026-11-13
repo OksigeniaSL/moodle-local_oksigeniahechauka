@@ -2,7 +2,7 @@
 
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {Composer, shapeOf, secondsOf, draftChoice} from '../src/compose.js';
+import {Composer, shapeOf, secondsOf, draftChoice, videosOfDay, VIDEO_GAP} from '../src/compose.js';
 import {leadsOf} from '../src/lead.js';
 import {countdown, dayLabel, mealTime, splitTitle, upcoming} from '../src/agenda.js';
 
@@ -388,5 +388,40 @@ test('while the canteen serves with several menus, the menu is no headline of «
     assert.deepEqual(types({menu: {}, notices: [notice], noon: true}), ['menu', 'notice']);
     assert.deepEqual(types({menu: {}, notices: [notice], menusApart: true}), ['notice']);
     assert.deepEqual(types({menu: {}, notices: [], menusApart: true}), ['menu']);
+});
+
+test('the videos share the days out: two a day in turn, those with days of their own besides, and a weekend keeps Friday', () => {
+    const video = (id, days) => ({id, type: 'video', when: days ? {days} : undefined});
+    const queue = [{id: 'p', type: 'image'}, video('a'), video('b'), video('c'), video('d'), video('e'), video('f'),
+        video('lunes', [1])];
+    const ids = (date) => videosOfDay(queue, 2, date).map((it) => it.id);
+    const monday = ids('2026-11-16');
+    assert.equal(monday.length, 4, monday.join(' '));
+    assert.ok(monday.includes('p') && monday.includes('lunes'));
+    // Over three weekdays, every video of the turn comes once.
+    const seen = {};
+    ['2026-11-16', '2026-11-17', '2026-11-18'].forEach((d) => ids(d).forEach((id) => {
+        seen[id] = (seen[id] || 0) + 1;
+    }));
+    ['a', 'b', 'c', 'd', 'e', 'f'].forEach((id) => assert.equal(seen[id], 1, id));
+    assert.deepEqual(ids('2026-11-21'), ids('2026-11-20'));
+    // No more than so many, or 0: all of them.
+    assert.equal(videosOfDay(queue.slice(0, 3), 2, '2026-11-16').length, 3);
+    assert.equal(videosOfDay(queue, 0, '2026-11-16').length, queue.length);
+});
+
+test('never two videos close together: one too soon gives its turn to what is not a video', () => {
+    const c = new Composer();
+    const queue = [{id: 'v1', type: 'video', width: 1920, height: 1080}, {id: 'v2', type: 'video', width: 1920, height: 1080},
+        {id: 'p1', type: 'image', width: 1920, height: 1080}, {id: 'p2', type: 'image', width: 1920, height: 1080}];
+    let last = -99;
+    for (let n = 0; n < 40; n++) {
+        const pick = c.next(queue, 0, true, {distance: 3});
+        if (pick.items.some((it) => it.type === 'video')) {
+            assert.ok(n - last >= VIDEO_GAP || last < 0, 'slide ' + n + ' after ' + last);
+            last = n;
+        }
+    }
+    assert.ok(last >= 0, 'videos still come');
 });
 

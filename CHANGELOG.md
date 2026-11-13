@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.22.0
+
+- **The videos share the days out.** Each screen shows so many videos a day (two by default, set in «Your centre»; 0,
+  all of them), in turn, other ones the next day; those with days of their own come on their days besides, and two
+  videos never come close together. The more videos a centre has, the more they share out, with no days to set by hand.
+- **«Your work» reminds whoever published something that it stops showing today or tomorrow**, with the way to make it
+  last; many are one reminder.
+
 ## 0.21.0
 
 - **Two new Surprises, each moving in a way none of the others does**, from the art direction: the frog leaps in from

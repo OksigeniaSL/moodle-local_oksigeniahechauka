@@ -40,6 +40,12 @@ class sources {
     /** @var int The most deadlines a screen gets: a screen is not the place for all of a big site's. */
     const DEADLINES_MOST = 60;
 
+    /** @var int Videos a screen shows a day, in turn, if the centre has not said. */
+    const VIDEOS_PER_DAY = 2;
+
+    /** @var int The most a centre can ask for a day, short of all of them (0). */
+    const VIDEOS_MOST = 20;
+
     /** @var string[] When the canteen serves, if the centre has not said: the menus come often then. */
     const MEAL_HOURS = ['from' => '11:00', 'to' => '14:00'];
 
@@ -73,6 +79,20 @@ class sources {
             return self::MEAL_HOURS;
         }
         return ['from' => $from, 'to' => $to];
+    }
+
+    /**
+     * How many videos each screen shows a day, in turn: the more there are, the more they share the days out; those with
+     * days of their own come on their days besides. 0, all of them every day. Each centre sets it in «Tu centro».
+     *
+     * @return int
+     */
+    public static function videos_per_day(): int {
+        $value = get_config('local_oksigeniahechauka', 'videosperday');
+        if ($value === false || $value === '' || !is_numeric($value)) {
+            return self::VIDEOS_PER_DAY;
+        }
+        return max(0, min(self::VIDEOS_MOST, (int) $value));
     }
 
     /**

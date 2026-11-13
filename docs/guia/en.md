@@ -312,7 +312,8 @@ What makes the screens the centre's, and not Hechauka's:
   your centre (colours, background, letter and corners), always with tested combinations that read from afar.
 - **The colours of the centre** and the **theme**, light, dark or by the hour.
 - **The categories**, up to six, to colour the events by whom they are for, or brought from the course categories.
-- **The day**: at what time the screens start showing tomorrow and, with Oksigenia Meals, when the canteen serves.
+- **The day**: at what time the screens start showing tomorrow; with Oksigenia Meals, when the canteen serves; and how
+  many videos each screen shows a day (two by default): if there are more, they take turns, other ones each day.
 - **The centre's sentence**: its motto, whole in the ticker every few sentences and with the logo.
 - **The surprises**: now and then, a character crosses the screen. Off by default.
 

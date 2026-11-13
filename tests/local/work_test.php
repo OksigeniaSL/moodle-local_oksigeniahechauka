@@ -96,4 +96,44 @@ final class work_test extends \advanced_testcase {
         $this->assertSame(get_string('work_down_many', 'local_oksigeniahechauka', 3), $alerts[0]['text']);
         $this->assertCount(2, $alerts);
     }
+
+    /**
+     * What someone published that stops showing today or tomorrow, to them alone and in time to make it last; many are
+     * one alert; an urgent notice is not among them.
+     */
+    public function test_ending(): void {
+        global $DB;
+        $this->resetAfterTest();
+        $gen = $this->getDataGenerator();
+        $now = time();
+        $publisher = $gen->create_user();
+        $other = $gen->create_user();
+        $this->give((int) $publisher->id, access::PUBLISHER);
+        $add = function (string $title, ?string $until, int $by, string $type = 'notice') use ($DB, $now) {
+            return (int) $DB->insert_record('local_oksigeniahechauka_item', (object) ['type' => $type, 'title' => $title,
+                'visible' => 1, 'data' => '{}', 'dateuntil' => $until, 'createdby' => $by, 'timecreated' => $now,
+                'timemodified' => $now]);
+        };
+        $today = schedule::day($now);
+        $tomorrow = schedule::day($now, 1);
+        $soon = $add('Salida temprana', $tomorrow, (int) $publisher->id);
+        $add('Fotos de grupo', $today, (int) $publisher->id);
+        $add('Sin fecha', null, (int) $publisher->id);
+        $add('Más adelante', schedule::day($now, 5), (int) $publisher->id);
+        $add('De otro', $tomorrow, (int) $other->id);
+        $add('Simulacro', $today, (int) $publisher->id, 'urgent');
+        $alerts = work::ending((int) $publisher->id, $now);
+        $this->assertSame([get_string('work_ending_today', 'local_oksigeniahechauka', 'Fotos de grupo'),
+            get_string('work_ending_tomorrow', 'local_oksigeniahechauka', 'Salida temprana')], array_column($alerts, 'text'));
+        $this->assertStringContainsString('edit.php?id=' . $soon, $alerts[1]['url']);
+        $this->assertSame(['today', 'today'], array_column($alerts, 'level'));
+        $card = work::cards((int) $publisher->id, $now)[0];
+        $this->assertCount(2, $card['alerts']);
+
+        foreach (['Uno', 'Dos'] as $title) {
+            $add($title, $tomorrow, (int) $publisher->id);
+        }
+        $alerts = work::ending((int) $publisher->id, $now);
+        $this->assertSame([get_string('work_ending_many', 'local_oksigeniahechauka', 4)], array_column($alerts, 'text'));
+    }
 }

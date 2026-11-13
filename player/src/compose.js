@@ -139,6 +139,44 @@ export function zonesOf(queue, start, o) {
 // How much the week has to have to come out, and to come out often.
 const WEEK_FULL = 4;
 
+/** How many slides go by, at least, between two videos. */
+export const VIDEO_GAP = 3;
+
+/**
+ * The videos of the day: of those without days of their own, each screen shows only `perDay` a day, the next ones the
+ * next day, in turn, so that the more there are the more they share out (a week moves the turn on by one, so that a
+ * video does not always fall on the same weekday). Those with days of their own come on their days, besides. A weekend
+ * keeps Friday's turn. With `perDay` 0, or no more than that, all of them.
+ *
+ * @param {object[]} queue the items of the main zone
+ * @param {number} perDay
+ * @param {string} date «YYYY-MM-DD»
+ * @returns {object[]}
+ */
+export function videosOfDay(queue, perDay, date) {
+    const free = queue.filter(function (it) {
+        return it.type === 'video' && !(it.when && it.when.days && it.when.days.length && it.when.days.length < 7);
+    });
+    if (!perDay || free.length <= perDay) {
+        return queue;
+    }
+    const ids = free.map(function (it) {
+        return String(it.id);
+    }).sort();
+    const parts = String(date).split('-');
+    const days = Math.floor((Date.UTC(+parts[0], +parts[1] - 1, +parts[2]) - Date.UTC(2024, 0, 1)) / 86400000);
+    const week = Math.floor(days / 7);
+    const weekday = week * 5 + Math.min(((days % 7) + 7) % 7, 4);
+    const start = (weekday * perDay + week) % ids.length;
+    const today = {};
+    for (let k = 0; k < perDay; k++) {
+        today[ids[(start + k) % ids.length]] = true;
+    }
+    return queue.filter(function (it) {
+        return free.indexOf(it) === -1 || today[String(it.id)];
+    });
+}
+
 export class Composer {
     constructor() {
         this.n = 0;
@@ -184,6 +222,9 @@ export class Composer {
         const pick = (comp, items, seconds, extra) => {
             this.sameRun = comp === this.last ? this.sameRun + 1 : 1;
             this.last = comp;
+            this.sinceVideo = items.some(function (it) {
+                return it && it.type === 'video';
+            }) ? 0 : (this.sinceVideo === undefined ? VIDEO_GAP : this.sinceVideo) + 1;
             if (items.length) {
                 this.lastId = items[items.length - 1].id;
             }
@@ -384,7 +425,16 @@ export class Composer {
         if (this.sameRun >= 2 && h > 0 && this.last === 'vertical-hoy') {
             return pick('solo-hoy', [], o.menu ? 15 : 12);
         }
-        const i = this.position(queue);
+        let i = this.position(queue);
+        // Never two videos close together: one too soon gives its turn to the next thing that is not a video.
+        if (queue[i] && queue[i].type === 'video' && this.sinceVideo !== undefined && this.sinceVideo < VIDEO_GAP) {
+            for (let k = 1; k < queue.length; k++) {
+                if (queue[(i + k) % queue.length].type !== 'video') {
+                    i = (i + k) % queue.length;
+                    break;
+                }
+            }
+        }
         const it = queue[i];
         const next = queue[(i + 1) % queue.length];
         const a = ratio(it);

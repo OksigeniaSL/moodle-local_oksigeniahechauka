@@ -32,6 +32,9 @@ class work {
     /** @var int Screens without a sign of life named one by one; more are one alert. */
     const ONE_BY_ONE = 2;
 
+    /** @var int What someone published that stops showing soon, named one by one; more are one alert. */
+    const ENDING_ONE_BY_ONE = 3;
+
     /**
      * The door of the screens for someone, as the block takes it; none without a permission.
      *
@@ -128,6 +131,8 @@ class work {
                 }
             }
         }
+        // What this person published that stops showing today or tomorrow: in time to make it last.
+        $alerts = array_merge($alerts, self::ending($userid, $now));
         if (!$manages) {
             $limited = !access::can('publishall', $userid);
             $count = $DB->count_records_select(
@@ -155,5 +160,45 @@ class work {
             'actions' => $actions,
             'icon' => $OUTPUT->image_url('icon', $c)->out(false),
         ];
+    }
+
+    /**
+     * What someone published that stops showing today or tomorrow, so that they make it last if they want: each with its
+     * way to the editing, or, when there are many, one alert to the panel. An urgent notice is not here: it is taken off,
+     * not let run out.
+     *
+     * @param int $userid
+     * @param int $now
+     * @return array[] alerts of the block
+     */
+    public static function ending(int $userid, int $now): array {
+        global $DB;
+        $c = 'local_oksigeniahechauka';
+        $today = schedule::day($now);
+        $tomorrow = schedule::day($now, 1);
+        $items = $DB->get_records_select(
+            'local_oksigeniahechauka_item',
+            "createdby = :me AND visible = 1 AND type <> 'urgent' AND (dateuntil = :today OR dateuntil = :tomorrow)",
+            ['me' => $userid, 'today' => $today, 'tomorrow' => $tomorrow],
+            'dateuntil, title',
+            'id, title, dateuntil'
+        );
+        if (!$items) {
+            return [];
+        }
+        if (count($items) > self::ENDING_ONE_BY_ONE) {
+            return [['text' => get_string('work_ending_many', $c, count($items)),
+                'url' => (new \moodle_url('/local/oksigeniahechauka/index.php'))->out(false), 'level' => 'today']];
+        }
+        $alerts = [];
+        foreach ($items as $item) {
+            $key = $item->dateuntil === $today ? 'work_ending_today' : 'work_ending_tomorrow';
+            $alerts[] = [
+                'text' => get_string($key, $c, items::plain(format_string($item->title))),
+                'url' => (new \moodle_url('/local/oksigeniahechauka/edit.php', ['id' => $item->id]))->out(false),
+                'level' => 'today',
+            ];
+        }
+        return $alerts;
     }
 }

@@ -13,7 +13,7 @@ import {pair} from './pairing.js';
 import {afterDayEnd, agendaOf, countdown, dayLabel, eventsOn, mealTime, monthOf, upcoming} from './agenda.js';
 import {AGENDA_DAYS, AGENDA_TOP} from './agendaview.js';
 import {albumsOf, oneOfEachAlbum} from './photos.js';
-import {Composer, draftChoice} from './compose.js';
+import {Composer, draftChoice, videosOfDay} from './compose.js';
 import {channelShow} from './canal.js';
 import {menusData} from './menus.js';
 import {dayNumber, isDark, isLive, isPowerOn, liveItems, urgentOf, useOf, weekdayOf} from './rules.js';
@@ -301,12 +301,15 @@ class Player {
         const media = this.media;
         const bad = this.bad;
         const now = Date.now();
-        return liveItems(this.manifest.items || [], 'main', wall).filter(function (it) {
+        const live = liveItems(this.manifest.items || [], 'main', wall).filter(function (it) {
             if (bad[it.id] && now - bad[it.id] < 10 * 60000) {
                 return false;
             }
             return media.ready(it.media);
         });
+        // The videos share the days out: so many a day, in turn (the centre says how many).
+        const perDay = this.manifest.videosperday === undefined ? 2 : this.manifest.videosperday;
+        return videosOfDay(live, perDay, wall.date);
     }
 
     isShowing(item) {
