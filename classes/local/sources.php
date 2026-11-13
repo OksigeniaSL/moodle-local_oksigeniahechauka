@@ -34,6 +34,9 @@ class sources {
     /** @var int The most books a screen gets. */
     const BOOKS_MOST = 12;
 
+    /** @var int The most of the library's moments a screen gets: what is worth telling this week, not a report. */
+    const MOMENTS_MOST = 4;
+
     /** @var int The most deadlines a screen gets: a screen is not the place for all of a big site's. */
     const DEADLINES_MOST = 60;
 
@@ -337,6 +340,58 @@ class sources {
         }
         return [['id' => 'books-' . schedule::day($now), 'type' => 'books', 'zone' => 'extra',
             'label' => get_string('label_books', 'local_oksigeniahechauka'), 'books' => $books]];
+    }
+
+    /**
+     * Whether the site's library tells what there is to celebrate this week.
+     *
+     * @return bool
+     */
+    public static function has_moments(): bool {
+        return class_exists('\\local_oksigeniaayvurenda\\api') && method_exists('\\local_oksigeniaayvurenda\\api', 'moments');
+    }
+
+    /**
+     * What the library celebrates this week, as its readers hear it and without names (Ayvurenda's own words: a round
+     * number of loans, a book that reached its hundredth loan, the busiest day, readers at the goal of a challenge), as an
+     * item of the contract. Nothing, if the library is not there or has nothing to tell.
+     *
+     * @param int $now
+     * @return array items of the contract
+     */
+    public static function moments(int $now): array {
+        if (!self::has_moments()) {
+            return [];
+        }
+        try {
+            $list = \local_oksigeniaayvurenda\api::moments(null, $now);
+        } catch (\Throwable $e) {
+            debugging('Hechauka: the moments of Ayvurenda failed: ' . $e->getMessage(), DEBUG_DEVELOPER);
+            return [];
+        }
+        $list = array_values(array_filter($list, function ($moment) {
+            return trim((string) ($moment['text'] ?? '')) !== '';
+        }));
+        $list = array_slice($list, 0, self::MOMENTS_MOST);
+        if (!$list) {
+            return [];
+        }
+        $places = self::book_places(array_map(function ($moment) {
+            return items::plain((string) ($moment['library'] ?? ''));
+        }, $list));
+        $moments = [];
+        foreach ($list as $key => $moment) {
+            $one = ['kind' => (string) ($moment['kind'] ?? ''), 'text' => items::plain((string) $moment['text'])];
+            if ($places[$key] !== '') {
+                $one['library'] = $places[$key];
+            }
+            if (($moment['cover'] ?? null) instanceof \stored_file) {
+                $one['cover'] = files::media($moment['cover']);
+            }
+            $moments[] = $one;
+        }
+        return [['id' => 'moments-' . schedule::day($now), 'type' => 'moments', 'zone' => 'extra',
+            'label' => get_string('label_moments', 'local_oksigeniahechauka'), 'moments' => $moments]];
     }
 
     /**

@@ -228,6 +228,9 @@ export function mediaOf(manifest) {
             add(book.cover);
             add(book.webqr);
         });
+        (it.moments || []).forEach(function (moment) {
+            add(moment.cover);
+        });
     });
     return out;
 }

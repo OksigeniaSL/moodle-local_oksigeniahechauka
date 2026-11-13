@@ -58,7 +58,7 @@ class report {
     const KEEP_MONTHS = 14;
 
     /** What comes by itself, under one name each. */
-    const SOURCES = ['agenda', 'birthdays', 'books', 'calendar', 'deadlines', 'menu', 'news'];
+    const SOURCES = ['agenda', 'birthdays', 'books', 'calendar', 'deadlines', 'menu', 'moments', 'news'];
 
     /**
      * The row of a screen and a day, created if it is the first.

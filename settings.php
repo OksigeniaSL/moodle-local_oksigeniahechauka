@@ -209,6 +209,14 @@ if ($hassiteconfig) {
                 4
             ));
         }
+        if (\local_oksigeniahechauka\local\sources::has_moments()) {
+            $settings->add(new admin_setting_configcheckbox(
+                "$p/sourcemoments",
+                get_string('sourcemoments', $p),
+                get_string('sourcemoments_desc', $p),
+                1
+            ));
+        }
         $settings->add(new admin_setting_configcheckbox(
             "$p/sourcedeadlines",
             get_string('sourcedeadlines', $p),
