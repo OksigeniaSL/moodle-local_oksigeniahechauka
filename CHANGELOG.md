@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.23.0
+
+- **A screen by the canteen**, in its sheet, where the site has Oksigenia Meals: while the canteen serves, every menu of
+  the day comes every other slide, so that whoever passes finds theirs (by its letter) at once.
+
 ## 0.22.0
 
 - **The videos share the days out.** Each screen shows so many videos a day (two by default, set in «Your centre»; 0,

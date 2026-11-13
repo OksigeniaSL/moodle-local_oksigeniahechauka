@@ -337,5 +337,15 @@ function xmldb_local_oksigeniahechauka_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026111304, 'local', 'oksigeniahechauka');
     }
 
+    if ($oldversion < 2026111306) {
+        // A screen by the canteen: while it serves, every menu of the day comes every other slide.
+        $table = new xmldb_table('local_oksigeniahechauka_screen');
+        $field = new xmldb_field('canteen', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'surprises');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        upgrade_plugin_savepoint(true, 2026111306, 'local', 'oksigeniahechauka');
+    }
+
     return true;
 }

@@ -75,6 +75,7 @@ class manifest {
                 'sound' => !empty($screen->sound),
                 'distance' => uses::distance($screen->distance ?? 3),
                 'glass' => !empty($screen->glass),
+                'canteen' => !empty($screen->canteen),
             ],
             'template' => uses::valid($screen->screenuse ?? null) === 'showcase' ? 'full' : 'zones',
             'centre' => ['name' => $site ? sites::name($site, $config) : self::centre_name()],

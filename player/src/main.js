@@ -652,6 +652,7 @@ class Player {
                 // Every menu of the day, for their slide (src/menus.js); none on a day with no canteen.
                 menus: today.menu ? this.menusOf(wall) : null,
                 mealTime: mealTime(wall, this.manifest.mealhours),
+                canteen: !!(m.screen && m.screen.canteen),
                 deadlines: liveItems(m.items || [], 'extra', wall).filter(function (it) {
                     return it.type === 'deadlines';
                 })[0] || null,

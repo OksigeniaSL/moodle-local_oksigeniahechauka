@@ -192,6 +192,7 @@ class sheet {
                     'checked' => $d === uses::distance($screen->distance ?? 3)];
             }, uses::DISTANCES),
             'glass' => !empty($screen->glass),
+            'canteen' => sources::has_meals() ? ['on' => !empty($screen->canteen)] : false,
             'place' => screenplace::sheet_context($screen, $letters, $names, time()),
             'surprises' => surprises::sheet_context($screen),
             'themes' => array_map(function ($t) use ($theme, $c) {
@@ -360,6 +361,7 @@ class sheet {
             'distance' => uses::distance(optional_param('distance', 3, PARAM_INT)),
             'glass' => optional_param('glass', 0, PARAM_BOOL) ? 1 : 0,
             'surprises' => optional_param('surprises', 0, PARAM_BOOL) ? 1 : 0,
+            'canteen' => optional_param('canteen', 0, PARAM_BOOL) ? 1 : 0,
             'useplan' => $plan ? json_encode(array_values($plan)) : null,
             'place' => $place,
             'timemodified' => time(),

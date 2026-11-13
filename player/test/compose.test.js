@@ -425,3 +425,14 @@ test('never two videos close together: one too soon gives its turn to what is no
     assert.ok(last >= 0, 'videos still come');
 });
 
+test('a screen by the canteen shows every menu every other slide while it serves', () => {
+    const menus = {menus: [{name: 'Menú A'}, {name: 'Menú B'}]};
+    const c = new Composer();
+    const comps = [];
+    for (let i = 0; i < 20; i++) {
+        comps.push(c.next([], 4, true, {menus, menu: true, mealTime: true, canteen: true, distance: 3}).comp);
+    }
+    const n = comps.filter((comp) => comp === 'menus').length;
+    assert.ok(n >= 8, comps.join(' '));
+});
+
