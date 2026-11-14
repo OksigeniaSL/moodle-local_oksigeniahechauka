@@ -12,7 +12,7 @@
 //
 // Chromium 56: flexbox, margins for gaps, no aspect-ratio, no inset; the carousel changes only opacity.
 
-import {fitWord} from './lead.js';
+import {fitWord, linesOf} from './lead.js';
 import {glyphSvg} from './redes.js';
 import {bindShort} from './canal.js';
 
@@ -21,6 +21,14 @@ export const CAROUSEL = {every: 3.6, most: 5};
 
 /** On an upright screen, the share of the poster's height the picture keeps at least. */
 const PICTURE_LEAST = 0.4;
+
+/** On a wide screen, the share of the poster's width the picture may take, and the most lines its words take beside it: who
+ *  passes looks at the picture, and reads three or four lines, not six (Gaudí, 14 November 2026). */
+const PICTURE_WIDE = 0.45;
+const CAPTION_LINES = 4;
+
+/** A caption cut shorter than this many words is not worth its big letter: the next step down is tried first. */
+const CAPTION_LEAST_WORDS = 8;
 
 function el(tag, cls, text) {
     const n = document.createElement(tag);
@@ -344,8 +352,10 @@ export function fitInstagram(c, horizontal) {
     };
     if (horizontal) {
         // The words want room for ten letters of who posts a line, at the least; the card keeps its own column beside them.
+        // The picture leads, as on Instagram: up to PICTURE_WIDE of the poster's width, as far as the words keep ten letters
+        // of who posts a line and the card its column (Gaudí, 14 November 2026).
         const least = 10 * px(who, 'fontSize');
-        const w = roomW - px(side, 'marginLeft') - column.offsetWidth - px(column, 'marginLeft') - least;
+        const w = Math.min(roomW * PICTURE_WIDE, roomW - px(side, 'marginLeft') - column.offsetWidth - px(column, 'marginLeft') - least);
         setFrame(frameOf(w, roomH - dotsH, s.hkAspect, true, 0));
     } else {
         // Upright, first the words with the picture at its least (two fifths of the poster): the picture grows after them.
@@ -353,7 +363,7 @@ export function fitInstagram(c, horizontal) {
     }
     const fits = function () {
         return text.scrollHeight <= text.clientHeight + 1 && side.scrollWidth <= side.clientWidth + 1 &&
-            s.scrollHeight <= s.clientHeight + 1;
+            s.scrollHeight <= s.clientHeight + 1 && (!horizontal || !caption || linesOf(caption) <= CAPTION_LINES);
     };
     // The headline gives way before the post's words: a step smaller at a time, at most four.
     const base = px(title, 'fontSize');
@@ -375,6 +385,11 @@ export function fitInstagram(c, horizontal) {
             caption.textContent = caption.hkWords;
         }
         done = titleFits();
+        // Wide, a caption is cut at a big letter rather than shown whole at a small one, while the cut keeps enough of it.
+        if (!done && horizontal && caption) {
+            cutTo(caption, fits);
+            done = fits() && caption.textContent.split(' ').length >= Math.min(CAPTION_LEAST_WORDS, caption.hkWords.split(' ').length);
+        }
     }
     if (!done && caption) {
         cutTo(caption, fits);
