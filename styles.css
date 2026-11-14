@@ -6154,3 +6154,158 @@ dialog.hkp-dialog > footer {
         height: 2.125rem;
     }
 }
+
+/* --- «Nuestras redes»: a box for each network, as a profile reads in the network itself (Jujol, 14 Nov 2026) -------
+   Its glyph and name, the account written as the network writes it («@centro.ejemplo») on a line, not in a field's box,
+   and its switch «En las pantallas». Empty, a dashed outline waiting for it; filled, a card; on the screens, in the
+   accent. Each gesture saves by itself (panel/redes.js), and says so under the box for a moment. */
+.hkp-redes-lista {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
+    gap: .75rem;
+    margin: .75rem 0 0;
+    padding: 0;
+    list-style: none;
+}
+.hkp-red {
+    position: relative;
+    display: grid;
+    grid-template-areas: "glifo nombre" "glifo cuenta" "pantallas pantallas" "estado estado";
+    grid-template-columns: 2.25rem minmax(0, 1fr);
+    align-content: start;
+    column-gap: .75rem;
+    row-gap: .1rem;
+    padding: .85rem .95rem .55rem;
+    border: 1px dashed var(--hkp-line);
+    border-radius: var(--hkp-radius-sm);
+    background: var(--hkp-card);
+    transition: border-color .2s ease, background-color .2s ease, box-shadow .2s ease;
+}
+.hkp-red[data-network="web"] {
+    grid-column: 1 / -1;
+}
+.hkp-red:focus-within {
+    border-color: var(--hkp-accent);
+    box-shadow: 0 0 0 3px var(--hkp-accent-tint);
+}
+.hkp-red-glifo {
+    grid-area: glifo;
+    align-self: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    color: var(--hkp-muted);
+}
+.hkp-red-glifo svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+.hkp-red-nombre {
+    grid-area: nombre;
+    margin: 0;
+    color: var(--hkp-muted);
+    font-size: .8125rem;
+    font-weight: 600;
+    line-height: 1.3;
+}
+.hkp-red-cuenta {
+    grid-area: cuenta;
+    width: 100%;
+    min-width: 0;
+    padding: .05rem 0 .2rem;
+    border: 0;
+    border-bottom: 1px solid transparent;
+    border-radius: 0;
+    background: transparent;
+    color: var(--hkp-ink);
+    font-size: 1.0625rem;
+    font-weight: 700;
+    line-height: 1.3;
+}
+input.hkp-red-cuenta::placeholder {
+    color: var(--hkp-muted);
+    font-weight: 400;
+    opacity: 1;
+}
+input.hkp-red-cuenta:focus {
+    border-bottom-color: var(--hkp-accent);
+    outline: 0;
+}
+
+@media (hover: hover) {
+    input.hkp-red-cuenta:hover {
+        border-bottom-color: var(--hkp-line);
+    }
+}
+.hkp-red-cuenta.is-fija {
+    overflow-wrap: anywhere;
+}
+.hkp-red-desde {
+    margin-left: .35rem;
+    padding: .05rem .45rem;
+    border-radius: 999px;
+    background: var(--hkp-chip);
+    font-size: .75rem;
+    font-weight: 600;
+}
+.hkp-red-pantallas {
+    grid-area: pantallas;
+    margin: .55rem 0 0;
+}
+.hkp-red:not(.is-filled) .hkp-red-pantallas {
+    display: none;
+}
+.hkp-red-estado {
+    grid-area: estado;
+    margin: .2rem 0 0;
+    color: var(--hkp-muted);
+    font-size: .8125rem;
+    line-height: 1.35;
+}
+.hkp-red-estado:empty {
+    display: none;
+}
+.hkp-red-estado[data-kind="ok"] {
+    color: var(--hkp-ok-ink);
+}
+.hkp-red-estado[data-kind="bad"] {
+    color: var(--hkp-bad-ink);
+}
+.hkp-red.is-filled {
+    border-style: solid;
+}
+.hkp-red.is-filled .hkp-red-glifo {
+    color: var(--hkp-ink);
+}
+.hkp-red.is-on {
+    border-color: var(--hkp-accent-line);
+    background: var(--hkp-accent-tint);
+}
+.hkp-red.is-on .hkp-red-glifo {
+    color: var(--hkp-accent-ink);
+}
+.hkp-red.is-saving .hkp-red-cuenta {
+    opacity: .6;
+}
+/* An address pasted in another box arrives in its own: it says so with a glow of the accent. */
+.hkp-red.is-new {
+    animation: hkp-red-llega 1.6s ease;
+}
+
+@keyframes hkp-red-llega {
+    0%,
+    30% {
+        box-shadow: 0 0 0 4px var(--hkp-accent-line);
+    }
+    100% {
+        box-shadow: 0 0 0 0 transparent;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .hkp-red,
+    .hkp-red.is-new {
+        transition: none;
+        animation: none;
+    }
+}

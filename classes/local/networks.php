@@ -195,9 +195,27 @@ class networks {
             $out[] = ['network' => $network,
                 'name' => $network === 'web' ? get_string('network_web', self::C) : $known['name'],
                 'url' => $read['url'] ?? '', 'account' => $read['account'] ?? '',
-                'filled' => (bool) $read, 'show' => $read && $box['show'], 'from' => $from];
+                'filled' => (bool) $read, 'show' => $read && $box['show'], 'from' => $from] + self::words($network, $known['name']);
         }
         return $out;
+    }
+
+    /**
+     * What a network's «Follow us» says on the screens: its headline and its line, the network's own line when it has one (the
+     * same words in the panel's preview and on the screens).
+     *
+     * @param string $network a key of KNOWN
+     * @param string $name the network's name
+     * @return array ['title' => …, 'text' => …]
+     */
+    public static function words(string $network, string $name): array {
+        $c = self::C;
+        if ($network === 'web') {
+            return ['title' => get_string('label_network_web', $c), 'text' => get_string('label_network_web_text', $c)];
+        }
+        $own = 'label_network_text_' . $network;
+        return ['title' => get_string('label_network', $c, $name),
+            'text' => get_string(get_string_manager()->string_exists($own, $c) ? $own : 'label_network_text', $c)];
     }
 
     /**
@@ -314,19 +332,15 @@ class networks {
         foreach ($besides as $item) {
             $there[self::same((string) ($item['web'] ?? ''))] = true;
         }
-        $c = self::C;
         $out = [];
         foreach (self::boxes() as $box) {
             if (!$box['show'] || $box['from'] !== '' || isset($there[self::same($box['url'])])) {
                 continue;
             }
-            $web = $box['network'] === 'web';
             $url = $box['url'] . (strpos($box['url'], '?') === false ? '?' : '&') . 'utm_source=pantallas';
             $out[] = ['id' => 'network-' . $box['network'], 'type' => 'channel', 'zone' => 'extra',
                 'network' => $box['network'],
-                'title' => $web ? get_string('label_network_web', $c) : get_string('label_network', $c, $box['name']),
-                'text' => get_string($web ? 'label_network_web_text' : 'label_network_text', $c),
-                'name' => $box['account'], 'web' => $url];
+                'title' => $box['title'], 'text' => $box['text'], 'name' => $box['account'], 'web' => $url];
         }
         return $out;
     }

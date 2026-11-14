@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.25.0
+
+- **Our networks**, in «Your centre»: a box for each usual network (Instagram, TikTok, YouTube, Facebook, X, LinkedIn,
+  Threads, Bluesky, Telegram, WhatsApp) and one for the centre's web, filled with the account («@…») or its address, and
+  saved by itself. An empty box makes nothing; each filled one has its switch, and the screens show the ones switched on,
+  one each turn, as «Follow us on …» with the network's glyph, the account and its QR. An address pasted in another
+  network's box goes to its own. The channel of Oksigenia Marandu is the Telegram box. Design by Jujol.
+- **The latest posts of the centre's Instagram** have their slide ready, one post each time, a carousel through its
+  pictures, with the QR to follow it; it shows once the site is connected to Instagram.
+- Items of the same order keep the manifest's order on every screen (Chromium 56 does not sort them stably).
+
 ## 0.24.0
 
 - **The picture of the day**: something curious or beautiful each day (a galaxy, a bee under the microscope, a painting),

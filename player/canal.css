@@ -6,7 +6,9 @@
  *       <div class="hk-canal-cielo"><div class="hk-canal-estela"><i>…</i></div><div class="hk-canal-avion"><svg/></div></div>
  *       <div class="hk-canal-texto"><h2 class="hk-canal-titular"/><p class="hk-canal-linea"/><p class="hk-canal-seguidores"/></div>
  *       <div class="hk-canal-lado">
- *         <div class="hk-canal-tarjeta"><p class="hk-canal-nombre"/><div class="hk-qr">(render.js's qrBox)</div></div>
+ *         <div class="hk-canal-tarjeta">
+ *           <p class="hk-canal-nombre"><span class="hk-canal-red"><svg/></span><span class="hk-canal-cuenta"/></p>
+ *           <div class="hk-qr">(render.js's qrBox)</div></div>
  *
  * A poster in the centre's main colour: the words on one side; on the other, the channel's last message, a white card with the
  * QR in black and the short address. The QR never on the colour: a phone reads it on white, in the light theme and in the dark
@@ -142,6 +144,18 @@
     font-size: 3.6rem;
     font-weight: 800;
     line-height: 1.08;
+}
+.hk .hk-canal-red {                      /* the network's glyph before the account, in the sender's ink (redes.js) */
+    display: inline-block;
+    width: .9em;
+    height: .9em;
+    margin-right: .3em;
+    vertical-align: -.1em;
+}
+.hk .hk-canal-red svg {
+    display: block;
+    width: 100%;
+    height: 100%;
 }
 .hk .hk-canal .hk-qr {
     width: var(--hk-canal-qr);

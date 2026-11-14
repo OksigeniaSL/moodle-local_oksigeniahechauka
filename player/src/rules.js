@@ -163,10 +163,17 @@ export function liveItems(items, zone, wall) {
             out.push(it);
         }
     }
-    out.sort(function (a, b) {
-        return (a.order || 0) - (b.order || 0);
+    // Chromium 56's sort is not stable past ten items: items of the same order keep the manifest's (the networks one a turn,
+    // Marandu's channel first, come in the order Hechauka gives them).
+    const at = out.map(function (it, i) {
+        return {it: it, i: i};
     });
-    return out;
+    at.sort(function (a, b) {
+        return (a.it.order || 0) - (b.it.order || 0) || a.i - b.i;
+    });
+    return at.map(function (x) {
+        return x.it;
+    });
 }
 
 /**

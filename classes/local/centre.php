@@ -170,7 +170,8 @@ class centre {
                 'leftone' => get_string('centre_phrase_left_one', $c)],
             'surprises' => surprises::centre_context($config),
             'networks' => ['boxes' => networks::boxes(),
-                'save' => (new \moodle_url('/local/oksigeniahechauka/networks.php'))->out(false)],
+                'save' => (new \moodle_url('/local/oksigeniahechauka/networks.php'))->out(false),
+                'words' => self::network_words()],
             'frame' => (new \moodle_url('/local/oksigeniahechauka/preview.php', ['frame' => 1, 'screen' => $first]))->out(false),
             'placename' => $place['name'] ?? '',
             'admin' => has_capability('moodle/site:config', \context_system::instance()) ?
@@ -182,6 +183,20 @@ class centre {
                 'dark' => get_string('centre_text_dark', $c), 'today' => schedule::day($now),
                 'samples' => self::samples()], JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP),
         ];
+    }
+
+    /**
+     * The words of the block «Our networks» while a box is saved (panel/redes.js).
+     *
+     * @return string JSON
+     */
+    protected static function network_words(): string {
+        $c = self::C;
+        $words = ['placeholder' => get_string('networks_placeholder', $c),
+            'placeholderweb' => get_string('networks_placeholder_web', $c), 'saving' => get_string('networks_saving', $c),
+            'saved' => get_string('networks_saved', $c), 'moved' => get_string('networks_moved', $c, '{$a}'),
+            'wrong' => get_string('networks_wrong', $c, '{$a}'), 'error' => get_string('networks_error', $c)];
+        return json_encode($words, JSON_UNESCAPED_UNICODE);
     }
 
     /**

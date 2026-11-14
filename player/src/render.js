@@ -15,6 +15,7 @@ import {buildMoments, fitMoments} from './celebra.js';
 import {buildMenus, fitMenus} from './menus.js';
 import {buildPhotoday, fitPhotoday} from './fotodia.js';
 import {buildChannel, fitChannel, startChannel, stopChannel} from './canal.js';
+import {buildInstagram, fitInstagram, startInstagram, stopInstagram} from './instagram.js';
 import {qrSvg, shortWeb} from './qr.js';
 import {even} from './balance.js';
 import {buildAgenda, startAgenda} from './agendaview.js';
@@ -34,7 +35,7 @@ const PHRASE_WAITS_MS = 25000;
 const CAPTION_MS = 2800;
 
 /** The compositions that are made anew each time, never only their pictures changed. */
-const NEW_EACH = {'solo-hoy': true, semana: true, titular: true, agenda: true, muro: true, 'fotos-tercio': true, cumple: true, biblioteca: true, celebra: true, menus: true, fotodia: true, canal: true, plazos: true,
+const NEW_EACH = {'solo-hoy': true, semana: true, titular: true, agenda: true, muro: true, 'fotos-tercio': true, cumple: true, biblioteca: true, celebra: true, menus: true, fotodia: true, canal: true, instagram: true, plazos: true,
     tabla: true, zonas: true};
 
 /** The width over the height of each slot shape, to measure a portrait slot when the body is lower than the sheet expects. */
@@ -758,6 +759,15 @@ export class Screen {
             }});
             return c;
         }
+        if (comp === 'instagram') {
+            // The centre's Instagram: a post a turn, the next each time, with the QR to follow it (src/instagram.js).
+            buildInstagram(c, extra && extra.item, (extra && extra.page) || 0, {s: this.s, media: mediaOf,
+                now: this.lastDate || new Date(), lang: document.documentElement.lang || '', horizontal: this.horizontal,
+                qr: function (url, image) {
+                    return self0.qrBox(url, false, image);
+                }});
+            return c;
+        }
         if (comp === 'semana') {
             const l = this.labelsFull();
             // What comes next and matters, in a strip in the centre's colour; the five days under it.
@@ -1003,6 +1013,12 @@ export class Screen {
             c.hkStop = function () {
                 stopChannel(c);
             };
+        } else if (comp === 'instagram') {
+            // A carousel goes through its pictures; leave() stops it.
+            startInstagram(c, {still: this.keepsStill()});
+            c.hkStop = function () {
+                stopInstagram(c);
+            };
         }
         // The parts of the slide in the order they are read, and its life while it stands (Gaudí, 8 November 2026): only the
         // compositions movimiento.js knows; the others keep their pass.
@@ -1243,6 +1259,7 @@ export class Screen {
         fitMenus(c);
         fitPhotoday(c, this.horizontal);
         fitChannel(c, this.horizontal);
+        fitInstagram(c, this.horizontal);
         fitDeadlines(c);
         fitTable(c);
         const shelfTitle = c.querySelector('.hk-biblio-titulo');

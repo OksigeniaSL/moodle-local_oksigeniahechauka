@@ -1,0 +1,310 @@
+/* Oksigenia Hechauka: «En nuestro Instagram», the centre's last posts, one a turn (Jujol, 14 November 2026). Goes after canal.css;
+ * its entrance is movimiento.js's (PARTS.instagram).
+ *
+ *   <div class="hk-cuerpo hk-capa" data-composicion="instagram">
+ *     <section class="hk-ig [hk-ig-sin-pie]" data-forma="h|v|c" data-ajuste="0–2">
+ *       <figure class="hk-ig-foto">
+ *         <div class="hk-ig-marco"><img class="hk-ig-img hk-ig-ahora"/>…<span class="hk-ig-video"><svg/></span></div>
+ *         <div class="hk-ig-puntos"><i class="hk-ig-ahora"/>…</div>
+ *       </figure>
+ *       <div class="hk-ig-lado">
+ *         <div class="hk-ig-texto">
+ *           <p class="hk-ig-quien"><span class="hk-ig-red"><svg/></span><span class="hk-ig-cuenta"/></p>
+ *           <p class="hk-ig-pie"/><p class="hk-ig-cuando"/><h2 class="hk-ig-titular"/></div>
+ *         <div class="hk-ig-columna"><div class="hk-ig-tarjeta"><div class="hk-qr">…</div></div></div>
+ *       (upright, who posts goes across, and the words' column and the card's in a row under it:
+ *        <div class="hk-ig-lado"><p class="hk-ig-quien"/><div class="hk-ig-sigue"><div class="hk-ig-texto"/><div class="hk-ig-columna"/>)
+ *
+ * The sibling of «Síguenos en …» (canal.css): the same poster in the centre's main colour, and the same white card with the QR
+ * in black, never on the colour, in a column of its own at the poster's side. The picture is the post's, whole, as the app shows
+ * it; instagram.js sizes its frame from its shape and the room the words and the card need, and steps the caption down
+ * (data-ajuste) before cutting it at a word. On an upright screen, who posts goes across under the picture, and the words and
+ * the card side by side under it.
+ *
+ * Chromium 56: flexbox only, margins instead of gap, no clamp, no aspect-ratio, no inset; the carousel changes opacity only. */
+.hk-cuerpo[data-composicion="instagram"] {
+    flex-direction: column;
+}
+.hk .hk-ig {
+    --hk-ig-qr: 30rem;                  /* the side of the QR: read from 1 to 2.5 m by a phone */
+    --hk-ig-cola: 2.6rem;               /* the tail of the card, as «Síguenos en …»'s */
+    position: relative;
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: row;
+    align-items: stretch;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+    padding: 4.4rem;
+    border-radius: calc(2.8rem * var(--hk-esquina));
+    background-color: var(--hk-primario);
+    background-image: radial-gradient(circle at 14% 12%, rgba(255, 255, 255, .13), rgba(255, 255, 255, 0) 46%);
+    color: var(--hk-sobre-primario);
+}
+
+/* --- The post's picture ------------------------------------------------------------------------------------------- */
+.hk .hk-ig-foto {
+    display: flex;
+    flex: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+}
+.hk .hk-ig-marco {
+    position: relative;
+    flex: none;
+    overflow: hidden;
+    border-radius: calc(1.6rem * var(--hk-esquina));
+    background: rgba(0, 0, 0, .16);
+    box-shadow: 0 1.2rem 3.2rem rgba(0, 0, 0, .28);
+}
+.hk .hk-ig-img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    -webkit-transition: opacity .9s ease;
+    transition: opacity .9s ease;
+}
+.hk .hk-ig-img.hk-ig-ahora {
+    opacity: 1;
+}
+.hk .hk-ig-video {                      /* a video: its cover, with the sign the app gives it; it plays in the app */
+    position: absolute;
+    top: 2.4rem;
+    right: 2.4rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 8rem;
+    height: 8rem;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, .55);
+    color: #fff;
+}
+.hk .hk-ig-video svg {
+    display: block;
+    width: 4rem;
+    height: 4rem;
+    margin-left: .5rem;
+}
+.hk .hk-ig-puntos {                     /* the carousel's dots, as the app draws them: the one shown in the accent */
+    display: flex;
+    flex: none;
+    justify-content: center;
+    margin-top: 2rem;
+}
+.hk .hk-ig-puntos i {
+    display: block;
+    width: 1.6rem;
+    height: 1.6rem;
+    margin: 0 .7rem;
+    border-radius: 50%;
+    background: var(--hk-sobre-primario);
+    opacity: .38;
+    -webkit-transition: opacity .9s ease;
+    transition: opacity .9s ease;
+}
+.hk .hk-ig-puntos i.hk-ig-ahora {
+    background: var(--hk-acento);
+    opacity: 1;
+}
+
+/* --- Beside it: the words in a column, the card in its own ----------------------------------------------------- */
+.hk .hk-ig-lado {
+    display: flex;
+    flex: 1 1 0px;
+    flex-direction: row;
+    min-width: 0;
+    min-height: 0;
+    margin-left: 5.6rem;
+}
+.hk .hk-ig-texto {
+    display: flex;
+    flex: 1 1 0px;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+}
+.hk-ig-texto > * {
+    flex: none;
+}
+.hk .hk-ig-columna {
+    display: flex;
+    flex: none;
+    flex-direction: column;
+    justify-content: flex-end;
+    margin-left: 4.8rem;
+}
+.hk .hk-ig-quien {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    font-size: var(--hk-t-lista);
+    font-weight: 800;
+    line-height: 1.12;
+}
+.hk .hk-ig-red {
+    display: block;
+    flex: none;
+    width: 1em;
+    height: 1em;
+    margin-right: .36em;
+}
+.hk .hk-ig-red svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+.hk .hk-ig-cuenta {
+    min-width: 0;
+    overflow-wrap: break-word;
+}
+.hk .hk-ig-cuando {                     /* when it was posted, under its words, as the app says it */
+    margin-top: 1.6rem;
+    font-size: var(--hk-t-min);
+    font-weight: 700;
+    line-height: 1.1;
+    opacity: .86;
+}
+.hk .hk-ig-pie {                         /* the post's words: the lead's second line, then a list's, then the least */
+    margin-top: 2.8rem;
+    font-size: var(--hk-t-entrada);
+    font-weight: 700;
+    line-height: 1.18;
+    overflow-wrap: break-word;
+}
+.hk .hk-ig[data-ajuste="1"] .hk-ig-pie { font-size: var(--hk-t-lista); }
+.hk .hk-ig[data-ajuste="2"] .hk-ig-pie { font-size: var(--hk-t-min); }
+.hk .hk-ig.hk-ig-sin-pie .hk-ig-pie {
+    display: none;
+}
+.hk .hk-ig-titular {                     /* «Síguenos en Instagram», low, level with the card's foot */
+    margin-top: auto;
+    padding-top: 2.8rem;
+    padding-bottom: calc(var(--hk-ig-cola) + .08em);
+    font-family: var(--hk-letra-titulos);
+    font-size: calc(var(--hk-t-titular) * .6);
+    font-weight: 800;
+    letter-spacing: -.02em;
+    line-height: 1.02;
+}
+.hk[data-cristal] .hk-ig-cuando {
+    opacity: 1;
+}
+
+/* --- The card: white in both themes, with the QR in black; a message that arrives ------------------------------- */
+.hk .hk-ig-tarjeta {
+    position: relative;
+    flex: none;
+    margin-bottom: var(--hk-ig-cola);
+    padding: 2.4rem 2.4rem 2rem;
+    border-radius: 2.8rem 2.8rem 2.8rem .8rem;
+    background: #fff;
+    box-shadow: 0 1rem 3rem rgba(0, 0, 0, .2);
+    color: #16191d;
+}
+.hk .hk-ig-tarjeta::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: calc(var(--hk-ig-cola) * -1 + .2rem);
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: var(--hk-ig-cola) var(--hk-ig-cola) 0 0;
+    border-color: #fff transparent transparent transparent;
+}
+.hk .hk-ig .hk-qr {
+    width: var(--hk-ig-qr);
+    margin: 0;
+    padding: 0;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+    color: #16191d;
+    text-align: center;
+}
+.hk .hk-ig .hk-qr svg,
+.hk .hk-ig .hk-qr img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+.hk .hk-ig .hk-qr.hk-qr-imagen img {
+    width: 110%;
+    height: calc(var(--hk-ig-qr) * 1.1);
+    margin: -5% -5% -3%;
+    object-fit: contain;
+}
+.hk .hk-ig .hk-qr-web {                 /* read close, from 1 to 2.5 m, as the card of «Síguenos en …» */
+    margin-top: 1.8rem;
+    color: #16191d;
+    font-size: 3.6rem;
+    font-weight: 800;
+    letter-spacing: -.01em;
+    line-height: 1.05;
+    overflow-wrap: break-word;
+}
+.hk .hk-ig .hk-qr-llamada {
+    margin-top: .6rem;
+    color: #4b5563;
+    font-size: 2.8rem;
+    font-weight: 700;
+    line-height: 1.08;
+}
+
+/* --- By the distance ---------------------------------------------------------------------------------------------- */
+.hk[data-distancia="8"] .hk-ig {
+    padding: 4rem;
+}
+.hk[data-distancia="8"] .hk-ig-lado {
+    margin-left: 4.4rem;
+}
+.hk[data-distancia="8"] .hk-ig-columna {
+    margin-left: 4rem;
+}
+.hk[data-distancia="8"] .hk-ig-pie {
+    margin-top: 2.2rem;
+}
+.hk[data-distancia="8"] .hk-ig-titular {   /* from 8 m the post's words come first: the follow, a step lower */
+    font-size: calc(var(--hk-t-titular) * .5);
+}
+
+/* --- Vertical: the picture on top, the words and the card under it ------------------------------------------------ */
+.hk.hk-vertical .hk-ig {
+    --hk-ig-qr: 32rem;
+    flex-direction: column;
+    padding: 5.2rem;
+}
+.hk.hk-vertical .hk-ig-foto {
+    align-self: center;
+}
+.hk.hk-vertical .hk-ig-lado {
+    margin-top: 4rem;
+    margin-left: 0;
+}
+.hk.hk-vertical .hk-ig-lado {
+    flex-direction: column;
+}
+.hk .hk-ig-sigue {                      /* upright: under who posts, its words and the card side by side */
+    display: flex;
+    flex: 1 1 auto;
+    min-height: 0;
+    margin-top: 2.4rem;
+}
+.hk .hk-ig-sigue .hk-ig-pie {
+    margin-top: 0;
+}
+.hk.hk-vertical[data-distancia="8"] .hk-ig {
+    padding: 4.4rem;
+}
+.hk.hk-vertical[data-distancia="8"] .hk-ig-lado {
+    margin-top: 3.2rem;
+}

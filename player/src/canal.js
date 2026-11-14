@@ -3,6 +3,11 @@
 // channel's last message, a white card with the QR and the short address; a paper plane crosses slowly where nothing is read,
 // leaving a trail of dots. No logo of any app: the app is named only in the words. Gaudí, 8 November 2026.
 //
+// Every network of the centre since «Nuestras redes» (Jujol, 14 November 2026): Instagram, TikTok, YouTube… one a turn in the
+// same place (compose.js). With several, the card's sender line carries the network's glyph in the card's ink before the account
+// (redes.js): from metres away, which app the QR opens, and that this turn is another network than the last one. The headline
+// still says it in words; the poster, the plane and the QR stay Gaudí's.
+//
 // The player builds it in makeLayer (buildChannel), fits it in adjustLayer (fitChannel) and gives it its life in startMoving
 // (startChannel; leave() stops it through c.hkStop). Its entrance is movimiento.js's (PARTS.canal, and the way «mensaje»).
 //
@@ -12,6 +17,7 @@
 import {even} from './balance.js';
 import {fitWord, linesOf} from './lead.js';
 import {onWhite} from './qr.js';
+import {glyphSvg, knownNetwork, NETWORK_NAMES} from './redes.js';
 
 /** The plane's flight, in seconds: it waits for the entrance to end, crosses, and comes back while the slide stays. */
 export const FLIGHT = {wait: 2.2, cross: 11, every: 20};
@@ -105,6 +111,17 @@ export function channelWords(item, s) {
     };
 }
 
+/**
+ * A site's name as people say it: its host without «www.». Pure.
+ *
+ * @param {string} url
+ * @returns {string}
+ */
+export function siteOf(url) {
+    const m = /^https?:\/\/([^/?#:]+)/i.exec(String(url || ''));
+    return m ? m[1].replace(/^www\./i, '').toLowerCase() : '';
+}
+
 /** Whether the slide can come: it needs its headline and the channel's address, which its QR says. */
 export function channelShow(item) {
     return !!(item && typeof item.web === 'string' && /^https?:\/\/\S+$/i.test(item.web) && String(item.title || '').trim());
@@ -142,8 +159,18 @@ export function buildChannel(c, item, o) {
     // The channel's last message: who writes it, and the code. A message that arrives, so its tail is on the left.
     const side = el('div', 'hk-canal-lado');
     const card = el('div', 'hk-canal-tarjeta');
-    if (words.name) {
-        card.appendChild(el('p', 'hk-canal-nombre', words.name));
+    // Who writes, as over a message: the network's glyph and the account («@centro.ejemplo»), the centre's own site by its
+    // name («centro.example»), or the network's name alone.
+    const sender = words.name || (item.network === 'web' ? siteOf(item.web) : knownNetwork(item.network) ? NETWORK_NAMES[item.network] : '');
+    if (sender) {
+        const name = el('p', 'hk-canal-nombre');
+        if (item.network) {
+            const glyph = el('span', 'hk-canal-red');
+            glyph.innerHTML = glyphSvg(item.network);
+            name.appendChild(glyph);
+        }
+        name.appendChild(el('span', 'hk-canal-cuenta', sender));
+        card.appendChild(name);
     }
     const qr = o.qr(item.web, item.webqr);
     if (qr && qr.nodeType === 1) {

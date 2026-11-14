@@ -117,6 +117,17 @@ const PARTS = {
         ['.hk-celebra-marcas', 'sube', 5],
     ],
     // The channel: its words, and then its last message arrives, the card with the QR (Gaudí, 8 November 2026).
+    // The centre's Instagram: the post's picture as a photo comes, who posts it, its words, and the card to follow it (Jujol,
+    // 14 November 2026).
+    'instagram': [
+        ['.hk-ig', 'marco', 0],
+        ['.hk-ig-marco', 'foto', 0.5],
+        ['.hk-ig-puntos', 'fundido', 2],
+        ['.hk-ig-quien', 'sube', 1.6],
+        ['.hk-ig-pie', 'sube', 2.4],
+        ['.hk-ig-titular', 'sube', 3.4],
+        ['.hk-ig-tarjeta', 'mensaje', 4],
+    ],
     'canal': [
         ['.hk-canal', 'marco', 0],
         ['.hk-canal-titular', 'sube', 1],

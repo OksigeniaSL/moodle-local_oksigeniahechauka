@@ -22,7 +22,8 @@
 // celebra        what the library celebrates this week: a moment at a time, with its rosette or its cover
 // fotodia        the picture of the day, a curious or beautiful one with its caption and its credit
 // menus          every menu of the day, the menus in columns and their dishes in rows; often while the canteen serves
-// canal           the centre's messaging channel: follow it from the screen, with its QR
+// canal           one of the centre's networks a turn (Instagram, TikTok, its channel…): follow it from the screen, with its QR
+// instagram       the centre's last Instagram posts, one a turn, with the QR to follow it
 // plazos          what falls due in the courses in the coming days, by days and by pages
 // tabla           a table of the centre: a spreadsheet or a list, by pages
 // reposo          nothing at all to show: the centre, the hour, the date and the weather, under a sky that goes by
@@ -51,8 +52,11 @@ const MENUS_EVERY = 12;
 /** How many go by between two of what the library celebrates: as its books, and half a round away from them. */
 const MOMENTS_EVERY = 16;
 
-/** How many slides go by between one of the channel and the next; the first comes soon, for whoever passes. */
+/** How many slides go by between one of the networks and the next; the first comes soon, for whoever passes. */
 const CHANNEL_EVERY = 14;
+
+/** How many slides go by between two of the centre's Instagram posts: its life, more often than a plain «follow us». */
+const INSTAGRAM_EVERY = 12;
 
 /** How many slides go by between one of the deadlines and the next. */
 const DEADLINES_EVERY = 12;
@@ -314,10 +318,22 @@ export class Composer {
             this.sincePhotoday = 1;
             return pick('fotodia', [], 15, {item: o.photoday});
         }
+        // The centre's Instagram posts, one a turn: never right after a network, which would read as the same slide twice.
+        this.sinceInstagram = (this.sinceInstagram === undefined ? INSTAGRAM_EVERY - 6 : this.sinceInstagram) + 1;
+        if (o.instagram && this.sinceInstagram > INSTAGRAM_EVERY && this.last !== 'canal') {
+            this.sinceInstagram = 1;
+            this.instagramPage = (this.instagramPage === undefined ? -1 : this.instagramPage) + 1;
+            return pick('instagram', [], 15, {item: o.instagram, page: this.instagramPage});
+        }
+        // One network a turn, in the manifest's order. Instagram's turn is its posts' when they come: they carry its QR.
+        const networks = (o.channels || (o.channel ? [o.channel] : [])).filter(function (it) {
+            return !(o.instagram && it.network === 'instagram');
+        });
         this.sinceChannel = (this.sinceChannel === undefined ? CHANNEL_EVERY - 4 : this.sinceChannel) + 1;
-        if (o.channel && this.sinceChannel > CHANNEL_EVERY) {
+        if (networks.length && this.sinceChannel > CHANNEL_EVERY && this.last !== 'instagram') {
             this.sinceChannel = 1;
-            return pick('canal', [], 15, {item: o.channel});
+            this.channelTurn = (this.channelTurn === undefined ? -1 : this.channelTurn) + 1;
+            return pick('canal', [], 15, {item: networks[this.channelTurn % networks.length]});
         }
         this.sinceDeadlines = (this.sinceDeadlines === undefined ? DEADLINES_EVERY / 2 : this.sinceDeadlines) + 1;
         if (o.deadlines && this.sinceDeadlines > DEADLINES_EVERY) {
@@ -519,6 +535,13 @@ export function draftChoice(item, focus, main, horizontal, use) {
         }
         return {comp: a < 1.2 ? 'vertical-hoy' : 'foto-hoy', items: [it], seconds: 0};
     };
+    // A network of «Nuestras redes» being filled in the panel: its own slide, as the screens will show it.
+    if (item && item.type === 'channel') {
+        return {comp: 'canal', items: [], seconds: 0, extra: {item}};
+    }
+    if (item && item.type === 'instagram') {
+        return {comp: 'instagram', items: [], seconds: 0, extra: {item, page: 0}};
+    }
     const isMedia = item && (item.type === 'image' || item.type === 'video');
     if (isMedia && use === 'showcase') {
         return {comp: 'escaparate', items: [item], seconds: 0};

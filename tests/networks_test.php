@@ -109,7 +109,7 @@ final class networks_test extends \advanced_testcase {
         $items = networks::items();
         $this->assertCount(1, $items);
         $this->assertSame(['id' => 'network-instagram', 'type' => 'channel', 'zone' => 'extra', 'network' => 'instagram',
-            'title' => 'Follow us on Instagram', 'text' => 'What we do, on your phone', 'name' => '@centro.ejemplo',
+            'title' => 'Follow us on Instagram', 'text' => 'Photos and videos of our everyday life', 'name' => '@centro.ejemplo',
             'web' => 'https://www.instagram.com/centro.ejemplo/?utm_source=pantallas'], $items[0]);
         // The switch alone keeps the account; the web, with its own words.
         networks::save(['tiktok' => ['show' => true], 'web' => ['value' => 'https://centro.example/?lang=es']]);
@@ -117,6 +117,9 @@ final class networks_test extends \advanced_testcase {
         $this->assertSame(['network-instagram', 'network-tiktok', 'network-web'], array_column($items, 'id'));
         $this->assertSame('https://centro.example/?lang=es&utm_source=pantallas', $items[2]['web']);
         $this->assertSame('Visit our website', $items[2]['title']);
+        $this->assertSame('All about us, in one place', $items[2]['text']);
+        // A network without a line of its own says the common one.
+        $this->assertSame('What we do, on your phone', networks::words('other', 'Mastodon')['text']);
         $this->assertSame('centro.example', $items[2]['name']);
         // A network already on the screens by another way does not come twice.
         $this->assertSame(['network-tiktok', 'network-web'], array_column(networks::items([['web' =>

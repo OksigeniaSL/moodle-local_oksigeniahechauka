@@ -76,6 +76,7 @@ if (data_submitted() && confirm_sesskey()) {
 $query = optional_param('q', '', PARAM_TEXT);
 $PAGE->requires->js(new moodle_url('/local/oksigeniahechauka/player/tiempo-iconos.js', ['v' => get_config($c, 'version')]));
 $PAGE->requires->js(new moodle_url('/local/oksigeniahechauka/panel/centre.js', ['v' => get_config($c, 'version')]));
+$PAGE->requires->js(new moodle_url('/local/oksigeniahechauka/panel/redes.js', ['v' => get_config($c, 'version')]));
 echo $OUTPUT->header();
 echo $OUTPUT->render_from_template('local_oksigeniahechauka/centre', centre::context($query, $now));
 echo $OUTPUT->footer();

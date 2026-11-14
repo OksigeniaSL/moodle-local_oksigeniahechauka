@@ -314,6 +314,12 @@
             send();
         });
     });
+    // «Nuestras redes» (redes.js) shows its own slide while a box is in hand; leaving the block, the screen goes back to its samples.
+    page.addEventListener('hkp-samples', () => {
+        if (frame && frame.contentWindow) {
+            frame.contentWindow.postMessage({hkDraft: samples()}, location.origin);
+        }
+    });
     window.addEventListener('message', (ev) => {
         if (ev.origin === location.origin && ev.data && ev.data.hkPreviewReady && frame && ev.source === frame.contentWindow) {
             frame.contentWindow.postMessage({hkDraft: samples()}, location.origin);

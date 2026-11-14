@@ -15,6 +15,7 @@ import {AGENDA_DAYS, AGENDA_TOP} from './agendaview.js';
 import {albumsOf, oneOfEachAlbum} from './photos.js';
 import {Composer, draftChoice, videosOfDay} from './compose.js';
 import {channelShow} from './canal.js';
+import {instagramShow} from './instagram.js';
 import {menusData} from './menus.js';
 import {dayNumber, isDark, isLive, isPowerOn, liveItems, urgentOf, useOf, weekdayOf} from './rules.js';
 import {Screen} from './render.js';
@@ -660,8 +661,12 @@ class Player {
                 deadlines: liveItems(m.items || [], 'extra', wall).filter(function (it) {
                     return it.type === 'deadlines';
                 })[0] || null,
-                channel: liveItems(m.items || [], 'extra', wall).filter(function (it) {
+                // Every network the centre shows (src/canal.js), one a turn; and its Instagram posts (src/instagram.js).
+                channels: liveItems(m.items || [], 'extra', wall).filter(function (it) {
                     return it.type === 'channel' && channelShow(it);
+                }),
+                instagram: liveItems(m.items || [], 'extra', wall).filter(function (it) {
+                    return it.type === 'instagram' && instagramShow(it);
                 })[0] || null,
                 tables: liveItems(m.items || [], 'extra', wall).filter(function (it) {
                     return it.type === 'table';

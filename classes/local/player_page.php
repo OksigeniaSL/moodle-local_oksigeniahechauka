@@ -74,6 +74,9 @@ class player_page {
             'scan' => get_string('label_scan', $c),
             'channel_members' => get_string('label_channel_members', $c),
             'channel_members_one' => get_string('label_channel_members_one', $c),
+            'instagram_today' => get_string('label_instagram_today', $c),
+            'instagram_yesterday' => get_string('label_instagram_yesterday', $c),
+            'instagram_days' => get_string('label_instagram_days', $c),
             'thisweek' => get_string('label_thisweek', $c),
             'letters' => explode(',', get_string('days_letters', $c)),
             'until_tomorrow' => get_string('agenda_until_tomorrow', $c),
@@ -178,7 +181,7 @@ class player_page {
             ['hechauka.css', 'composiciones.css', 'tiempo.css', 'semana.css', 'proximos-dias.css', 'urgente.css',
             'distancia.css', 'jerarquia.css', 'tercios.css', 'cinta.css', 'usos.css', 'agenda.css', 'fotos.css',
             'lideres.css', 'agenda-lista.css', 'cumple.css', 'reposo.css', 'plazos.css', 'tabla.css',
-            'biblioteca.css', 'celebra.css', 'canal.css', 'alergenos.css', 'menus.css', 'fotodia.css',
+            'biblioteca.css', 'celebra.css', 'canal.css', 'instagram.css', 'alergenos.css', 'menus.css', 'fotodia.css',
             'identidad.css', 'zonas.css',
             'pieles.css', 'fondos.css', 'letras.css', 'actividad.css',
             'movimiento.css'] as $file
