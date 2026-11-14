@@ -298,9 +298,9 @@ class manifest {
         if (!empty($config->sourcemoments)) {
             $items = array_merge($items, sources::moments($now));
         }
-        if (!empty($config->sourcechannel)) {
-            $items = array_merge($items, sources::channel());
-        }
+        // The «Follow us» slides: the channel of Oksigenia Marandu, and the centre's networks switched on, one each turn.
+        $channel = empty($config->sourcechannel) ? [] : sources::channel();
+        $items = array_merge($items, $channel, networks::items($channel));
         if (!empty($config->sourcedeadlines)) {
             $items = array_merge($items, sources::deadlines($now, (int) ($config->deadlinesdays ?? 7) ?: 7, $scope));
         }
