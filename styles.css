@@ -6167,6 +6167,14 @@ dialog.hkp-dialog > footer {
     padding: 0;
     list-style: none;
 }
+
+/* On a narrow phone, one column the whole width: under 17rem a column would overflow the block. */
+@media (max-width: 30rem) {
+    .hkp-redes-lista {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
 .hkp-red {
     position: relative;
     display: grid;
