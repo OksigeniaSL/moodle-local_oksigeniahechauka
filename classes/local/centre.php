@@ -169,6 +169,8 @@ class centre {
                 'uprightscreens' => self::upright_far(), 'left' => get_string('centre_phrase_left', $c, '{$a}'),
                 'leftone' => get_string('centre_phrase_left_one', $c)],
             'surprises' => surprises::centre_context($config),
+            'networks' => ['boxes' => networks::boxes(),
+                'save' => (new \moodle_url('/local/oksigeniahechauka/networks.php'))->out(false)],
             'frame' => (new \moodle_url('/local/oksigeniahechauka/preview.php', ['frame' => 1, 'screen' => $first]))->out(false),
             'placename' => $place['name'] ?? '',
             'admin' => has_capability('moodle/site:config', \context_system::instance()) ?
