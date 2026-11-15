@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.25.1
 
 - Our networks: an address that names no account (a YouTube channel by its old address, a page) reads in its box without
   «https://www.», and a long one ends in «…» instead of being cut; the box shows the same when the page opens and after
