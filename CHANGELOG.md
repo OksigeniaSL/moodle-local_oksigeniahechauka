@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- Our networks: an address that names no account (a YouTube channel by its old address, a page) reads in its box without
+  «https://www.», and a long one ends in «…» instead of being cut; the box shows the same when the page opens and after
+  saving, and the preview beside takes the same name as the screens.
+- Our networks: one column the whole width on a narrow phone.
+
 ## 0.25.0
 
 - **Our networks**, in «Your centre»: a box for each usual network (Instagram, TikTok, YouTube, Facebook, X, LinkedIn,

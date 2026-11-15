@@ -159,6 +159,21 @@ class networks {
     }
 
     /**
+     * A box as the panel writes it: the account where the address names one; else the address, without «https://», «www.» and
+     * a last slash alone, so that a long one still reads in its box.
+     *
+     * @param string $network
+     * @param array $read what read() gave
+     * @return string
+     */
+    protected static function shown(string $network, array $read): string {
+        if ($read['account'] !== '' && $network !== 'web') {
+            return $read['account'];
+        }
+        return preg_replace('#^([^/?\#]+)/$#', '$1', preg_replace('#^https://(www\.)?#i', '', $read['url']));
+    }
+
+    /**
      * What the centre has put, box by box as saved: [network => ['url' => …, 'show' => bool]], only the filled ones.
      *
      * @return array
@@ -177,7 +192,7 @@ class networks {
     /**
      * Every box, in its order, for the panel: filled or not, what it has, and whether the screens show it.
      *
-     * @return array [['network', 'name', 'url', 'account', 'filled', 'show']]
+     * @return array [['network', 'name', 'url', 'account', 'value', 'filled', 'show']]
      */
     public static function boxes(): array {
         $saved = self::saved();
@@ -195,6 +210,7 @@ class networks {
             $out[] = ['network' => $network,
                 'name' => $network === 'web' ? get_string('network_web', self::C) : $known['name'],
                 'url' => $read['url'] ?? '', 'account' => $read['account'] ?? '',
+                'value' => $read ? self::shown($network, $read) : '',
                 'filled' => (bool) $read, 'show' => $read && $box['show'], 'from' => $from] + self::words($network, $known['name']);
         }
         return $out;
@@ -276,8 +292,8 @@ class networks {
         }
         foreach (self::boxes() as $now) {
             if ($now['network'] === $network) {
-                return ['network' => $network, 'value' => $now['account'] !== '' && $network !== 'web' ? $now['account'] :
-                    $now['url'], 'web' => $now['url'], 'show' => $now['show'], 'from' => $now['from'], 'wrong' => $wrong];
+                return ['network' => $network, 'value' => $now['value'], 'account' => $now['account'], 'web' => $now['url'],
+                    'show' => $now['show'], 'from' => $now['from'], 'wrong' => $wrong];
             }
         }
         return [];

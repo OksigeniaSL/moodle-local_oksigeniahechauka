@@ -135,7 +135,7 @@ final class networks_test extends \advanced_testcase {
     public function test_change(): void {
         $this->resetAfterTest();
         $this->assertSame(
-            ['network' => 'instagram', 'value' => '@centro.ejemplo',
+            ['network' => 'instagram', 'value' => '@centro.ejemplo', 'account' => '@centro.ejemplo',
             'web' => 'https://www.instagram.com/centro.ejemplo/', 'show' => true, 'from' => '', 'wrong' => false],
             networks::change('instagram', ['value' => 'centro.ejemplo'])
         );
@@ -149,6 +149,12 @@ final class networks_test extends \advanced_testcase {
         $this->assertSame('@centro.ejemplo', $off['value']);
         $this->assertTrue(networks::change('linkedin', ['value' => 'centro'])['wrong']);
         $web = networks::change('web', ['value' => 'centro.example']);
-        $this->assertSame('https://centro.example', $web['value']);
+        $this->assertSame('centro.example', $web['value']);
+        $this->assertSame('https://centro.example', $web['web']);
+        // An address that names no account reads in the box without its «https://www.», and the screens take no name from it.
+        $channel = networks::change('youtube', ['value' => 'https://www.youtube.com/centroejemplo']);
+        $this->assertSame('youtube.com/centroejemplo', $channel['value']);
+        $this->assertSame('', $channel['account']);
+        $this->assertSame('youtube.com/centroejemplo', array_column(networks::boxes(), 'value', 'network')['youtube']);
     }
 }

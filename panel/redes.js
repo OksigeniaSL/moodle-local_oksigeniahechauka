@@ -74,6 +74,7 @@
             fixed.textContent = now.value || '';
         }
         box.setAttribute('data-web', now.web || '');
+        box.setAttribute('data-account', now.account || '');
         box.classList.toggle('is-filled', filled);
         box.classList.toggle('is-on', filled && !!now.show);
         const on = box.querySelector('.hkp-red-pantallas input');
@@ -87,12 +88,10 @@
             return;
         }
         const network = box.getAttribute('data-network');
-        const field = box.querySelector('.hkp-red-cuenta');
-        const name = (field && (field.value || field.textContent) || '').trim();
+        // The name the screens take: the account, or the web's site; none for an address that names no account.
         frame.contentWindow.postMessage({hkDraft: {item: {id: 'draft-network', type: 'channel', zone: 'extra', network,
             title: box.getAttribute('data-title') || '', text: box.getAttribute('data-text') || '',
-            name: network === 'web' ? name.replace(/^https?:\/\//, '').replace(/\/$/, '') : name,
-            web: box.getAttribute('data-web')}, focus: 'canal'}}, location.origin);
+            name: box.getAttribute('data-account') || '', web: box.getAttribute('data-web')}, focus: 'canal'}}, location.origin);
     };
     let away = null;
     block.addEventListener('focusin', (ev) => {
