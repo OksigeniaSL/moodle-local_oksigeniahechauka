@@ -122,6 +122,21 @@ export function siteOf(url) {
     return m ? m[1].replace(/^www\./i, '').toLowerCase() : '';
 }
 
+/**
+ * The address the code says. With the shortener's own, that one; without it, a network's address loses the screens' tag
+ * («utm_source=pantallas»): only the centre's web reads it, and it makes the code denser, so harder to read from afar. Pure.
+ *
+ * @param {object} item {network, web, webqr}
+ * @returns {string}
+ */
+export function qrAddress(item) {
+    const url = String(item.web || '');
+    if (item.webqr || item.network === 'web') {
+        return url;
+    }
+    return url.replace(/([?&])utm_source=pantallas(&|#|$)/, (m, before, after) => (after === '&' ? before : after));
+}
+
 /** Whether the slide can come: it needs its headline and the channel's address, which its QR says. */
 export function channelShow(item) {
     return !!(item && typeof item.web === 'string' && /^https?:\/\/\S+$/i.test(item.web) && String(item.title || '').trim());
@@ -172,7 +187,7 @@ export function buildChannel(c, item, o) {
         name.appendChild(el('span', 'hk-canal-cuenta', sender));
         card.appendChild(name);
     }
-    const qr = o.qr(item.web, item.webqr);
+    const qr = o.qr(qrAddress(item), item.webqr);
     if (qr && qr.nodeType === 1) {
         // A picture from the shortener brings its own white margin: the card gives it less of its own.
         if (qr.querySelector('img')) {

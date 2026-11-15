@@ -3,7 +3,7 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {bindShort, channelShow, channelWords, flightPath, membersWords, trailOf, FLIGHT} from '../src/canal.js';
+import {bindShort, channelShow, channelWords, flightPath, membersWords, qrAddress, trailOf, FLIGHT} from '../src/canal.js';
 
 const ITEM = {id: 'channel', type: 'channel', zone: 'extra', network: 'telegram', title: 'Síguenos en Telegram',
     text: 'Avisos, fotos y novedades en tu móvil', name: 'Centro de ejemplo · Avisos', members: 312,
@@ -24,6 +24,18 @@ test('the words come from the item, in the centre\'s language; the network is ne
     assert.equal(w.name, 'Centro de ejemplo · Avisos');
     assert.equal(w.members, '312 personas ya\u00a0lo\u00a0siguen');
     assert.equal(channelWords({title: 'Follow us', web: ITEM.web}, {}).line, '');
+});
+
+test('the code of a network without its short address goes without the screens\' tag; the web and a short one keep theirs', () => {
+    const tagged = 'https://www.instagram.com/centro.ejemplo/?utm_source=pantallas';
+    assert.equal(qrAddress({network: 'instagram', web: tagged}), 'https://www.instagram.com/centro.ejemplo/');
+    assert.equal(qrAddress({network: 'x', web: 'https://x.com/centro?lang=es&utm_source=pantallas'}), 'https://x.com/centro?lang=es');
+    assert.equal(qrAddress({network: 'x', web: 'https://x.com/centro?utm_source=pantallas&lang=es'}), 'https://x.com/centro?lang=es');
+    assert.equal(qrAddress({network: 'telegram', web: 'https://t.me/centro?utm_source=pantallas#top'}), 'https://t.me/centro#top');
+    assert.equal(qrAddress({network: 'web', web: 'https://centro.example/?utm_source=pantallas'}),
+        'https://centro.example/?utm_source=pantallas');
+    assert.equal(qrAddress({network: 'instagram', web: 'https://enlace.example/Ab3', webqr: 'data:image/png;base64,AA'}),
+        'https://enlace.example/Ab3');
 });
 
 test('how many follow it: with its singular, and nothing when it is not said', () => {

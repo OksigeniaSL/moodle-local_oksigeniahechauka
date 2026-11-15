@@ -6,6 +6,9 @@
   «https://www.», and a long one ends in «…» instead of being cut; the box shows the same when the page opens and after
   saving, and the preview beside takes the same name as the screens.
 - Our networks: one column the whole width on a narrow phone.
+- «Follow us»: when the shortener does not shorten a network's address (its key only takes the centre's domains), the QR
+  the screen draws leaves out the screens' tag («utm_source=pantallas»), which only the centre's web reads: a less dense
+  code, easier to read from afar.
 
 ## 0.25.0
 
