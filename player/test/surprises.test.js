@@ -442,3 +442,32 @@ test('the robin lands and makes its gesture on the screen, also on a narrow one'
     }
 });
 
+
+test('what only crosses (the witch, the grandfather on his carpet) comes from out of sight and goes out by the other side', () => {
+    for (const id of ['bruja', 'abuelo']) {
+        const meta = atlasOf(id).meta;
+        const e = meta.estados.cruza;
+        assert.ok(!meta.estados.para && !meta.estados.huye && meta.gestos.length === 0, id);
+        assert.equal(e.avance.length, e.frames, id);
+        for (let i = 0; i < e.frames; i++) {
+            assert.ok(atlasOf(id).frames['cruza_' + (i < 10 ? '0' : '') + i], id + ' ' + i);
+        }
+        // It goes round at its height, and its speed is its way forward.
+        const sum = (k) => e.avance.reduce((total, step) => total + step[k], 0);
+        assert.ok(Math.abs(sum(1)) < 0.01, id + ' dy ' + sum(1));
+        assert.ok(Math.abs(sum(0) - e.speed * e.frames / e.fps) < 0.5, id + ' dx ' + sum(0));
+        for (const r of [0.2, 0.8]) {
+            const w = walkOf(meta, 1920, 1, at(r));
+            assert.equal(w.turns, 0);
+            if (w.dir > 0) {
+                assert.ok(w.from + (meta.cell.w - meta.anchor.x) <= 0 && w.exit - meta.anchor.x >= 1920, id);
+            } else {
+                assert.ok(w.from - (meta.cell.w - meta.anchor.x) >= 1920 && w.exit + meta.anchor.x <= 0, id);
+            }
+        }
+        // It crosses in the band where the flying ones go.
+        const y = heightOf(meta, 1080, 1, null, at(0.5));
+        assert.ok(y >= 260 && y <= 700, id + ' ' + y);
+        assert.deepEqual(pagesOf(atlasOf(id), ['cruza']).length, meta.pages.length);
+    }
+});

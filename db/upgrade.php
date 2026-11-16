@@ -347,5 +347,17 @@ function xmldb_local_oksigeniahechauka_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026111306, 'local', 'oksigeniahechauka');
     }
 
+    if ($oldversion < 2026111700) {
+        // Two new Surprises that fly across, the witch and the grandfather on his carpet: as the frog and the robin, they
+        // join a centre that had chosen every one of the others.
+        $who = get_config('local_oksigeniahechauka', 'surprisewho');
+        $before = ['gusanito', 'abeja', 'mosca', 'arana', 'pulpo', 'pezglobo', 'geco', 'rana', 'petirrojo'];
+        if ($who !== false && !array_diff($before, explode(',', (string) $who))) {
+            $all = array_unique(array_merge(explode(',', (string) $who), ['bruja', 'abuelo']));
+            set_config('surprisewho', implode(',', $all), 'local_oksigeniahechauka');
+        }
+        upgrade_plugin_savepoint(true, 2026111700, 'local', 'oksigeniahechauka');
+    }
+
     return true;
 }

@@ -78,6 +78,10 @@ export function walkOf(meta, width, scale, random) {
     // From where it enters: the part of the cell that goes first has to start out of sight.
     const ahead = (meta.cell.w - meta.anchor.x) * scale;
     const behind = meta.anchor.x * scale;
+    if (!meta.estados.para) {
+        // What only crosses (the witch, the grandfather on his carpet): from out of sight on one side to out on the other.
+        return {dir, turns: 0, from: dir > 0 ? -ahead : width + ahead, exit: dir > 0 ? width + behind : -behind};
+    }
     let into = width * (0.2 + 0.25 * random());
     if (meta.posa) {
         // What lands (the robin) comes down a good way past where `para` begins and hops on: all of it on the screen.
@@ -596,8 +600,11 @@ class Walk {
      */
     run(plan, height, scale, gesture, done) {
         const m = this.atlas.meta;
-        const steps = [{state: 'cruza', times: plan.turns}, {state: 'para', times: 1}, {state: gesture, times: 1},
-            {state: 'huye', times: 0}];
+        // What only crosses has no `para`, gestures or `huye`: its `cruza` goes round until it is out.
+        const only = !m.estados.para;
+        const last = only ? 'cruza' : 'huye';
+        const steps = only ? [{state: 'cruza', times: 0}] : [{state: 'cruza', times: plan.turns}, {state: 'para', times: 1},
+            {state: gesture, times: 1}, {state: 'huye', times: 0}];
         // What jumps in plays `entra` first, after the frames that continue its leap back to under the edge.
         const before = plan.leap ? plan.leap.before.slice() : [];
         if (plan.leap) {
@@ -642,7 +649,7 @@ class Walk {
                 }
             }
             const out = plan.top !== undefined ? y < plan.exit : (plan.dir > 0 ? x > plan.exit : x < plan.exit) || (m.posa && y < -below);
-            if (now.state === 'huye' && out) {
+            if (now.state === last && out) {
                 done();
                 return;
             }
@@ -1138,9 +1145,10 @@ export class Surprises {
                     scale);
                 start = () => walk.run(Math.random() < 0.5 ? 1 : -1, done);
             } else {
-                const gestures = atlas.meta.gestos;
+                const gestures = atlas.meta.gestos || [];
                 const gesture = gestures[Math.floor(Math.random() * gestures.length)];
-                walk = new Walk(this.layer, atlas, base, ['cruza', 'para', gesture, 'huye'].concat(atlas.meta.estados.entra ? ['entra'] : []));
+                walk = new Walk(this.layer, atlas, base, !atlas.meta.estados.para ? ['cruza'] :
+                    ['cruza', 'para', gesture, 'huye'].concat(atlas.meta.estados.entra ? ['entra'] : []));
                 const stop = heightOf(atlas.meta, height, scale, this.hooks.floor(), Math.random);
                 const plan = atlas.meta.estados.cruza.hilo ? hangOf(atlas.meta, width, stop, scale, Math.random) :
                     (atlas.meta.estados.entra && jumpOf(atlas.meta, width, height, stop, scale, Math.random)) ||
