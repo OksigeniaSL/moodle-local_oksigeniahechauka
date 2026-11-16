@@ -40,9 +40,10 @@ class shortener {
     const RETRIES = 5;
 
     /** @var string[] What the shortener answers when asking again would get the same: a destination it never takes (out
-     *     of its domains, or not an address), its limit of links reached, an address that is not this program's. A
+     *     of its domains, or not an address), its limit of links reached, an address that is not this program's or does
+     *     not exist (an update answered 404, said «error:notfound» here). A
      *     plugin that sees one of these does not ask again for that destination for a long while. */
-    const FINAL = ['error:domain', 'error:nourl', 'error:max', 'error:notyours'];
+    const FINAL = ['error:domain', 'error:nourl', 'error:max', 'error:notyours', 'error:notfound'];
 
     /** @var string The code of the last answer: '' when it went well or there was no answer; «inactive» when an update
      *     was kept but left the address paused or expired. */
@@ -198,6 +199,12 @@ class shortener {
         $answer = $this->call(['action' => 'update', 'shorturl' => $short, 'url' => $url,
             'title' => \core_text::substr($title, 0, 200)]);
         if (!str_starts_with((string) ($answer['message'] ?? ''), 'success')) {
+            // An address that does not exist is answered with a message and a 404, not with a code: said as one.
+            $notfound = (int) ($answer['statusCode'] ?? 0) === 404
+                || str_contains(strtolower((string) ($answer['message'] ?? '')), 'not found');
+            if ($this->code === '' && $notfound) {
+                $this->code = 'error:notfound';
+            }
             return false;
         }
         if (($answer['active'] ?? true) === false) {
