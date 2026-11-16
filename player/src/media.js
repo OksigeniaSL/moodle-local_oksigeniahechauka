@@ -197,17 +197,21 @@ export class MediaStore {
     }
 }
 
-/** Every media object a manifest refers to. */
+/**
+ * Every media object a manifest refers to: the logos and the birthdays' photos first, so that a screen that has just
+ * started (every morning, when the television switches on) has them in seconds, not after the albums and the videos.
+ */
 export function mediaOf(manifest) {
+    const first = [];
     const out = [];
-    function add(m) {
+    function add(m, list) {
         if (m && m.sha1 && m.url) {
-            out.push(m);
+            (list || out).push(m);
         }
     }
     if (manifest.theme) {
-        add(manifest.theme.logo);
-        add(manifest.theme.logo_dark);
+        add(manifest.theme.logo, first);
+        add(manifest.theme.logo_dark, first);
     }
     // The QR codes the site's link shortener draws, beside each web.
     if (manifest.idle) {
@@ -222,7 +226,7 @@ export function mediaOf(manifest) {
             add(it.album.webqr);
         }
         (it.people || []).forEach(function (person) {
-            add(person.photo);
+            add(person.photo, first);
         });
         (it.books || []).forEach(function (book) {
             add(book.cover);
@@ -233,5 +237,5 @@ export function mediaOf(manifest) {
         });
         add(it.image);
     });
-    return out;
+    return first.concat(out);
 }

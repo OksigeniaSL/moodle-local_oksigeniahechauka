@@ -67,3 +67,15 @@ test('every answer of the server tells its time, with when the request left and 
         globalThis.fetch = original;
     }
 });
+
+test('a screen that has just started brings the logos and the birthdays\' photos before anything else', async () => {
+    const {mediaOf} = await import('../src/media.js');
+    const m = (n) => ({sha1: n, url: '/f/' + n});
+    const list = mediaOf({theme: {logo: m('logo')}, items: [
+        {type: 'album', media: m('foto1')},
+        {type: 'video', media: m('video'), poster: m('poster')},
+        {type: 'birthdays', people: [{name: 'A', photo: m('cara1')}, {name: 'B'}, {name: 'C', photo: m('cara2')}]},
+        {type: 'photoday', image: m('dia')},
+    ]});
+    assert.deepEqual(list.map((x) => x.sha1), ['logo', 'cara1', 'cara2', 'foto1', 'video', 'poster', 'dia']);
+});

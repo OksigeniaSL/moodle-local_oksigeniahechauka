@@ -832,6 +832,9 @@ class Player {
         const body = {
             time: Math.floor(Date.now() / 1000),
             tz_offset: -new Date().getTimezoneOffset(),
+            // What the player adds to the device's clock (clock.js), in seconds: the panel tells a television whose clock
+            // is wrong but whose screen is right from one that shows the wrong time.
+            skew: Math.round((this.clock.skew ? this.clock.skew() : 0) / 1000),
             version: VERSION,
             // Not by the wall clock: a Raspberry Pi has no battery, and it jumps when the network gives it the time.
             uptime: Math.floor(performance.now() / 1000),

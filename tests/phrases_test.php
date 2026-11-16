@@ -127,6 +127,12 @@ final class phrases_test extends \advanced_testcase {
         $this->assertSame(['on', 'Running', 'signal 1 min ago'], [$on['key'], $on['label'], $on['meta']]);
         $late = home::state($screen($now - 60), ['time' => $now - 60 - 360], $now);
         $this->assertSame(['warn', '6 min late', 6], [$late['key'], $late['meta'], $late['drift']]);
+        // A television 62 minutes behind whose player puts it right (skew): running, with a note for its own clock.
+        $fixed = home::state($screen($now - 60), ['time' => $now - 60 - 3720, 'skew' => 3719], $now);
+        $this->assertSame(['on', 0, 62], [$fixed['key'], $fixed['drift'], $fixed['device']]);
+        // A player that puts it only half right still shows the wrong time.
+        $half = home::state($screen($now - 60), ['time' => $now - 60 - 3720, 'skew' => 1800], $now);
+        $this->assertSame(['warn', 32], [$half['key'], $half['drift']]);
         $off = home::state($screen($now - DAYSECS, [['days' => [4], 'on' => '16:00', 'off' => '20:00']]), [], $now);
         $this->assertSame(['off', 'comes on on thursday 5 at 16:00'], [$off['key'], $off['meta']]);
         $down = home::state($screen($this->moment('2026-11-02 10:12')), [], $now);

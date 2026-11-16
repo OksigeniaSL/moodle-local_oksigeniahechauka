@@ -369,6 +369,7 @@ class home {
             'reloadlabel' => get_string('reload_of', $c, $name),
             'lastseen' => (int) $s->lastseen,
             'drift' => $state['drift'],
+            'devicedrift' => $state['device'] ?? 0,
         ];
     }
 
@@ -392,7 +393,11 @@ class home {
                 return ['key' => 'down', 'label' => get_string('state_frozen', $c), 'meta' => get_string('meta_frozen', $c),
                     'drift' => 0];
             }
-            $drift = !empty($info['time']) ? (int) $s->lastseen - (int) $info['time'] : 0;
+            $device = !empty($info['time']) ? (int) $s->lastseen - (int) $info['time'] : 0;
+            // Since 0.25.2 the player puts a wrong clock right with the server's time, and says by how much (skew): what
+            // the screen shows is the device's time plus that. Only that is a warning; the device's own clock, a note.
+            $drift = $device - (int) ($info['skew'] ?? 0);
+            $out['device'] = abs($device) > self::DRIFT ? (int) round($device / MINSECS) : 0;
             if (abs($drift) > self::DRIFT) {
                 $minutes = (int) round(abs($drift) / MINSECS);
                 return ['key' => 'warn', 'label' => get_string('state_clock', $c), 'meta' => get_string(

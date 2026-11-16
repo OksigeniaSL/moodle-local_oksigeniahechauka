@@ -384,6 +384,7 @@ class screens {
         $keep = [
             'time' => $int($beat['time'] ?? null),
             'tz_offset' => $int($beat['tz_offset'] ?? null),
+            'skew' => $int($beat['skew'] ?? null),
             'version' => $text($beat['version'] ?? null, 32),
             'uptime' => $int($beat['uptime'] ?? null),
             'manifest' => $text($beat['manifest'] ?? null, 64),

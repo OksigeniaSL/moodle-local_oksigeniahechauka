@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.25.3
+
+- The panel warns of a screen's clock only when what the screen shows is wrong. A device whose own clock is off, which the
+  player puts right since 0.25.2, is «Running», and its sheet says «On time» with a note: set the device's clock, so that it
+  switches on and off on time. The heartbeat says how much the player adds to the device's clock (`skew`, contract).
+- A screen that has just started (every morning, when the television switches on) brings the logos and the birthdays'
+  photos before anything else: the birthdays came with the creatures until the albums and videos were through.
+
 ## 0.25.2
 
 - A screen whose own clock is wrong (a television that keeps summer time, or was never set) shows the right time all the

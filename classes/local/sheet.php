@@ -159,7 +159,11 @@ class sheet {
                     $card['meta'] : get_string('sheet_ago', $c, phrases::ago($now - (int) $screen->lastseen))) :
                     get_string('meta_new', $c))],
                 ['term' => get_string('sheet_clock', $c), 'value' => $first($card['drift'] ? $card['meta'] :
-                    get_string('sheet_clock_ok', $c))],
+                    ($card['devicedrift'] ? get_string(
+                        $card['devicedrift'] > 0 ? 'sheet_clock_device_late' : 'sheet_clock_device_ahead',
+                        $c,
+                        abs($card['devicedrift'])
+                    ) : get_string('sheet_clock_ok', $c)))],
                 ['term' => get_string('sheet_display', $c), 'value' => $width && $height ? get_string(
                     $height > $width ? 'sheet_display_v' : 'sheet_display_h',
                     $c,

@@ -297,6 +297,9 @@ All fields are optional; an item without `when` is always on.
 ```
 
 - `tz_offset`: minutes east of UTC on the device, now.
+- `skew`: seconds the player adds to the device's clock, because the server's answers (their `Date` header) say it is a
+  minute or more off; `0` when it is right. `time` stays the device's own, so the server can tell a wrong clock that the
+  screen puts right (`time + skew` is near the server's time) from a screen that shows the wrong time.
 - `errors`: the last few, short.
 - `played`, every ten heartbeats and only if there is anything: what came out large since the last one, `{"i12": [times, seconds]}`. The server adds it up for the monthly report and tells nothing back.
 
