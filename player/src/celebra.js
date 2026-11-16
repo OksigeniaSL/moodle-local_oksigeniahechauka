@@ -146,7 +146,8 @@ export function buildMoments(c, item, page, o) {
     s.appendChild(streamers());
     const room = el('div', 'hk-celebra-sala');
     const thing = el('div', 'hk-celebra-objeto');
-    const src = m.cover ? (o.media(m.cover) || m.cover.url) : null;
+    // On a screen, only from the device: the server's address answers 401 without the screen's key (0.19.2).
+    const src = m.cover ? (o.media ? o.media(m.cover) : m.cover.url) : null;
     if (src) {
         const book = el('div', 'hk-libro hk-libro-grande hk-celebra-portada');
         const im = el('img');

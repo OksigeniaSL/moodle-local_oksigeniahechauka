@@ -216,7 +216,11 @@ export function buildInstagram(c, item, page, o) {
     pictures.forEach(function (m, i) {
         const im = el('img', 'hk-ig-img' + (i === 0 ? ' hk-ig-ahora' : ''));
         im.alt = '';
-        im.src = (o.media && o.media(m)) || m.url || '';
+        // On a screen, only from the device: the server's address answers 401 without the screen's key (0.19.2).
+        const src = o.media ? o.media(m) : m.url;
+        if (src) {
+            im.src = src;
+        }
         frame.appendChild(im);
     });
     if (post.media_type === 'VIDEO') {

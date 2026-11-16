@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.25.2
+
+- A screen whose own clock is wrong (a television that keeps summer time, or was never set) shows the right time all the
+  same: when it is a minute or more off, the player takes the time of the server from its answers, for the clock, «Today»,
+  the timetable and the agenda. The panel still says the screen's clock is off, so that it can be set right.
+- The picture of the day waits until it is on the screen before its slide comes, and the covers of the library and of
+  Instagram are drawn only from what the screen has downloaded: just after a screen starts, they asked the server without
+  the screen's key and came out empty.
+- The shared shortener piece again (an update answered 404 is a refusal for good).
+
 ## 0.25.1
 
 - Our networks: an address that names no account (a YouTube channel by its old address, a page) reads in its box without

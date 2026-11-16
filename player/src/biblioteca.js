@@ -24,7 +24,8 @@ export function booksPages(item) {
 
 function cover(b, media, big) {
     const d = el('div', 'hk-libro' + (big ? ' hk-libro-grande' : ''));
-    const src = b.cover ? (media(b.cover) || b.cover.url) : null;
+    // On a screen, only from the device: the server's address answers 401 without the screen's key (0.19.2).
+    const src = b.cover ? (media ? media(b.cover) : b.cover.url) : null;
     if (src) {
         const im = el('img');
         im.alt = '';

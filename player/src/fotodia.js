@@ -102,7 +102,12 @@ export function buildPhotoday(c, item, o) {
     const box = el('div', 'hk-fdd-lamina');
     const im = el('img', 'hk-fdd-img');
     im.alt = item.title || '';
-    im.src = (o.media && o.media(item.image)) || item.image.url || '';
+    // On a screen, only from the device (the slide waits for it, main.js): the server's address answers 401 without
+    // the screen's key (0.19.2).
+    const src = o.media ? o.media(item.image) : item.image.url;
+    if (src) {
+        im.src = src;
+    }
     box.appendChild(im);
     frame.appendChild(box);
     if (item.credit) {

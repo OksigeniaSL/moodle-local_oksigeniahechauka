@@ -42,8 +42,10 @@ function failure(res) {
  * @param {object} endpoints from the boot block
  * @param {function(): (string|null)} key the key of the screen, when it has one
  * @param {boolean} session true in the preview: the person signed in to the panel, not a key
+ * @param {function(number, number, number)=} heard told the server's time (Date header) of each answer, and when the
+ *     request left and came back, by the device's clock
  */
-export function makeApi(endpoints, key, session) {
+export function makeApi(endpoints, key, session, heard) {
     function headers(extra) {
         const h = extra || {};
         const k = key();
@@ -55,7 +57,16 @@ export function makeApi(endpoints, key, session) {
     function request(url, opts, ms) {
         opts.credentials = session ? 'same-origin' : 'omit';
         opts.cache = 'no-store';
-        return withTimeout(fetch(url, opts), ms || 20000);
+        const sent = Date.now();
+        return withTimeout(fetch(url, opts), ms || 20000).then(function (res) {
+            if (heard && res.headers) {
+                const server = Date.parse(res.headers.get('Date') || '');
+                if (server > 0) {
+                    heard(server, sent, Date.now());
+                }
+            }
+            return res;
+        });
     }
     function postJson(url, body) {
         return request(url, {
