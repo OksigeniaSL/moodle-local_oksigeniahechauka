@@ -71,6 +71,28 @@ export function instagramShow(item) {
 }
 
 /**
+ * The item with only what the device already has: each post with its pictures on the device, and only the posts with one at
+ * least; null when none is left, or the slide cannot come. Pure but for the device's store.
+ *
+ * @param {object|null} item the manifest's {posts}
+ * @param {object|null} media the device's store, with ready(media); without it, everything counts as there
+ * @returns {object|null}
+ */
+export function instagramReady(item, media) {
+    if (!item) {
+        return null;
+    }
+    const posts = (item.posts || []).map(function (post) {
+        const have = (post.media || []).filter(function (m) {
+            return isMedia(m) && (!media || media.ready(m));
+        });
+        return Object.assign({}, post, {media: have});
+    }).filter(shown);
+    const ready = Object.assign({}, item, {posts: posts});
+    return instagramShow(ready) ? ready : null;
+}
+
+/**
  * The post of a turn: the newest the first time, the next one each time after, round again. Pure.
  *
  * @param {object} item

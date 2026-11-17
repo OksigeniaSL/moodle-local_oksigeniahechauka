@@ -15,7 +15,7 @@ import {AGENDA_DAYS, AGENDA_TOP} from './agendaview.js';
 import {albumsOf, oneOfEachAlbum} from './photos.js';
 import {Composer, draftChoice, videosOfDay} from './compose.js';
 import {channelShow} from './canal.js';
-import {instagramShow} from './instagram.js';
+import {instagramReady} from './instagram.js';
 import {openActsNow} from './jornadas.js';
 import {menusData} from './menus.js';
 import {dayNumber, isDark, isLive, isPowerOn, liveItems, urgentOf, useOf, weekdayOf} from './rules.js';
@@ -672,9 +672,10 @@ class Player {
                 channels: liveItems(m.items || [], 'extra', wall).filter(function (it) {
                     return it.type === 'channel' && channelShow(it);
                 }),
-                instagram: liveItems(m.items || [], 'extra', wall).filter(function (it) {
-                    return it.type === 'instagram' && instagramShow(it);
-                })[0] || null,
+                // Only the pictures already on the device, as the picture of the day: never an empty frame after a start.
+                instagram: instagramReady(liveItems(m.items || [], 'extra', wall).filter(function (it) {
+                    return it.type === 'instagram';
+                })[0], media),
                 tables: liveItems(m.items || [], 'extra', wall).filter(function (it) {
                     return it.type === 'table';
                 }),

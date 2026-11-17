@@ -298,6 +298,9 @@ class manifest {
         if (!empty($config->sourcemoments)) {
             $items = array_merge($items, sources::moments($now));
         }
+        if (!empty($config->sourceinstagram)) {
+            $items = array_merge($items, instagram::items());
+        }
         if (!empty($config->sourceopenacts)) {
             $items = array_merge($items, sources::open_acts($now));
         }

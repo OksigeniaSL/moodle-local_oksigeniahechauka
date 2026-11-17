@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.28.0
+
+- **On our Instagram**: the centre's last posts on its screens, one a turn, with their pictures (a video's cover, a
+  carousel's first five), their words and the QR to follow the account. The slide was ready since 0.25.0; now the server
+  reads the posts once an hour with a key of Meta that never expires, kept encrypted in the settings («Key of Meta for
+  Instagram»), and keeps their pictures among the screens' own files: the screens never ask Meta, and the slide waits until
+  its pictures are on the device. With the source «Our Instagram», on by default; nothing without the key.
+
 ## 0.27.0
 
 - **Open days** on the screens, where the site has Oksigenia Eguahe: its open days, talks and festivals with sign-up open

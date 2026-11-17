@@ -5,7 +5,8 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {glyphSvg, knownNetwork, NETWORKS, NETWORK_NAMES} from '../src/redes.js';
-import {CAROUSEL, captionWords, cutWords, frameOf, instagramShow, picturesOf, postAt, postsOf, whenWords} from '../src/instagram.js';
+import {CAROUSEL, captionWords, cutWords, frameOf, instagramReady, instagramShow, picturesOf, postAt, postsOf, whenWords} from '../src/instagram.js';
+import {mediaOf} from '../src/media.js';
 import {Composer, draftChoice} from '../src/compose.js';
 import {siteOf} from '../src/canal.js';
 
@@ -167,3 +168,25 @@ test('instagram.css stays with what Chromium 56 understands; the carousel change
         }
     }
 });
+
+test('the Instagram slide waits for its pictures on the device, and the device downloads them', () => {
+    const pic = (n) => ({id: n, url: 'https://x/api/media.php?f=' + n, sha1: 's' + n, width: 1080, height: 1080});
+    const item = {type: 'instagram', zone: 'extra', web: 'https://www.instagram.com/ejemplo/', posts: [
+        {id: '1', media_type: 'CAROUSEL_ALBUM', caption: 'Uno', media: [pic(1), pic(2)]},
+        {id: '2', media_type: 'VIDEO', caption: 'Dos', media: [pic(3)]},
+    ]};
+    // Every picture of every post is downloaded.
+    assert.deepEqual(mediaOf({items: [item]}).map((m) => m.sha1), ['s1', 's2', 's3']);
+    // Nothing on the device yet: no slide.
+    assert.equal(instagramReady(item, {ready: () => false}), null);
+    // Only the second picture of the carousel: the post shows with it alone, the video waits.
+    const some = instagramReady(item, {ready: (m) => m.sha1 === 's2'});
+    assert.equal(some.posts.length, 1);
+    assert.deepEqual(some.posts[0].media.map((m) => m.sha1), ['s2']);
+    // The item itself is left as it came.
+    assert.equal(item.posts[0].media.length, 2);
+    // Without a store (the panel's preview), everything counts.
+    assert.equal(instagramReady(item, null).posts.length, 2);
+    assert.equal(instagramReady(null, null), null);
+});
+

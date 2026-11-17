@@ -133,13 +133,16 @@ class files {
 
     /**
      * Whether a file comes with what arrives by itself and is no item's: a cover of the library, a picture of a birthday,
-     * the guide of the open acts.
+     * the guide of the open acts, a picture of the centre's Instagram.
      *
      * @param \stored_file $file
      * @return bool
      */
     public static function from_source(\stored_file $file): bool {
         if ($file->get_component() === self::COMPONENT && $file->get_filearea() === photoday::AREA) {
+            return !$file->is_directory() && (int) $file->get_itemid() === 0;
+        }
+        if ($file->get_component() === self::COMPONENT && $file->get_filearea() === instagram::AREA) {
             return !$file->is_directory() && (int) $file->get_itemid() === 0;
         }
         if ($file->get_component() === self::COMPONENT && $file->get_filearea() === self::GUIDE) {

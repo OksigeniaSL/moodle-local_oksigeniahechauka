@@ -217,6 +217,17 @@ if ($hassiteconfig) {
                 1
             ));
         }
+        $settings->add(new admin_setting_configcheckbox(
+            "$p/sourceinstagram",
+            get_string('sourceinstagram', $p),
+            get_string('sourceinstagram_desc', $p),
+            1
+        ));
+        $settings->add(new admin_setting_encryptedpassword(
+            "$p/instagramtoken",
+            get_string('instagramtoken', $p),
+            get_string('instagramtoken_desc', $p)
+        ));
         if (\local_oksigeniahechauka\local\sources::has_open_acts()) {
             $settings->add(new admin_setting_configcheckbox(
                 "$p/sourceopenacts",
