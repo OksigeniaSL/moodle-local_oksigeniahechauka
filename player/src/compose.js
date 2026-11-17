@@ -218,7 +218,7 @@ export class Composer {
      *     countdown: «Today» has a countdown, agenda: the next thirty days have something,
      *     agendaNext: the days after today have something, place: the screen has a place with its hours,
      *     centre: the centre's sentence, when it goes in slides of its own (from 8 m, where there is no ticker),
-     *     albums: [{id, count}], the albums that can be shown}
+     *     albums: [{id, count}], the albums that can be shown, openacts: «Puertas abiertas» now (jornadas.js's openActsNow)}
      * @returns {{comp: string, items: object[], seconds: number}}
      */
     next(queue, today, horizontal, opts) {
@@ -262,6 +262,22 @@ export class Composer {
             }
             return null;
         };
+        // «Puertas abiertas» (src/jornadas.js): the acts that open the centre to new families. While one lasts, every
+        // other slide, and one in three on a showcase; on its day before it starts, one in four; its last week, one in
+        // eight; before, one in fourteen, as the networks (o.openacts.every). Never two in a row; one act a turn, in the
+        // order they start.
+        const open = o.openacts;
+        if (open && open.acts && open.acts.length) {
+            const live = open.acts[0].phase === 'ahora';
+            const every = o.use === 'showcase' ? (live ? Math.max(3, open.every) : 0) : open.every;
+            this.sinceOpen = (this.sinceOpen === undefined ? Math.max(0, every - 4) : this.sinceOpen) + 1;
+            if (every && this.sinceOpen >= every && this.last !== 'jornadas') {
+                this.sinceOpen = 0;
+                this.openTurn = (this.openTurn === undefined ? -1 : this.openTurn) + 1;
+                const one = open.acts[this.openTurn % open.acts.length];
+                return pick('jornadas', [], 15, {item: one.act, phase: one.phase});
+            }
+        }
         // A showcase: only pictures and videos, each over the whole screen; one with a web stays long enough to scan
         // its QR. Without any, the centre's own slide.
         if (o.use === 'showcase') {

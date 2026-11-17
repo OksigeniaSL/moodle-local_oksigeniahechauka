@@ -235,6 +235,11 @@ export function mediaOf(manifest) {
         (it.moments || []).forEach(function (moment) {
             add(moment.cover);
         });
+        // Eguahe's acts: the centre's guide with the first (the day it waves at whoever comes), and each act's code.
+        (it.acts || []).forEach(function (act) {
+            add(act.guide && act.guide.img, first);
+            add(act.webqr);
+        });
         add(it.image);
     });
     return first.concat(out);

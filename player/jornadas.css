@@ -1,0 +1,401 @@
+/* Oksigenia Hechauka: «Puertas abiertas», the acts Eguahe opens to new families (Jujol, 17 November 2026). Goes after
+ * instagram.css, before alergenos.css.
+ *
+ *   <div class="hk-cuerpo hk-capa" data-composicion="jornadas">
+ *     <section class="hk-pa [hk-pa-con-guia] [hk-pa-lleno]" data-cara="antes|dia" data-ajuste="0–3" data-tipo="openday|other">
+ *       <div class="hk-pa-hoja"><span class="hk-pa-hoja-dia"/><b class="hk-pa-hoja-num"/><span class="hk-pa-hoja-mes"/></div>
+ *         (or, the day, <figure class="hk-pa-guia"><p class="hk-pa-bocadillo"/><img class="hk-pa-guia-img"/></figure>)
+ *       <div class="hk-pa-texto">
+ *         <p class="hk-pa-cuando"/><h2 class="hk-pa-titular"/>[<p class="hk-pa-nombre"/>]<p class="hk-pa-donde"/>
+ *         <ul class="hk-pa-turnos"><li class="hk-pa-turno" data-estado="libre|lleno|pasado|ahora">10:00<small/></li></ul>
+ *         <p class="hk-pa-quedan|hk-pa-vinieron"/></div>
+ *       <div class="hk-pa-lado"><div class="hk-pa-tarjeta"><p class="hk-pa-tarjeta-t"/><p class="hk-pa-tarjeta-sub"/>
+ *         <div class="hk-qr">(render.js's qrBox)</div></div> (or <p class="hk-pa-completo"/>)</div>
+ *
+ * An invitation in the centre's main colour, as «Síguenos en …»: the day on a white calendar leaf; the words; and the QR in
+ * black on a white card, never on the colour. The day itself, the centre's guide waving with its words in a white bubble.
+ * The turns are chips: the full ones struck out, the gone ones faint, the one now in the accent. jornadas.js sets
+ * --hk-pa-qr when the card needs a smaller QR, and drops, in this order, the note (places left, families come), the turns
+ * and the place (hk-pa-sin-*).
+ *
+ * Chromium 56: flexbox only, margins instead of gap, no clamp, no aspect-ratio, no inset. */
+.hk-cuerpo[data-composicion="jornadas"] {
+    flex-direction: column;
+}
+.hk .hk-pa {
+    --hk-pa-qr: 40rem;                  /* read from 1 to 2.5 m by a phone, on any screen */
+    position: relative;
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: row;
+    align-items: center;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+    padding: 4.4rem 4.4rem 4.4rem 6rem;
+    border-radius: calc(2.8rem * var(--hk-esquina));
+    background-color: var(--hk-primario);
+    background-image: radial-gradient(circle at 86% 10%, rgba(255, 255, 255, .14), rgba(255, 255, 255, 0) 42%);
+    color: var(--hk-sobre-primario);
+}
+
+/* --- The calendar leaf (the days before) -------------------------------------------------------------------------- */
+.hk .hk-pa-hoja {
+    display: flex;
+    flex: none;
+    flex-direction: column;
+    align-items: center;
+    width: calc(var(--hk-t-titular) * 2.4);   /* grows with the distance, as its letters */
+    margin-right: 5.6rem;
+    overflow: hidden;
+    border-radius: calc(2.4rem * var(--hk-esquina));
+    background: #fff;
+    box-shadow: 0 1.2rem 3.2rem rgba(0, 0, 0, .22);
+    color: #16191d;
+    transform: rotate(-2deg);
+}
+.hk .hk-pa-hoja-dia {
+    align-self: stretch;
+    padding: 1.4rem 0 1.2rem;
+    background: var(--hk-acento);
+    color: var(--hk-sobre-acento);
+    font-family: var(--hk-letra-titulos);
+    font-size: var(--hk-t-lista);
+    font-weight: 800;
+    letter-spacing: .06em;
+    line-height: 1;
+    text-align: center;
+}
+.hk .hk-pa-hoja-num {
+    margin-top: 1.6rem;
+    font-family: var(--hk-letra-titulos);
+    font-size: calc(var(--hk-t-titular) * 1.55);
+    font-weight: 800;
+    letter-spacing: -.04em;
+    line-height: .9;
+}
+.hk[data-distancia="8"] .hk-pa {         /* from afar the letters are biggest: the slide keeps less margin above and below */
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+}
+.hk[data-distancia="8"] .hk-pa-hoja {   /* from afar, the words need the width: the leaf narrower, its day still big */
+    width: calc(var(--hk-t-titular) * 1.9);
+}
+.hk[data-distancia="8"] .hk-pa-hoja-num {
+    font-size: calc(var(--hk-t-titular) * 1.25);
+}
+.hk .hk-pa-hoja-mes {
+    margin: .8rem 0 2.4rem;
+    color: #4b5563;
+    font-size: var(--hk-t-lista);
+    font-weight: 800;
+    letter-spacing: .08em;
+    line-height: 1;
+}
+
+/* --- The guide (the day) ------------------------------------------------------------------------------------------ */
+.hk .hk-pa-guia {
+    display: flex;
+    flex: none;
+    flex-direction: column;
+    align-items: flex-start;
+    align-self: stretch;
+    justify-content: flex-end;
+    width: 54rem;
+    margin: 0 4.8rem 0 -1rem;
+}
+.hk .hk-pa-bocadillo {                   /* its words, as said: a white bubble, its tail towards the guide */
+    position: relative;
+    flex: none;
+    margin: 0 0 4.4rem 6rem;
+    padding: 2.6rem 3.2rem 2.8rem;
+    border-radius: 3.6rem;
+    background: #fff;
+    box-shadow: 0 1rem 3rem rgba(0, 0, 0, .2);
+    color: #16191d;
+    font-family: var(--hk-letra-titulos);
+    font-size: var(--hk-t-lista);
+    font-weight: 800;
+    line-height: 1.12;
+}
+.hk .hk-pa-bocadillo::after {
+    content: "";
+    position: absolute;
+    left: 7rem;
+    bottom: -3rem;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 3.2rem 3.2rem 0 0;
+    border-color: #fff transparent transparent transparent;
+}
+.hk .hk-pa-guia-img {                    /* what the bubble leaves of the column, the guide whole in it */
+    display: block;
+    flex: 1 1 0px;
+    width: 100%;
+    min-height: 0;
+    object-fit: contain;
+    object-position: left bottom;
+}
+
+/* --- The words ---------------------------------------------------------------------------------------------------- */
+.hk .hk-pa-texto {
+    display: flex;
+    flex: 1 1 0px;
+    flex-direction: column;
+    justify-content: center;
+    align-self: stretch;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+}
+.hk-pa-texto > * {
+    flex: none;
+}
+.hk .hk-pa-cuando {                     /* how near: «Este sábado», «Hoy · 10:00 – 13:00», on a tag of the accent */
+    align-self: flex-start;
+    max-width: 100%;
+    padding: .28em .6em .3em;
+    border-radius: .7em;                /* round on one line, a rounded card on two */
+    background: var(--hk-acento);
+    color: var(--hk-sobre-acento);
+    font-size: var(--hk-t-lista);
+    font-weight: 800;
+    line-height: 1.05;
+}
+.hk .hk-pa-horas {
+    white-space: nowrap;
+}
+.hk .hk-pa-titular {
+    margin-top: 2.6rem;
+    padding-bottom: .08em;
+    font-family: var(--hk-letra-titulos);
+    font-size: var(--hk-t-titular);
+    font-weight: 800;
+    letter-spacing: -.02em;
+    line-height: 1;
+}
+.hk .hk-pa[data-ajuste="1"] .hk-pa-titular { font-size: calc(var(--hk-t-titular) * .88); }
+.hk .hk-pa[data-ajuste="2"] .hk-pa-titular { font-size: calc(var(--hk-t-titular) * .76); }
+.hk .hk-pa[data-ajuste="3"] .hk-pa-titular { font-size: calc(var(--hk-t-titular) * .64); }
+.hk .hk-pa[data-ajuste="4"] .hk-pa-titular { font-size: calc(var(--hk-t-titular) * .56); }
+.hk .hk-pa[data-ajuste="5"] .hk-pa-titular { font-size: calc(var(--hk-t-titular) * .5); }
+.hk[data-distancia="8"] .hk-pa[data-ajuste="3"] .hk-pa-titular,
+.hk[data-distancia="8"] .hk-pa[data-ajuste="4"] .hk-pa-titular,
+.hk[data-distancia="8"] .hk-pa[data-ajuste="5"] .hk-pa-titular {
+    font-size: calc(var(--hk-t-titular) * .76);  /* from 8 m never under the least title */
+}
+.hk .hk-pa-nombre,
+.hk .hk-pa-donde {
+    margin-top: 2.4rem;
+    font-size: var(--hk-t-entrada);
+    font-weight: 700;
+    line-height: 1.1;
+    opacity: .94;
+}
+.hk .hk-pa-nombre {
+    font-weight: 800;
+    opacity: 1;
+}
+
+/* The turns: each hour a chip; full, struck out; gone, faint; now, the accent with its word. */
+.hk .hk-pa-turnos {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 3.2rem 0 -1.6rem;
+    padding: 0;
+    list-style: none;
+}
+.hk .hk-pa-turno {
+    display: flex;
+    align-items: baseline;
+    margin: 0 1.6rem 1.6rem 0;
+    padding: .2em .55em .24em;
+    border: .4rem solid rgba(255, 255, 255, .6);
+    border-radius: 999px;
+    font-size: var(--hk-t-lista);
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+}
+.hk .hk-pa-turno[data-estado="lleno"] {
+    border-style: dashed;
+    opacity: .6;
+    text-decoration: line-through;
+}
+.hk .hk-pa-turno[data-estado="pasado"] {
+    border-color: rgba(255, 255, 255, .25);
+    opacity: .45;
+}
+.hk .hk-pa-turno[data-estado="ahora"] {
+    border-color: var(--hk-acento);
+    background: var(--hk-acento);
+    color: var(--hk-sobre-acento);
+}
+.hk .hk-pa-turno small {
+    margin-left: .4em;
+    font-size: var(--hk-t-min);
+    font-weight: 800;
+    text-transform: uppercase;
+}
+.hk .hk-pa-quedan,
+.hk .hk-pa-vinieron {
+    display: flex;
+    align-items: center;
+    margin-top: 3rem;
+    font-size: var(--hk-t-lista);
+    font-weight: 800;
+    line-height: 1.1;
+}
+.hk .hk-pa-quedan::before,
+.hk .hk-pa-vinieron::before {         /* a dot of the accent, as the counts of the channel */
+    content: "";
+    flex: none;
+    width: .5em;
+    height: .5em;
+    margin-right: .45em;
+    border-radius: 50%;
+    background: var(--hk-acento);
+}
+.hk .hk-pa-sin-nota .hk-pa-quedan,
+.hk .hk-pa-sin-nota .hk-pa-vinieron,
+.hk .hk-pa-sin-turnos .hk-pa-turnos,
+.hk .hk-pa-sin-donde .hk-pa-donde,
+.hk .hk-pa-sin-bocadillo .hk-pa-bocadillo,
+.hk .hk-pa-sin-guia .hk-pa-guia,
+.hk .hk-pa-sin-hoja .hk-pa-hoja,
+.hk[data-distancia="5"] .hk-pa-tarjeta-sub,
+.hk[data-distancia="8"] .hk-pa-tarjeta-sub {         /* from 5 m the question and the code say it */
+    display: none;
+}
+
+/* --- The card: the QR on white -------------------------------------------------------------------------------------- */
+.hk .hk-pa-lado {
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    align-self: stretch;
+    min-height: 0;
+    margin-left: 5rem;
+}
+.hk .hk-pa-tarjeta {                    /* as wide as the QR wants, whatever it gives up: its words keep their lines */
+    flex: none;
+    width: 40rem;
+    padding: 3rem 3rem 2.6rem;
+    box-sizing: content-box;
+    border-radius: calc(3.2rem * var(--hk-esquina));
+    background: #fff;
+    box-shadow: 0 1rem 3rem rgba(0, 0, 0, .2);
+    color: #16191d;
+    text-align: center;
+}
+.hk .hk-pa-tarjeta-t {
+    font-family: var(--hk-letra-titulos);
+    font-size: var(--hk-t-entrada);
+    font-weight: 800;
+    letter-spacing: -.01em;
+    line-height: 1;
+}
+.hk .hk-pa-tarjeta-sub {
+    margin-top: .8rem;
+    color: #4b5563;
+    font-size: var(--hk-t-min);
+    font-weight: 700;
+    line-height: 1.08;
+}
+.hk .hk-pa .hk-qr {                     /* the code at --hk-pa-qr; its address under it, the card's whole width */
+    width: auto;
+    margin: 2.4rem 0 0;
+    padding: 0;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+    color: #16191d;
+    text-align: center;
+}
+.hk .hk-pa .hk-qr svg,
+.hk .hk-pa .hk-qr img {
+    display: block;
+    width: var(--hk-pa-qr);
+    height: auto;
+    margin: 0 auto;
+}
+.hk .hk-pa .hk-qr.hk-qr-imagen img {
+    width: calc(var(--hk-pa-qr) * 1.1);
+    height: calc(var(--hk-pa-qr) * 1.1);
+    margin: calc(var(--hk-pa-qr) * -.05) auto calc(var(--hk-pa-qr) * -.03);
+    object-fit: contain;
+}
+.hk .hk-pa .hk-qr-web {
+    margin-top: 2rem;
+    color: #16191d;
+    font-size: 4.2rem;
+    font-weight: 800;
+    letter-spacing: -.01em;
+    line-height: 1.05;
+    overflow-wrap: break-word;
+}
+.hk .hk-pa .hk-qr-llamada {            /* the card already asks, in the families' words */
+    display: none;
+}
+
+/* Full, the days before: its stamp instead of the QR. */
+.hk .hk-pa-completo {                  /* turned, it keeps its corners inside the slide */
+    margin: 4rem 2rem;
+    padding: .3em .6em .26em;
+    border: 1.2rem solid currentColor;
+    border-radius: 2.4rem;
+    font-family: var(--hk-letra-titulos);
+    font-size: calc(var(--hk-t-titular) * .72);
+    font-weight: 800;
+    letter-spacing: .06em;
+    line-height: 1;
+    text-transform: uppercase;
+    transform: rotate(-8deg);
+    opacity: .92;
+}
+
+/* The day the card asks a longer question («Coming without signing up?»): in the size of a list's line. */
+.hk .hk-pa[data-cara="dia"] .hk-pa-tarjeta-t {
+    font-size: var(--hk-t-lista);
+    line-height: 1.05;
+}
+
+/* --- An upright screen: the words on top, the whole width; under them, side by side, the leaf or the guide and the card */
+.hk.hk-vertical .hk-pa {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    align-content: space-between;
+    padding: 5.6rem 5.6rem 6rem;
+}
+.hk.hk-vertical .hk-pa-texto {
+    order: -1;
+    flex: 0 0 100%;
+    align-self: flex-start;
+    justify-content: flex-start;
+}
+.hk.hk-vertical .hk-pa-hoja {
+    width: calc(var(--hk-t-titular) * 1.7);
+    margin: 0 0 2rem 1rem;
+}
+.hk.hk-vertical .hk-pa-guia {
+    width: 38rem;
+    height: 70rem;
+    margin: 0 0 0 -1rem;
+}
+.hk.hk-vertical .hk-pa-bocadillo {     /* beside the card: the least that is read */
+    max-height: none;
+    margin: 0 0 4rem 3rem;
+    font-size: var(--hk-t-min);
+}
+.hk.hk-vertical .hk-pa-completo {      /* beside the leaf, in the same row */
+    font-size: calc(var(--hk-t-titular) * .58);
+}
+.hk.hk-vertical .hk-pa-lado {
+    flex: 1 1 0px;
+    justify-content: flex-end;
+    align-self: flex-end;
+    margin: 4rem 0 0 3rem;
+}

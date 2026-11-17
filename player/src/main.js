@@ -16,6 +16,7 @@ import {albumsOf, oneOfEachAlbum} from './photos.js';
 import {Composer, draftChoice, videosOfDay} from './compose.js';
 import {channelShow} from './canal.js';
 import {instagramShow} from './instagram.js';
+import {openActsNow} from './jornadas.js';
 import {menusData} from './menus.js';
 import {dayNumber, isDark, isLive, isPowerOn, liveItems, urgentOf, useOf, weekdayOf} from './rules.js';
 import {Screen} from './render.js';
@@ -677,6 +678,10 @@ class Player {
                 tables: liveItems(m.items || [], 'extra', wall).filter(function (it) {
                     return it.type === 'table';
                 }),
+                // «Puertas abiertas»: Eguahe's acts, the days before and while they last (src/jornadas.js).
+                openacts: openActsNow((m.items || []).filter(function (it) {
+                    return it.type === 'openacts';
+                })[0], this.clock.date().getTime()),
                 albums: albums.map(function (a) {
                     return {id: a.id, count: a.photos.length};
                 }),
