@@ -421,7 +421,9 @@ export function fitOpenAct(c, horizontal) {
         ['hk-pa-sin-nota', 'hk-pa-sin-turnos', 'hk-pa-sin-donde', 'hk-pa-sin-bocadillo'],
         ['hk-pa-sin-nota', 'hk-pa-sin-turnos', 'hk-pa-sin-donde', 'hk-pa-sin-bocadillo', 'hk-pa-sin-guia'],
         ['hk-pa-sin-nota', 'hk-pa-sin-turnos', 'hk-pa-sin-donde', 'hk-pa-sin-bocadillo', 'hk-pa-sin-guia', 'hk-pa-sin-hoja']];
-    // The code's own side (its address goes under it at the card's width).
+    // The code's own side (its address goes under it at the card's width), measured at its size: fitted again when the
+    // letters arrive, it must not start from the size the first fitting left.
+    sec.style.removeProperty('--hk-pa-qr');
     const code = sec.querySelector('.hk-pa-tarjeta .hk-qr svg, .hk-pa-tarjeta .hk-qr img');
     const wanted = code ? Math.round(code.getBoundingClientRect().width) : 0;
     const put = function (n, step, qr) {

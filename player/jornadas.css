@@ -199,10 +199,10 @@
 }
 
 /* The turns: each hour a chip; full, struck out; gone, faint; now, the accent with its word. */
-.hk .hk-pa-turnos {
+.hk .hk-pa-turnos {                     /* no negative margin: last in its column, it would stick out of it */
     display: flex;
     flex-wrap: wrap;
-    margin: 3.2rem 0 -1.6rem;
+    margin: 3.2rem 0 0;
     padding: 0;
     list-style: none;
 }
@@ -246,6 +246,10 @@
     font-size: var(--hk-t-lista);
     font-weight: 800;
     line-height: 1.1;
+}
+.hk .hk-pa-turnos + .hk-pa-quedan,
+.hk .hk-pa-turnos + .hk-pa-vinieron {  /* the chips keep their own margin under them */
+    margin-top: 1.4rem;
 }
 .hk .hk-pa-quedan::before,
 .hk .hk-pa-vinieron::before {         /* a dot of the accent, as the counts of the channel */
