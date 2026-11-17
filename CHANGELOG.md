@@ -3,7 +3,8 @@
 ## 0.26.0
 
 - Two new Surprises that fly across the screen, by the art direction: the witch on her broom, taking the robin, the frog and
-  the bee for a ride, with a trail of stars; and the grandfather on his flying carpet, reading with his cup of tea. They only
+  the bee for a ride, with a trail of stars; and the grandfather on his flying carpet, reading, who raises his cup of tea
+  in a toast once a lap. They only
   cross: the engine loops their one state from out of sight on one side to out on the other. A centre that had chosen
   every Surprise gets them too.
 
