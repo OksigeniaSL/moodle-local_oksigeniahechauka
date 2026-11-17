@@ -37,6 +37,12 @@ class sources {
     /** @var int The most of the library's moments a screen gets: what is worth telling this week, not a report. */
     const MOMENTS_MOST = 4;
 
+    /** @var string The admissions plugin, whose open acts the screens tell. */
+    const ADMISSIONS = 'local_oksigeniaeguahe';
+
+    /** @var int The most open acts a screen gets, the nearest first: an open day is told, not a calendar. */
+    const ACTS_MOST = 6;
+
     /** @var int The most deadlines a screen gets: a screen is not the place for all of a big site's. */
     const DEADLINES_MOST = 60;
 
@@ -432,6 +438,144 @@ class sources {
         }
         return [['id' => 'moments-' . schedule::day($now), 'type' => 'moments', 'zone' => 'extra',
             'label' => get_string('label_moments', 'local_oksigeniahechauka'), 'moments' => $moments]];
+    }
+
+    /**
+     * Whether the site's admissions tell their open acts: open days, talks and festivals with open sign-up.
+     *
+     * @return bool
+     */
+    public static function has_open_acts(): bool {
+        return class_exists('\\local_oksigeniaeguahe\\api') && method_exists('\\local_oksigeniaeguahe\\api', 'open_acts');
+    }
+
+    /**
+     * The open acts of the site's admissions (Eguahe), under way and coming, as an item of the contract: the days before,
+     * the address to sign up; the day, the guide of the centre with its greeting, the turns and how many families have
+     * come (a number, never who). Nothing, if the admissions are not there or have nothing open.
+     *
+     * @param int $now
+     * @return array items of the contract
+     */
+    public static function open_acts(int $now): array {
+        if (!self::has_open_acts()) {
+            return [];
+        }
+        try {
+            $list = \local_oksigeniaeguahe\api::open_acts(null, $now);
+        } catch (\Throwable $e) {
+            debugging('Hechauka: the open acts of Eguahe failed: ' . $e->getMessage(), DEBUG_DEVELOPER);
+            return [];
+        }
+        $acts = self::acts($list);
+        if (!$acts) {
+            return [];
+        }
+        return [['id' => 'openacts-' . schedule::day($now), 'type' => 'openacts', 'zone' => 'extra',
+            'label' => get_string('label_openacts', 'local_oksigeniahechauka'), 'acts' => $acts]];
+    }
+
+    /**
+     * The open acts as the contract has them, from what the admissions give: the nearest first, those with a name and an
+     * address to sign up, the centre only when they come from more than one. Pure but for the guide's picture.
+     *
+     * @param array[] $list what \local_oksigeniaeguahe\api::open_acts() gives
+     * @return array[] the acts of the item
+     */
+    public static function acts(array $list): array {
+        $list = array_values(array_filter($list, function ($act) {
+            return trim((string) ($act['name'] ?? '')) !== ''
+                && preg_match('~^https?://\S+$~i', (string) ($act['url'] ?? ''))
+                && (int) ($act['timeend'] ?? 0) > (int) ($act['timestart'] ?? 0);
+        }));
+        usort($list, function ($a, $b) {
+            return [(int) $a['timestart'], (int) ($a['id'] ?? 0)] <=> [(int) $b['timestart'], (int) ($b['id'] ?? 0)];
+        });
+        $list = array_slice($list, 0, self::ACTS_MOST);
+        $centres = count(array_unique(array_map(function ($act) {
+            return (int) ($act['centreid'] ?? 0);
+        }, $list)));
+        $acts = [];
+        foreach ($list as $act) {
+            $one = ['id' => (int) ($act['id'] ?? 0), 'kind' => ($act['kind'] ?? '') === 'openday' ? 'openday' : 'other',
+                'name' => items::plain((string) $act['name']), 'timestart' => (int) $act['timestart'],
+                'timeend' => (int) $act['timeend'], 'today' => !empty($act['today']), 'web' => (string) $act['url']];
+            $place = items::plain((string) ($act['place'] ?? ''));
+            if ($place !== '') {
+                $one['place'] = $place;
+            }
+            $one['turns'] = array_values(array_map(function ($turn) {
+                return ['timestart' => (int) $turn['timestart'], 'timeend' => (int) $turn['timeend'],
+                    'full' => !empty($turn['full'])];
+            }, array_filter((array) ($act['turns'] ?? []), function ($turn) {
+                return (int) ($turn['timeend'] ?? 0) > (int) ($turn['timestart'] ?? 0);
+            })));
+            $one['capacity'] = max(0, (int) ($act['capacity'] ?? 0));
+            $one['signed'] = max(0, (int) ($act['signed'] ?? 0));
+            if ($one['today'] && isset($act['came'])) {
+                $one['came'] = max(0, (int) $act['came']);
+            }
+            $guide = is_array($act['guide'] ?? null) ? $act['guide'] : null;
+            $file = $guide ? self::guide_file($guide) : null;
+            if ($file) {
+                $one['guide'] = ['img' => files::media($file), 'hello' => items::plain((string) ($guide['hello'] ?? ''))];
+            }
+            if ($centres > 1) {
+                $one['centre'] = items::plain((string) ($act['centre'] ?? ''));
+            }
+            $acts[] = $one;
+        }
+        return $acts;
+    }
+
+    /**
+     * The picture of a centre's guide, kept among the screens' own files: a screen draws only what it has downloaded with
+     * its key, never an address of the server. From the file the admissions give (`file`, `path`) or, failing that, from
+     * the address of their picture, as long as it is one of theirs on this server.
+     *
+     * @param array $guide the guide of an act: img, hello, and maybe path or file
+     * @return \stored_file|null
+     */
+    public static function guide_file(array $guide): ?\stored_file {
+        global $CFG;
+        $fs = get_file_storage();
+        $source = ($guide['file'] ?? null) instanceof \stored_file ? $guide['file'] : null;
+        $path = null;
+        if (!$source) {
+            $path = (string) ($guide['path'] ?? '');
+            $img = strtok((string) ($guide['img'] ?? ''), '?#');
+            $home = $CFG->wwwroot . '/local/oksigeniaeguahe/';
+            if ($path === '' && is_string($img) && str_starts_with($img, $home)) {
+                $path = $CFG->dirroot . '/local/oksigeniaeguahe/' . rawurldecode(substr($img, strlen($home)));
+            }
+            $real = $path !== '' ? realpath($path) : false;
+            $root = realpath($CFG->dirroot . '/local/oksigeniaeguahe');
+            $inside = $real && $root && str_starts_with($real, $root . DIRECTORY_SEPARATOR) && is_file($real);
+            if (!$inside || !preg_match('~\.(webp|png|jpe?g)$~i', $real)) {
+                return null;
+            }
+            $path = $real;
+        }
+        $name = clean_param($source ? $source->get_filename() : basename($path), PARAM_FILE);
+        $hash = $source ? $source->get_contenthash() : sha1_file($path);
+        if ($name === '' || !$hash) {
+            return null;
+        }
+        $record = ['contextid' => files::context()->id, 'component' => files::COMPONENT, 'filearea' => files::GUIDE,
+            'itemid' => 0, 'filepath' => '/', 'filename' => $name];
+        $kept = $fs->get_file($record['contextid'], $record['component'], $record['filearea'], 0, '/', $name);
+        if ($kept && $kept->get_contenthash() === $hash) {
+            return $kept;
+        }
+        if ($kept) {
+            $kept->delete();
+        }
+        try {
+            return $source ? $fs->create_file_from_storedfile($record, $source) : $fs->create_file_from_pathname($record, $path);
+        } catch (\Throwable $e) {
+            debugging('Hechauka: the picture of a guide could not be kept: ' . $e->getMessage(), DEBUG_DEVELOPER);
+            return null;
+        }
     }
 
     /**

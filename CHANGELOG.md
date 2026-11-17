@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.27.0
+
+- **Open days** on the screens, where the site has Oksigenia Eguahe: its open days, talks and festivals with sign-up open
+  in the next 30 days. The days before, what, when and where, with the QR to sign up; on the day, the welcome of the
+  centre's guide with its greeting, the times and the turns (the full ones marked), and how many families have come, a
+  number and never who. A switch in the settings and a row in «Start», on by default. The guide's picture is kept among
+  the screens' own files, so that a screen downloads it with its key and has it without a network.
+
 ## 0.26.0
 
 - Two new Surprises that fly across the screen, by the art direction: the witch on her broom, taking the robin, the frog and

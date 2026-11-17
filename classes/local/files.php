@@ -52,6 +52,9 @@ class files {
     /** The logo of the site for the dark theme. */
     const LOGODARK = 'logodark';
 
+    /** The picture of a centre's guide for its open acts, copied from the admissions plugin (item id 0). */
+    const GUIDE = 'guide';
+
     /** The last screenshot of each screen (item id = screen id). */
     const SHOT = 'shot';
 
@@ -129,13 +132,17 @@ class files {
     }
 
     /**
-     * Whether a file comes with what arrives by itself and is no item's: a cover of the library, a picture of a birthday.
+     * Whether a file comes with what arrives by itself and is no item's: a cover of the library, a picture of a birthday,
+     * the guide of the open acts.
      *
      * @param \stored_file $file
      * @return bool
      */
     public static function from_source(\stored_file $file): bool {
         if ($file->get_component() === self::COMPONENT && $file->get_filearea() === photoday::AREA) {
+            return !$file->is_directory() && (int) $file->get_itemid() === 0;
+        }
+        if ($file->get_component() === self::COMPONENT && $file->get_filearea() === self::GUIDE) {
             return !$file->is_directory() && (int) $file->get_itemid() === 0;
         }
         if ($file->get_component() === sources::BOOKS && $file->get_filearea() === 'cover') {

@@ -217,6 +217,14 @@ if ($hassiteconfig) {
                 1
             ));
         }
+        if (\local_oksigeniahechauka\local\sources::has_open_acts()) {
+            $settings->add(new admin_setting_configcheckbox(
+                "$p/sourceopenacts",
+                get_string('sourceopenacts', $p),
+                get_string('sourceopenacts_desc', $p),
+                1
+            ));
+        }
         $settings->add(new admin_setting_configcheckbox(
             "$p/sourcephotoday",
             get_string('sourcephotoday', $p),

@@ -17,6 +17,7 @@
 namespace local_oksigeniahechauka;
 
 use local_oksigeniahechauka\local\categories;
+use local_oksigeniahechauka\local\files;
 use local_oksigeniahechauka\local\news;
 use local_oksigeniahechauka\local\screens;
 use local_oksigeniahechauka\local\sources;
@@ -209,5 +210,84 @@ final class sources_test extends \advanced_testcase {
             'data' => json_encode(['forumdiscussion' => $discussion]), 'visible' => 1, 'targetall' => 1, 'sortorder' => 0,
             'usermodified' => 2, 'timecreated' => $now, 'timemodified' => $now]);
         $this->assertSame([], news::without_own($found));
+    }
+
+    /**
+     * An open act as the admissions give it.
+     *
+     * @param array $over what differs
+     * @return array
+     */
+    protected function act(array $over = []): array {
+        return $over + ['centreid' => 1, 'centre' => 'Colegio de ejemplo', 'colour' => '#336699', 'lang' => 'es', 'id' => 7,
+            'kind' => 'openday', 'name' => 'Jornada de puertas abiertas', 'place' => 'Patio central',
+            'timestart' => 2000000000, 'timeend' => 2000010800, 'today' => false,
+            'turns' => [['timestart' => 2000000000, 'timeend' => 2000003600, 'full' => true],
+                ['timestart' => 2000003600, 'timeend' => 2000007200, 'full' => false]],
+            'url' => 'https://example.com/j/AB12', 'capacity' => 120, 'signed' => 87, 'came' => null, 'guide' => null];
+    }
+
+    /**
+     * The open acts of the admissions as the screens get them: the nearest first and six at most, only those with a name
+     * and an address to sign up, how many came only on the day, and the centre only when there are several.
+     */
+    public function test_open_acts(): void {
+        $this->resetAfterTest();
+        $acts = sources::acts([
+            $this->act(['id' => 2, 'timestart' => 2000090000, 'timeend' => 2000099000]),
+            $this->act(['id' => 1, 'today' => true, 'came' => 23, 'kind' => 'talk', 'place' => '']),
+            $this->act(['id' => 3, 'url' => '']),
+            $this->act(['id' => 4, 'name' => ' ']),
+        ]);
+        $this->assertSame([1, 2], array_column($acts, 'id'));
+        $this->assertSame('other', $acts[0]['kind']);
+        $this->assertSame(23, $acts[0]['came']);
+        $this->assertArrayNotHasKey('place', $acts[0]);
+        $this->assertArrayNotHasKey('came', $acts[1]);
+        $this->assertSame('Patio central', $acts[1]['place']);
+        $this->assertSame('https://example.com/j/AB12', $acts[1]['web']);
+        $this->assertSame([true, false], array_column($acts[1]['turns'], 'full'));
+        $this->assertArrayNotHasKey('centre', $acts[0]);
+        $this->assertArrayNotHasKey('guide', $acts[0]);
+
+        // Two centres: each act says whose it is.
+        $acts = sources::acts([$this->act(), $this->act(['id' => 8, 'centreid' => 2, 'centre' => 'Escuela del valle'])]);
+        $this->assertSame(['Colegio de ejemplo', 'Escuela del valle'], array_column($acts, 'centre'));
+
+        // Never more than six, the nearest.
+        $many = [];
+        for ($i = 10; $i > 0; $i--) {
+            $many[] = $this->act(['id' => $i, 'timestart' => 2000000000 + $i * 100, 'timeend' => 2000090000]);
+        }
+        $this->assertSame([1, 2, 3, 4, 5, 6], array_column(sources::acts($many), 'id'));
+    }
+
+    /**
+     * The guide of an open act is copied among the screens' own files, once, so that a screen downloads it with its key;
+     * a picture that is not one of the admissions' own on this server is left out.
+     */
+    public function test_open_acts_guide(): void {
+        $this->resetAfterTest();
+        $fs = get_file_storage();
+        $user = \context_user::instance(2);
+        $source = $fs->create_file_from_string(['contextid' => $user->id, 'component' => 'user', 'filearea' => 'draft',
+            'itemid' => 5, 'filepath' => '/', 'filename' => 'perro-saluda-512.png'], base64_decode(
+                'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=='
+            ));
+        $acts = sources::acts([$this->act(['guide' => ['img' => 'https://example.com/perro.webp', 'hello' => '¡Hola!',
+            'file' => $source]])]);
+        $this->assertSame('¡Hola!', $acts[0]['guide']['hello']);
+        $kept = $fs->get_file_by_id($acts[0]['guide']['img']['id']);
+        $this->assertSame(files::GUIDE, $kept->get_filearea());
+        $this->assertTrue(files::readable($kept));
+        $this->assertTrue(files::from_source($kept));
+        $again = sources::acts([$this->act(['guide' => ['img' => '', 'hello' => '', 'file' => $source]])]);
+        $this->assertSame((int) $kept->get_id(), $again[0]['guide']['img']['id']);
+
+        // Only a file of the admissions on this server, never any address or path.
+        $acts = sources::acts([$this->act(['guide' => ['img' => 'https://example.com/perro.webp', 'hello' => '¡Hola!']]),
+            $this->act(['id' => 9, 'guide' => ['img' => '', 'path' => '/etc/passwd', 'hello' => '¡Hola!']])]);
+        $this->assertArrayNotHasKey('guide', $acts[0]);
+        $this->assertArrayNotHasKey('guide', $acts[1]);
     }
 }
