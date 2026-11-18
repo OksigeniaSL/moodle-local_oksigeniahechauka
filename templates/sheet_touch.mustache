@@ -1,0 +1,137 @@
+{{!
+    This file is part of Moodle - https://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_oksigeniahechauka/sheet_touch
+
+    The card «Se puede tocar» of a screen's sheet (Jujol, 18 November 2026): its switch and, when it is on, its doors as
+    the screen draws them, in the two corridors of the families and of the visitors. A door is touched to light it or
+    put it out, and its arrows move it along its corridor. It goes with the sheet's form (touchsent, touch, doors[] in
+    the order they are seen, only those lit); the sheet's save bar comes up with the first change. When the device says
+    its screen is touched and the sheet has not said so yet, it is suggested.
+
+    Example context (json):
+    {"touch": {"on": true, "suggest": false, "doors": [{"key": "menu", "label": "El comedor", "on": true, "visitors": false},
+        {"key": "about", "label": "Conoce el centro", "on": true, "visitors": true},
+        {"key": "library", "label": "La biblioteca", "on": false, "visitors": false}]
+    }
+    }
+}}
+{{#touch}}
+<section class="hkp-card hkp-touch" id="hkp-touch">
+    <h2>{{#str}}sheet_touch, local_oksigeniahechauka{{/str}}</h2>
+    <input type="hidden" name="touchsent" value="1">
+    {{#suggest}}<p class="hkp-touch-suggest" data-touch-suggest><span>{{#str}}sheet_touch_suggest, local_oksigeniahechauka{{/str}}</span><button type="button" class="btn btn-sm btn-primary" data-touch-yes>{{#str}}sheet_touch_suggest_yes, local_oksigeniahechauka{{/str}}</button></p>{{/suggest}}
+    <div class="form-switch form-check"><input class="form-check-input" type="checkbox" role="switch" id="hkp-touch-on" name="touch" value="1"{{#on}} checked{{/on}}><div><label class="form-check-label" for="hkp-touch-on"><b>{{#str}}sheet_touch_on, local_oksigeniahechauka{{/str}}</b></label><p class="hkp-hint">{{#str}}sheet_touch_help, local_oksigeniahechauka{{/str}}</p></div></div>
+    <div class="hkp-touch-doors" data-touch-doors{{^on}} hidden{{/on}}>
+        <p class="hkp-hint">{{#str}}sheet_touch_doors_help, local_oksigeniahechauka{{/str}}</p>
+        <div class="hkp-touch-hall"><p class="hkp-touch-hall-name">{{#str}}touch_families, local_oksigeniahechauka{{/str}}</p>
+            <ol data-hall="families">{{#doors}}{{^visitors}}{{> local_oksigeniahechauka/sheet_touch_door }}{{/visitors}}{{/doors}}</ol></div>
+        <div class="hkp-touch-hall"><p class="hkp-touch-hall-name">{{#str}}touch_visitors, local_oksigeniahechauka{{/str}}</p>
+            <ol data-hall="visitors">{{#doors}}{{#visitors}}{{> local_oksigeniahechauka/sheet_touch_door }}{{/visitors}}{{/doors}}</ol></div>
+        <span data-touch-inputs>{{#doors}}{{#on}}<input type="hidden" name="doors[]" value="{{key}}">{{/on}}{{/doors}}</span>
+        <p class="hkp-touch-none" data-touch-none hidden>{{#str}}sheet_touch_none, local_oksigeniahechauka{{/str}}</p>
+    </div>
+</section>
+{{/touch}}
+{{#js}}
+(function() {
+    var card = document.getElementById('hkp-touch');
+    if (!card) {
+        return;
+    }
+    // The drawing of each door, as on the screen (a line of 2 on 24 x 24).
+    var ICON = {
+        menu: '<circle cx="12" cy="13" r="6.5"/><circle cx="12" cy="13" r="3.2"/><path d="M3 4v5.5a1.5 1.5 0 0 0 3 0V4M4.5 9.5V20M21 4c-1.8 1.2-2.5 3.5-2.5 6v2H21V20"/>',
+        agenda: '<rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/><rect x="7" y="13" width="3.5" height="3" rx=".6"/>',
+        photos: '<rect x="3" y="5" width="18" height="14" rx="2.5"/><circle cx="9" cy="10" r="1.8"/><path d="M4 18l5-5 3.5 3.5L16 13l4 4"/>',
+        notices: '<path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 2H4.5zM10 20.5a2 2 0 0 0 4 0"/>',
+        library: '<path d="M4 5.5C6.5 4.5 9.5 4.5 12 6c2.5-1.5 5.5-1.5 8-.5V19c-2.5-1-5.5-1-8 .5-2.5-1.5-5.5-1.5-8-.5z"/><path d="M12 6v13.5"/>',
+        networks: '<rect x="4" y="4" width="16" height="16" rx="4.5"/><circle cx="12" cy="12" r="3.6"/><circle cx="16.6" cy="7.4" r=".9"/>',
+        about: '<path d="M3 20.5h18M5 20.5V10l7-5.5 7 5.5v10.5M10 20.5v-5h4v5"/><path d="M12 4.5V2.5l3 1"/>',
+        visit: '<circle cx="9" cy="7.5" r="3.2"/><path d="M3.5 20v-1.5A5.5 5.5 0 0 1 9 13a5.5 5.5 0 0 1 5.5 5.5V20"/><path d="M17 8.5c1.5-.2 2.5-1 3-2.5M16.5 12c1.8 0 3.2-.5 4-1.5"/>',
+        openacts: '<path d="M6 21V5.5A2.5 2.5 0 0 1 8.5 3h7A2.5 2.5 0 0 1 18 5.5V21M3.5 21h17"/><circle cx="14.5" cy="12.5" r="1"/>',
+        centre: '<path d="M12 21s-6.5-6.2-6.5-11a6.5 6.5 0 0 1 13 0c0 4.8-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.4"/>'
+    };
+    card.querySelectorAll('[data-door]').forEach(function(li) {
+        li.querySelector('.hkp-door-icon').innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" ' +
+            'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">' + (ICON[li.getAttribute('data-door')] || '') + '</svg>';
+    });
+    var on = card.querySelector('#hkp-touch-on');
+    var doors = card.querySelector('[data-touch-doors]');
+    var inputs = card.querySelector('[data-touch-inputs]');
+    // What the form sends: the lit doors, in the order they are seen (the families', then the visitors'). A change of
+    // the form brings up the sheet's save bar.
+    var write = function() {
+        inputs.textContent = '';
+        card.querySelectorAll('[data-door].is-on').forEach(function(li) {
+            var input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'doors[]';
+            input.value = li.getAttribute('data-door');
+            inputs.appendChild(input);
+        });
+        card.querySelector('[data-touch-none]').hidden = !!card.querySelector('[data-door].is-on');
+        on.dispatchEvent(new Event('change', {bubbles: true}));
+    };
+    var arrows = function() {
+        card.querySelectorAll('ol[data-hall]').forEach(function(ol) {
+            var items = ol.querySelectorAll('[data-door]');
+            items.forEach(function(li, i) {
+                li.querySelector('[data-door-move="-1"]').disabled = i === 0;
+                li.querySelector('[data-door-move="1"]').disabled = i === items.length - 1;
+            });
+        });
+    };
+    on.addEventListener('change', function() {
+        doors.hidden = !on.checked;
+    });
+    var yes = card.querySelector('[data-touch-yes]');
+    if (yes) {
+        yes.addEventListener('click', function() {
+            on.checked = true;
+            doors.hidden = false;
+            card.querySelector('[data-touch-suggest]').hidden = true;
+            write();
+        });
+    }
+    card.addEventListener('click', function(e) {
+        var toggle = e.target.closest('[data-door-toggle]');
+        var move = e.target.closest('[data-door-move]');
+        if (toggle) {
+            var li = toggle.closest('[data-door]');
+            var lit = !li.classList.contains('is-on');
+            li.classList.toggle('is-on', lit);
+            toggle.setAttribute('aria-pressed', lit ? 'true' : 'false');
+            write();
+        } else if (move) {
+            var item = move.closest('[data-door]');
+            var step = Number(move.getAttribute('data-door-move'));
+            var other = step < 0 ? item.previousElementSibling : item.nextElementSibling;
+            if (!other) {
+                return;
+            }
+            item.parentNode.insertBefore(item, step < 0 ? other : other.nextSibling);
+            arrows();
+            write();
+            // The finger stays on the same arrow of the same door.
+            var again = item.querySelector('[data-door-move="' + step + '"]');
+            (again.disabled ? item.querySelector('[data-door-toggle]') : again).focus();
+        }
+    });
+    arrows();
+})();
+{{/js}}

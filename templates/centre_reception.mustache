@@ -1,0 +1,69 @@
+{{!
+    This file is part of Moodle - https://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_oksigeniahechauka/centre_reception
+
+    «Cómo llegar» and «Conoce el centro» in «Tu centro» (Jujol, 18 November 2026), only when one of the centre's screens
+    is touched: what the doors of the same names show, drawn as the doors show it, and written on it. Each gesture saves
+    by itself through reception.php (panel/recepcion.js): a line when it is left or Enter is pressed, a picture when it
+    is chosen, a moment moved or taken out when its button is touched. The answer is the whole block again.
+
+    Example context (json):
+    {"reception": {"contact": [{"key": "address", "value": "Calle de Ejemplo, 12", "most": 120, "label": "Dirección"},
+        {"key": "phone", "value": "", "most": 40, "label": "Teléfono"}], "map": "", "words": "Un colegio de Infantil y Primaria.",
+        "wordsmost": 280, "stages": [{"id": "c1", "name": "Infantil", "colour": "#1f5f8b", "n": 1, "line": "3 a 5 años", "most": 60}],
+        "day": [{"n": 1, "time": "08:45", "title": "Entramos", "words": "Cada mañana, alguien riega el huerto.", "picture": ""}],
+        "daymost": 8, "dayfull": false, "titlemost": 40, "saysmost": 140, "action": "#"
+    }
+    }
+}}
+{{#reception}}
+<div class="hkp-recepcion" id="hkp-recepcion" data-action="{{action}}" data-w-saving="{{#str}}reception_saving, local_oksigeniahechauka{{/str}}" data-w-saved="{{#str}}reception_saved, local_oksigeniahechauka{{/str}}" data-w-failed="{{#str}}reception_failed, local_oksigeniahechauka{{/str}}" data-w-map-add="{{#str}}reception_map_add, local_oksigeniahechauka{{/str}}" data-w-map-change="{{#str}}reception_map_change, local_oksigeniahechauka{{/str}}" data-w-map-drop="{{#str}}reception_map_drop, local_oksigeniahechauka{{/str}}" data-w-day-photo="{{#str}}reception_day_photo, local_oksigeniahechauka{{/str}}" data-w-day-photo-change="{{#str}}reception_day_photo_change, local_oksigeniahechauka{{/str}}" data-w-day-time="{{#str}}reception_day_time, local_oksigeniahechauka{{/str}}" data-w-day-title="{{#str}}reception_day_title, local_oksigeniahechauka{{/str}}" data-w-day-words="{{#str}}reception_day_words, local_oksigeniahechauka{{/str}}" data-w-day-before="{{#str}}reception_day_before, local_oksigeniahechauka{{/str}}" data-w-day-after="{{#str}}reception_day_after, local_oksigeniahechauka{{/str}}" data-w-day-drop="{{#str}}reception_day_drop, local_oksigeniahechauka{{/str}}" data-w-day-add="{{#str}}reception_day_add, local_oksigeniahechauka{{/str}}">
+<section class="hkp-fs hkp-rc" aria-labelledby="hkp-rc-llegar-h" data-rc-contact>
+    <h2 id="hkp-rc-llegar-h" class="hkp-label hkp-section-label">{{#str}}door_centre, local_oksigeniahechauka{{/str}}</h2>
+    <p class="hkp-hint hkp-section-hint">{{#str}}reception_contact_help, local_oksigeniahechauka{{/str}}</p>
+    <div class="hkp-rc-sala">
+        <div class="hkp-rc-mapa{{#map}} has-picture{{/map}}" data-rc-map>
+            {{#map}}<img src="{{map}}" alt="">{{/map}}
+            <span class="hkp-rc-mapa-vacio" aria-hidden="true">{{#str}}reception_map_none, local_oksigeniahechauka{{/str}}</span>
+            <span class="hkp-rc-mapa-mandos"><label class="btn btn-sm btn-outline-secondary">{{#map}}{{#str}}reception_map_change, local_oksigeniahechauka{{/str}}{{/map}}{{^map}}{{#str}}reception_map_add, local_oksigeniahechauka{{/str}}{{/map}}<input class="visually-hidden sr-only" type="file" accept=".jpg,.jpeg,.png,.webp" data-rc-map-file></label>{{#map}}<button type="button" class="btn btn-sm btn-outline-secondary" data-rc-map-drop>{{#str}}reception_map_drop, local_oksigeniahechauka{{/str}}</button>{{/map}}</span>
+        </div>
+        <ul class="hkp-rc-lineas">
+            {{#contact}}<li class="hkp-rc-linea" data-rc-line="{{key}}"><span class="hkp-rc-ic" data-rc-icon="{{key}}" aria-hidden="true"></span><label class="visually-hidden sr-only" for="hkp-rc-{{key}}">{{label}}</label><input id="hkp-rc-{{key}}" type="text" value="{{value}}" maxlength="{{most}}" placeholder="{{label}}" data-rc-contact-key="{{key}}" autocomplete="off"><span class="hkp-rc-estado" aria-live="polite"></span></li>{{/contact}}
+        </ul>
+    </div>
+</section>
+<section class="hkp-fs hkp-rc" aria-labelledby="hkp-rc-conoce-h" data-rc-about>
+    <h2 id="hkp-rc-conoce-h" class="hkp-label hkp-section-label">{{#str}}door_about, local_oksigeniahechauka{{/str}}</h2>
+    <p class="hkp-hint hkp-section-hint">{{#str}}reception_about_help, local_oksigeniahechauka{{/str}}</p>
+    <div class="hkp-rc-sala hkp-rc-conoce">
+        <label class="visually-hidden sr-only" for="hkp-rc-words">{{#str}}reception_words, local_oksigeniahechauka{{/str}}</label>
+        <textarea id="hkp-rc-words" class="hkp-rc-palabras" rows="3" maxlength="{{wordsmost}}" placeholder="{{#str}}reception_words_placeholder, local_oksigeniahechauka{{/str}}" data-rc-words>{{words}}</textarea>
+        <span class="hkp-rc-estado" data-rc-words-state aria-live="polite"></span>
+        {{#stages.0}}<p class="hkp-rc-sub">{{#str}}reception_stages, local_oksigeniahechauka{{/str}}</p>{{/stages.0}}
+        <ul class="hkp-rc-etapas">
+            {{#stages}}<li class="hkp-rc-etapa" style="--hkp-rc-c: {{colour}}"><b>{{name}}</b><label class="visually-hidden sr-only" for="hkp-rc-st-{{id}}">{{#str}}reception_stage_line, local_oksigeniahechauka, {{name}}{{/str}}</label><input id="hkp-rc-st-{{id}}" type="text" value="{{line}}" maxlength="{{most}}" placeholder="{{#str}}reception_stage_placeholder, local_oksigeniahechauka{{/str}}" data-rc-stage="{{id}}" autocomplete="off"><span class="hkp-rc-estado" aria-live="polite"></span></li>{{/stages}}
+        </ul>
+    </div>
+    <div class="hkp-rc-dia-cab"><h3 class="hkp-label">{{#str}}touch_day_here, local_oksigeniahechauka{{/str}}</h3><p class="hkp-hint">{{#str}}reception_day_help, local_oksigeniahechauka, {{daymost}}{{/str}}</p></div>
+    <ol class="hkp-rc-dia" data-rc-day data-titlemost="{{titlemost}}" data-saysmost="{{saysmost}}" data-full="{{#dayfull}}1{{/dayfull}}">
+        {{#day}}{{> local_oksigeniahechauka/centre_reception_moment }}{{/day}}
+        {{^dayfull}}<li class="hkp-rc-momento is-nuevo"><button type="button" class="hkp-rc-nuevo" data-rc-day-add><span aria-hidden="true">+</span>{{#str}}reception_day_add, local_oksigeniahechauka{{/str}}</button></li>{{/dayfull}}
+    </ol>
+</section>
+</div>
+{{/reception}}

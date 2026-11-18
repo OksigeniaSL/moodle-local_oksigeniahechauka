@@ -1,0 +1,29 @@
+{{!
+    This file is part of Moodle - https://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_oksigeniahechauka/sheet_touch_door
+
+    One door of the card «Se puede tocar» (sheet_touch): drawn as on the screen, lit and ajar when it comes out, closed
+    and in outline when it does not; touched, it changes; its arrows move it along its corridor.
+
+    Example context (json):
+    {"key": "menu", "label": "El comedor", "on": true, "visitors": false}
+}}
+<li class="hkp-door{{#on}} is-on{{/on}}" data-door="{{key}}">
+    <button type="button" class="hkp-door-art" data-door-toggle aria-pressed="{{#on}}true{{/on}}{{^on}}false{{/on}}"><span class="hkp-door-leaf"><span class="hkp-door-icon"></span></span><span class="hkp-door-name">{{label}}</span></button>
+    <span class="hkp-door-move"><button type="button" data-door-move="-1" aria-label="{{#str}}sheet_touch_before, local_oksigeniahechauka, {{label}}{{/str}}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M14.5 5.5L8 12l6.5 6.5"/></svg></button><button type="button" data-door-move="1" aria-label="{{#str}}sheet_touch_after, local_oksigeniahechauka, {{label}}{{/str}}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9.5 5.5L16 12l-6.5 6.5"/></svg></button></span>
+</li>

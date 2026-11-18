@@ -121,5 +121,13 @@
         </section>{{/hassources}}
     </div>
     {{/hasplayed}}
+    {{#touch}}
+    <section class="hkp-fs hkp-rep-touch">
+        <h2 class="hkp-label">{{#str}}report_touch, local_oksigeniahechauka{{/str}}</h2>
+        <p class="hkp-hint">{{#str}}report_touch_help, local_oksigeniahechauka{{/str}}</p>
+        {{#visits}}<p class="hkp-rep-touch-visits"><b>{{count}}</b><span>{{#str}}report_touch_visits, local_oksigeniahechauka{{/str}}<small>{{#str}}report_touch_length, local_oksigeniahechauka, {{length}}{{/str}}</small></span></p>{{/visits}}
+        {{#doors.0}}<ul class="hkp-rep-lines hkp-rep-doors" data-hkp-doors>{{#doors}}<li data-count="{{count}}"><span>{{title}}<small>{{times}}</small></span><b>{{length}}</b><span class="hkp-rep-door-bar" aria-hidden="true"><i></i></span></li>{{/doors}}</ul>{{/doors.0}}
+    </section>
+    {{/touch}}
     {{/hasdata}}
 </div>

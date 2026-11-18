@@ -6318,3 +6318,490 @@ input.hkp-red-cuenta:focus {
         animation: none;
     }
 }
+
+/* ==================== The touch screen in the panel (Jujol, 18 November 2026) ====================
+ * The card «Se puede tocar» of a screen's sheet, with its doors drawn as the screen draws them; «Cómo llegar» and «Conoce el
+ * centro» in «Tu centro», drawn as their doors show them and written on; and the row of the report. No form look: what is
+ * touched is the thing itself. */
+
+/* --- The sheet: the screen's doors, lit or out, in their two corridors --- */
+.hkp-touch-suggest {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem 1rem;
+    align-items: center;
+    justify-content: space-between;
+    margin: 0 0 .9rem;
+    padding: .7rem .9rem;
+    border-radius: var(--hkp-radius-sm);
+    background: var(--hkp-warn-tint);
+    color: var(--hkp-warn-ink);
+    font-weight: 600;
+}
+.hkp-touch-doors {
+    margin-top: .9rem;
+}
+.hkp-touch-hall {
+    margin-top: .8rem;
+}
+.hkp-touch-hall-name {
+    margin: 0 0 .35rem;
+    color: var(--hkp-muted);
+    font-size: .8125rem;
+    font-weight: 700;
+    letter-spacing: .02em;
+    text-transform: uppercase;
+}
+.hkp-touch-hall ol {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .6rem;
+    margin: 0;
+    padding: .8rem .8rem .6rem;
+    border-radius: var(--hkp-radius);
+    background: var(--hkp-sunk);
+    list-style: none;
+}
+.hkp-door {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 6.4rem;
+}
+.hkp-door-art {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    padding: .2rem 0 0;
+    border: 0;
+    border-radius: var(--hkp-radius-sm);
+    background: none;
+    color: var(--hkp-muted);
+    cursor: pointer;
+}
+.hkp-door-art:focus-visible {
+    outline: 3px solid var(--hkp-accent-edge);
+    outline-offset: 2px;
+}
+/* Out: closed, in outline. */
+.hkp-door-leaf {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    width: 4.4rem;
+    height: 6.6rem;
+    padding-top: .75rem;
+    border: 2px dashed var(--hkp-edge);
+    border-bottom-width: 4px;
+    border-radius: 2.2rem 2.2rem .3rem .3rem;
+    background: var(--hkp-card);
+    transition: background-color var(--hkp-ease, .15s ease), transform .2s ease;
+}
+.hkp-door-icon svg {
+    display: block;
+    width: 1.7rem;
+    height: 1.7rem;
+}
+/* Lit: the door of the screen, ajar, with its thread of warm light. */
+.hkp-door.is-on .hkp-door-art {
+    color: var(--hkp-ink);
+}
+.hkp-door.is-on .hkp-door-leaf {
+    border: 0;
+    background: var(--hkp-accent);
+    color: #fff;
+    box-shadow: inset -.45rem 0 .5rem rgba(0, 0, 0, .18), .25rem 0 0 #ffd27a, .25rem 0 .7rem rgba(255, 190, 90, .7);
+}
+.hkp-door-art:active .hkp-door-leaf {
+    transform: scale(.96);
+}
+.hkp-door-name {
+    display: block;
+    margin-top: .4rem;
+    font-size: .8125rem;
+    font-weight: 650;
+    line-height: 1.15;
+    text-align: center;
+}
+.hkp-door-move {
+    display: flex;
+    gap: .3rem;
+    margin-top: .35rem;
+}
+.hkp-door-move button {
+    display: grid;
+    place-items: center;
+    width: 2.2rem;
+    height: 2rem;
+    border: 1px solid var(--hkp-line);
+    border-radius: var(--hkp-radius-sm);
+    background: var(--hkp-card);
+    color: var(--hkp-ink);
+}
+.hkp-door-move button svg {
+    width: 1rem;
+    height: 1rem;
+}
+.hkp-door-move button:disabled {
+    opacity: .3;
+}
+.hkp-touch-none {
+    margin: .6rem 0 0;
+    color: var(--hkp-warn-ink);
+    font-weight: 600;
+}
+
+/* --- «Tu centro»: what the doors «Cómo llegar» and «Conoce el centro» show, written on --- */
+.hkp-rc-sala {
+    padding: 1rem 1.1rem;
+    border: 1px solid var(--hkp-line);
+    border-radius: var(--hkp-radius);
+    background: var(--hkp-card);
+}
+[data-rc-contact] .hkp-rc-sala {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+    gap: 1.1rem;
+    align-items: start;
+}
+/* stylelint-disable-next-line csstree/validator */
+@container hkp (max-width: 46rem) {
+    [data-rc-contact] .hkp-rc-sala {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+.hkp-rc-mapa {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: .6rem;
+    min-height: 11rem;
+    padding: .8rem;
+    overflow: hidden;
+    border: 2px dashed var(--hkp-line);
+    border-radius: var(--hkp-radius-sm);
+    background: var(--hkp-sunk);
+    text-align: center;
+}
+.hkp-rc-mapa.has-picture {
+    border-style: solid;
+    aspect-ratio: 16 / 10;
+    justify-content: flex-end;
+}
+.hkp-rc-mapa img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    background: var(--hkp-card);
+}
+.hkp-rc-mapa-vacio {
+    color: var(--hkp-muted);
+    font-size: .875rem;
+}
+.hkp-rc-mapa.has-picture .hkp-rc-mapa-vacio {
+    display: none;
+}
+.hkp-rc-mapa-mandos {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    gap: .4rem;
+    justify-content: center;
+}
+.hkp-rc-mapa.has-picture .hkp-rc-mapa-mandos .btn {
+    background: var(--hkp-card);
+}
+.hkp-rc-lineas {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+.hkp-rc-linea {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0 .7rem;
+    padding: .15rem 0;
+    border-bottom: 1px solid var(--hkp-line);
+}
+.hkp-rc-linea:last-child {
+    border-bottom: 0;
+}
+.hkp-rc-ic {
+    flex: none;
+    width: 1.4rem;
+    height: 1.4rem;
+    color: var(--hkp-accent);
+}
+.hkp-rc-ic svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+/* A line written on: no box, only a line under it while it is in hand. */
+.hkp-rc input[type="text"],
+.hkp-rc textarea {
+    border: 0;
+    border-bottom: 2px solid transparent;
+    border-radius: 0;
+    background: transparent;
+    color: var(--hkp-ink);
+    font: inherit;
+}
+.hkp-rc input[type="text"]:hover,
+.hkp-rc textarea:hover {
+    border-bottom-color: var(--hkp-line);
+}
+.hkp-rc input[type="text"]:focus,
+.hkp-rc textarea:focus {
+    border-bottom-color: var(--hkp-accent);
+    outline: 0;
+}
+.hkp-rc input::placeholder,
+.hkp-rc textarea::placeholder {
+    color: var(--hkp-muted);
+    font-weight: 500;
+}
+.hkp-rc-linea input {
+    flex: 1 1 12rem;
+    min-width: 0;
+    padding: .55rem .1rem;
+    font-size: 1.0625rem;
+    font-weight: 650;
+}
+.hkp-rc-estado {
+    flex-basis: 100%;
+    min-height: 0;
+    color: var(--hkp-muted);
+    font-size: .8125rem;
+}
+.hkp-rc-estado:empty {
+    display: none;
+}
+.hkp-rc-estado[data-kind="ok"] {
+    color: var(--hkp-ok-ink);
+}
+.hkp-rc-estado[data-kind="error"] {
+    color: var(--hkp-bad-ink);
+    font-weight: 600;
+}
+.hkp-rc-palabras {
+    display: block;
+    width: 100%;
+    padding: .3rem .1rem;
+    font-size: 1.1875rem;
+    font-weight: 650;
+    line-height: 1.35;
+    resize: vertical;
+}
+.hkp-rc-sub {
+    margin: .9rem 0 .45rem;
+    color: var(--hkp-muted);
+    font-size: .875rem;
+    font-weight: 600;
+}
+.hkp-rc-etapas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+.hkp-rc-etapa {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0 .5rem;
+    padding: .25rem .9rem .25rem .7rem;
+    border-left: .4rem solid var(--hkp-rc-c, var(--hkp-accent));
+    border-radius: 999px;
+    background: var(--hkp-sunk);
+}
+.hkp-rc-etapa input {
+    width: 14rem;
+    padding: .35rem .1rem;
+}
+.hkp-rc-dia-cab {
+    margin: 1.2rem 0 .5rem;
+}
+.hkp-rc-dia-cab h3 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 700;
+}
+.hkp-rc-dia {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 14rem), 1fr));
+    gap: .9rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+/* A moment, as the screen shows it: its picture, its hour and title on the band under it, its words. */
+.hkp-rc-momento {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid var(--hkp-line);
+    border-radius: var(--hkp-radius);
+    background: var(--hkp-card);
+}
+.hkp-rc-foto {
+    position: relative;
+    display: grid;
+    place-items: center;
+    aspect-ratio: 4 / 3;
+    margin: 0;
+    background: var(--hkp-sunk);
+    cursor: pointer;
+}
+.hkp-rc-foto img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.hkp-rc-foto-poner {
+    position: relative;
+    padding: .35rem .8rem;
+    border: 1px solid var(--hkp-line);
+    border-radius: 999px;
+    background: var(--hkp-card);
+    color: var(--hkp-ink);
+    font-size: .875rem;
+    font-weight: 600;
+}
+.hkp-rc-momento.has-picture .hkp-rc-foto-poner {
+    position: absolute;
+    top: .5rem;
+    right: .5rem;
+    font-size: .8125rem;
+    opacity: .9;
+}
+.hkp-rc-foto:focus-within {
+    outline: 3px solid var(--hkp-accent-edge);
+    outline-offset: -3px;
+}
+.hkp-rc-momento-pie {
+    display: flex;
+    align-items: baseline;
+    gap: .4rem;
+    padding: .35rem .7rem;
+    background: #1d2125;
+}
+.hkp-rc .hkp-rc-momento-pie input[type="text"] {
+    color: #fff;
+    font-weight: 700;
+}
+.hkp-rc .hkp-rc-momento-pie input::placeholder {
+    color: rgba(255, 255, 255, .6);
+}
+.hkp-rc .hkp-rc-momento-pie input[type="text"]:focus {
+    border-bottom-color: #ffd27a;
+}
+.hkp-rc-hora {
+    flex: none;
+    width: 3.6rem;
+    padding: .3rem 0;
+    font-variant-numeric: tabular-nums;
+}
+.hkp-rc-titulo {
+    flex: 1;
+    min-width: 0;
+    padding: .3rem 0;
+    font-size: 1.0625rem;
+}
+.hkp-rc-frase {
+    display: block;
+    width: 100%;
+    margin: 0;
+    padding: .55rem .7rem;
+    font-size: .9375rem;
+    line-height: 1.35;
+    resize: none;
+}
+.hkp-rc-momento-mandos {
+    display: flex;
+    gap: .35rem;
+    margin-top: auto;
+    padding: 0 .7rem .7rem;
+}
+.hkp-rc-momento-mandos [data-rc-day-move] {
+    display: grid;
+    place-items: center;
+    width: 2.2rem;
+    padding: .25rem 0;
+}
+.hkp-rc-momento-mandos svg {
+    display: block;
+    width: 1rem;
+    height: 1rem;
+}
+.hkp-rc-momento-mandos [data-rc-day-drop] {
+    margin-left: auto;
+}
+.hkp-rc-momento .hkp-rc-estado {
+    padding: 0 .7rem .6rem;
+}
+.hkp-rc-momento.is-nuevo {
+    border-style: dashed;
+    background: var(--hkp-sunk);
+}
+.hkp-rc-nuevo {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: .3rem;
+    min-height: 12rem;
+    border: 0;
+    background: none;
+    color: var(--hkp-link);
+    font-weight: 650;
+}
+.hkp-rc-nuevo span {
+    font-size: 2.4rem;
+    line-height: 1;
+}
+
+/* --- The report: how many times somebody began to touch it, and the doors they opened --- */
+.hkp-rep-touch-visits {
+    display: flex;
+    gap: .8rem;
+    align-items: baseline;
+    margin: 0 0 .6rem;
+}
+.hkp-rep-touch-visits b {
+    font-size: 2.4rem;
+    line-height: 1;
+}
+.hkp-rep-touch-visits small {
+    display: block;
+    color: var(--hkp-muted);
+    font-size: .875rem;
+}
+.hkp-rep-doors li {
+    flex-wrap: wrap;
+}
+.hkp-rep-door-bar {
+    flex-basis: 100%;
+    height: .5rem;
+    border-radius: 999px;
+    background: var(--hkp-sunk);
+}
+.hkp-rep-door-bar i {
+    display: block;
+    width: 0;
+    height: 100%;
+    border-radius: 999px;
+    background: var(--hkp-accent);
+}
