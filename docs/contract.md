@@ -293,6 +293,8 @@ All fields are optional; an item without `when` is always on.
   "manifest": "9f2c…", "stale": false,
   "showing": [{"zone": "main", "item": "i12"}, {"zone": "side", "item": "i30"}],
   "display": {"width": 1920, "height": 1080},
+  "touch": {"points": 10, "pointer": true, "ratio": 1, "events": {"pointerdown": 3, "touchstart": 3, "mousedown": 0},
+            "last": {"type": "pointerdown", "kind": "touch", "x": 0.12, "y": 0.9}},
   "cache": {"files": 14, "bytes": 182334112},
   "errors": ["media 45: 404"]
 }
@@ -303,6 +305,10 @@ All fields are optional; an item without `when` is always on.
   minute or more off; `0` when it is right. `time` stays the device's own, so the server can tell a wrong clock that the
   screen puts right (`time + skew` is near the server's time) from a screen that shows the wrong time.
 - `errors`: the last few, short.
+- `touch`: what the device says about touch (`points`, its `navigator.maxTouchPoints`; `pointer`, whether it has
+  Pointer Events; `ratio`, its `devicePixelRatio`) and, once anything has been touched since the page opened, how many
+  events of each kind reached it and where the last one fell, as a share of the page from its top left corner. It only
+  listens: a screen that turns its picture but not its touch shows it here.
 - `played`, every ten heartbeats and only if there is anything: what came out large since the last one, `{"i12": [times, seconds]}`. The server adds it up for the monthly report and tells nothing back.
 
 Answer:

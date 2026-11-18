@@ -23,6 +23,7 @@ import {Screen} from './render.js';
 import {store} from './store.js';
 import {filesOf, isRaining, Surprises} from './surprises.js';
 import {countToday} from './today.js';
+import {Touches} from './touch.js';
 import {weekOf} from './week.js';
 
 const VERSION = '0.9.1';
@@ -58,6 +59,11 @@ class Player {
         this.strings = boot.strings || {};
         this.root = document.getElementById('hechauka') || document.body;
         this.played = new Played();
+        // Only listens: tells the server whether a touch screen's touches reach the page.
+        this.touches = new Touches(window);
+        if (this.mode === 'screen') {
+            this.touches.listen();
+        }
         this.heardAt = 0;
         this.turnDue = 0;
         this.errors = [];
@@ -849,6 +855,7 @@ class Player {
             on: m ? isPowerOn(m.power, wall) : true,
             showing: this.screen ? this.screen.showing() : [],
             display: {width: window.innerWidth, height: window.innerHeight},
+            touch: this.touches.report(),
             stalled: this.stalled(),
             device: this.device,
             cache: this.media ? this.media.usage() : {files: 0, bytes: 0},

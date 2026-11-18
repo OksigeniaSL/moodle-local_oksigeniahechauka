@@ -412,6 +412,29 @@ class screens {
         if (is_array($display)) {
             $keep['display'] = ['width' => $int($display['width'] ?? null), 'height' => $int($display['height'] ?? null)];
         }
+        // What the device says about touch and the touches that reached the page (player/src/touch.js).
+        $touch = $beat['touch'] ?? null;
+        if (is_array($touch)) {
+            $keep['touch'] = [
+                'points' => $int($touch['points'] ?? null),
+                'pointer' => !empty($touch['pointer']),
+                'ratio' => is_numeric($touch['ratio'] ?? null) ? round((float) $touch['ratio'], 2) : null,
+            ];
+            if (is_array($touch['events'] ?? null)) {
+                foreach (['pointerdown', 'touchstart', 'mousedown'] as $type) {
+                    $keep['touch']['events'][$type] = (int) $int($touch['events'][$type] ?? 0);
+                }
+            }
+            $last = $touch['last'] ?? null;
+            if (is_array($last)) {
+                $share = function ($v): float {
+                    return is_numeric($v) ? round(max(0, min(1, (float) $v)), 2) : 0.0;
+                };
+                $keep['touch']['last'] = ['type' => (string) $text($last['type'] ?? '', 12),
+                    'kind' => (string) $text($last['kind'] ?? '', 8), 'x' => $share($last['x'] ?? null),
+                    'y' => $share($last['y'] ?? null)];
+            }
+        }
         $cache = $beat['cache'] ?? null;
         if (is_array($cache)) {
             $keep['cache'] = ['files' => $int($cache['files'] ?? null), 'bytes' => $int($cache['bytes'] ?? null)];

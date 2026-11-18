@@ -126,5 +126,21 @@ final class alerts_test extends \advanced_testcase {
         $this->assertSame('standby', $kept['device']['tv']);
         $this->assertArrayNotHasKey('nonsense', $kept['device']);
         $this->assertArrayNotHasKey('frozen', $kept['device']);
+        $this->assertArrayNotHasKey('touch', $kept);
+    }
+
+    /**
+     * What a touch screen says about its touches is kept, inside the page and short; nothing more.
+     */
+    public function test_the_touches(): void {
+        $kept = \local_oksigeniahechauka\local\screens::clean_beat(['touch' => ['points' => 10, 'pointer' => true,
+            'ratio' => 2.004, 'events' => ['pointerdown' => 3, 'touchstart' => '2', 'other' => 9],
+            'last' => ['type' => 'pointerdown', 'kind' => 'touch', 'x' => 1.7, 'y' => 0.256, 'extra' => 'x']]]);
+        $this->assertSame(['points' => 10, 'pointer' => true, 'ratio' => 2.0,
+            'events' => ['pointerdown' => 3, 'touchstart' => 2, 'mousedown' => 0],
+            'last' => ['type' => 'pointerdown', 'kind' => 'touch', 'x' => 1.0, 'y' => 0.26]], $kept['touch']);
+        $quiet = \local_oksigeniahechauka\local\screens::clean_beat(['touch' => ['points' => 0, 'pointer' => false,
+            'ratio' => 1]]);
+        $this->assertSame(['points' => 0, 'pointer' => false, 'ratio' => 1.0], $quiet['touch']);
     }
 }
