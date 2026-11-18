@@ -38,7 +38,8 @@ function local_oksigeniahechauka_pluginfile($course, $cm, $context, $filearea, $
     if ($context->contextlevel != CONTEXT_SYSTEM) {
         return false;
     }
-    if (!in_array($filearea, ['media', 'video', 'poster', 'backdrop', 'logo', 'logodark', 'shot', 'birthday'])) {
+    $areas = ['media', 'video', 'poster', 'backdrop', 'logo', 'logodark', 'shot', 'birthday', 'contactmap', 'day'];
+    if (!in_array($filearea, $areas)) {
         return false;
     }
     require_login();

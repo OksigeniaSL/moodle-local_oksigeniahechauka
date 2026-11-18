@@ -236,6 +236,14 @@ if ($hassiteconfig) {
                 1
             ));
         }
+        if (\local_oksigeniahechauka\local\touch::has_visits()) {
+            $settings->add(new admin_setting_configcheckbox(
+                "$p/sourcevisits",
+                get_string('sourcevisits', $p),
+                get_string('sourcevisits_desc', $p),
+                1
+            ));
+        }
         $settings->add(new admin_setting_configcheckbox(
             "$p/sourcephotoday",
             get_string('sourcephotoday', $p),

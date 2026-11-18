@@ -199,6 +199,7 @@ class sheet {
             'canteen' => sources::has_meals() ? ['on' => !empty($screen->canteen)] : false,
             'place' => screenplace::sheet_context($screen, $letters, $names, time()),
             'surprises' => surprises::sheet_context($screen),
+            'touch' => touch::sheet_context($screen),
             'themes' => array_map(function ($t) use ($theme, $c) {
                 return ['value' => $t, 'label' => get_string('sheet_theme_' . $t, $c), 'checked' => $t === $theme];
             }, self::THEMES),
@@ -354,7 +355,7 @@ class sheet {
         } else {
             $plan = [];
         }
-        $DB->update_record('local_oksigeniahechauka_screen', (object) [
+        $DB->update_record('local_oksigeniahechauka_screen', (object) ([
             'id' => $screen->id,
             'name' => $name,
             'power' => $power,
@@ -369,7 +370,11 @@ class sheet {
             'useplan' => $plan ? json_encode(array_values($plan)) : null,
             'place' => $place,
             'timemodified' => time(),
-        ]);
+        ] + (optional_param('touchsent', 0, PARAM_BOOL) ? [
+            // Only when the sheet brings its doors: one without them keeps what the screen had.
+            'touch' => optional_param('touch', 0, PARAM_BOOL) ? 1 : 0,
+            'doors' => touch::doors_param(optional_param_array('doors', [], PARAM_ALPHA)),
+        ] : [])));
         screens::set_groups((int) $screen->id, array_map('intval', optional_param_array('groups', [], PARAM_INT)));
         return [];
     }

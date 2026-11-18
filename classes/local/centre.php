@@ -169,6 +169,8 @@ class centre {
                 'uprightscreens' => self::upright_far(), 'left' => get_string('centre_phrase_left', $c, '{$a}'),
                 'leftone' => get_string('centre_phrase_left_one', $c)],
             'surprises' => surprises::centre_context($config),
+            // The blocks «How to get here» and «Get to know the centre», only when one of its screens is touched.
+            'reception' => $DB->record_exists('local_oksigeniahechauka_screen', ['touch' => 1]) ? touch::panel() : false,
             'networks' => ['boxes' => networks::boxes(),
                 'save' => (new \moodle_url('/local/oksigeniahechauka/networks.php'))->out(false),
                 'words' => self::network_words()],

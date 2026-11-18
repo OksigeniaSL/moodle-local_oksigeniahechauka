@@ -26,6 +26,8 @@
         <FIELD NAME="glass" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Whether it is behind glass"/>
         <FIELD NAME="surprises" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="Whether surprises come out on it, when the centre has them on"/>
         <FIELD NAME="canteen" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Whether it is by the canteen: while it serves, every menu of the day comes every other slide"/>
+        <FIELD NAME="touch" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Whether people touch it: close up, its doors open"/>
+        <FIELD NAME="doors" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Its doors in their order, comma separated; empty for every one"/>
         <FIELD NAME="sortorder" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>

@@ -359,5 +359,20 @@ function xmldb_local_oksigeniahechauka_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026111700, 'local', 'oksigeniahechauka');
     }
 
+    if ($oldversion < 2026111801) {
+        // The screen people touch, at the door of a centre: whether a screen is one, and its doors.
+        $table = new xmldb_table('local_oksigeniahechauka_screen');
+        $fields = [
+            new xmldb_field('touch', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'canteen'),
+            new xmldb_field('doors', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'touch'),
+        ];
+        foreach ($fields as $field) {
+            if (!$dbman->field_exists($table, $field)) {
+                $dbman->add_field($table, $field);
+            }
+        }
+        upgrade_plugin_savepoint(true, 2026111801, 'local', 'oksigeniahechauka');
+    }
+
     return true;
 }

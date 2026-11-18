@@ -202,10 +202,12 @@ changed, or the manifest with its `ETag` header:
   - `{"type": "moments", "label": "…", "moments": [{"kind": "anniversary|loans|book|record|quest|challenge|first", "text": "…", "cover": {media}, "library": "…"}]}`: what the library celebrates this week, as its readers hear it and never with a name of a person, the most worth telling first, four at most. `text` is a whole sentence in the screen's language; `cover` only when the moment is about a book that has one; `library` as in `books`.
   - `{"type": "instagram", "network": "instagram", "title": "…", "name": "@…", "web": "https://…", "posts": [{"id": "…", "media_type": "IMAGE|VIDEO|CAROUSEL_ALBUM", "caption": "…", "timestamp": "2026-11-12T11:00:00+0000", "media": [{media}]}]}`: the centre's last Instagram posts, the newest first, twelve at most. `media` are the pictures the screen shows: a picture's own, a video's cover, a carousel's first five. `caption` is the post's text as written (the screen leaves out what it cannot draw). `web` is the account, for the QR to follow it. The screen shows only the pictures it already has.
   - `{"type": "openacts", "label": "…", "acts": [{"id": 7, "kind": "openday|other", "name": "…", "place": "…", "timestart": 0, "timeend": 0, "today": true, "turns": [{"timestart": 0, "timeend": 0, "full": true}], "web": "https://…", "capacity": 120, "signed": 87, "came": 23, "guide": {"img": {media}, "hello": "…"}, "centre": "…"}]}`: the open days, talks and festivals of the centre's admissions with sign-up open, the one under way and those of the next 30 days, the nearest first, six at most. `web` is where to sign up (the screen draws its QR). `today` when it starts today or is under way. `turns` may be empty; a `full` turn has no places left. `capacity` 0 is no limit. `came`, only for today's, is how many families have come: a number, never who. `guide` is the centre's mascot greeting, with its words in the centre's language; it may be missing. `place` may be missing, and `centre` comes only when the acts are of more than one centre.
+  - `{"type": "visit", "visits": [{"id": 3, "kind": "visit|openday", "name": "…", "place": "…", "timestart": 0, "timeend": 0, "minutes": 45, "turns": [{"timestart": 0, "timeend": 0, "minutes": 20}], "hosts": [{"first": "…", "name": "…", "role": "…", "says": "…", "img": {media}}], "where": "…", "plan": {media}}]}`: only on a screen people touch, today's visits of the centre's admissions that have not ended, the first first: those made for one family and the open days with their turns. `hosts` is who receives them, with their role as families see it and a sentence of theirs; `img` may be missing. `where` is how far the guide goes with them, as the centre wrote it (may be empty); `plan`, the drawn plan of the centre with its way, may be missing. Never anything of the family that comes. The screen decides when to welcome them (an hour before, by `timestart`).
   - `{"type": "deadlines", "label": "…", "words": {"due": "…", "quiz": "…"}, "days": [{"date": "YYYY-MM-DD", "items": [{"course": "…", "activity": "…", "kind": "due|quiz", "time": "HH:MM", "color": 2}]}]}`: `color` is the centre's category of the course, when it has one.
   - `{"type": "table", "title": "…", "head": ["…"], "rows": [["…"]]}`: a table of the centre, up to 6 columns and 100 rows, each cell as plain text.
   - `{"type": "channel", "network": "instagram|tiktok|youtube|facebook|x|linkedin|threads|bluesky|telegram|whatsapp|web|other", "title": "…", "text": "…", "name": "…", "web": "https://…", "members": 120}`: «Follow us», with the QR of `web`. One for each of the centre's networks switched on, and one for the channel of Oksigenia Marandu; the screen shows one each turn, in their order. `name` is the account as its network writes it («@…»), or the web's host; it may be empty. `text` and `members` may be missing. `other` is a channel the server does not recognise.
 - In a `menu` item, `menus[].courses[].allergens` is a list per dish, aligned with `dishes`, of codes of Regulation (EU) 1169/2011, and `allergennames` gives their names. An empty list says nothing about the dish: never that it has none.
+- In a `menu` item, `menus[].courses[].icons`, when the canteen has a dictionary of drawings (Oksigenia Meals): one per dish, aligned with `dishes`, the name of its drawing, or `''`. A screen draws only the names it has.
 - An `event` may have `icon`: a name of `player/actividad-iconos.js`, or `none`. Without it, the player chooses by the words of its title.
 - `sample`: true when the manifest carries example data; the screen says so in a corner.
 - `theme.skin`: the skin of the screen (`player/pieles.css`, `pieles.json`), which sets its colours and its letter; `theme.vars` goes
@@ -220,6 +222,19 @@ changed, or the manifest with its `ETag` header:
   centre's own sentence (its motto), said whole in the ticker every few sentences with the centre's logo, and as a headline
   from 8 m; never cut, so a screen where it does not fit does not say it in the ticker. `screen.name` is for the panel, and the screen
   does not show it.
+- `screen.touch`, only on a screen people touch, at the door of a centre: `{"doors": ["menu", "agenda", "photos",
+  "notices", "library", "networks", "about", "visit", "openacts", "centre"], "idle": 60, "links": {"menu": "https://…"}}`.
+  From afar it shows what every screen shows, with an invitation to touch; close up, its doors, in this order. A door with
+  nothing to show does not come out even if it is in the list. `idle` is how many seconds without a touch it waits to go
+  back. `links`, optional and per door: the page to take the door to a phone, for its QR; a door without one has none,
+  unless the contract gives its address another way (an open act's `web`, a channel's, `centre.contact`).
+- `centre.contact`, on a screen people touch, «How to get here»: `{"address": "…", "hours": "…", "phone": "…", "email":
+  "…", "web": "https://…", "map": {media}, "geo": "https://…"}`. Every field may be missing. `map` is a picture the centre
+  put (a map or a plan); `geo` is where the centre is on OpenStreetMap, for the QR.
+- `centre.about`, on a screen people touch, «Get to know the centre», when the centre has told something of itself:
+  `{"words": "…", "stages": [{"name": "…", "line": "…", "color": 1}], "day": [{"time": "08:45", "title": "…", "words":
+  "…", "media": {media}}]}`. `stages` are the centre's categories, `color` their position, `line` what the centre wrote of
+  each (may be empty). `day` is «A day here», one to eight moments, each with its picture; `time` may be empty.
 - `power`: when the screen should be on. Outside these hours the player shows black and a device agent may turn the
   display off. Without `power`, always on.
 
@@ -309,7 +324,7 @@ All fields are optional; an item without `when` is always on.
   Pointer Events; `ratio`, its `devicePixelRatio`) and, once anything has been touched since the page opened, how many
   events of each kind reached it and where the last one fell, as a share of the page from its top left corner. It only
   listens: a screen that turns its picture but not its touch shows it here.
-- `played`, every ten heartbeats and only if there is anything: what came out large since the last one, `{"i12": [times, seconds]}`. The server adds it up for the monthly report and tells nothing back.
+- `played`, every ten heartbeats and only if there is anything: what came out large since the last one, `{"i12": [times, seconds]}`. The server adds it up for the monthly report and tells nothing back. A screen people touch adds `door-<door>` (`door-menu`…), each door opened and the seconds it stayed open, and `touch`, each time someone began to touch and how long until it went back.
 
 Answer:
 

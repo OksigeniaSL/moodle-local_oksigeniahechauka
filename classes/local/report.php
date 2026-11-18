@@ -153,6 +153,13 @@ class report {
         if (preg_match('/^event-\d+$/', $id)) {
             return 'calendar';
         }
+        // The door screen: each door opened (door-menu…) and each time someone began to touch (touch).
+        if (preg_match('/^door-([a-z]+)$/', $id, $m) && in_array($m[1], touch::DOORS)) {
+            return $id;
+        }
+        if ($id === 'touch') {
+            return 'touch';
+        }
         $from = explode('-', $id)[0];
         return in_array($from, self::SOURCES) ? $from : null;
     }

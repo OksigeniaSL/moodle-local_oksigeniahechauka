@@ -148,6 +148,13 @@ class files {
         if ($file->get_component() === self::COMPONENT && $file->get_filearea() === self::GUIDE) {
             return !$file->is_directory() && (int) $file->get_itemid() === 0;
         }
+        // The door screen's: who receives a visit and its plan, the centre's map, the pictures of «A day here».
+        if ($file->get_component() === self::COMPONENT && in_array($file->get_filearea(), [touch::VISIT, touch::MAP])) {
+            return !$file->is_directory() && (int) $file->get_itemid() === 0;
+        }
+        if ($file->get_component() === self::COMPONENT && $file->get_filearea() === touch::DAY) {
+            return !$file->is_directory() && (int) $file->get_itemid() >= 1 && (int) $file->get_itemid() <= touch::DAY_MOST;
+        }
         if ($file->get_component() === sources::BOOKS && $file->get_filearea() === 'cover') {
             return !$file->is_directory() && sources::has_books();
         }

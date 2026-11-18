@@ -121,10 +121,10 @@ class reportpage {
     }
 
     /**
-     * What came out, panel items and sources apart.
+     * What came out, panel items and sources apart; and, on a screen people touch, the doors they opened.
      *
      * @param array $played key => [times, seconds], most first
-     * @return array [own, sources]
+     * @return array [own, sources, touch: [visits: a line or null, doors: lines]]
      */
     protected static function played(array $played): array {
         global $DB;
@@ -138,9 +138,19 @@ class reportpage {
         $records = $ids ? $DB->get_records_list('local_oksigeniahechauka_item', 'id', $ids, '', 'id, type, title') : [];
         $own = [];
         $sources = [];
+        $touch = ['visits' => null, 'doors' => []];
         foreach ($played as $key => $pair) {
             $line = ['times' => $pair[0] === 1 ? get_string('report_times_one', $c) : get_string('report_times_many', $c, $pair[0]),
                 'length' => self::duration((int) $pair[1])];
+            if ($key === 'touch') {
+                $touch['visits'] = $line + ['count' => (int) $pair[0]];
+                continue;
+            }
+            if (strpos($key, 'door-') === 0) {
+                $touch['doors'][] = $line + ['door' => substr($key, 5), 'count' => (int) $pair[0],
+                    'title' => get_string('door_' . substr($key, 5), $c)];
+                continue;
+            }
             if ($key[0] !== 'i') {
                 $sources[] = $line + ['title' => get_string('report_source_' . $key, $c)];
                 continue;
@@ -154,7 +164,7 @@ class reportpage {
             }
             $own[] = $line + ['title' => $title];
         }
-        return [array_slice($own, 0, self::MOST_LINES), array_slice($sources, 0, self::MOST_LINES)];
+        return [array_slice($own, 0, self::MOST_LINES), array_slice($sources, 0, self::MOST_LINES), $touch];
     }
 
     /**
@@ -215,7 +225,7 @@ class reportpage {
         });
         $allcuts = count($cuts);
         $cuts = array_slice($cuts, 0, self::MOST_CUTS);
-        [$own, $sources] = self::played($data['played']);
+        [$own, $sources, $touch] = self::played($data['played']);
         [$summary, $summarymore] = $data['hasdata'] ? self::summary($data, $decsep) : ['', ''];
         $first = self::first_month();
         $start = new \DateTimeImmutable($month . '-01', \core_date::get_server_timezone_object());
@@ -249,6 +259,8 @@ class reportpage {
             'sources' => $sources,
             'hassources' => (bool) $sources,
             'hasplayed' => $own || $sources,
+            // The door screen: how many times people began to touch, and each door they opened, most first.
+            'touch' => $touch['visits'] || $touch['doors'] ? $touch : false,
         ];
     }
 

@@ -178,6 +178,14 @@ class sources {
         $menus = [];
         $names = [];
         $allergens = (bool) get_config('local_oksigeniahechauka', 'menuallergens');
+        // The drawing of each dish, with the dictionary of Meals itself (its pix/food), for the canteen's door.
+        $drawing = method_exists('\local_oksigeniameals\local\food', 'of') ? function (string $dish): string {
+            try {
+                return (string) \local_oksigeniameals\local\food::of($dish);
+            } catch (\Throwable $e) {
+                return '';
+            }
+        } : null;
         foreach ($data['meals'] ?? [] as $meal) {
             foreach ($meal['menus'] ?? [] as $menu) {
                 if (isset($menu['chosen']) && !$menu['chosen']) {
@@ -191,6 +199,10 @@ class sources {
                         $courses[$part] = ['label' => $part, 'dishes' => []];
                     }
                     $courses[$part]['dishes'][] = (string) ($dish['name'] ?? '');
+                    if ($drawing) {
+                        // One per dish, in its order; '' when the dish has none.
+                        $courses[$part]['icons'][] = $drawing((string) ($dish['name'] ?? ''));
+                    }
                     if ($allergens) {
                         // One list per dish, in its order. An empty one says nothing about the dish, never that it has none.
                         $codes = [];

@@ -100,6 +100,19 @@ class manifest {
         if ($phrase !== '') {
             $m['centre']['phrase'] = $phrase;
         }
+        // A screen people touch: its doors, and what the centre tells of itself behind two of them.
+        $touch = touch::contract($screen);
+        if ($touch) {
+            $m['screen']['touch'] = $touch;
+            $contact = touch::contact($config, $site && sites::has_place($site, $config) ? sites::suffix($site) : '');
+            if ($contact) {
+                $m['centre']['contact'] = $contact;
+            }
+            $about = touch::about($config);
+            if ($about) {
+                $m['centre']['about'] = $about;
+            }
+        }
         $power = schedule::power($screen->power);
         if ($power) {
             $m['power'] = $power;
@@ -121,6 +134,10 @@ class manifest {
         $m['categories'] = categories::contract();
         $scope = screens::scope((int) $screen->id);
         $m['items'] = self::unique(array_merge(self::own_items($screen, $now), self::source_items($config, $now, $scope)));
+        // Today's visits, only for a screen people touch: the welcome is at the door, where visitors wait.
+        if ($touch && !empty($config->sourcevisits ?? 1)) {
+            $m['items'] = array_merge($m['items'], touch::visits($now));
+        }
         // A centre that has put nothing yet: the screen says where to start, and stops saying it with the first thing.
         if (!$DB->record_exists('local_oksigeniahechauka_item', [])) {
             $m['idle'] = ['qr' => (new \moodle_url('/local/oksigeniahechauka/edit.php', ['type' => 'notice']))->out(false)];

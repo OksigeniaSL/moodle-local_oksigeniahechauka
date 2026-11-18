@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.29.0
+
+- **The screen people touch**, at the door of a centre, where families come in a hurry and visitors wait for whoever
+  receives them. From afar it shows what every screen shows, with an invitation to touch; close up, its doors: the
+  canteen, what's on, photos, notices, the library, our networks, «Get to know the centre», today's visit, open days and
+  «How to get here». On the screen's sheet, «People touch it» and its doors; it goes back by itself after a minute.
+- **Today's visit**, from Oksigenia Eguahe: an hour before, who receives the visitors, with their face and their role, and
+  on a touch how long it lasts and where it goes, with the drawn plan of the centre. Nothing of the family that comes.
+- **«How to get here» and «Get to know the centre»** in «Your centre»: the address, the opening hours, the phone, the
+  email, the web and a map; the centre's words, a line for each of its categories and «A day here», up to eight moments
+  with their picture. Each gesture is kept on its own.
+- **The drawing of each dish** goes with the menus, from the dictionary of Oksigenia Meals.
+- **The heartbeat tells what the device says about touch** and the touches that reach the page, and the monthly report
+  counts each door opened and each time someone began to touch.
+
 ## 0.28.0
 
 - **On our Instagram**: the centre's last posts on its screens, one a turn, with their pictures (a video's cover, a
