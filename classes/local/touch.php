@@ -37,6 +37,12 @@ class touch {
     /** @var string[] The doors for those who visit; the others are the families'. */
     const VISITORS = ['about', 'visit', 'openacts', 'centre'];
 
+    /** @var string[] The colour of the skin each door wears on the screen (the same as player/src/tactil.js, DOORS). */
+    const COLOURS = [
+        'menu' => 'menu', 'agenda' => 'evento', 'photos' => 'marca-1', 'notices' => 'marca-4', 'library' => 'marca-2',
+        'networks' => 'marca-3', 'about' => 'marca-1', 'visit' => 'marca-4', 'openacts' => 'evento', 'centre' => 'marca-2',
+    ];
+
     /** @var int Seconds without a touch before the screen goes back to what it shows from afar. */
     const IDLE = 60;
 
@@ -367,10 +373,15 @@ class touch {
         $info = json_decode((string) ($screen->lastinfo ?? ''), true) ?: [];
         $on = self::doors($screen->doors ?? null);
         $order = array_merge($on, array_diff(self::DOORS, $on));
+        // Each door in the colour it wears on the screen (the centre's skin: player/src/tactil.js, DOORS), so that whoever
+        // sets them recognises it.
+        $config = get_config(self::C);
+        $skin = skins::get(skins::chosen($config) ?: skins::first());
+        $tones = $skin['light'] ?? [];
         $doors = [];
         foreach ($order as $door) {
             $doors[] = ['key' => $door, 'label' => get_string('door_' . $door, self::C), 'on' => in_array($door, $on),
-                'visitors' => in_array($door, self::VISITORS)];
+                'visitors' => in_array($door, self::VISITORS), 'colour' => (string) ($tones[self::COLOURS[$door]] ?? '')];
         }
         return [
             'on' => !empty($screen->touch),

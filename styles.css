@@ -6408,9 +6408,10 @@ input.hkp-red-cuenta:focus {
 .hkp-door.is-on .hkp-door-art {
     color: var(--hkp-ink);
 }
+/* Lit: in the colour it wears on the screen, so that it is recognised; the theme's blue stays for the controls. */
 .hkp-door.is-on .hkp-door-leaf {
     border: 0;
-    background: var(--hkp-accent);
+    background: var(--hkp-door, var(--hkp-accent));
     color: #fff;
     box-shadow: inset -.45rem 0 .5rem rgba(0, 0, 0, .18), .25rem 0 0 #ffd27a, .25rem 0 .7rem rgba(255, 190, 90, .7);
 }

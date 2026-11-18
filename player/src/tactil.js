@@ -383,6 +383,34 @@ export function doorOfSlide(choice, shown) {
 }
 
 /**
+ * What comes next in the agenda: today, the first that has not started yet (one that has, or one of all day, is not «next»);
+ * after today, the first of the next day with something. If nothing is left, the first there is. Pure.
+ *
+ * @param {object[]} days the agenda's days (src/agenda.js: {date, today, events: [{time, title, group}]})
+ * @param {number} now ms
+ * @returns {{day: object, ev: object}|null}
+ */
+export function nextOf(days, now) {
+    const d = new Date(now);
+    const hm = two(d.getHours()) + ':' + two(d.getMinutes());
+    for (let i = 0; i < days.length; i++) {
+        const day = days[i];
+        const events = day.today ? day.events.filter(function (ev) {
+            return ev.time && ev.time >= hm;
+        }) : day.events;
+        if (events.length) {
+            return {day: day, ev: events[0]};
+        }
+    }
+    for (let i = 0; i < days.length; i++) {
+        if (days[i].events.length) {
+            return {day: days[i], ev: days[i].events[0]};
+        }
+    }
+    return null;
+}
+
+/**
  * The clock of the touches: near since the first, warning in the last WARN_S seconds, back when idle has gone by. Pure.
  */
 export class IdleClock {
@@ -747,13 +775,7 @@ export class Tactil {
     }
 
     nextEvent(d) {
-        const days = (d.agenda && d.agenda.days) || [];
-        for (let i = 0; i < days.length; i++) {
-            if (days[i].events.length) {
-                return {day: days[i], ev: days[i].events[0]};
-            }
-        }
-        return null;
+        return nextOf((d.agenda && d.agenda.days) || [], d.now);
     }
 
     goNear() {
@@ -990,7 +1012,11 @@ export class Tactil {
             clear(card);
             card.appendChild(el('h2', '', day.label ? day.label + ', ' + String(day.weekday).toLowerCase() + ' ' + day.day :
                 capital(day.weekday) + ' ' + day.day));
-            day.events.forEach(function (ev) {
+            // What is already large above is not read twice: the day's list goes on from the next.
+            const others = day.events.filter(function (ev) {
+                return ev !== next.ev;
+            });
+            (others.length ? others : day.events).forEach(function (ev) {
                 const r = el('div', 'hk-tc-acto');
                 r.appendChild(el('b', '', ev.time || self.word('touch_all_day')));
                 const w = el('span', '', ev.title);

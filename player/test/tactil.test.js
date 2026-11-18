@@ -4,7 +4,7 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {
-    DOORS, IdleClock, contactHas, aboutHas, doorOfSlide, doorsShown, frontDoors, hourOf, linkOf, menuWeek, say,
+    DOORS, IdleClock, contactHas, aboutHas, doorOfSlide, doorsShown, frontDoors, hourOf, linkOf, menuWeek, nextOf, say,
     visitToWelcome, visitsLeft,
 } from '../src/tactil.js';
 import {FOOD} from '../src/comida.js';
@@ -152,4 +152,13 @@ test('the words: the site\'s first, the Spanish ones when it has not sent them, 
     assert.equal(say({}, 'touch_back_in', {n: 7}), 'Vuelve al inicio en 7 s');
     assert.equal(say({touch_back_in: 'Back in {n} s'}, 'touch_back_in', {n: 7}), 'Back in 7 s');
     assert.equal(say({}, 'touch_welcome', {t: '11:00'}), '¿Vienen a la visita de las 11:00? Los recibe');
+});
+
+test('what comes next: today, the first not started yet; else the next day', () => {
+    const days = [{date: '2026-11-02', today: true, events: [{time: '10:30', title: 'Teatro'}, {time: '12:00', title: 'Charla'},
+        {time: '', title: 'Todo el día'}]}, {date: '2026-11-03', today: false, events: [{time: '10:00', title: 'Residencia'}]}];
+    assert.equal(nextOf(days, NOW).ev.title, 'Charla');
+    assert.equal(nextOf(days, new Date(2026, 10, 2, 9, 0).getTime()).ev.title, 'Teatro');
+    assert.equal(nextOf(days, new Date(2026, 10, 2, 18, 0).getTime()).ev.title, 'Residencia');
+    assert.equal(nextOf([], NOW), null);
 });
