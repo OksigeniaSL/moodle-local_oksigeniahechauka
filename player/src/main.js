@@ -24,6 +24,7 @@ import {store} from './store.js';
 import {filesOf, isRaining, Surprises} from './surprises.js';
 import {countToday} from './today.js';
 import {Touches} from './touch.js';
+import {Tactil, menuWeek, dayOf} from './tactil.js';
 import {weekOf} from './week.js';
 
 const VERSION = '0.9.1';
@@ -138,6 +139,31 @@ class Player {
             }
         };
         const screen = this.screen;
+        // A screen that can be touched (screen.touch): the doors (src/tactil.js). While somebody touches, the rotation
+        // waits; when they go, it goes on.
+        this.tactil = new Tactil({
+            frame: screen.frame, header: screen.frame.firstChild, after: screen.birthdayStrip, s: this.strings,
+            media: function (ref) {
+                return self.media.url(ref);
+            },
+            qr: function (url) {
+                return screen.qrBox(url, false, null);
+            },
+            played: this.played,
+            data: function () {
+                return self.touchData();
+            },
+            showing: function () {
+                return self.lastChoice || null;
+            },
+            near: function () {
+                clearTimeout(self.timer);
+                self.turnDue = 0;
+            },
+            far: function () {
+                self.next();
+            },
+        });
         this.surprises = new Surprises(screen.frame, {
             quiet: function () {
                 return screen.keepsStill();
@@ -272,6 +298,7 @@ class Player {
         }
         document.documentElement.lang = (m.screen && m.screen.lang) || this.boot.lang || 'en';
         this.screen.configure(m);
+        this.tactil.configure((m.screen && m.screen.touch) || null);
         this.surprises.configure(m.surprises, (m.screen && m.screen.distance) || 3, Date.now());
         if (this.mode === 'screen') {
             this.keepSurprises(m.surprises);
@@ -453,6 +480,48 @@ class Player {
         };
     }
 
+    /** What the doors of a touch screen need (src/tactil.js), from what the screen already has. */
+    touchData() {
+        const m = this.manifest;
+        if (!m) {
+            return {};
+        }
+        const wall = this.clock.wall();
+        const now = this.clock.date().getTime();
+        const media = this.media;
+        const today = this.todayOf(wall);
+        const extra = liveItems(m.items || [], 'extra', wall);
+        const centre = m.centre || {};
+        return {
+            s: this.strings,
+            now: now,
+            dateWords: today.dateWords,
+            menuWeek: menuWeek(m.items || [], dayOf(now)),
+            agenda: this.agendaOfNow(wall, m),
+            albums: albumsOf(this.mainList(wall), function (ref) {
+                return media.url(ref);
+            }),
+            notices: today.notices,
+            books: extra.filter(function (it) {
+                return it.type === 'books';
+            })[0] || null,
+            channels: extra.filter(function (it) {
+                return it.type === 'channel' && channelShow(it);
+            }),
+            instagram: instagramReady(extra.filter(function (it) {
+                return it.type === 'instagram';
+            })[0], media),
+            openacts: openActsNow((m.items || []).filter(function (it) {
+                return it.type === 'openacts';
+            })[0], now),
+            visit: (m.items || []).filter(function (it) {
+                return it.type === 'visit';
+            })[0] || null,
+            about: centre.about || null,
+            contact: centre.contact || null,
+        };
+    }
+
     /** The words the agenda's days are said with. */
     agendaNames(m) {
         const s = this.strings;
@@ -609,6 +678,10 @@ class Player {
             // Nothing moves under an urgent notice.
             return;
         }
+        if (this.tactil && this.tactil.near) {
+            // Somebody is touching: the rotation waits for them (src/tactil.js sends it on when they go).
+            return;
+        }
         if (this.reloadAt) {
             location.reload();
             return;
@@ -713,6 +786,11 @@ class Player {
         }
         // Some know how long they last only once they are in the page.
         const seconds = this.screen.show(choice, today, week) || choice.seconds;
+        // What is on screen now: a touch on it opens its door.
+        this.lastChoice = choice;
+        if (this.tactil) {
+            this.tactil.refresh();
+        }
         if (this.mode === 'screen') {
             this.played.add(this.screen.shownIds(choice), seconds);
         }
@@ -750,6 +828,10 @@ class Player {
         }
         this.screen.setDark(this.forcedTheme !== undefined ? this.forcedTheme : isDark(m.theme, wall));
         this.screen.setClock(this.clock.date());
+        if (this.tactil) {
+            // The touches go by the device's own time (they are measured, not shown); the welcome, by the screen's.
+            this.tactil.tick(Date.now());
+        }
         // Whose birthday it is today, all day above the ticker; never on a showcase. Before a first slide is measured.
         this.screen.showBirthdayStrip(useOf(m, wall) === 'showcase' ? null : liveItems(m.items || [], 'extra', wall).filter(function (it) {
             return it.type === 'birthdays' && it.people && it.people.length;

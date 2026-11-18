@@ -217,6 +217,14 @@ export function mediaOf(manifest) {
     if (manifest.idle) {
         add(manifest.idle.qrimage);
     }
+    // A touch screen's «Cómo llegar» and «Conoce el centro» (src/tactil.js): the map and a day here.
+    const centre = manifest.centre || {};
+    if (centre.contact) {
+        add(centre.contact.map);
+    }
+    ((centre.about && centre.about.day) || []).forEach(function (moment) {
+        add(moment.media);
+    });
     (manifest.items || []).forEach(function (it) {
         add(it.media);
         add(it.poster);
@@ -240,6 +248,13 @@ export function mediaOf(manifest) {
             (post.media || []).forEach(function (m) {
                 add(m);
             });
+        });
+        // Today's visits of Eguahe, for a touch screen: whoever receives them first (the welcome), and the plan.
+        (it.visits || []).forEach(function (visit) {
+            (visit.hosts || []).forEach(function (host) {
+                add(host.img, first);
+            });
+            add(visit.plan);
         });
         // Eguahe's acts: the centre's guide with the first (the day it waves at whoever comes), and each act's code.
         (it.acts || []).forEach(function (act) {

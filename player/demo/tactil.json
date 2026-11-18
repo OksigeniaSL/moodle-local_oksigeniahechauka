@@ -1,0 +1,821 @@
+{
+ "contract": 1,
+ "etag": "tactil-demo",
+ "generated": 1793577600,
+ "horizon": "2026-11-15",
+ "dayend": "16:00",
+ "sample": true,
+ "screen": {
+  "id": 1,
+  "name": "Secretaría",
+  "width": 1080,
+  "height": 1920,
+  "timezone": "Atlantic/Canary",
+  "lang": "es",
+  "distance": 3,
+  "glass": false,
+  "touch": {
+   "doors": [
+    "menu",
+    "agenda",
+    "photos",
+    "notices",
+    "library",
+    "networks",
+    "about",
+    "visit",
+    "openacts",
+    "centre"
+   ],
+   "idle": 60,
+   "links": {}
+  }
+ },
+ "centre": {
+  "name": "Centro de ejemplo",
+  "phrase": "Aprender juntos, crecer juntos",
+  "contact": {
+   "address": "Calle de Ejemplo, 12 · Ciudad de ejemplo",
+   "hours": "De lunes a viernes, de 8:30 a 14:00",
+   "phone": "900 123 456",
+   "email": "secretaria@centro.example",
+   "web": "https://centro.example",
+   "geo": "https://www.openstreetmap.org/?mlat=28.46&mlon=-16.25"
+  },
+  "about": {
+   "words": "Un colegio de Infantil y Primaria de 450 alumnos, donde se aprende haciendo: en el huerto, en la cancha y en la biblioteca.",
+   "stages": [
+    {
+     "name": "Infantil",
+     "line": "3 a 5 años",
+     "color": 1
+    },
+    {
+     "name": "Primaria",
+     "line": "6 a 11 años",
+     "color": 2
+    }
+   ],
+   "day": [
+    {
+     "time": "08:45",
+     "title": "Entramos",
+     "words": "Cada mañana, alguien riega el huerto antes de clase.",
+     "media": {
+      "id": 900,
+      "url": "media/huerto.jpg",
+      "sha1": "tactil-huerto.jpg",
+      "mime": "image/jpeg",
+      "width": 1152,
+      "height": 768
+     }
+    },
+    {
+     "time": "10:30",
+     "title": "Al recreo",
+     "words": "La cancha, renovada, es de todos en los recreos.",
+     "media": {
+      "id": 900,
+      "url": "media/huerto.jpg",
+      "sha1": "tactil-huerto.jpg",
+      "mime": "image/jpeg",
+      "width": 1152,
+      "height": 768
+     }
+    },
+    {
+     "time": "11:30",
+     "title": "Aprendemos haciendo",
+     "words": "En 4.º B pintaron su propia noche estrellada.",
+     "media": {
+      "id": 900,
+      "url": "media/huerto.jpg",
+      "sha1": "tactil-huerto.jpg",
+      "mime": "image/jpeg",
+      "width": 1152,
+      "height": 768
+     }
+    },
+    {
+     "time": "15:00",
+     "title": "A leer",
+     "words": "La biblioteca abre por la tarde para estudiar.",
+     "media": {
+      "id": 900,
+      "url": "media/huerto.jpg",
+      "sha1": "tactil-huerto.jpg",
+      "mime": "image/jpeg",
+      "width": 1152,
+      "height": 768
+     }
+    }
+   ]
+  }
+ },
+ "template": "zones",
+ "theme": {
+  "mode": "light",
+  "vars": {
+   "--hk-primario": "#1f5f8b",
+   "--hk-acento": "#e8a33a"
+  },
+  "logo": {
+   "id": 1,
+   "url": "media/logo-claro.svg",
+   "sha1": "b574431ad41ecdd6285a4d403dff53b376d83886",
+   "mime": "image/svg+xml"
+  },
+  "logo_dark": {
+   "id": 2,
+   "url": "media/logo-oscuro.svg",
+   "sha1": "6d38334090681a62db5adb463fa373f17f8be1f2",
+   "mime": "image/svg+xml"
+  }
+ },
+ "labels": {
+  "menu": "Menú de hoy",
+  "notices": "Avisos",
+  "events": "Hoy en el centro",
+  "ticker": "Al día",
+  "upcoming": "Próximos días",
+  "today": "Hoy",
+  "tomorrow": "Mañana",
+  "days": "días"
+ },
+ "items": [
+  {
+   "id": "i1",
+   "type": "image",
+   "zone": "main",
+   "order": 1,
+   "duration": 10,
+   "fit": "cover",
+   "media": {
+    "id": 3,
+    "url": "media/huerto.jpg",
+    "sha1": "d6f065413bda8a8a46c81deef3d271992546c981",
+    "mime": "image/jpeg",
+    "width": 1152,
+    "height": 768
+   },
+   "caption": {
+    "title": "El huerto, listo para la siembra de otoño",
+    "text": "Esta semana plantan las clases de 3.º de Primaria"
+   },
+   "album": {
+    "id": "huerto",
+    "name": "El huerto"
+   }
+  },
+  {
+   "id": "i2",
+   "type": "image",
+   "zone": "main",
+   "order": 2,
+   "duration": 8,
+   "fit": "blur",
+   "media": {
+    "id": 4,
+    "url": "media/huerto-vertical.jpg",
+    "sha1": "a970bd87e5ca46d6300ab19825821cec30fab55c",
+    "mime": "image/jpeg",
+    "width": 576,
+    "height": 1024
+   },
+   "caption": {
+    "title": "Una foto en vertical, entera",
+    "text": "Sobre un fondo difuminado de sí misma"
+   },
+   "album": {
+    "id": "huerto",
+    "name": "El huerto"
+   }
+  },
+  {
+   "id": "i4",
+   "type": "image",
+   "zone": "main",
+   "order": 3,
+   "duration": 8,
+   "fit": "blur",
+   "media": {
+    "id": 4,
+    "url": "media/huerto-vertical.jpg",
+    "sha1": "a970bd87e5ca46d6300ab19825821cec30fab55c",
+    "mime": "image/jpeg",
+    "width": 576,
+    "height": 1024
+   },
+   "caption": {
+    "title": "El huerto, de cerca",
+    "text": "La segunda vertical va junto a la primera"
+   },
+   "album": {
+    "id": "huerto",
+    "name": "El huerto"
+   }
+  },
+  {
+   "id": "i3",
+   "type": "video",
+   "zone": "main",
+   "order": 3,
+   "fit": "blur",
+   "media": {
+    "id": 5,
+    "url": "media/clip-vertical.mp4",
+    "sha1": "clip-vertical",
+    "mime": "video/mp4",
+    "width": 1080,
+    "height": 1920,
+    "duration": 12
+   },
+   "poster": {
+    "id": 6,
+    "url": "media/clip-vertical.jpg",
+    "sha1": "clip-vertical-poster",
+    "mime": "image/jpeg"
+   },
+   "caption": {
+    "title": "Un vídeo grabado con el móvil",
+    "text": "Solo si se ha generado: demo/make-videos.sh"
+   }
+  },
+  {
+   "id": "n1",
+   "type": "notice",
+   "zone": "side",
+   "order": 1,
+   "title": "Fotos de grupo",
+   "body": "Martes y miércoles, con el uniforme"
+  },
+  {
+   "id": "n2",
+   "type": "notice",
+   "zone": "side",
+   "order": 2,
+   "title": "Biblioteca en el recreo",
+   "body": "De 11:00 a 11:30, con préstamo"
+  },
+  {
+   "id": "n3",
+   "type": "notice",
+   "zone": "side",
+   "order": 3,
+   "title": "Torneo de ajedrez",
+   "body": "Inscripciones hasta el viernes, en secretaría"
+  },
+  {
+   "id": "n4",
+   "type": "notice",
+   "zone": "side",
+   "order": 4,
+   "tone": "important",
+   "title": "Salida temprana el viernes",
+   "body": "Las clases acaban a las 13:00"
+  },
+  {
+   "id": "e1",
+   "type": "event",
+   "zone": "side",
+   "title": "Teatro en inglés",
+   "detail": "3.º y 4.º de Primaria",
+   "start": "2026-11-02T10:30",
+   "end": "2026-11-02T11:30",
+   "color": 2
+  },
+  {
+   "id": "e2",
+   "type": "event",
+   "zone": "side",
+   "title": "Charla de orientación",
+   "detail": "4.º de ESO",
+   "start": "2026-11-02T12:00",
+   "end": "2026-11-02T13:00",
+   "color": 3
+  },
+  {
+   "id": "e3",
+   "type": "event",
+   "zone": "side",
+   "title": "Reunión de familias",
+   "detail": "Infantil",
+   "start": "2026-11-02T17:00",
+   "end": "2026-11-02T18:00",
+   "color": 1
+  },
+  {
+   "id": "t1",
+   "type": "ticker",
+   "zone": "ticker",
+   "order": 1,
+   "text": "Mañana, salida al Museo de la Ciencia con 5.º de Primaria"
+  },
+  {
+   "id": "t2",
+   "type": "ticker",
+   "zone": "ticker",
+   "order": 2,
+   "text": "El viernes, festival de otoño en el patio a las 16:00"
+  },
+  {
+   "id": "t3",
+   "type": "ticker",
+   "zone": "ticker",
+   "order": 3,
+   "text": "Abiertas las inscripciones para el torneo de ajedrez"
+  },
+  {
+   "id": "e4",
+   "type": "event",
+   "zone": "side",
+   "title": "3º ESO - Acampada",
+   "start": "2026-11-05T08:00",
+   "end": "2026-11-07T16:00",
+   "color": 2,
+   "when": {
+    "from": "2026-11-05",
+    "until": "2026-11-07"
+   }
+  },
+  {
+   "id": "e5",
+   "type": "event",
+   "zone": "side",
+   "title": "4º Pri C - Residencia",
+   "start": "2026-11-03T10:00",
+   "end": "2026-11-03T13:00",
+   "color": 3,
+   "when": {
+    "from": "2026-11-03",
+    "until": "2026-11-03"
+   }
+  },
+  {
+   "id": "e6",
+   "type": "event",
+   "zone": "side",
+   "title": "📚 Celebración del libro",
+   "start": "2026-11-06T00:00",
+   "allday": true,
+   "color": 4,
+   "when": {
+    "from": "2026-11-06",
+    "until": "2026-11-06"
+   }
+  },
+  {
+   "id": "e7",
+   "type": "event",
+   "zone": "side",
+   "title": "Día del deporte",
+   "start": "2026-11-06T09:00",
+   "end": "2026-11-06T14:00",
+   "color": 1,
+   "when": {
+    "from": "2026-11-06",
+    "until": "2026-11-06"
+   }
+  },
+  {
+   "id": "e8",
+   "type": "event",
+   "zone": "side",
+   "title": "Festivo - Día del Enseñante",
+   "start": "2026-11-04T00:00",
+   "allday": true,
+   "when": {
+    "from": "2026-11-04",
+    "until": "2026-11-04"
+   }
+  },
+  {
+   "id": "mt0",
+   "type": "menu",
+   "zone": "side",
+   "date": "2026-11-02",
+   "when": {
+    "from": "2026-11-02",
+    "until": "2026-11-02",
+    "times": [
+     [
+      "00:00",
+      "16:00"
+     ]
+    ]
+   },
+   "allergennames": {
+    "celery": "Apio",
+    "fish": "Pescado",
+    "milk": "Leche",
+    "gluten": "Gluten",
+    "eggs": "Huevo"
+   },
+   "menus": [
+    {
+     "name": "Menú",
+     "courses": [
+      {
+       "label": "Primero",
+       "dishes": [
+        "Lentejas estofadas"
+       ],
+       "allergens": [
+        [
+         "celery"
+        ]
+       ],
+       "icons": [
+        "lentils"
+       ]
+      },
+      {
+       "label": "Segundo",
+       "dishes": [
+        "Merluza a la plancha con ensalada"
+       ],
+       "allergens": [
+        [
+         "fish"
+        ]
+       ],
+       "icons": [
+        "fish"
+       ]
+      },
+      {
+       "label": "Postre",
+       "dishes": [
+        "Yogur natural"
+       ],
+       "allergens": [
+        [
+         "milk"
+        ]
+       ],
+       "icons": [
+        "yogurt"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "mt1",
+   "type": "menu",
+   "zone": "side",
+   "date": "2026-11-03",
+   "when": {
+    "from": "2026-11-03",
+    "until": "2026-11-03",
+    "times": [
+     [
+      "00:00",
+      "16:00"
+     ]
+    ]
+   },
+   "allergennames": {
+    "celery": "Apio",
+    "fish": "Pescado",
+    "milk": "Leche",
+    "gluten": "Gluten",
+    "eggs": "Huevo"
+   },
+   "menus": [
+    {
+     "name": "Menú",
+     "courses": [
+      {
+       "label": "Primero",
+       "dishes": [
+        "Crema de calabaza"
+       ],
+       "allergens": [
+        [
+         "milk",
+         "celery"
+        ]
+       ],
+       "icons": [
+        "cream"
+       ]
+      },
+      {
+       "label": "Segundo",
+       "dishes": [
+        "Pollo asado con papas"
+       ],
+       "allergens": [
+        []
+       ],
+       "icons": [
+        "roastchicken"
+       ]
+      },
+      {
+       "label": "Postre",
+       "dishes": [
+        "Fruta de temporada"
+       ],
+       "allergens": [
+        []
+       ],
+       "icons": [
+        "fruit"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "mt2",
+   "type": "menu",
+   "zone": "side",
+   "date": "2026-11-05",
+   "when": {
+    "from": "2026-11-05",
+    "until": "2026-11-05",
+    "times": [
+     [
+      "00:00",
+      "16:00"
+     ]
+    ]
+   },
+   "allergennames": {
+    "celery": "Apio",
+    "fish": "Pescado",
+    "milk": "Leche",
+    "gluten": "Gluten",
+    "eggs": "Huevo"
+   },
+   "menus": [
+    {
+     "name": "Menú",
+     "courses": [
+      {
+       "label": "Primero",
+       "dishes": [
+        "Macarrones con tomate"
+       ],
+       "allergens": [
+        [
+         "gluten"
+        ]
+       ],
+       "icons": [
+        "macaroni"
+       ]
+      },
+      {
+       "label": "Segundo",
+       "dishes": [
+        "Tortilla de papas"
+       ],
+       "allergens": [
+        [
+         "eggs"
+        ]
+       ],
+       "icons": [
+        "omelette"
+       ]
+      },
+      {
+       "label": "Postre",
+       "dishes": [
+        "Natillas"
+       ],
+       "allergens": [
+        [
+         "milk",
+         "eggs"
+        ]
+       ],
+       "icons": [
+        "ricepudding"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "mt3",
+   "type": "menu",
+   "zone": "side",
+   "date": "2026-11-06",
+   "when": {
+    "from": "2026-11-06",
+    "until": "2026-11-06",
+    "times": [
+     [
+      "00:00",
+      "16:00"
+     ]
+    ]
+   },
+   "allergennames": {
+    "celery": "Apio",
+    "fish": "Pescado",
+    "milk": "Leche",
+    "gluten": "Gluten",
+    "eggs": "Huevo"
+   },
+   "menus": [
+    {
+     "name": "Menú",
+     "courses": [
+      {
+       "label": "Primero",
+       "dishes": [
+        "Arroz a la cubana"
+       ],
+       "allergens": [
+        [
+         "eggs"
+        ]
+       ],
+       "icons": [
+        "rice"
+       ]
+      },
+      {
+       "label": "Segundo",
+       "dishes": [
+        "Albóndigas en salsa"
+       ],
+       "allergens": [
+        [
+         "gluten",
+         "eggs"
+        ]
+       ],
+       "icons": [
+        "meatballs"
+       ]
+      },
+      {
+       "label": "Postre",
+       "dishes": [
+        "Fruta de temporada"
+       ],
+       "allergens": [
+        []
+       ],
+       "icons": [
+        "fruit"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "bk1",
+   "type": "books",
+   "zone": "extra",
+   "label": "Novedades de la biblioteca",
+   "books": [
+    {
+     "title": "La abuela que miraba el mar",
+     "authors": "Ana Ruiz"
+    },
+    {
+     "title": "El gran libro de los bichos",
+     "authors": "Luis Pérez"
+    },
+    {
+     "title": "Cuentos para contar en voz alta",
+     "authors": "Varios autores"
+    }
+   ]
+  },
+  {
+   "id": "vs1",
+   "type": "visit",
+   "zone": "extra",
+   "visits": [
+    {
+     "id": 3,
+     "kind": "visit",
+     "name": "Visita de una familia",
+     "place": "Secretaría",
+     "timestart": 1793617200,
+     "timeend": 1793619900,
+     "minutes": 45,
+     "turns": [],
+     "hosts": [
+      {
+       "first": "Ana",
+       "name": "Ana Martín",
+       "role": "Jefa de estudios",
+       "says": "Les enseño el centro con calma y les cuento todo lo que quieran saber."
+      }
+     ],
+     "where": "Los acompaña por el patio de Infantil, el comedor y el huerto, y vuelven aquí."
+    }
+   ]
+  },
+  {
+   "id": "oa1",
+   "type": "openacts",
+   "zone": "extra",
+   "acts": [
+    {
+     "kind": "openday",
+     "name": "Jornada de puertas abiertas",
+     "place": "Infantil y Primaria",
+     "timestart": 1795255200,
+     "timeend": 1795266000,
+     "web": "https://centro.example/jornada",
+     "turns": []
+    }
+   ]
+  }
+ ],
+ "weather": {
+  "now": {
+   "symbol": "fair_day",
+   "temp": 22
+  },
+  "today": {
+   "symbol": "partlycloudy_day",
+   "max": 24,
+   "min": 18,
+   "rain": 40,
+   "text": "Intervalos nubosos"
+  },
+  "tomorrow": {
+   "symbol": "lightrain",
+   "max": 21,
+   "min": 17,
+   "rain": 70,
+   "text": "Lluvia débil"
+  },
+  "credit": "Datos de MET Norway",
+  "days": [
+   {
+    "date": "2026-11-03",
+    "max": 21,
+    "min": 16,
+    "symbol": "partlycloudy_day",
+    "text": "Intervalos nubosos",
+    "rain": 10
+   },
+   {
+    "date": "2026-11-04",
+    "max": 19,
+    "min": 15,
+    "symbol": "rain",
+    "text": "Lluvia",
+    "rain": 80
+   },
+   {
+    "date": "2026-11-05",
+    "max": 23,
+    "min": 17,
+    "symbol": "clearsky_day",
+    "text": "Despejado",
+    "rain": 0
+   }
+  ]
+ },
+ "categories": [
+  {
+   "n": 1,
+   "name": "Infantil",
+   "words": [
+    "inf",
+    "infantil"
+   ]
+  },
+  {
+   "n": 2,
+   "name": "Primaria",
+   "words": [
+    "pri",
+    "primaria"
+   ]
+  },
+  {
+   "n": 3,
+   "name": "ESO",
+   "words": [
+    "eso"
+   ]
+  },
+  {
+   "n": 4,
+   "name": "Bachillerato",
+   "words": [
+    "bach",
+    "bachillerato"
+   ]
+  }
+ ],
+ "use": "info"
+}

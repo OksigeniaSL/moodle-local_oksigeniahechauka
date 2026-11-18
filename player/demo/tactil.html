@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="es" data-tema="claro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hechauka · demo de la pantalla táctil</title>
+<!-- The player with a static manifest and its media (mode «demo»): for development, captures and trying a device
+     without a server. ?at=2026-11-02T10:45 fixes the clock (by default, Monday 2 November 2026, the day of the
+     example data); ?at=now uses the real one; ?tema=oscuro forces the dark theme. All of it is example data. -->
+<link rel="stylesheet" href="../hechauka.css">
+<link rel="stylesheet" href="../composiciones.css">
+<link rel="stylesheet" href="../tiempo.css">
+<link rel="stylesheet" href="../semana.css">
+<link rel="stylesheet" href="../proximos-dias.css">
+<link rel="stylesheet" href="../urgente.css">
+<link rel="stylesheet" href="../distancia.css">
+<link rel="stylesheet" href="../jerarquia.css">
+<link rel="stylesheet" href="../tercios.css">
+<link rel="stylesheet" href="../cinta.css">
+<link rel="stylesheet" href="../usos.css">
+<link rel="stylesheet" href="../agenda.css">
+<link rel="stylesheet" href="../fotos.css">
+<link rel="stylesheet" href="../lideres.css">
+<link rel="stylesheet" href="../agenda-lista.css">
+<link rel="stylesheet" href="../identidad.css">
+<link rel="stylesheet" href="../cumple.css">
+<link rel="stylesheet" href="../reposo.css">
+<link rel="stylesheet" href="../plazos.css">
+<link rel="stylesheet" href="../tabla.css">
+<link rel="stylesheet" href="../biblioteca.css">
+<link rel="stylesheet" href="../celebra.css">
+<link rel="stylesheet" href="../canal.css">
+<link rel="stylesheet" href="../instagram.css">
+<link rel="stylesheet" href="../jornadas.css">
+<link rel="stylesheet" href="../alergenos.css">
+<link rel="stylesheet" href="../menus.css">
+<link rel="stylesheet" href="../fotodia.css">
+<link rel="stylesheet" href="../zonas.css">
+<link rel="stylesheet" href="../pieles.css">
+<link rel="stylesheet" href="../fondos.css">
+<link rel="stylesheet" href="../letras.css">
+<link rel="stylesheet" href="../actividad.css">
+<link rel="stylesheet" href="../movimiento.css">
+<link rel="stylesheet" href="../tactil.css">
+</head>
+<body>
+<div id="hechauka"></div>
+<script id="hechauka-boot" type="application/json">
+{
+  "contract": 1,
+  "mode": "demo",
+  "lang": "es",
+  "at": "2026-11-02T10:45",
+  "manifest_url": "tactil.json",
+  "strings": {
+    "sample": "Datos de ejemplo",
+    "menu": "Menú de hoy",
+    "notices": "Avisos",
+    "events": "Hoy",
+    "ticker": "Al día",
+    "closed": "Hoy no hay comedor",
+    "days": ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"],
+    "months": ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"],
+    "date_format": "{d} de {m}",
+    "days_short": ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"],
+    "months_short": ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"],
+    "upcoming": "Próximos días",
+    "today": "Hoy",
+    "tomorrow": "Mañana",
+    "days_word": "días",
+    "days_mid": ["dom", "lun", "mar", "mié", "jue", "vie", "sáb"],
+    "week_none": "Sin actividades",
+    "week_holiday": "Festivo",
+    "week_more": "+{n} más",
+    "week_from": "desde el",
+    "week_until": "hasta el",
+    "birthdays_one": "Hoy cumple años",
+    "birthdays_many": "Hoy cumplen años",
+    "allergens": "Alérgenos:",
+    "also": "También:",
+    "idle_qr": "Añade lo primero desde el móvil",
+    "important": "Importante",
+    "notice": "Aviso",
+    "countdown": "Faltan",
+    "daysfor": "días para",
+    "scan": "Ábrelo en el móvil",
+    "channel_members": "{n} personas ya lo siguen",
+    "channel_members_one": "{n} persona ya lo sigue",
+    "instagram_today": "Hoy",
+    "instagram_yesterday": "Ayer",
+    "instagram_days": "Hace {n} días",
+    "thisweek": "Esta semana",
+    "letters": ["L", "M", "X", "J", "V", "S", "D"],
+    "until_tomorrow": "hasta mañana",
+    "agenda_in": "dentro de %d días",
+    "agenda_nomore": "Nada más hasta el %s",
+    "agenda_quiet_title": "Un mes tranquilo",
+    "agenda_quiet": "Nada previsto en los próximos 30 días",
+    "zones_weather": "El tiempo",
+    "place_open": "Abierto",
+    "place_closed": "Cerrado",
+    "place_until": "hasta las {time}",
+    "place_opens_today": "abre a las {time}",
+    "place_opens_tomorrow": "abre mañana a las {time}",
+    "place_opens_day": "abre el {day} a las {time}",
+    "place_opens_date": "abre el {date} a las {time}",
+    "place_hours": "Horario",
+    "place_today": "Hoy",
+    "place_days_range": "{from} a {until}",
+    "place_days_pair": "{from} y {until}",
+    "place_time_range": "{from} – {until}",
+    "open_today": "Hoy",
+    "open_tomorrow": "Mañana",
+    "open_this": "Este {day}",
+    "open_in": "Faltan {n} días",
+    "open_signup": "Inscríbanse",
+    "open_walkin": "¿Vienen sin inscribirse?",
+    "open_walkin_do": "Apúntense aquí",
+    "open_full": "Completo",
+    "open_left": "Quedan {n} plazas",
+    "open_left_one": "Queda una plaza",
+    "open_came": "Ya han venido {n} familias",
+    "open_came_one": "Ya ha venido una familia",
+    "open_now": "Ahora",
+    "open_welcome": "Bienvenidos"
+  }
+}
+</script>
+<script>
+  // ?at=now: the real clock, for a device that runs the demo for hours.
+  (function () {
+    if (/[?&]at=now\b/.test(location.search)) {
+      var n = document.getElementById('hechauka-boot');
+      var b = JSON.parse(n.textContent);
+      delete b.at;
+      n.textContent = JSON.stringify(b);
+    }
+  }());
+</script>
+<script src="../tiempo-iconos.js"></script>
+<script src="../actividad-iconos.js"></script>
+<script src="../build/hechauka.js"></script>
+</body>
+</html>

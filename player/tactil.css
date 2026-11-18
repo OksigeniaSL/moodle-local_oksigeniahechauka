@@ -1,0 +1,1450 @@
+/* Oksigenia Hechauka: the touch screen, the way of the doors (Enrique, 18 November 2026: «Vamos con las puertas»;
+ * src/tactil.js). Only with screen.touch: everything here hangs from .hk-tactil. In rem: on an upright 1080 x 1920 screen
+ * 1rem is 10 px and 1 cm about 1.6rem. What is touched goes between 0.9 and 1.4 m from the floor on a 55" screen; doors
+ * of 8 cm or more and buttons of 3 cm or more, with air between them.
+ *
+ * Chromium 56 (Samsung, Tizen 4): flexbox only, margins instead of gap, no grid, no inset, no aspect-ratio, no
+ * clamp/min/max; and never a flex box inside a <button>: Chrome 56 lays a button's content out as a block and gives it
+ * the width of its text, so inside a button the widths are written and the order is the page's. Goes after the skins. */
+
+/* --- The screen that can be touched: nothing to select, no context menu, a finger at a time ---------------------- */
+.hk.hk-tactil {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+}
+.hk-tc-b {
+    display: block;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    -webkit-appearance: none;
+}
+
+/* --- From afar: the welcome of today's visit, at the top --------------------------------------------------------- */
+.hk-tc-bienvenida {
+    display: none;
+    flex: none;
+    align-items: center;
+    margin: 0 0 1.6rem;
+    padding: 1.8rem 3.4rem 1.8rem 2rem;
+    border-radius: 2.8rem;
+    background: var(--hk-primario);
+    color: var(--hk-sobre-primario);
+    cursor: pointer;
+}
+.hk-tc-bienvenida.hk-tc-ve {
+    display: -webkit-box;
+    display: flex;
+}
+.hk-tc-cara {
+    flex: none;
+    width: 17rem;
+    height: 17rem;
+    margin-right: 3rem;
+    border: .6rem solid var(--hk-sobre-primario);
+    border-radius: 50%;
+    object-fit: cover;
+}
+.hk-tc-bienvenida-texto small {
+    display: block;
+    font-size: 3.4rem;
+    font-weight: 700;
+    line-height: 1.15;
+}
+.hk-tc-bienvenida-texto b {
+    display: block;
+    margin: .4rem 0;
+    font-family: var(--hk-letra-titulos);
+    font-size: 7.6rem;
+    font-weight: 800;
+    line-height: 1;
+}
+.hk-tc-bienvenida-texto span {
+    display: block;
+    font-size: 3.4rem;
+}
+
+/* --- From afar: the front, four doors ajar, under the rotation ---------------------------------------------------- */
+.hk-tc-fachada {
+    flex: none;
+    margin: 1.6rem 0 0;
+    padding: 1.6rem 2rem 0;
+    border-radius: 4rem 4rem 0 0;
+    background: linear-gradient(var(--hk-superficie), var(--hk-linea));
+}
+.hk-tc-invita {
+    margin: 0 0 .6rem;
+    color: var(--hk-texto-suave);
+    font-size: 3.6rem;
+    font-weight: 800;
+    line-height: 5rem;
+    text-align: center;
+}
+.hk-tc-puertas {
+    display: -webkit-box;
+    display: flex;
+    justify-content: space-around;
+}
+.hk-tc-puerta {
+    position: relative;
+    width: 22.8rem;
+    color: var(--hk-texto);
+    text-align: center;
+}
+.hk-tactil .hk-tc-puerta {
+    text-align: center;
+}
+.hk-tc-cartel {
+    display: block;
+    height: 9.6rem;
+    padding-top: 1rem;
+    margin-bottom: 1.2rem;
+    font-family: var(--hk-letra-titulos);
+    font-size: 4.2rem;
+    font-weight: 800;
+    line-height: 1;
+}
+/* The doorway, its width written: inside a button, Chrome 56 would make it as narrow as its text. */
+.hk-tc-portal {
+    position: relative;
+    display: block;
+    width: 22.8rem;
+    height: 40rem;
+    border-radius: 11.4rem 11.4rem 0 0;
+    background: radial-gradient(ellipse at 50% 70%, #fffaf0, #ffd9a6 55%, var(--hk-acento) 100%);
+    box-shadow: 0 0 0 1rem var(--hk-superficie), 0 0 0 1.4rem var(--hk-linea);
+    -webkit-perspective: 90rem;
+    perspective: 90rem;
+}
+/* The thread of warm light in the gap: seen from the chairs; it breathes. */
+.hk-tc-portal::after {
+    content: '';
+    position: absolute;
+    right: .4rem;
+    top: 3.4rem;
+    bottom: 0;
+    width: 1.4rem;
+    border-radius: .7rem;
+    background: linear-gradient(#fffdf2, #ffe6a8);
+    box-shadow: 0 0 1.8rem .6rem rgba(255, 214, 130, .95), 0 0 5rem 1.8rem rgba(255, 170, 70, .6);
+    -webkit-animation: hk-tc-hilo 3.2s ease-in-out infinite alternate;
+    animation: hk-tc-hilo 3.2s ease-in-out infinite alternate;
+}
+@-webkit-keyframes hk-tc-hilo {
+    from { opacity: .75; }
+    to { opacity: 1; }
+}
+@keyframes hk-tc-hilo {
+    from { opacity: .75; }
+    to { opacity: 1; }
+}
+/* The leaf, on its hinges at the left, ajar. */
+.hk-tc-hoja {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: 11.4rem 11.4rem 0 0;
+    background: var(--hk-tc, var(--hk-primario));
+    color: #fff;
+    transform-origin: 0 50%;
+    transform: rotateY(-22deg);
+    transition: transform .9s cubic-bezier(.4, .1, .25, 1);
+    box-shadow: inset -1rem 0 1.8rem rgba(0, 0, 0, .2);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+}
+.hk-tc-hoja::before,
+.hk-tc-hoja::after {
+    content: '';
+    position: absolute;
+    left: 2.6rem;
+    right: 2.6rem;
+    border: .3rem solid rgba(255, 255, 255, .28);
+    border-radius: 1.4rem;
+}
+.hk-tc-hoja::before {
+    top: 15.6rem;
+    height: 10rem;
+}
+.hk-tc-hoja::after {
+    top: 27.6rem;
+    bottom: 2.6rem;
+}
+.hk-tc-ventanuco {
+    position: absolute;
+    left: 50%;
+    top: 2.6rem;
+    display: block;
+    width: 11.8rem;
+    height: 11.8rem;
+    margin-left: -5.9rem;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .22);
+    box-shadow: inset 0 0 0 .6rem rgba(255, 255, 255, .5);
+}
+.hk-tc-ventanuco .hk-tc-ic {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 6.6rem;
+    height: 6.6rem;
+    margin: -3.3rem 0 0 -3.3rem;
+}
+.hk-tc-pomo {
+    position: absolute;
+    right: 2.2rem;
+    top: 21.8rem;
+    display: block;
+    width: 2.6rem;
+    height: 2.6rem;
+    border-radius: 50%;
+    background: #f4d58d;
+    box-shadow: 0 .3rem .4rem rgba(0, 0, 0, .35);
+}
+.hk-tc-luz {
+    position: absolute;
+    left: 40%;
+    right: -6rem;
+    bottom: -4rem;
+    display: block;
+    height: 4rem;
+    background: radial-gradient(ellipse at 40% 0%, rgba(255, 196, 110, .95), rgba(255, 196, 110, 0) 70%);
+}
+/* Somebody coming: it opens a little more. Touched: wide open. */
+.hk-tc-asoma .hk-tc-hoja {
+    transform: rotateY(-42deg);
+}
+.hk-tc-pulsado .hk-tc-hoja {
+    transform: rotateY(-70deg);
+    transition-duration: .25s;
+}
+.hk-tc-puerta.hk-tc-pulsado .hk-tc-portal {
+    box-shadow: 0 0 0 1rem var(--hk-acento), 0 0 0 1.4rem var(--hk-linea);
+}
+/* Each door the colour of what is behind it, the skin's. */
+[data-c="menu"] { --hk-tc: var(--hk-menu); }
+[data-c="evento"] { --hk-tc: var(--hk-evento); }
+[data-c="marca-1"] { --hk-tc: var(--hk-marca-1); }
+[data-c="marca-2"] { --hk-tc: var(--hk-marca-2); }
+[data-c="marca-3"] { --hk-tc: var(--hk-marca-3); }
+[data-c="marca-4"] { --hk-tc: var(--hk-marca-4); }
+[data-tema="oscuro"] [data-c="marca-1"] { --hk-tc: var(--hk-primario); }
+[data-c="mas"] .hk-tc-hoja {
+    background: var(--hk-texto);
+    color: var(--hk-fondo);
+}
+
+/* On a screen lying down, the front is lower. */
+.hk-horizontal .hk-tc-fachada {
+    margin-top: 1rem;
+}
+.hk-horizontal .hk-tc-cartel {
+    height: 6rem;
+    font-size: 3rem;
+}
+.hk-horizontal .hk-tc-portal {
+    height: 22rem;
+}
+
+/* --- Near: the doors, and each door its room ----------------------------------------------------------------------- */
+.hk-tc-cerca {
+    display: none;
+}
+.hk-tc-de-cerca .hk-tc-cerca {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 30;
+    display: block;
+    width: 100%;
+    height: 100%;
+    background: var(--hk-fondo);
+    color: var(--hk-texto);
+}
+/* The urgent notice of the panel is seen over it too. */
+.hk-tactil .hk-urgente {
+    z-index: 45;
+}
+.hk-tc-casa,
+.hk-tc-sala {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: none;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    padding: 5.6rem 5.6rem 21rem;
+}
+.hk-tc-casa.hk-tc-ve,
+.hk-tc-sala {
+    display: -webkit-box;
+    display: flex;
+}
+.hk-tc-casa h1,
+.hk-tc-sala-cabeza h1 {
+    font-family: var(--hk-letra-titulos);
+    font-size: 9.2rem;
+    font-weight: 800;
+    line-height: 1;
+    color: var(--hk-primario);
+}
+.hk-tc-ayuda {
+    margin-top: 1.8rem;
+    color: var(--hk-texto-suave);
+    font-size: 4rem;
+}
+.hk-tc-tarjeta {
+    position: relative;
+    overflow: hidden;
+    border-radius: 2.8rem;
+    background: var(--hk-superficie);
+    box-shadow: 0 .2rem .4rem rgba(0, 0, 0, .06), 0 1.4rem 3rem -1.4rem rgba(0, 0, 0, .22);
+}
+.hk-tc-hoy {
+    flex: none;
+    margin-top: 4.4rem;
+    padding: 3.4rem 4.4rem;
+}
+.hk-tc-hoy h2 {
+    margin-bottom: 1.6rem;
+    font-size: 5.2rem;
+    font-weight: 800;
+}
+.hk-tc-hoy p {
+    margin-top: 1rem;
+    font-size: 4rem;
+    line-height: 1.2;
+}
+.hk-tc-hoy b {
+    color: var(--hk-acento-texto);
+}
+/* The two corridors, at the foot: the families' and the visitors'. */
+.hk-tc-pasillos {
+    flex: none;
+    margin-top: auto;
+}
+.hk-tc-pasillo {
+    margin-top: 2.6rem;
+    padding: 1.4rem 1.8rem 3rem;
+    border-radius: 3.4rem;
+    background: linear-gradient(var(--hk-superficie), var(--hk-linea));
+}
+.hk-tc-pasillo-rotulo {
+    margin: 0 .6rem .8rem;
+    color: var(--hk-texto-suave);
+    font-size: 3.2rem;
+    font-weight: 800;
+    line-height: 4.6rem;
+}
+.hk-tc-pasillo .hk-tc-puerta {
+    width: 14.6rem;
+}
+.hk-tc-pasillo .hk-tc-portal {
+    width: 14.6rem;
+    height: 27rem;
+    border-radius: 7.3rem 7.3rem 0 0;
+    box-shadow: 0 0 0 .6rem var(--hk-superficie), 0 0 0 .9rem var(--hk-linea);
+}
+.hk-tc-pasillo .hk-tc-portal::after,
+.hk-tc-pasillo .hk-tc-luz {
+    display: none;
+}
+.hk-tc-pasillo .hk-tc-hoja {
+    border-radius: 7.3rem 7.3rem 0 0;
+}
+.hk-tc-pasillo .hk-tc-hoja::before {
+    top: 10rem;
+    height: 5.4rem;
+    left: 1.8rem;
+    right: 1.8rem;
+}
+.hk-tc-pasillo .hk-tc-hoja::after {
+    top: 16.8rem;
+    bottom: 1.8rem;
+    left: 1.8rem;
+    right: 1.8rem;
+}
+.hk-tc-pasillo .hk-tc-ventanuco {
+    top: 1.8rem;
+    width: 7.6rem;
+    height: 7.6rem;
+    margin-left: -3.8rem;
+}
+.hk-tc-pasillo .hk-tc-ventanuco .hk-tc-ic {
+    width: 4.4rem;
+    height: 4.4rem;
+    margin: -2.2rem 0 0 -2.2rem;
+}
+.hk-tc-pasillo .hk-tc-pomo {
+    top: 14rem;
+    right: 1.4rem;
+    width: 1.8rem;
+    height: 1.8rem;
+}
+/* In the corridors the name goes under the door (after it in the page). */
+.hk-tc-pasillo .hk-tc-cartel {
+    height: 6.6rem;
+    margin: 1.4rem 0 0;
+    padding: 0;
+    font-size: 2.8rem;
+    line-height: 1.05;
+}
+
+/* A room: its head (the name and the code to take it), what is looked at, and what is touched at the foot. */
+.hk-tc-sala-cabeza {
+    display: -webkit-box;
+    display: flex;
+    flex: none;
+    align-items: center;
+    margin: -5.6rem -5.6rem 3rem;
+    padding: 5.6rem 5.6rem 3rem;
+    background: var(--hk-tc, var(--hk-primario));
+}
+.hk-tc-sala-cabeza h1 {
+    flex: 1;
+    color: #fff;
+}
+.hk-tc-sala-cabeza .hk-tc-insignia {
+    display: none;
+}
+.hk-tc-llevar {
+    display: -webkit-box;
+    display: flex;
+    flex: none;
+    align-items: center;
+    padding: 1.4rem 1.8rem 1.4rem 2.6rem;
+    border-radius: 2.2rem;
+    background: var(--hk-superficie);
+}
+.hk-tc-llevar > span {
+    width: 17rem;
+    margin-right: 1.6rem;
+    font-size: 2.8rem;
+    line-height: 1.1;
+    text-align: right;
+}
+.hk-tc-llevar .hk-qr {
+    width: 15rem;
+    margin: 0;
+}
+.hk-tc-llevar .hk-qr-web,
+.hk-tc-llevar .hk-qr-llamada {
+    display: none;
+}
+.hk-tc-sala-cabeza + * {
+    margin-top: auto;
+}
+.hk-tc-sala > * {
+    flex: none;
+}
+/* The one thing to look at of each room grows over the empty top. */
+.hk-tc-sala > .hk-tc-llena {
+    flex: 1 1 auto;
+    min-height: 0;
+    margin-bottom: 2.6rem;
+}
+.hk-tc-sala > * + * {
+    margin-top: 2.6rem;
+}
+
+/* «Atrás» and «Inicio», at the foot, always: more than 3 cm. */
+.hk-tc-barra {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    z-index: 2;
+    display: -webkit-box;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    height: 18rem;
+    padding: 0 4rem 2.4rem;
+    align-items: center;
+    background: var(--hk-fondo);
+}
+.hk-tc-boton {
+    min-width: 30rem;
+    height: 12rem;
+    margin: 0 1.8rem;
+    padding: 0 4rem;
+    border-radius: 6rem;
+    background: var(--hk-superficie);
+    color: var(--hk-texto);
+    box-shadow: 0 .2rem .3rem rgba(0, 0, 0, .12), 0 1rem 2rem -1rem rgba(0, 0, 0, .3);
+    font-size: 4.6rem;
+    font-weight: 800;
+    line-height: 12rem;
+}
+.hk-tactil .hk-tc-boton {
+    text-align: center;
+}
+.hk-tc-boton .hk-tc-ic {
+    display: inline-block;
+    width: 5.2rem;
+    height: 5.2rem;
+    margin-right: 1.6rem;
+    vertical-align: -1rem;
+}
+.hk-tc-boton > span {
+    display: inline;
+}
+.hk-tc-principal {
+    background: var(--hk-primario);
+    color: var(--hk-sobre-primario);
+}
+.hk-tc-boton.hk-tc-pulsado,
+.hk-tc-flecha-t.hk-tc-pulsado,
+.hk-tc-dia.hk-tc-pulsado,
+.hk-tc-plato.hk-tc-pulsado,
+.hk-tc-album.hk-tc-pulsado {
+    transform: translateY(.4rem) scale(.98);
+}
+.hk-tc-ic {
+    display: block;
+}
+.hk-tc-ic svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+/* Back by itself: the last seconds say so, and the bar empties. */
+.hk-tc-vuelta {
+    position: absolute;
+    left: 4rem;
+    right: 4rem;
+    bottom: 20rem;
+    z-index: 3;
+    padding: 3rem 4rem 3.6rem;
+    border-radius: 3rem;
+    background: var(--hk-texto);
+    color: var(--hk-fondo);
+    font-size: 4.8rem;
+    font-weight: 800;
+    line-height: 1.1;
+    text-align: center;
+    opacity: 0;
+    transform: translateY(3rem);
+    transition: opacity .3s ease, transform .3s ease;
+    pointer-events: none;
+}
+.hk-tc-vuelta.hk-tc-ve {
+    opacity: 1;
+    transform: none;
+}
+.hk-tc-vuelta small {
+    display: block;
+    margin-top: 1rem;
+    font-size: 3.2rem;
+    font-weight: 600;
+    opacity: .8;
+}
+.hk-tc-vuelta-barra {
+    height: 1.2rem;
+    margin-top: 2.2rem;
+    overflow: hidden;
+    border-radius: .6rem;
+    background: rgba(255, 255, 255, .2);
+}
+.hk-tc-vuelta-barra i {
+    display: block;
+    height: 100%;
+    border-radius: .6rem;
+    background: var(--hk-acento);
+    transform-origin: 0 50%;
+}
+
+/* --- The rooms -------------------------------------------------------------------------------------------------------- */
+/* The canteen: the day's menu large with the drawings of its dishes; the dishes to touch; the days. */
+.hk-tc-plato-hoy {
+    display: -webkit-box;
+    display: flex;
+    flex-direction: column;
+    padding: 3.4rem 4rem;
+}
+.hk-tc-plato-hoy h2,
+.hk-tc-agenda-dia h2,
+.hk-tc-dia-aqui h2,
+.hk-tc-como h2,
+.hk-tc-estante h2 {
+    font-family: var(--hk-letra-titulos);
+    font-size: 5.6rem;
+    font-weight: 800;
+    line-height: 1.05;
+}
+.hk-tc-platos-grandes {
+    display: -webkit-box;
+    display: flex;
+    flex: 1;
+    align-items: center;
+    margin: 0 -1rem;
+}
+.hk-tc-plato-grande {
+    flex: 1 1 0%;
+    min-width: 0;
+    margin: 0 1rem;
+    text-align: center;
+}
+.hk-tc-comida {
+    display: block;
+    width: 30rem;
+    height: 30rem;
+    margin: -2rem 0 0 50%;
+    position: relative;
+    left: -15rem;
+    background: var(--hk-menu);
+    -webkit-mask-size: 100% 100%;
+    mask-size: 100% 100%;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+}
+.hk-tc-plato-grande small {
+    display: block;
+    color: var(--hk-texto-suave);
+    font-size: 3rem;
+}
+.hk-tc-plato-grande b {
+    display: block;
+    margin-top: .6rem;
+    font-family: var(--hk-letra-titulos);
+    font-size: 4.2rem;
+    font-weight: 800;
+    line-height: 1.1;
+}
+.hk-tc-platos {
+    padding: 2.6rem 4rem 1rem;
+}
+.hk-tc-platos h2 {
+    margin-bottom: .4rem;
+    color: var(--hk-texto-suave);
+    font-size: 3.4rem;
+    font-weight: 800;
+}
+.hk-tc-plato {
+    position: relative;
+    width: 100%;
+    min-height: 11.6rem;
+    padding: 2rem 9rem 2rem 19rem;
+    border-top: .2rem solid var(--hk-linea);
+}
+.hk-tc-plato-que {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    display: block;
+    width: 18rem;
+    margin-top: -1.8rem;
+    color: var(--hk-texto-suave);
+    font-size: 3rem;
+    line-height: 3.6rem;
+}
+.hk-tc-plato-nombre {
+    display: block;
+    font-family: var(--hk-letra-titulos);
+    font-size: 4.4rem;
+    font-weight: 700;
+    line-height: 1.1;
+}
+.hk-tc-alergenos {
+    --hk-alergeno: 4.6rem;
+    margin-top: 1rem;
+}
+.hk-tc-flecha {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    width: 5.6rem;
+    height: 5.6rem;
+    margin-top: -2.8rem;
+    color: var(--hk-texto-suave);
+}
+.hk-tc-dias {
+    display: -webkit-box;
+    display: flex;
+    margin: 0 -1rem;
+}
+.hk-tc-dia {
+    flex: 1;
+    height: 15rem;
+    margin: 0 1rem;
+    border-radius: 2.6rem;
+    background: var(--hk-superficie);
+    box-shadow: 0 .1rem .2rem rgba(0, 0, 0, .1);
+    text-align: center;
+}
+.hk-tactil .hk-tc-dia {
+    text-align: center;
+}
+.hk-tc-dia b {
+    display: block;
+    padding-top: 3rem;
+    font-family: var(--hk-letra-titulos);
+    font-size: 4rem;
+    font-weight: 800;
+    line-height: 1;
+}
+.hk-tc-dia small {
+    display: block;
+    margin-top: .8rem;
+    color: var(--hk-texto-suave);
+    font-size: 2.8rem;
+    font-weight: 700;
+}
+.hk-tc-dia.hk-tc-elegido {
+    background: var(--hk-primario);
+    color: var(--hk-sobre-primario);
+}
+.hk-tc-dia.hk-tc-elegido small {
+    color: var(--hk-sobre-primario);
+}
+/* A dish's allergens, large, low, with «Cerrar» at its foot. */
+.hk-tc-alergia {
+    position: absolute;
+    left: 4rem;
+    right: 4rem;
+    bottom: 22rem;
+    z-index: 4;
+    display: none;
+    padding: 4.4rem;
+    box-shadow: 0 3rem 8rem -2rem rgba(0, 0, 0, .45);
+}
+.hk-tc-sala > .hk-tc-alergia {
+    margin: 0;
+}
+.hk-tc-alergia.hk-tc-ve {
+    display: block;
+}
+.hk-tc-alergia h2 {
+    font-family: var(--hk-letra-titulos);
+    font-size: 6.4rem;
+    font-weight: 800;
+    line-height: 1.05;
+}
+.hk-tc-alergia p {
+    margin: 1rem 0 2.6rem;
+    color: var(--hk-texto-suave);
+    font-size: 3.4rem;
+}
+.hk-tc-alergia ul {
+    display: -webkit-box;
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 -1.4rem;
+}
+.hk-tc-alergia li {
+    width: 28rem;
+    margin: 1.4rem;
+    padding: 2.4rem;
+    border-radius: 2.6rem;
+    background: var(--hk-fondo);
+    font-size: 3.8rem;
+    font-weight: 800;
+    line-height: 1.1;
+    text-align: center;
+}
+.hk-tc-alergia li .hk-alergeno {
+    --hk-alergeno: 15rem;
+    margin: 0 auto 1.4rem;
+}
+.hk-tc-cerrar {
+    width: 100%;
+    margin: 3rem 0 0;
+}
+
+/* The agenda: what comes next, large, with its calendar leaf; the day; the days. */
+.hk-tc-proximo {
+    display: -webkit-box;
+    display: flex;
+    align-items: center;
+    padding: 7rem 4.4rem 4rem;
+}
+.hk-tc-proximo-rotulo {
+    position: absolute;
+    left: 4.4rem;
+    top: 3rem;
+    color: var(--hk-texto-suave);
+    font-size: 3.4rem;
+    font-weight: 800;
+}
+.hk-tc-hoja-cal {
+    flex: none;
+    width: 23rem;
+    margin-right: 4rem;
+    overflow: hidden;
+    border-radius: 2.6rem;
+    background: var(--hk-fondo);
+    text-align: center;
+    box-shadow: 0 .2rem .3rem rgba(0, 0, 0, .1);
+}
+.hk-tc-hoja-cal b {
+    display: block;
+    padding: 1.2rem 0;
+    background: var(--hk-evento);
+    color: var(--hk-sobre-evento);
+    font-family: var(--hk-letra-titulos);
+    font-size: 4.6rem;
+    font-weight: 800;
+    line-height: 1;
+}
+.hk-tc-hoja-cal span {
+    display: block;
+    padding: 1.4rem 0 2.2rem;
+    font-family: var(--hk-letra-titulos);
+    font-size: 14rem;
+    font-weight: 800;
+    line-height: 1;
+}
+.hk-tc-proximo-que em {
+    display: block;
+    color: var(--hk-acento-texto);
+    font-family: var(--hk-letra-titulos);
+    font-size: 4.4rem;
+    font-style: normal;
+    font-weight: 800;
+    line-height: 1;
+}
+.hk-tc-proximo-que strong {
+    display: block;
+    margin: 1.2rem 0;
+    font-family: var(--hk-letra-titulos);
+    font-size: 8.4rem;
+    font-weight: 800;
+    line-height: 1;
+}
+.hk-tc-proximo-que span {
+    font-size: 3.6rem;
+}
+.hk-tc-agenda-dia {
+    padding: 2.8rem 4rem 1.4rem;
+}
+.hk-tc-agenda-dia h2 {
+    margin-bottom: 1.4rem;
+    font-size: 4.8rem;
+}
+.hk-tc-acto {
+    display: -webkit-box;
+    display: flex;
+    align-items: baseline;
+    padding: 2.2rem 0;
+    border-top: .2rem solid var(--hk-linea);
+}
+.hk-tc-acto b {
+    flex: none;
+    width: 17rem;
+    color: var(--hk-acento-texto);
+    font-family: var(--hk-letra-titulos);
+    font-size: 4.4rem;
+    font-weight: 800;
+}
+.hk-tc-acto span {
+    flex: 1;
+    font-family: var(--hk-letra-titulos);
+    font-size: 4.4rem;
+    font-weight: 700;
+    line-height: 1.15;
+}
+.hk-tc-acto small {
+    display: block;
+    color: var(--hk-texto-suave);
+    font-size: 3.2rem;
+    font-weight: 600;
+}
+
+/* The photos: the albums, and each photo large with its arrows (swiping too). */
+.hk-tc-albumes {
+    display: -webkit-box;
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-end;
+    margin-left: -1.2rem;
+    margin-right: -1.2rem;
+}
+.hk-tc-album {
+    width: 46rem;
+    margin: 1.2rem;
+}
+.hk-tc-album img {
+    display: block;
+    width: 46rem;
+    height: 33rem;
+    object-fit: cover;
+}
+.hk-tc-album-nombre {
+    display: block;
+    padding: 2rem 2.4rem 2.4rem;
+    font-family: var(--hk-letra-titulos);
+    font-size: 4rem;
+    font-weight: 800;
+    line-height: 1.1;
+}
+.hk-tc-album-nombre small {
+    display: block;
+    color: var(--hk-texto-suave);
+    font-size: 2.8rem;
+    font-weight: 600;
+}
+.hk-tc-visor,
+.hk-tc-dia-aqui {
+    display: -webkit-box;
+    display: flex;
+    flex-direction: column;
+}
+.hk-tc-visor-foto,
+.hk-tc-momento {
+    flex: 1;
+    min-height: 0;
+    margin-bottom: 2.4rem;
+}
+.hk-tc-visor-foto img,
+.hk-tc-momento img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.hk-tc-visor-pie {
+    display: -webkit-box;
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: space-between;
+}
+.hk-tc-flecha-t {
+    width: 20rem;
+    height: 14rem;
+    border-radius: 7rem;
+    background: var(--hk-superficie);
+    box-shadow: 0 .2rem .3rem rgba(0, 0, 0, .12), 0 1rem 2rem -1rem rgba(0, 0, 0, .3);
+}
+.hk-tc-flecha-t .hk-tc-ic {
+    width: 7rem;
+    height: 7rem;
+    margin: 0 auto;
+}
+.hk-tc-visor-cuenta {
+    flex: 1;
+    padding: 0 2rem;
+    text-align: center;
+}
+.hk-tc-visor-cuenta b {
+    display: block;
+    font-family: var(--hk-letra-titulos);
+    font-size: 4.4rem;
+    font-weight: 800;
+    line-height: 1.1;
+}
+.hk-tc-visor-cuenta small {
+    display: block;
+    color: var(--hk-texto-suave);
+    font-size: 3rem;
+    font-weight: 600;
+}
+
+/* Notices, each large, filling the room. */
+.hk-tc-avisos {
+    display: -webkit-box;
+    display: flex;
+    flex-direction: column;
+}
+.hk-tc-avisos li {
+    display: -webkit-box;
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    justify-content: center;
+    margin-bottom: 2rem;
+    padding: 4rem 5rem;
+    border-left: 1.8rem solid var(--hk-acento);
+}
+.hk-tc-avisos li.hk-tc-importante {
+    border-left-color: #9f1d16;
+}
+.hk-tc-avisos b {
+    font-family: var(--hk-letra-titulos);
+    font-size: 5.8rem;
+    font-weight: 800;
+    line-height: 1.1;
+}
+.hk-tc-avisos small {
+    display: block;
+    margin-top: 1rem;
+    color: var(--hk-texto-suave);
+    font-size: 3.8rem;
+    line-height: 1.2;
+}
+
+/* The library: the covers on a shelf. */
+.hk-tc-estante {
+    display: -webkit-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.hk-tc-portadas {
+    display: -webkit-box;
+    display: flex;
+    flex-wrap: wrap;
+    margin: 2rem -1.2rem 0;
+}
+.hk-tc-libro {
+    width: 29.6rem;
+    margin: 1.2rem;
+}
+.hk-tc-libro img,
+.hk-tc-lomo {
+    display: block;
+    width: 29.6rem;
+    height: 42rem;
+    border-radius: 1rem 2.2rem 2.2rem 1rem;
+    object-fit: cover;
+    box-shadow: 0 1.6rem 2.6rem -1.6rem rgba(0, 0, 0, .5);
+}
+.hk-tc-lomo {
+    padding: 2.8rem 2.2rem;
+    background: var(--hk-tc, var(--hk-marca-1));
+    color: #fff;
+    font-family: var(--hk-letra-titulos);
+    font-size: 4rem;
+    font-weight: 800;
+    line-height: 1.1;
+    box-shadow: inset 1.2rem 0 0 rgba(0, 0, 0, .18), 0 1.6rem 2.6rem -1.6rem rgba(0, 0, 0, .5);
+}
+/* Three books or fewer: large, they fill the shelf. */
+.hk-tc-portadas[data-n="1"] .hk-tc-libro img,
+.hk-tc-portadas[data-n="1"] .hk-tc-lomo,
+.hk-tc-portadas[data-n="2"] .hk-tc-libro img,
+.hk-tc-portadas[data-n="2"] .hk-tc-lomo,
+.hk-tc-portadas[data-n="3"] .hk-tc-libro img,
+.hk-tc-portadas[data-n="3"] .hk-tc-lomo {
+    height: 62rem;
+}
+.hk-tc-libro > span {
+    display: block;
+    margin-top: 1.4rem;
+    font-family: var(--hk-letra-titulos);
+    font-size: 3.2rem;
+    font-weight: 700;
+    line-height: 1.15;
+}
+.hk-tc-libro small {
+    display: block;
+    color: var(--hk-texto-suave);
+    font-size: 2.6rem;
+    font-weight: 600;
+}
+
+/* The networks: the last posts. */
+.hk-tc-redes {
+    display: -webkit-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+.hk-tc-posts {
+    display: -webkit-box;
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 -1rem;
+}
+.hk-tc-post {
+    width: 30.9rem;
+    margin: 1rem;
+}
+.hk-tc-post img {
+    display: block;
+    width: 30.9rem;
+    height: 30rem;
+    object-fit: cover;
+}
+.hk-tc-post span {
+    display: block;
+    overflow: hidden;
+    height: 6.6rem;
+    padding: 1.4rem 1.8rem;
+    font-size: 2.8rem;
+    line-height: 1.15;
+}
+.hk-tc-canal {
+    margin-top: 2rem;
+    padding: 3rem 4rem;
+}
+.hk-tc-canal b {
+    display: block;
+    font-family: var(--hk-letra-titulos);
+    font-size: 4.4rem;
+    font-weight: 800;
+}
+.hk-tc-canal small {
+    display: block;
+    color: var(--hk-texto-suave);
+    font-size: 3.2rem;
+}
+
+/* Getting to know the centre: its words and stages; a day here, a moment at a time. */
+.hk-tc-conoce {
+    padding: 3.4rem 4.4rem;
+}
+.hk-tc-conoce p {
+    margin-bottom: 2.2rem;
+    font-family: var(--hk-letra-titulos);
+    font-size: 4.4rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+.hk-tc-etapas span {
+    display: inline-block;
+    margin: 0 1rem 1rem 0;
+    padding: 1.2rem 2.2rem;
+    border-radius: 3rem;
+    background: var(--hk-fondo);
+    font-size: 3rem;
+}
+.hk-tc-dia-aqui h2 {
+    flex: none;
+    margin-bottom: 1.6rem;
+}
+.hk-tc-momento-pie {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 11rem 4rem 3.2rem;
+    background: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, .75));
+    color: #fff;
+}
+.hk-tc-momento-pie b {
+    display: block;
+    font-family: var(--hk-letra-titulos);
+    font-size: 6rem;
+    font-weight: 800;
+    line-height: 1;
+}
+.hk-tc-momento-pie span {
+    display: block;
+    margin-top: 1rem;
+    font-size: 3.6rem;
+}
+.hk-tc-sin-foto .hk-tc-momento-pie {
+    background: none;
+    color: var(--hk-texto);
+}
+.hk-tc-momento .hk-qr {
+    width: 42rem;
+    margin: 6rem auto 0;
+}
+
+/* Today's visit: who receives them, with her face and her words; how it will be, with the drawn plan of the centre. */
+.hk-tc-quien {
+    display: -webkit-box;
+    display: flex;
+    align-items: center;
+    padding: 3.6rem 4rem;
+    background: var(--hk-primario);
+    color: var(--hk-sobre-primario);
+}
+.hk-tc-quien img {
+    flex: none;
+    width: 26rem;
+    height: 26rem;
+    margin-right: 4rem;
+    border: .8rem solid var(--hk-sobre-primario);
+    border-radius: 50%;
+    object-fit: cover;
+}
+.hk-tc-quien small {
+    display: block;
+    font-size: 3.6rem;
+    line-height: 1.15;
+    opacity: .9;
+}
+.hk-tc-quien b {
+    display: block;
+    margin: .6rem 0;
+    font-family: var(--hk-letra-titulos);
+    font-size: 8.8rem;
+    font-weight: 800;
+    line-height: 1;
+}
+.hk-tc-quien span {
+    font-size: 3.8rem;
+}
+.hk-tc-quien q {
+    display: block;
+    margin-top: 1.8rem;
+    font-size: 3.4rem;
+    font-style: italic;
+    line-height: 1.2;
+}
+.hk-tc-como {
+    display: -webkit-box;
+    display: flex;
+    flex-direction: column;
+    padding: 3.4rem 4.4rem;
+}
+.hk-tc-como h2 {
+    flex: none;
+    margin-bottom: 1.8rem;
+    font-size: 5.2rem;
+}
+.hk-tc-como h2 small {
+    color: var(--hk-texto-suave);
+    font-size: 3.6rem;
+    font-weight: 700;
+}
+/* The whole plan, never cropped: every label of the way reads whole. */
+.hk-tc-plano {
+    display: block;
+    flex: 1;
+    width: 100%;
+    min-height: 0;
+    margin-bottom: 2rem;
+    border-radius: 2rem;
+    object-fit: contain;
+}
+.hk-tc-como p {
+    flex: none;
+    font-family: var(--hk-letra-titulos);
+    font-size: 4rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+.hk-tc-como .hk-tc-turnos {
+    margin-top: 1.6rem;
+    color: var(--hk-acento-texto);
+}
+
+/* The open act: when, its name and the code to sign up. */
+.hk-tc-acto-grande {
+    display: -webkit-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 4.4rem;
+}
+.hk-tc-cuando {
+    display: inline-block;
+    align-self: flex-start;
+    padding: 1.2rem 2.6rem;
+    border-radius: 4rem;
+    background: var(--hk-acento);
+    color: var(--hk-sobre-acento);
+    font-family: var(--hk-letra-titulos);
+    font-size: 4rem;
+    font-weight: 800;
+}
+.hk-tc-acto-grande h2 {
+    margin: 2.6rem 0 1.4rem;
+    font-family: var(--hk-letra-titulos);
+    font-size: 10rem;
+    font-weight: 800;
+    line-height: 1;
+}
+.hk-tc-acto-grande p {
+    color: var(--hk-texto-suave);
+    font-size: 3.8rem;
+}
+.hk-tc-qr-grande {
+    display: -webkit-box;
+    display: flex;
+    align-items: center;
+    margin-top: 4rem;
+}
+.hk-tc-qr-grande .hk-qr {
+    flex: none;
+    width: 42rem;
+    margin: 0 4rem 0 0;
+}
+.hk-tc-qr-grande b {
+    font-family: var(--hk-letra-titulos);
+    font-size: 5.6rem;
+    font-weight: 800;
+    line-height: 1.1;
+}
+
+/* Getting there: the centre's map, if it has one; its lines with their icons. */
+.hk-tc-mapa img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+.hk-tc-datos {
+    display: -webkit-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 3rem 4rem;
+}
+.hk-tc-dato {
+    display: -webkit-box;
+    display: flex;
+    align-items: center;
+    padding: 1.8rem 0;
+    border-bottom: .2rem solid var(--hk-linea);
+    font-family: var(--hk-letra-titulos);
+    font-size: 4.2rem;
+    font-weight: 700;
+    line-height: 1.15;
+}
+.hk-tc-dato:last-child {
+    border-bottom: 0;
+}
+.hk-tc-dato .hk-tc-ic {
+    flex: none;
+    width: 5.6rem;
+    height: 5.6rem;
+    margin-right: 2.4rem;
+    color: var(--hk-primario);
+}
+.hk-tc-dato small {
+    display: block;
+    color: var(--hk-texto-suave);
+    font-size: 2.8rem;
+    font-weight: 600;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .hk-tc-portal::after {
+        -webkit-animation: none;
+        animation: none;
+    }
+    .hk-tc-hoja,
+    .hk-tc-vuelta {
+        transition: none;
+    }
+}
+
+/* The drawing of each dish (player/comida, the drawings of Meals): painted in the menu's colour through a mask. */
+.hk-tc-comida-allergy { -webkit-mask-image: url(comida/allergy.svg); mask-image: url(comida/allergy.svg); }
+.hk-tc-comida-apple { -webkit-mask-image: url(comida/apple.svg); mask-image: url(comida/apple.svg); }
+.hk-tc-comida-arepa { -webkit-mask-image: url(comida/arepa.svg); mask-image: url(comida/arepa.svg); }
+.hk-tc-comida-artichoke { -webkit-mask-image: url(comida/artichoke.svg); mask-image: url(comida/artichoke.svg); }
+.hk-tc-comida-avocado { -webkit-mask-image: url(comida/avocado.svg); mask-image: url(comida/avocado.svg); }
+.hk-tc-comida-banana { -webkit-mask-image: url(comida/banana.svg); mask-image: url(comida/banana.svg); }
+.hk-tc-comida-bao { -webkit-mask-image: url(comida/bao.svg); mask-image: url(comida/bao.svg); }
+.hk-tc-comida-boiledegg { -webkit-mask-image: url(comida/boiledegg.svg); mask-image: url(comida/boiledegg.svg); }
+.hk-tc-comida-bread { -webkit-mask-image: url(comida/bread.svg); mask-image: url(comida/bread.svg); }
+.hk-tc-comida-broccoli { -webkit-mask-image: url(comida/broccoli.svg); mask-image: url(comida/broccoli.svg); }
+.hk-tc-comida-burger { -webkit-mask-image: url(comida/burger.svg); mask-image: url(comida/burger.svg); }
+.hk-tc-comida-cabbage { -webkit-mask-image: url(comida/cabbage.svg); mask-image: url(comida/cabbage.svg); }
+.hk-tc-comida-cake { -webkit-mask-image: url(comida/cake.svg); mask-image: url(comida/cake.svg); }
+.hk-tc-comida-cakeslice { -webkit-mask-image: url(comida/cakeslice.svg); mask-image: url(comida/cakeslice.svg); }
+.hk-tc-comida-cauliflower { -webkit-mask-image: url(comida/cauliflower.svg); mask-image: url(comida/cauliflower.svg); }
+.hk-tc-comida-cereal { -webkit-mask-image: url(comida/cereal.svg); mask-image: url(comida/cereal.svg); }
+.hk-tc-comida-cheese { -webkit-mask-image: url(comida/cheese.svg); mask-image: url(comida/cheese.svg); }
+.hk-tc-comida-chicken { -webkit-mask-image: url(comida/chicken.svg); mask-image: url(comida/chicken.svg); }
+.hk-tc-comida-churros { -webkit-mask-image: url(comida/churros.svg); mask-image: url(comida/churros.svg); }
+.hk-tc-comida-cookies { -webkit-mask-image: url(comida/cookies.svg); mask-image: url(comida/cookies.svg); }
+.hk-tc-comida-corn { -webkit-mask-image: url(comida/corn.svg); mask-image: url(comida/corn.svg); }
+.hk-tc-comida-couscous { -webkit-mask-image: url(comida/couscous.svg); mask-image: url(comida/couscous.svg); }
+.hk-tc-comida-cream { -webkit-mask-image: url(comida/cream.svg); mask-image: url(comida/cream.svg); }
+.hk-tc-comida-croissant { -webkit-mask-image: url(comida/croissant.svg); mask-image: url(comida/croissant.svg); }
+.hk-tc-comida-croquettes { -webkit-mask-image: url(comida/croquettes.svg); mask-image: url(comida/croquettes.svg); }
+.hk-tc-comida-cucumber { -webkit-mask-image: url(comida/cucumber.svg); mask-image: url(comida/cucumber.svg); }
+.hk-tc-comida-curry { -webkit-mask-image: url(comida/curry.svg); mask-image: url(comida/curry.svg); }
+.hk-tc-comida-custard { -webkit-mask-image: url(comida/custard.svg); mask-image: url(comida/custard.svg); }
+.hk-tc-comida-dish { -webkit-mask-image: url(comida/dish.svg); mask-image: url(comida/dish.svg); }
+.hk-tc-comida-dumplings { -webkit-mask-image: url(comida/dumplings.svg); mask-image: url(comida/dumplings.svg); }
+.hk-tc-comida-egg { -webkit-mask-image: url(comida/egg.svg); mask-image: url(comida/egg.svg); }
+.hk-tc-comida-egg-free { -webkit-mask-image: url(comida/egg-free.svg); mask-image: url(comida/egg-free.svg); }
+.hk-tc-comida-eggplant { -webkit-mask-image: url(comida/eggplant.svg); mask-image: url(comida/eggplant.svg); }
+.hk-tc-comida-empanada { -webkit-mask-image: url(comida/empanada.svg); mask-image: url(comida/empanada.svg); }
+.hk-tc-comida-falafel { -webkit-mask-image: url(comida/falafel.svg); mask-image: url(comida/falafel.svg); }
+.hk-tc-comida-fish { -webkit-mask-image: url(comida/fish.svg); mask-image: url(comida/fish.svg); }
+.hk-tc-comida-fishsticks { -webkit-mask-image: url(comida/fishsticks.svg); mask-image: url(comida/fishsticks.svg); }
+.hk-tc-comida-fries { -webkit-mask-image: url(comida/fries.svg); mask-image: url(comida/fries.svg); }
+.hk-tc-comida-fruit { -webkit-mask-image: url(comida/fruit.svg); mask-image: url(comida/fruit.svg); }
+.hk-tc-comida-gazpacho { -webkit-mask-image: url(comida/gazpacho.svg); mask-image: url(comida/gazpacho.svg); }
+.hk-tc-comida-gluten-free { -webkit-mask-image: url(comida/gluten-free.svg); mask-image: url(comida/gluten-free.svg); }
+.hk-tc-comida-gnocchi { -webkit-mask-image: url(comida/gnocchi.svg); mask-image: url(comida/gnocchi.svg); }
+.hk-tc-comida-grapes { -webkit-mask-image: url(comida/grapes.svg); mask-image: url(comida/grapes.svg); }
+.hk-tc-comida-greenbeans { -webkit-mask-image: url(comida/greenbeans.svg); mask-image: url(comida/greenbeans.svg); }
+.hk-tc-comida-hotdog { -webkit-mask-image: url(comida/hotdog.svg); mask-image: url(comida/hotdog.svg); }
+.hk-tc-comida-hummus { -webkit-mask-image: url(comida/hummus.svg); mask-image: url(comida/hummus.svg); }
+.hk-tc-comida-icecream { -webkit-mask-image: url(comida/icecream.svg); mask-image: url(comida/icecream.svg); }
+.hk-tc-comida-jelly { -webkit-mask-image: url(comida/jelly.svg); mask-image: url(comida/jelly.svg); }
+.hk-tc-comida-juice { -webkit-mask-image: url(comida/juice.svg); mask-image: url(comida/juice.svg); }
+.hk-tc-comida-kiwi { -webkit-mask-image: url(comida/kiwi.svg); mask-image: url(comida/kiwi.svg); }
+.hk-tc-comida-lactose-free { -webkit-mask-image: url(comida/lactose-free.svg); mask-image: url(comida/lactose-free.svg); }
+.hk-tc-comida-lasagne { -webkit-mask-image: url(comida/lasagne.svg); mask-image: url(comida/lasagne.svg); }
+.hk-tc-comida-lentils { -webkit-mask-image: url(comida/lentils.svg); mask-image: url(comida/lentils.svg); }
+.hk-tc-comida-macaroni { -webkit-mask-image: url(comida/macaroni.svg); mask-image: url(comida/macaroni.svg); }
+.hk-tc-comida-mango { -webkit-mask-image: url(comida/mango.svg); mask-image: url(comida/mango.svg); }
+.hk-tc-comida-meat { -webkit-mask-image: url(comida/meat.svg); mask-image: url(comida/meat.svg); }
+.hk-tc-comida-meatballs { -webkit-mask-image: url(comida/meatballs.svg); mask-image: url(comida/meatballs.svg); }
+.hk-tc-comida-melon { -webkit-mask-image: url(comida/melon.svg); mask-image: url(comida/melon.svg); }
+.hk-tc-comida-milk { -webkit-mask-image: url(comida/milk.svg); mask-image: url(comida/milk.svg); }
+.hk-tc-comida-milkshake { -webkit-mask-image: url(comida/milkshake.svg); mask-image: url(comida/milkshake.svg); }
+.hk-tc-comida-mushrooms { -webkit-mask-image: url(comida/mushrooms.svg); mask-image: url(comida/mushrooms.svg); }
+.hk-tc-comida-mussels { -webkit-mask-image: url(comida/mussels.svg); mask-image: url(comida/mussels.svg); }
+.hk-tc-comida-nachos { -webkit-mask-image: url(comida/nachos.svg); mask-image: url(comida/nachos.svg); }
+.hk-tc-comida-noodles { -webkit-mask-image: url(comida/noodles.svg); mask-image: url(comida/noodles.svg); }
+.hk-tc-comida-nuggets { -webkit-mask-image: url(comida/nuggets.svg); mask-image: url(comida/nuggets.svg); }
+.hk-tc-comida-octopus { -webkit-mask-image: url(comida/octopus.svg); mask-image: url(comida/octopus.svg); }
+.hk-tc-comida-omelette { -webkit-mask-image: url(comida/omelette.svg); mask-image: url(comida/omelette.svg); }
+.hk-tc-comida-onion { -webkit-mask-image: url(comida/onion.svg); mask-image: url(comida/onion.svg); }
+.hk-tc-comida-orange { -webkit-mask-image: url(comida/orange.svg); mask-image: url(comida/orange.svg); }
+.hk-tc-comida-paella { -webkit-mask-image: url(comida/paella.svg); mask-image: url(comida/paella.svg); }
+.hk-tc-comida-pancakes { -webkit-mask-image: url(comida/pancakes.svg); mask-image: url(comida/pancakes.svg); }
+.hk-tc-comida-pasta { -webkit-mask-image: url(comida/pasta.svg); mask-image: url(comida/pasta.svg); }
+.hk-tc-comida-peach { -webkit-mask-image: url(comida/peach.svg); mask-image: url(comida/peach.svg); }
+.hk-tc-comida-pear { -webkit-mask-image: url(comida/pear.svg); mask-image: url(comida/pear.svg); }
+.hk-tc-comida-pepper { -webkit-mask-image: url(comida/pepper.svg); mask-image: url(comida/pepper.svg); }
+.hk-tc-comida-persimmon { -webkit-mask-image: url(comida/persimmon.svg); mask-image: url(comida/persimmon.svg); }
+.hk-tc-comida-pie { -webkit-mask-image: url(comida/pie.svg); mask-image: url(comida/pie.svg); }
+.hk-tc-comida-pineapple { -webkit-mask-image: url(comida/pineapple.svg); mask-image: url(comida/pineapple.svg); }
+.hk-tc-comida-pizza { -webkit-mask-image: url(comida/pizza.svg); mask-image: url(comida/pizza.svg); }
+.hk-tc-comida-plum { -webkit-mask-image: url(comida/plum.svg); mask-image: url(comida/plum.svg); }
+.hk-tc-comida-potatoes { -webkit-mask-image: url(comida/potatoes.svg); mask-image: url(comida/potatoes.svg); }
+.hk-tc-comida-pulses { -webkit-mask-image: url(comida/pulses.svg); mask-image: url(comida/pulses.svg); }
+.hk-tc-comida-pumpkin { -webkit-mask-image: url(comida/pumpkin.svg); mask-image: url(comida/pumpkin.svg); }
+.hk-tc-comida-quiche { -webkit-mask-image: url(comida/quiche.svg); mask-image: url(comida/quiche.svg); }
+.hk-tc-comida-ravioli { -webkit-mask-image: url(comida/ravioli.svg); mask-image: url(comida/ravioli.svg); }
+.hk-tc-comida-ribs { -webkit-mask-image: url(comida/ribs.svg); mask-image: url(comida/ribs.svg); }
+.hk-tc-comida-rice { -webkit-mask-image: url(comida/rice.svg); mask-image: url(comida/rice.svg); }
+.hk-tc-comida-ricepudding { -webkit-mask-image: url(comida/ricepudding.svg); mask-image: url(comida/ricepudding.svg); }
+.hk-tc-comida-ringbread { -webkit-mask-image: url(comida/ringbread.svg); mask-image: url(comida/ringbread.svg); }
+.hk-tc-comida-roastchicken { -webkit-mask-image: url(comida/roastchicken.svg); mask-image: url(comida/roastchicken.svg); }
+.hk-tc-comida-salad { -webkit-mask-image: url(comida/salad.svg); mask-image: url(comida/salad.svg); }
+.hk-tc-comida-samosa { -webkit-mask-image: url(comida/samosa.svg); mask-image: url(comida/samosa.svg); }
+.hk-tc-comida-sandwich { -webkit-mask-image: url(comida/sandwich.svg); mask-image: url(comida/sandwich.svg); }
+.hk-tc-comida-sausages { -webkit-mask-image: url(comida/sausages.svg); mask-image: url(comida/sausages.svg); }
+.hk-tc-comida-schnitzel { -webkit-mask-image: url(comida/schnitzel.svg); mask-image: url(comida/schnitzel.svg); }
+.hk-tc-comida-shrimp { -webkit-mask-image: url(comida/shrimp.svg); mask-image: url(comida/shrimp.svg); }
+.hk-tc-comida-skewer { -webkit-mask-image: url(comida/skewer.svg); mask-image: url(comida/skewer.svg); }
+.hk-tc-comida-soup { -webkit-mask-image: url(comida/soup.svg); mask-image: url(comida/soup.svg); }
+.hk-tc-comida-spinach { -webkit-mask-image: url(comida/spinach.svg); mask-image: url(comida/spinach.svg); }
+.hk-tc-comida-springroll { -webkit-mask-image: url(comida/springroll.svg); mask-image: url(comida/springroll.svg); }
+.hk-tc-comida-squid { -webkit-mask-image: url(comida/squid.svg); mask-image: url(comida/squid.svg); }
+.hk-tc-comida-stewpot { -webkit-mask-image: url(comida/stewpot.svg); mask-image: url(comida/stewpot.svg); }
+.hk-tc-comida-strawberry { -webkit-mask-image: url(comida/strawberry.svg); mask-image: url(comida/strawberry.svg); }
+.hk-tc-comida-sushi { -webkit-mask-image: url(comida/sushi.svg); mask-image: url(comida/sushi.svg); }
+.hk-tc-comida-taco { -webkit-mask-image: url(comida/taco.svg); mask-image: url(comida/taco.svg); }
+.hk-tc-comida-tamale { -webkit-mask-image: url(comida/tamale.svg); mask-image: url(comida/tamale.svg); }
+.hk-tc-comida-toast { -webkit-mask-image: url(comida/toast.svg); mask-image: url(comida/toast.svg); }
+.hk-tc-comida-tofu { -webkit-mask-image: url(comida/tofu.svg); mask-image: url(comida/tofu.svg); }
+.hk-tc-comida-tomato { -webkit-mask-image: url(comida/tomato.svg); mask-image: url(comida/tomato.svg); }
+.hk-tc-comida-tostada { -webkit-mask-image: url(comida/tostada.svg); mask-image: url(comida/tostada.svg); }
+.hk-tc-comida-vegetables { -webkit-mask-image: url(comida/vegetables.svg); mask-image: url(comida/vegetables.svg); }
+.hk-tc-comida-vegetarian { -webkit-mask-image: url(comida/vegetarian.svg); mask-image: url(comida/vegetarian.svg); }
+.hk-tc-comida-watermelon { -webkit-mask-image: url(comida/watermelon.svg); mask-image: url(comida/watermelon.svg); }
+.hk-tc-comida-wok { -webkit-mask-image: url(comida/wok.svg); mask-image: url(comida/wok.svg); }
+.hk-tc-comida-wrap { -webkit-mask-image: url(comida/wrap.svg); mask-image: url(comida/wrap.svg); }
+.hk-tc-comida-yogurt { -webkit-mask-image: url(comida/yogurt.svg); mask-image: url(comida/yogurt.svg); }
+.hk-tc-comida-zucchini { -webkit-mask-image: url(comida/zucchini.svg); mask-image: url(comida/zucchini.svg); }
