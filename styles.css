@@ -6638,6 +6638,7 @@ input.hkp-red-cuenta:focus {
 }
 .hkp-rc-dia {
     display: grid;
+    /* stylelint-disable-next-line csstree/validator */
     grid-template-columns: repeat(auto-fill, minmax(min(100%, 14rem), 1fr));
     gap: .9rem;
     margin: 0;

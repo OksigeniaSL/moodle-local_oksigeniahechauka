@@ -164,6 +164,10 @@ class reportpage {
             }
             $own[] = $line + ['title' => $title];
         }
+        // The doors by how many times they were opened, as their bars show.
+        usort($touch['doors'], function ($a, $b) {
+            return $b['count'] <=> $a['count'];
+        });
         return [array_slice($own, 0, self::MOST_LINES), array_slice($sources, 0, self::MOST_LINES), $touch];
     }
 
