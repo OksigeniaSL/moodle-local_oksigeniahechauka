@@ -1532,5 +1532,6 @@ $string['touch_from_to'] = 'de {a} a {b}';
 $string['touch_turns'] = 'Turnos';
 $string['touch_signup'] = 'Inscríbanse con el móvil';
 $string['touch_hours'] = 'Horario de atención';
+$string['touch_take_me'] = 'Ábranlo en el móvil y los lleva hasta aquí';
 $string['touch_previous'] = 'Anterior';
 $string['touch_following'] = 'Siguiente';

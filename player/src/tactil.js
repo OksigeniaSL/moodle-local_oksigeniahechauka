@@ -92,6 +92,7 @@ export const WORDS = {
     touch_turns: 'Turnos',
     touch_signup: 'Inscríbanse con el móvil',
     touch_hours: 'Horario de atención',
+    touch_take_me: 'Ábranlo en el móvil y los lleva hasta aquí',
     touch_previous: 'Anterior',
     touch_following: 'Siguiente',
 };
@@ -839,7 +840,11 @@ export class Tactil {
         // A title of three words or more never leaves its last one alone on the second line.
         h1.appendChild(document.createTextNode(title.split(' ').length > 2 ? title.replace(/ (\S+)$/, ' $1') : title));
         head.appendChild(h1);
-        const link = linkOf(key, d);
+        let link = linkOf(key, d);
+        // «Cómo llegar» without a map carries the code of the way here large in the room: not twice.
+        if (key === 'centre' && this.wayHere(d)) {
+            link = '';
+        }
         if (link) {
             const take = el('div', 'hk-tc-llevar');
             take.appendChild(el('span', '', this.word('touch_take')));
@@ -1328,9 +1333,16 @@ export class Tactil {
         room.appendChild(card);
     }
 
+    /** Without a map of its own, the address of the way here (contact.geo), for its code large in the room. */
+    wayHere(d) {
+        const c = d.contact || {};
+        return c.map && this.o.media(c.map) ? '' : webOf(c.geo);
+    }
+
     centreRoom(room, d) {
         const c = d.contact;
         const map = c.map ? this.o.media(c.map) : null;
+        const way = this.wayHere(d);
         if (map) {
             const fig = el('div', 'hk-tc-tarjeta hk-tc-llena hk-tc-mapa');
             const im = el('img');
@@ -1338,8 +1350,14 @@ export class Tactil {
             im.src = map;
             fig.appendChild(im);
             room.appendChild(fig);
+        } else if (way) {
+            // The way here, on a phone: the code large, and what it does.
+            const go = el('div', 'hk-tc-tarjeta hk-tc-llena hk-tc-llevame');
+            go.appendChild(this.o.qr(way));
+            go.appendChild(el('b', '', this.word('touch_take_me').replace(/ (\S+)$/, '\u00a0$1')));
+            room.appendChild(go);
         }
-        const card = el('div', 'hk-tc-tarjeta hk-tc-datos' + (map ? '' : ' hk-tc-llena'));
+        const card = el('div', 'hk-tc-tarjeta hk-tc-datos' + (map || way ? '' : ' hk-tc-llena'));
         [['address', c.address], ['hours', c.hours, this.word('touch_hours')], ['phone', c.phone], ['email', c.email],
             ['web', c.web ? String(c.web).replace(/^https?:\/\//, '').replace(/\/$/, '') : '']].forEach(function (row) {
             if (!String(row[1] || '').trim()) {

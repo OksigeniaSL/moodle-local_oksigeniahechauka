@@ -122,6 +122,7 @@ class player_page {
             'touch_turns' => get_string('touch_turns', $c),
             'touch_signup' => get_string('touch_signup', $c),
             'touch_hours' => get_string('touch_hours', $c),
+            'touch_take_me' => get_string('touch_take_me', $c),
             'touch_previous' => get_string('touch_previous', $c),
             'touch_following' => get_string('touch_following', $c),
             'touch_door_menu' => get_string('door_menu', $c),

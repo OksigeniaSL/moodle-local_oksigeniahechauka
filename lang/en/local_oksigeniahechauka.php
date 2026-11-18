@@ -1532,5 +1532,6 @@ $string['touch_from_to'] = 'from {a} to {b}';
 $string['touch_turns'] = 'Times';
 $string['touch_signup'] = 'Sign up on your phone';
 $string['touch_hours'] = 'Office hours';
+$string['touch_take_me'] = 'Open it on your phone and it brings you here';
 $string['touch_previous'] = 'Previous';
 $string['touch_following'] = 'Next';

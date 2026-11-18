@@ -1275,6 +1275,29 @@
     line-height: 1.1;
 }
 
+/* Getting there: the centre's map, if it has one; if not, the code of the way here large; and its lines with their icons. */
+.hk-tc-llevame {
+    display: -webkit-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem;
+    text-align: center;
+}
+.hk-tc-llevame .hk-qr {
+    width: 48rem;
+    margin: 0 auto 3rem;
+}
+.hk-tc-llevame .hk-qr-llamada {
+    display: none;
+}
+.hk-tc-llevame > b {
+    font-family: var(--hk-letra-titulos);
+    font-size: 5.2rem;
+    font-weight: 800;
+    line-height: 1.1;
+}
 /* Getting there: the centre's map, if it has one; its lines with their icons. */
 .hk-tc-mapa img {
     position: absolute;
