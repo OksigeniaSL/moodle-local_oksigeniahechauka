@@ -61,7 +61,7 @@
     </div>
     <div class="hkp-rc-dia-cab"><h3 class="hkp-label">{{#str}}touch_day_here, local_oksigeniahechauka{{/str}}</h3><p class="hkp-hint">{{#str}}reception_day_help, local_oksigeniahechauka, {{daymost}}{{/str}}</p></div>
     <ol class="hkp-rc-dia" data-rc-day data-titlemost="{{titlemost}}" data-saysmost="{{saysmost}}" data-full="{{#dayfull}}1{{/dayfull}}">
-        {{#day}}{{> local_oksigeniahechauka/centre_reception_moment }}{{/day}}
+        {{#day}}<li class="hkp-rc-momento{{#picture}} has-picture{{/picture}}" data-rc-moment="{{n}}">{{> local_oksigeniahechauka/centre_reception_moment }}</li>{{/day}}
         {{^dayfull}}<li class="hkp-rc-momento is-nuevo"><button type="button" class="hkp-rc-nuevo" data-rc-day-add><span aria-hidden="true">+</span>{{#str}}reception_day_add, local_oksigeniahechauka{{/str}}</button></li>{{/dayfull}}
     </ol>
 </section>
