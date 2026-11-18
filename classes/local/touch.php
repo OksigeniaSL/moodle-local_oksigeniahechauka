@@ -73,6 +73,9 @@ class touch {
     /** @var int What fits of a moment's words. */
     const SAYS = 140;
 
+    /** @var int The longest a visit of today lasts: longer, it is a window to choose a day in, not a visit yet. */
+    const VISIT_MOST = 12 * HOURSECS;
+
     /** @var int The biggest picture kept, in bytes. */
     const MOST = 8 * 1024 * 1024;
 
@@ -237,7 +240,8 @@ class touch {
     }
 
     /**
-     * The visits for the screens, from what Eguahe gives: those that have not ended, with what a screen shows of them.
+     * The visits for the screens, from what Eguahe gives: those that have not ended, with what a screen shows of them. One
+     * that lasts more than half a day is a window to choose a day in, not a visit with its time: it does not come.
      * Pure but for the keeping of the pictures, which comes as a function.
      *
      * @param array $list what api::visits_today() gives
@@ -253,7 +257,7 @@ class touch {
         foreach ($list as $visit) {
             $start = (int) ($visit['timestart'] ?? 0);
             $end = (int) ($visit['timeend'] ?? 0);
-            if (!$start || $end <= $start || $end <= $now) {
+            if (!$start || $end <= $start || $end <= $now || $end - $start > self::VISIT_MOST) {
                 continue;
             }
             $hosts = [];

@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.29.1
+
+- Today's visit leaves out what lasts more than half a day: a window for a family to choose a day in, not a visit
+  with its time yet.
+
 ## 0.29.0
 
 - **The screen people touch**, at the door of a centre, where families come in a hurry and visitors wait for whoever

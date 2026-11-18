@@ -140,6 +140,7 @@ final class touch_test extends \advanced_testcase {
                 'turns' => [['timestart' => $now - 600, 'timeend' => $now + 600]], 'hosts' => []],
             ['id' => 3, 'kind' => 'visit', 'name' => 'Ya pasó', 'timestart' => $now - 7200, 'timeend' => $now - 3600],
             ['id' => 4, 'kind' => 'visit', 'name' => 'Sin horas'],
+            ['id' => 5, 'kind' => 'visit', 'name' => 'Aún sin día', 'timestart' => $now + 600, 'timeend' => $now + 90 * DAYSECS],
         ];
         $visits = touch::visits_of($list, $now, function ($file) {
             return $file instanceof \stored_file ? touch::keep($file) : null;
