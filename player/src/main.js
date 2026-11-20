@@ -323,12 +323,22 @@ class Player {
             (surprises.characters || []).forEach(function (c) {
                 const base = c.atlas.slice(0, c.atlas.lastIndexOf('/') + 1);
                 cache.match(c.atlas).then(function (hit) {
-                    return hit || fetch(c.atlas).then(function (r) {
+                    return (hit ? Promise.resolve(hit) : fetch(c.atlas)).then(function (r) {
                         return r.json();
                     }).then(function (atlas) {
-                        return cache.addAll([c.atlas].concat(filesOf(atlas).map(function (name) {
+                        // Also what is missing of one already kept: a player before this one may not have known all its
+                        // files (the bat's peel came with a new version of the player, a moment after the bat).
+                        const all = [c.atlas].concat(filesOf(atlas).map(function (name) {
                             return base + name;
-                        })));
+                        }));
+                        return Promise.all(all.map(function (url) {
+                            return cache.match(url);
+                        })).then(function (kept) {
+                            const missing = all.filter(function (url, k) {
+                                return !kept[k];
+                            });
+                            return missing.length ? cache.addAll(missing) : null;
+                        });
                     });
                 }).catch(function () {
                     return null;
