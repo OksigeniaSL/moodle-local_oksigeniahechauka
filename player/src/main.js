@@ -165,8 +165,9 @@ class Player {
             },
         });
         this.surprises = new Surprises(screen.frame, {
+            // Nor while somebody touches the doors: they are up close, reading; a character would cross what they read.
             quiet: function () {
-                return screen.keepsStill();
+                return screen.keepsStill() || !!(self.tactil && self.tactil.near);
             },
             floor: function () {
                 return screen.tickerTop();
