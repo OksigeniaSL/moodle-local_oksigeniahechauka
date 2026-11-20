@@ -239,6 +239,46 @@ export function hangOf(meta, width, stop, scale, random) {
 }
 
 /**
+ * What comes down from the top edge and falls out of the bottom one (the ladybug, `meta.baja`), straight down: it has no
+ * `cruza` and no `huye`. `asoma` starts with its anchor `y0` above the top edge, so that it peeps over it; whole turns of
+ * `baja` and then `para` set it down at the nearest to `stop` they can, never so low that the fall has no room (`baja.abajo`
+ * above the bottom edge, at most). Then its gesture, `resbala` and `cae` turn after turn until all of it is under the bottom
+ * edge; one of those turns is `adios`, which has the same steps: the last that ends `baja.adios` or more above the edge.
+ * Everything is known before it starts.
+ *
+ * @param {object} meta the atlas's
+ * @param {number} width of the screen
+ * @param {number} height of the screen
+ * @param {number} stop the height it would like to stop at
+ * @param {number} scale
+ * @param {string} gesture
+ * @param {function(): number} random from 0 to 1
+ * @returns {{dir: number, from: number, top: number, halt: number, exit: number, down: boolean, steps: object[]}}
+ */
+export function dropOf(meta, width, height, stop, scale, gesture, random) {
+    const est = meta.estados;
+    const sum = (state) => est[state].avance.reduce((total, step) => total + step[1], 0) * scale;
+    const top = est.asoma.y0 * scale;
+    const peeped = top + sum('asoma');
+    const turn = sum('baja');
+    const brake = sum('para');
+    const lowest = height - meta.baja.abajo * scale;
+    let turns = Math.max(0, Math.round((Math.min(stop, lowest) - brake - peeped) / turn));
+    while (turns > 0 && peeped + turns * turn + brake > lowest) {
+        turns--;
+    }
+    const halt = peeped + turns * turn + brake;
+    const after = halt + sum(gesture) + sum('resbala');
+    const falls = Math.max(0, Math.floor((height - meta.baja.adios * scale - after) / sum('cae')) - 1);
+    const side = meta.anchor.x * scale;
+    const steps = [{state: 'asoma', times: 1}].concat(turns ? [{state: 'baja', times: turns}] : [],
+        [{state: 'para', times: 1}, {state: gesture, times: 1}, {state: 'resbala', times: 1}],
+        falls ? [{state: 'cae', times: falls}] : [], [{state: 'adios', times: 1}, {state: 'cae', times: 0}]);
+    return {dir: random() < 0.5 ? 1 : -1, from: side + random() * (width - 2 * side), top, halt,
+        exit: height + meta.anchor.y * scale, down: true, steps};
+}
+
+/**
  * The height its anchor goes at. What walks, on the ticker if it is in sight and if not on the bottom edge; what flies has no
  * floor: anywhere within the heights its atlas says (`altura`, at base 1080), on any shape of screen. What hangs stops there.
  *
@@ -505,7 +545,7 @@ class Walk {
         this.root.appendChild(box);
         // What hangs has its thread behind it, at scale 1 from the start: only `transform` changes.
         this.thread = null;
-        if (m.estados.cruza.hilo) {
+        if (m.estados.cruza && m.estados.cruza.hilo) {
             this.thread = document.createElement('div');
             css(this.thread, {position: 'absolute', left: '0', top: '0', width: THREAD_WIDE + 'px', height: '1px',
                 background: THREAD_TEXELS, willChange: 'transform', visibility: 'hidden',
@@ -592,7 +632,9 @@ class Walk {
     }
 
     /**
-     * @param {{dir: number, from: number, turns: number, exit: number, top: (number|undefined)}} plan with `top`, it hangs
+     * @param {{dir: number, from: number, turns: number, exit: number, top: (number|undefined), steps: (object[]|undefined),
+     *     down: (boolean|undefined)}} plan with `top`, it hangs or comes down from there; with `steps`, those are its steps
+     *     (the last goes round until it is out), and with `down`, it goes out by the bottom edge
      * @param {number} height the height its anchor starts at, if it does not hang
      * @param {number} scale
      * @param {string} gesture
@@ -602,9 +644,8 @@ class Walk {
         const m = this.atlas.meta;
         // What only crosses has no `para`, gestures or `huye`: its `cruza` goes round until it is out.
         const only = !m.estados.para;
-        const last = only ? 'cruza' : 'huye';
-        const steps = only ? [{state: 'cruza', times: 0}] : [{state: 'cruza', times: plan.turns}, {state: 'para', times: 1},
-            {state: gesture, times: 1}, {state: 'huye', times: 0}];
+        const steps = plan.steps ? plan.steps : only ? [{state: 'cruza', times: 0}] : [{state: 'cruza', times: plan.turns},
+            {state: 'para', times: 1}, {state: gesture, times: 1}, {state: 'huye', times: 0}];
         // What jumps in plays `entra` first, after the frames that continue its leap back to under the edge.
         const before = plan.leap ? plan.leap.before.slice() : [];
         if (plan.leap) {
@@ -648,8 +689,9 @@ class Walk {
                     time = 0;
                 }
             }
-            const out = plan.top !== undefined ? y < plan.exit : (plan.dir > 0 ? x > plan.exit : x < plan.exit) || (m.posa && y < -below);
-            if (now.state === last && out) {
+            const out = plan.down ? y > plan.exit : plan.top !== undefined ? y < plan.exit :
+                (plan.dir > 0 ? x > plan.exit : x < plan.exit) || (m.posa && y < -below);
+            if (now === steps[steps.length - 1] && out) {
                 done();
                 return;
             }
@@ -1147,12 +1189,16 @@ export class Surprises {
             } else {
                 const gestures = atlas.meta.gestos || [];
                 const gesture = gestures[Math.floor(Math.random() * gestures.length)];
-                walk = new Walk(this.layer, atlas, base, !atlas.meta.estados.para ? ['cruza'] :
-                    ['cruza', 'para', gesture, 'huye'].concat(atlas.meta.estados.entra ? ['entra'] : []));
+                // What comes down from the top and falls out by the bottom (the ladybug) has a way of its own.
+                const drops = !!atlas.meta.baja;
+                walk = new Walk(this.layer, atlas, base, drops ? ['asoma', 'baja', 'para', gesture, 'resbala', 'cae', 'adios'] :
+                    !atlas.meta.estados.para ? ['cruza'] :
+                        ['cruza', 'para', gesture, 'huye'].concat(atlas.meta.estados.entra ? ['entra'] : []));
                 const stop = heightOf(atlas.meta, height, scale, this.hooks.floor(), Math.random);
-                const plan = atlas.meta.estados.cruza.hilo ? hangOf(atlas.meta, width, stop, scale, Math.random) :
-                    (atlas.meta.estados.entra && jumpOf(atlas.meta, width, height, stop, scale, Math.random)) ||
-                    walkOf(atlas.meta, width, scale, Math.random);
+                const plan = drops ? dropOf(atlas.meta, width, height, stop, scale, gesture, Math.random) :
+                    atlas.meta.estados.cruza.hilo ? hangOf(atlas.meta, width, stop, scale, Math.random) :
+                        (atlas.meta.estados.entra && jumpOf(atlas.meta, width, height, stop, scale, Math.random)) ||
+                        walkOf(atlas.meta, width, scale, Math.random);
                 const run = (end) => walk.run(plan, stop, scale, gesture, end);
                 // What comes with water: the water rises, the creature comes a moment later and, once it is gone, the water goes down.
                 start = () => {

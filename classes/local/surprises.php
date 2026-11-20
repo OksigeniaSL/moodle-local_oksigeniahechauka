@@ -33,7 +33,7 @@ class surprises {
 
     /** @var string[] Who there is: each has its folder in player/sorpresas. */
     const CHARACTERS = ['gusanito', 'abeja', 'mosca', 'arana', 'pulpo', 'pezglobo', 'geco', 'rana', 'petirrojo', 'bruja',
-        'abuelo'];
+        'abuelo', 'mariquita'];
 
     /** @var string[] Who comes only on the dates the centre sets, and only if it asks for them: nobody has them by default. */
     const SEASONAL = ['nieve'];

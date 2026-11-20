@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {existsSync, readFileSync} from 'node:fs';
-import {cleanOf, dueAfter, filesOf, hangOf, heightOf, inSeason, isRaining, jumpOf, leapOf, pagesOf, scaleOf, Surprises, tileOf, walkOf} from '../src/surprises.js';
+import {cleanOf, dropOf, dueAfter, filesOf, hangOf, heightOf, inSeason, isRaining, jumpOf, leapOf, pagesOf, scaleOf, Surprises, tileOf, walkOf} from '../src/surprises.js';
 
 const atlasOf = (id) => JSON.parse(readFileSync(new URL('../sorpresas/' + id + '/spr.' + id + '.atlas.json', import.meta.url), 'utf8'));
 const atlas = atlasOf('gusanito');
@@ -470,4 +470,58 @@ test('what only crosses (the witch, the grandfather on his carpet) comes from ou
         assert.ok(y >= 260 && y <= 700, id + ' ' + y);
         assert.deepEqual(pagesOf(atlasOf(id), ['cruza']).length, meta.pages.length);
     }
+});
+
+test('the ladybird peeps over the top edge, stops on the screen with room for her fall and waves goodbye just before she is out', () => {
+    const one = atlasOf('mariquita');
+    const meta = one.meta;
+    const gesture = meta.gestos[0];
+    // Every frame of every state she plays is in her atlas, and none moves her sideways.
+    for (const state of ['asoma', 'baja', 'para', 'resbala', 'cae', 'adios'].concat(meta.gestos)) {
+        const e = meta.estados[state];
+        assert.ok(e && e.avance.length === e.frames, state);
+        assert.ok(e.avance.every((step) => step[0] === 0), state);
+        for (let i = 0; i < e.frames; i++) {
+            assert.ok(one.frames[state + '_' + (i < 10 ? '0' : '') + i], state + ' ' + i);
+        }
+    }
+    assert.ok(!meta.estados.cruza && !meta.estados.huye);
+    for (const [width, height] of [[1920, 1080], [1080, 1920]]) {
+        for (const distance of [3, 5, 8]) {
+            const scale = scaleOf(width, height, distance);
+            const sum = (state) => meta.estados[state].avance.reduce((total, step) => total + step[1], 0) * scale;
+            for (const r of [0, 0.5, 0.999]) {
+                const stop = heightOf(meta, height, scale, 900, at(r));
+                const plan = dropOf(meta, width, height, stop, scale, gesture, at(r));
+                const where = width + 'x' + height + ' at ' + distance + ' m, ' + r;
+                // From out of sight, and on the screen across.
+                assert.ok(plan.top + (meta.cell.h - meta.anchor.y) * scale <= 0, where);
+                assert.ok(plan.from - meta.anchor.x * scale >= 0 && plan.from + meta.anchor.x * scale <= width, where);
+                // Her steps take her to where she stops, on the screen and with room for the fall under her.
+                let y = plan.top;
+                const ends = {};
+                for (const step of plan.steps) {
+                    if (step.times) {
+                        y += sum(step.state) * step.times;
+                        ends[step.state] = y;
+                    }
+                }
+                assert.ok(Math.abs(ends.para - plan.halt) < 1e-6, where);
+                // Her body on the screen: on a wide one from afar, high up, for the fall needs most of the screen.
+                assert.ok(plan.halt > 0, where + ': stops at ' + plan.halt);
+                assert.ok(plan.halt <= height - meta.baja.abajo * scale + 1e-6 || !plan.steps.some((s) => s.state === 'baja'),
+                    where + ': room under ' + plan.halt);
+                // Goodbye on the last turn that ends far enough above the bottom edge, if one does.
+                const room = height - meta.baja.adios * scale;
+                if (ends.resbala + sum('cae') <= room) {
+                    assert.ok(ends.adios <= room + 1e-6 && ends.adios + sum('cae') > room, where + ': goodbye at ' + ends.adios);
+                }
+                // She goes on falling until all of her is under the bottom edge.
+                const last = plan.steps[plan.steps.length - 1];
+                assert.deepEqual([last.state, last.times], ['cae', 0]);
+                assert.ok(plan.down && plan.exit - meta.anchor.y * scale >= height, where);
+            }
+        }
+    }
+    assert.equal(pagesOf(one, ['asoma', 'baja', 'para', gesture, 'resbala', 'cae', 'adios']).length, meta.pages.length);
 });

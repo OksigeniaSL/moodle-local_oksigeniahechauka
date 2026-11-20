@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.30.0
+
+- **The ladybird**, a new Surprise that comes from the top: it peeps over the edge, walks down the glass, turns round,
+  waves and washes its face until it slips and, flop!, opens its spotted wings like a parachute and floats down out of
+  the screen, waving goodbye. The same on a portrait screen as on a landscape one. It joins a centre that had chosen
+  every other one.
+- On a screen people touch, no Surprise crosses the doors while somebody is touching them: they come again when the
+  screen goes back to its turns.
+
 ## 0.29.1
 
 - Today's visit leaves out what lasts more than half a day: a window for a family to choose a day in, not a visit
