@@ -249,7 +249,8 @@ export function hangOf(meta, width, stop, scale, random) {
  * What comes down from the top edge and falls out of the bottom one (the ladybug, `meta.baja`), straight down: it has no
  * `cruza` and no `huye`. `asoma` starts with its anchor `y0` above the top edge, so that it peeps over it; whole turns of
  * `baja` and then `para` set it down at the nearest to `stop` they can, never so low that the fall has no room (`baja.abajo`
- * above the bottom edge, at most). Then its gesture, `resbala` and `cae` turn after turn until all of it is under the bottom
+ * above the bottom edge, at most), nor so high that the top edge cuts its head (`baja.arriba` over its anchor while it
+ * stops, waves and washes): rather than that, its goodbye may end nearer the bottom edge, at most on it. Then its gesture, `resbala` and `cae` turn after turn until all of it is under the bottom
  * edge; one of those turns is `adios`, which has the same steps: the last that ends `baja.adios` or more above the edge.
  * Everything is known before it starts.
  *
@@ -273,6 +274,10 @@ export function dropOf(meta, width, height, stop, scale, gesture, random) {
     let turns = Math.max(0, Math.round((Math.min(stop, lowest) - brake - peeped) / turn));
     while (turns > 0 && peeped + turns * turn + brake > lowest) {
         turns--;
+    }
+    const head = (meta.baja.arriba || 0) * scale;
+    while (peeped + turns * turn + brake < head && peeped + (turns + 1) * turn + brake <= lowest + meta.baja.adios * scale) {
+        turns++;
     }
     const halt = peeped + turns * turn + brake;
     const after = halt + sum(gesture) + sum('resbala');

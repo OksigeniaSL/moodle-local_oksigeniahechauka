@@ -507,10 +507,15 @@ test('the ladybird peeps over the top edge, stops on the screen with room for he
                     }
                 }
                 assert.ok(Math.abs(ends.para - plan.halt) < 1e-6, where);
-                // Her body on the screen: on a wide one from afar, high up, for the fall needs most of the screen.
-                assert.ok(plan.halt > 0, where + ': stops at ' + plan.halt);
-                assert.ok(plan.halt <= height - meta.baja.abajo * scale + 1e-6 || !plan.steps.some((s) => s.state === 'baja'),
+                // All her head on the screen, and room for the fall under her: her goodbye may end nearer the bottom
+                // edge, at most on it.
+                assert.ok(plan.halt >= meta.baja.arriba * scale, where + ': her head at ' + (plan.halt - meta.baja.arriba * scale));
+                const under = height - meta.baja.abajo * scale;
+                assert.ok(plan.halt <= under + meta.baja.adios * scale + 1e-6 || !plan.steps.some((s) => s.state === 'baja'),
                     where + ': room under ' + plan.halt);
+                if (plan.halt > under + 1e-6) {
+                    assert.ok(plan.halt - sum('baja') < meta.baja.arriba * scale, where + ': lower only to keep her head');
+                }
                 // Goodbye on the last turn that ends far enough above the bottom edge, if one does.
                 const room = height - meta.baja.adios * scale;
                 if (ends.resbala + sum('cae') <= room) {
