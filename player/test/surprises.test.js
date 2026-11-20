@@ -525,3 +525,45 @@ test('the ladybird peeps over the top edge, stops on the screen with room for he
     }
     assert.equal(pagesOf(one, ['asoma', 'baja', 'para', gesture, 'resbala', 'cae', 'adios']).length, meta.pages.length);
 });
+
+test('the bat comes down from out of sight, stops with its feet on the top edge, and flies off by the side it faces', () => {
+    const one = atlasOf('murcielago');
+    const meta = one.meta;
+    assert.ok(meta.cuelga && !meta.estados.cruza.hilo);
+    for (const state of ['cruza', 'para', 'huye'].concat(meta.gestos)) {
+        const e = meta.estados[state];
+        assert.ok(e && e.avance.length === e.frames, state);
+        for (let i = 0; i < e.frames; i++) {
+            assert.ok(one.frames[state + '_' + (i < 10 ? '0' : '') + i], state + ' ' + i);
+        }
+    }
+    for (const [width, height] of [[1920, 1080], [1080, 1920]]) {
+        for (const distance of [3, 5, 8]) {
+            const scale = scaleOf(width, height, distance);
+            const sum = (state) => meta.estados[state].avance.reduce((total, step) => total + step[1], 0) * scale;
+            for (const r of [0.2, 0.8]) {
+                const plan = hangOf(meta, width, 0, scale, at(r));
+                const where = width + 'x' + height + ' at ' + distance + ' m, ' + r;
+                assert.ok(plan.top + (meta.cell.h - meta.anchor.y) * scale <= 0, where + ': starts out of sight');
+                assert.ok(Math.abs(plan.top + plan.turns * sum('cruza') + sum('para')) < 1e-6, where + ': its feet on the edge');
+                assert.ok(plan.from - meta.anchor.x * scale >= 0 && plan.from + meta.anchor.x * scale <= width, where);
+                // Out when all of its cell is past the edge of its side.
+                if (plan.dir > 0) {
+                    assert.ok(plan.exit - meta.anchor.x * scale >= width, where);
+                } else {
+                    assert.ok(plan.exit + (meta.cell.w - meta.anchor.x) * scale <= 0, where);
+                }
+            }
+        }
+    }
+    // Its flight goes forward and comes back to its height at each turn.
+    const huye = meta.estados.huye.avance;
+    assert.ok(huye.reduce((total, step) => total + step[0], 0) > 0);
+    assert.ok(Math.abs(huye.reduce((total, step) => total + step[1], 0)) < 0.01);
+    // The peel is one of its files, and leaves the sheet at a frame its gesture has.
+    const c = meta.cascara;
+    assert.ok(filesOf(one).includes(c.image));
+    assert.ok(c.fotograma < meta.estados[c.estado].frames && meta.gestos.includes(c.estado));
+    assert.ok(c.g > 0 && c.vy >= 0);
+    assert.equal(pagesOf(one, ['cruza', 'para', 'huye'].concat(meta.gestos)).length, meta.pages.length);
+});

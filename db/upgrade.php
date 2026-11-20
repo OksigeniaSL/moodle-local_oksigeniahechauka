@@ -375,12 +375,12 @@ function xmldb_local_oksigeniahechauka_upgrade($oldversion) {
     }
 
     if ($oldversion < 2026112000) {
-        // The ladybird, a new Surprise that comes down from the top edge: as the others, it joins a centre that had
-        // chosen every one of the others.
+        // The ladybird and the bat, new Surprises that come down from the top edge: as the others, they join a centre that
+        // had chosen every one of the others.
         $who = get_config('local_oksigeniahechauka', 'surprisewho');
         $before = ['gusanito', 'abeja', 'mosca', 'arana', 'pulpo', 'pezglobo', 'geco', 'rana', 'petirrojo', 'bruja', 'abuelo'];
         if ($who !== false && !array_diff($before, explode(',', (string) $who))) {
-            $all = array_unique(array_merge(explode(',', (string) $who), ['mariquita']));
+            $all = array_unique(array_merge(explode(',', (string) $who), ['mariquita', 'murcielago']));
             set_config('surprisewho', implode(',', $all), 'local_oksigeniahechauka');
         }
         upgrade_plugin_savepoint(true, 2026112000, 'local', 'oksigeniahechauka');

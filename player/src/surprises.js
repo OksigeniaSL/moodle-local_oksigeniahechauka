@@ -11,6 +11,11 @@
 // What falls over the whole screen (`tipo: capas`, snow and rain) has no frames: tiles that join on their four sides, one element per
 // layer, each moved by a CSS animation of `transform` on the compositor, with no code per frame. What swims brings its water in
 // its atlas (`agua`), made the same way; and who comes with steam, the steam (`vaho`), with its cut in step with the sheet.
+//
+// From the top edge: what comes down and falls out by the bottom one (the ladybird, `meta.baja`) has its own plan, known
+// before it starts (`dropOf`); what hangs by its feet from the edge (the bat, `meta.cuelga`) comes down as the spider does,
+// with no thread, and flies off by its side. What it lets go of (its peel, `meta.cascara`) is a picture of its own that falls
+// from the frame the sheet no longer has it.
 
 const LEAST_MINUTES = 15;
 // An order waits this long for the manifest that says who comes out: it may have been given right after turning them on.
@@ -218,7 +223,8 @@ export function cleanOf(meta, width, height, scale, gesture, slips) {
 
 /**
  * What hangs comes down instead of crossing: whole turns of its loop, as many as it takes to start out of sight, so that it
- * brakes just at the height it stops at. It leaves upwards.
+ * brakes just at the height it stops at. It leaves upwards; what hangs by its feet from the top edge (the bat, `meta.cuelga`)
+ * stops with them on it and leaves flying by the side it faces, out when all of its cell is past that edge.
  *
  * @param {object} meta the atlas's
  * @param {number} width of the screen
@@ -234,8 +240,9 @@ export function hangOf(meta, width, stop, scale, random) {
     const below = (meta.cell.h - meta.anchor.y) * scale;
     const turns = Math.max(1, Math.ceil((stop - brake + below) / turn));
     const side = meta.anchor.x * scale;
-    return {dir: random() < 0.5 ? 1 : -1, turns, from: side + random() * (width - 2 * side), top: stop - brake - turns * turn,
-        exit: -below};
+    const dir = random() < 0.5 ? 1 : -1;
+    const exit = !meta.cuelga ? -below : dir > 0 ? width + meta.cell.w * scale : -meta.cell.w * scale;
+    return {dir, turns, from: side + random() * (width - 2 * side), top: stop - brake - turns * turn, exit};
 }
 
 /**
@@ -326,6 +333,10 @@ export function filesOf(atlas) {
     const files = atlas.meta.pages || atlas.meta.capas.map(function (capa) {
         return capa.image;
     });
+    // What lets go of something that falls out of its cell (the bat's peel) brings it as a picture of its own.
+    if (atlas.meta.cascara) {
+        return files.concat([atlas.meta.cascara.image]);
+    }
     const steam = atlas.meta.vaho;
     if (steam) {
         return files.concat([steam.ancha.image, steam.ancha.tapon.image, steam.alta.image, steam.alta.tapon.image, steam.barra.image],
@@ -553,11 +564,20 @@ class Walk {
             layer.appendChild(this.thread);
         }
         layer.appendChild(this.root);
+        // What it lets go of falls out of its cell (the bat's peel): a picture of its own, in front, at its anchor.
+        this.peel = null;
+        if (m.cascara) {
+            this.peel = new Image();
+            css(this.peel, {position: 'absolute', left: '0', top: '0', willChange: 'transform', visibility: 'hidden',
+                transformOrigin: m.cascara.ancla[0] + 'px ' + m.cascara.ancla[1] + 'px', transform: 'translate3d(0,0,0) scale(1,1)'});
+            this.peel.src = base + m.cascara.image;
+            layer.appendChild(this.peel);
+        }
     }
 
     /** Waits for the pages and has them decoded now, not in the middle of the walk. */
     prepare() {
-        const images = Object.keys(this.images).map((p) => this.images[p]);
+        const images = Object.keys(this.images).map((p) => this.images[p]).concat(this.peel ? [this.peel] : []);
         return Promise.all(images.map(function (img) {
             return new Promise(function (resolve, reject) {
                 if (img.complete && img.naturalWidth) {
@@ -574,6 +594,10 @@ class Walk {
                 this.thread.style.opacity = '0.001';
                 this.thread.style.visibility = 'visible';
             }
+            // The peel is out of the root: almost invisible on its own while it is painted once.
+            if (this.peel) {
+                this.peel.style.opacity = '0.001';
+            }
             images.forEach(function (img) {
                 img.style.visibility = 'visible';
             });
@@ -587,6 +611,9 @@ class Walk {
                     if (this.thread) {
                         this.thread.style.opacity = '1';
                         this.thread.style.visibility = 'hidden';
+                    }
+                    if (this.peel) {
+                        this.peel.style.opacity = '1';
                     }
                     resolve();
                 });
@@ -629,6 +656,46 @@ class Walk {
         }
         this.root.style.transform = 'translate3d(' + (x - m.anchor.x) + 'px,' + (y - m.anchor.y) + 'px,0) scale(' +
             (mirrored ? -scale : scale) + ',' + scale + ')';
+        if (this.peel) {
+            this.drop(state, i, x, y, scale, mirrored);
+        }
+    }
+
+    /**
+     * The peel: at its frame it is no longer on the sheet, and from where it was it falls by itself, turning, on the time of
+     * the steps, until all of it is under the bottom edge. Its eyes follow it, so where it is comes from the atlas.
+     *
+     * @param {string} state
+     * @param {number} i
+     * @param {number} x
+     * @param {number} y
+     * @param {number} scale
+     * @param {boolean} mirrored
+     */
+    drop(state, i, x, y, scale, mirrored) {
+        const m = this.atlas.meta;
+        const c = m.cascara;
+        if (this.peelT === undefined && state === c.estado && i === c.fotograma) {
+            this.peelT = 0;
+            this.peelX = x + (c.x - m.anchor.x) * (mirrored ? -scale : scale);
+            this.peelY = y + (c.y - m.anchor.y) * scale;
+            this.peelD = mirrored ? -1 : 1;
+            this.peel.style.visibility = 'visible';
+        }
+        if (this.peelT === undefined || this.peelT === null) {
+            return;
+        }
+        const t = this.peelT;
+        const px = this.peelX + this.peelD * c.vx * t * scale;
+        const py = this.peelY + (c.vy * t + 0.5 * c.g * t * t) * scale;
+        if (py - Math.max(c.w, c.h) * scale > this.bottom) {
+            this.peel.style.visibility = 'hidden';
+            this.peelT = null;
+            return;
+        }
+        this.peel.style.transform = 'translate3d(' + (px - c.ancla[0]) + 'px,' + (py - c.ancla[1]) + 'px,0) scale(' +
+            (this.peelD * scale) + ',' + scale + ') rotate(' + (c.giro0 + c.giro * t) + 'deg)';
+        this.peelT = t + 1 / m.estados[state].fps;
     }
 
     /**
@@ -662,6 +729,7 @@ class Walk {
         // On a whole pixel, for it to be as sharp as it can when still.
         this.threadX = Math.round(plan.from) + 0.5;
         this.threadSeen = false;
+        this.peelT = undefined;
         let step = 0;
         let time = 0;
         let i = 0;
@@ -689,7 +757,9 @@ class Walk {
                     time = 0;
                 }
             }
-            const out = plan.down ? y > plan.exit : plan.top !== undefined ? y < plan.exit :
+            // What hangs by its feet from the edge flies off by its side (or, just in case, under the bottom edge).
+            const out = plan.down ? y > plan.exit : m.cuelga ? (plan.dir > 0 ? x > plan.exit : x < plan.exit) ||
+                y - m.anchor.y * scale > this.bottom : plan.top !== undefined ? y < plan.exit :
                 (plan.dir > 0 ? x > plan.exit : x < plan.exit) || (m.posa && y < -below);
             if (now === steps[steps.length - 1] && out) {
                 done();
@@ -711,6 +781,15 @@ class Walk {
         }
         if (this.thread && this.thread.parentNode) {
             this.thread.parentNode.removeChild(this.thread);
+        }
+        if (this.peel) {
+            if (this.peel.parentNode) {
+                this.peel.parentNode.removeChild(this.peel);
+            }
+            this.peel.onload = null;
+            this.peel.onerror = null;
+            this.peel.src = '';
+            this.peel = null;
         }
         Object.keys(this.images).forEach((p) => {
             this.images[p].onload = null;
@@ -1194,9 +1273,11 @@ export class Surprises {
                 walk = new Walk(this.layer, atlas, base, drops ? ['asoma', 'baja', 'para', gesture, 'resbala', 'cae', 'adios'] :
                     !atlas.meta.estados.para ? ['cruza'] :
                         ['cruza', 'para', gesture, 'huye'].concat(atlas.meta.estados.entra ? ['entra'] : []));
-                const stop = heightOf(atlas.meta, height, scale, this.hooks.floor(), Math.random);
+                walk.bottom = height;
+                // What hangs by its feet from the top edge (the bat) stops with them on it.
+                const stop = atlas.meta.cuelga ? 0 : heightOf(atlas.meta, height, scale, this.hooks.floor(), Math.random);
                 const plan = drops ? dropOf(atlas.meta, width, height, stop, scale, gesture, Math.random) :
-                    atlas.meta.estados.cruza.hilo ? hangOf(atlas.meta, width, stop, scale, Math.random) :
+                    atlas.meta.estados.cruza.hilo || atlas.meta.cuelga ? hangOf(atlas.meta, width, stop, scale, Math.random) :
                         (atlas.meta.estados.entra && jumpOf(atlas.meta, width, height, stop, scale, Math.random)) ||
                         walkOf(atlas.meta, width, scale, Math.random);
                 const run = (end) => walk.run(plan, stop, scale, gesture, end);

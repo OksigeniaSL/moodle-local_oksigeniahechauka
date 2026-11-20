@@ -4,8 +4,11 @@
 
 - **The ladybird**, a new Surprise that comes from the top: it peeps over the edge, walks down the glass, turns round,
   waves and washes its face until it slips and, flop!, opens its spotted wings like a parachute and floats down out of
-  the screen, waving goodbye. The same on a portrait screen as on a landscape one. It joins a centre that had chosen
-  every other one.
+  the screen, waving goodbye.
+- **The bat**, a new Surprise that hangs by its feet from the top edge: it comes down asleep, wrapped in its wings,
+  wakes up, offers a piece of banana and, as nobody takes it, eats it itself; the peel falls, turning, and the bat lets
+  go to follow it and flies off by the side, clumsy, with its ears over its eyes.
+- Both look the same on a portrait screen as on a landscape one, and join a centre that had chosen every other one.
 - On a screen people touch, no Surprise crosses the doors while somebody is touching them: they come again when the
   screen goes back to its turns.
 
