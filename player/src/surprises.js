@@ -364,17 +364,14 @@ export function filesOf(atlas) {
         return capa.image;
     });
     // What lets go of something that falls out of its cell (the bat's peel) brings it as a picture of its own.
-    if (atlas.meta.cascara) {
-        return files.concat([atlas.meta.cascara.image]);
-    }
+    const peel = atlas.meta.cascara ? [atlas.meta.cascara.image] : [];
     const steam = atlas.meta.vaho;
-    if (steam) {
-        return files.concat([steam.ancha.image, steam.ancha.tapon.image, steam.alta.image, steam.alta.tapon.image, steam.barra.image],
-            steam.borde ? [steam.borde.image] : []);
-    }
-    return atlas.meta.agua ? files.concat(atlas.meta.agua.capas.map(function (capa) {
+    const veil = steam ? [steam.ancha.image, steam.ancha.tapon.image, steam.alta.image, steam.alta.tapon.image, steam.barra.image]
+        .concat(steam.borde ? [steam.borde.image] : []) : [];
+    const water = atlas.meta.agua ? atlas.meta.agua.capas.map(function (capa) {
         return capa.image;
-    })) : files;
+    }) : [];
+    return files.concat(peel, veil, water);
 }
 
 /**

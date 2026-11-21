@@ -294,6 +294,9 @@ class player_page {
         header('Cache-Control: no-cache');
         // What the worker of the screens looks for before keeping a page as theirs.
         header('X-Hechauka-Player: 1');
+        // The page is the same for every screen and has nothing of anyone: the app of the Samsung displays may follow a short
+        // address to it and keep where it really is, instead of depending on the shortener every morning.
+        header('Access-Control-Allow-Origin: *');
         header('X-Content-Type-Options: nosniff');
         header('X-Frame-Options: ' . ($framed ? 'SAMEORIGIN' : 'DENY'));
         echo self::html($boot);

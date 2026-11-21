@@ -511,7 +511,15 @@ export class Tactil {
         if (!this.built) {
             this.build();
         }
-        this.clock = this.clock && this.clock.idle === (this.touch.idle || 60) ? this.clock : new IdleClock(this.touch.idle || 60);
+        if (!this.clock || this.clock.idle !== (this.touch.idle || 60)) {
+            // Another wait from the panel while somebody touches: the touch so far still counts.
+            const before = this.clock;
+            this.clock = new IdleClock(this.touch.idle || 60);
+            if (before) {
+                this.clock.started = before.started;
+                this.clock.last = before.last;
+            }
+        }
         this.refresh();
     }
 
@@ -781,6 +789,10 @@ export class Tactil {
     goNear() {
         if (this.near) {
             return;
+        }
+        // Opened without a finger (the OK key of a remote, a keyboard): the doors still go back by themselves.
+        if (this.clock && this.clock.started === null) {
+            this.clock.touched(Date.now());
         }
         this.frame.classList.add('hk-tc-de-cerca');
         if (this.o.near) {

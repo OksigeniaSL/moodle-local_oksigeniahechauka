@@ -308,7 +308,7 @@ export class Composer {
         // on a screen with little else, «Today» is every other slide.
         this.sinceMenus = (this.sinceMenus === undefined ? MENUS_EVERY : this.sinceMenus) + 1;
         // A screen by the canteen shows them every other slide while it serves: whoever passes finds theirs at once.
-        const menusEvery = o.mealTime ? (o.canteen ? 1 : MENUS_MEAL_EVERY) : MENUS_EVERY;
+        const menusEvery = o.mealTime ? (o.canteen ? 2 : MENUS_MEAL_EVERY) : MENUS_EVERY;
         const afterToday = this.last === 'solo-hoy' && o.menu && this.sinceMenus <= menusEvery + 2;
         if (o.menus && o.menus.menus && o.menus.menus.length > 1 && this.sinceMenus > menusEvery && !afterToday) {
             this.sinceMenus = 1;

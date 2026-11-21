@@ -118,6 +118,8 @@ class Player {
                 if (!self.bad[item.id]) {
                     self.note('item ' + item.id + ': the file does not play');
                 }
+                // Gone from the browser's store (it may clear it when short of room): brought again at the next sync.
+                self.media.forget(item.media);
                 self.bad[item.id] = Date.now();
                 // A photo of an album goes by the album's name: the photo itself is what must not come back.
                 if (item.source) {
@@ -183,7 +185,13 @@ class Player {
             this.registerWorker();
             const stored = store.manifest();
             if (stored) {
-                this.apply(stored);
+                // A kept manifest the new player cannot take must not stop it for good: it asks the server again.
+                try {
+                    this.apply(stored);
+                } catch (e) {
+                    this.note('kept manifest: ' + (e && e.message || e));
+                    store.setManifest(null);
+                }
             }
             setInterval(function () {
                 self.heartbeat();
@@ -276,7 +284,12 @@ class Player {
             if (m && m.errorcode) {
                 self.note('manifest: ' + m.errorcode);
             } else if (m) {
-                self.apply(m);
+                try {
+                    self.apply(m);
+                } catch (e) {
+                    self.note('manifest: ' + (e && e.message || e));
+                    return;
+                }
                 if (self.mode === 'screen') {
                     store.setManifest(m);
                 }
@@ -694,7 +707,7 @@ class Player {
             return;
         }
         if (this.reloadAt) {
-            location.reload();
+            this.reload();
             return;
         }
         const m = this.manifest;
@@ -815,6 +828,18 @@ class Player {
     }
 
     tick() {
+        // Each second: a part that throws (a strip, the urgent notice) must not stop the turns, the reload and the ticker.
+        try {
+            this.tickOnce();
+        } catch (e) {
+            if (!this.tickFailed) {
+                this.note('tick: ' + (e && e.message || e));
+            }
+            this.tickFailed = true;
+        }
+    }
+
+    tickOnce() {
         if (!this.manifest) {
             return;
         }
@@ -852,8 +877,8 @@ class Player {
         if ((was && !urgent) || wasOn === false || lost || !this.screen.comp) {
             this.next();
         }
-        if (this.reloadAt && Date.now() - this.reloadAt > 30000) {
-            location.reload();
+        if (this.reloadAt && Date.now() - this.reloadAt > 30000 && !(this.tactil && this.tactil.near)) {
+            this.reload();
             return;
         }
         this.screen.showTicker(liveItems(m.items || [], 'ticker', wall).map(function (it) {
@@ -865,8 +890,32 @@ class Player {
     nightly(wall) {
         // Where the browser keeps nothing, not even the key, a reload would leave the screen asking to be paired.
         if (this.mode === 'screen' && store.works() && performance.now() > 20 * 3600000 && wall.min >= 180 && wall.min < 240) {
-            location.reload();
+            this.reload();
         }
+    }
+
+    /**
+     * Starts again, only when the server gives the page: never onto its error page or the page of a site being updated,
+     * which a screen without the worker (the Samsung displays) would show until it is switched off. Tried again a minute
+     * later.
+     */
+    reload() {
+        if (this.mode !== 'screen') {
+            location.reload();
+            return;
+        }
+        const now = Date.now();
+        if (this.reloadTried && now - this.reloadTried < 60000) {
+            return;
+        }
+        this.reloadTried = now;
+        fetch(location.href, {credentials: 'omit', cache: 'no-store'}).then(function (res) {
+            if (res.ok && res.headers.get('X-Hechauka-Player')) {
+                location.reload();
+            }
+        }, function () {
+            return null;
+        });
     }
 
     /**
@@ -882,7 +931,8 @@ class Player {
         this.keepPixel();
         const m = this.manifest;
         return JSON.stringify({version: VERSION, key: store.key(), revoked: store.revoked(),
-            on: m ? isPowerOn(m.power, this.clock.wall()) : true});
+            // Without a manifest it does not know yet: the agent leaves the television as it is.
+            on: m ? isPowerOn(m.power, this.clock.wall()) : null});
     }
 
     keepPixel() {
@@ -997,5 +1047,6 @@ class Player {
 }
 
 const player = new Player(readBoot());
-player.start();
+// Before it starts: the agent of the device speaks with it even if something in the start goes wrong.
 window.hechauka = player;
+player.start();

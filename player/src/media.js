@@ -47,6 +47,23 @@ export class MediaStore {
         return !!this.url(media);
     }
 
+    /**
+     * A file that would not show: out of what the device has, so that the next sync brings it again.
+     *
+     * @param {object|undefined} media
+     */
+    forget(media) {
+        const sha1 = media && media.sha1;
+        if (!sha1 || !this.urls[sha1]) {
+            return;
+        }
+        if (this.blobs[sha1]) {
+            URL.revokeObjectURL(this.urls[sha1]);
+        }
+        delete this.urls[sha1];
+        delete this.blobs[sha1];
+    }
+
     /** Files that failed and why, for the heartbeat. */
     errors() {
         const out = [];
@@ -84,15 +101,23 @@ export class MediaStore {
         });
         Object.keys(wanted).forEach(function (sha1) {
             chain = chain.then(function (cache) {
+                // A newer list came while this one was being brought: it goes first, and brings again what it still needs
+                // (today's birthdays do not wait behind yesterday's videos).
+                if (self.pending) {
+                    return cache;
+                }
                 // A download that hangs (the network gone with no answer) must not keep the rest waiting.
                 const limit = Math.max(600000, (wanted[sha1].size || 0) / 100);
+                let timer = 0;
                 return Promise.race([self.bring(cache, wanted[sha1]), new Promise(function (resolve, reject) {
-                    setTimeout(function () {
+                    timer = setTimeout(function () {
                         reject(new Error('it takes too long'));
                     }, limit);
                 })]).then(function () {
+                    clearTimeout(timer);
                     return cache;
                 }, function (e) {
+                    clearTimeout(timer);
                     self.failed[sha1] = 'media ' + wanted[sha1].id + ': ' + (e && e.message || e);
                     return cache;
                 });
@@ -173,6 +198,12 @@ export class MediaStore {
 
     prune(cache, wanted) {
         const self = this;
+        // What failed and is no longer wanted is no longer a fault: not told, not brought again at every heartbeat.
+        Object.keys(this.failed).forEach(function (sha1) {
+            if (!wanted[sha1]) {
+                delete self.failed[sha1];
+            }
+        });
         Object.keys(this.urls).forEach(function (sha1) {
             if (!wanted[sha1]) {
                 if (self.blobs[sha1]) {

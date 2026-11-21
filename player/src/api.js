@@ -54,12 +54,14 @@ export function makeApi(endpoints, key, session, heard) {
         }
         return h;
     }
-    function request(url, opts, ms) {
+    // `clock`: whether its Date header tells the time. Only the answers of the contract do: a file may come from the
+    // browser's own cache (Chromium before 64 takes no notice of `cache`) with the date of the day it first came.
+    function request(url, opts, ms, clock) {
         opts.credentials = session ? 'same-origin' : 'omit';
         opts.cache = 'no-store';
         const sent = Date.now();
         return withTimeout(fetch(url, opts), ms || 20000).then(function (res) {
-            if (heard && res.headers) {
+            if (heard && clock !== false && res.headers && !res.headers.get('Age')) {
                 const server = Date.parse(res.headers.get('Date') || '');
                 if (server > 0) {
                     heard(server, sent, Date.now());
@@ -108,13 +110,13 @@ export function makeApi(endpoints, key, session, heard) {
                 method: 'POST',
                 headers: headers({'Content-Type': blob.type}),
                 body: blob,
-            }).then(function (res) {
+            }, 0, false).then(function (res) {
                 return res.ok ? null : failure(res);
             });
         },
         /** A media file, as a Response, for the cache. Videos can be big: a long time limit. */
         media: function (url) {
-            return request(url, {method: 'GET', headers: headers()}, 30 * 60000).then(function (res) {
+            return request(url, {method: 'GET', headers: headers()}, 30 * 60000, false).then(function (res) {
                 return res.ok ? res : failure(res);
             });
         },

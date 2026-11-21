@@ -427,13 +427,17 @@ test('never two videos close together: one too soon gives its turn to what is no
 
 test('a screen by the canteen shows every menu every other slide while it serves', () => {
     const menus = {menus: [{name: 'Menú A'}, {name: 'Menú B'}]};
+    const queue = [{id: 'p1', type: 'image', width: 1920, height: 1080}, {id: 'p2', type: 'image', width: 1920, height: 1080},
+        {id: 'p3', type: 'image', width: 1920, height: 1080}];
     const c = new Composer();
     const comps = [];
     for (let i = 0; i < 20; i++) {
-        comps.push(c.next([], 4, true, {menus, menu: true, mealTime: true, canteen: true, distance: 3}).comp);
+        comps.push(c.next(queue, i % 3, true, {menus, menu: true, mealTime: true, canteen: true, distance: 3}).comp);
     }
     const n = comps.filter((comp) => comp === 'menus').length;
     assert.ok(n >= 8, comps.join(' '));
+    // Every other slide, not every slide: whoever passes by also sees the rest.
+    assert.ok(!/menus menus/.test(comps.join(' ')), comps.join(' '));
 });
 
 test('the picture of the day: one slide in twelve, and at rest it comes and goes with the screen at rest', () => {

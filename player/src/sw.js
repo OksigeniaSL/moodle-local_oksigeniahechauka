@@ -91,11 +91,14 @@ self.addEventListener('fetch', function (event) {
         return;
     }
     const page = req.mode === 'navigate';
+    // The copy is kept within the event's own waitUntil, below: Chromium 56 throws if it is called once the event is over,
+    // and that error would leave the page without its files.
+    let keep = null;
     const answer = fetch(req).then(function (res) {
         // As a page, only ours: a site being updated answers with a page of its own, and that one must not stay as the screen's.
         if (res.ok && (!page || res.headers.get('X-Hechauka-Player'))) {
             const copy = res.clone();
-            event.waitUntil(caches.open(SHELL).then(function (c) {
+            keep = caches.open(SHELL).then(function (c) {
                 // One copy of each file: the copies of other versions (?v=…) go.
                 const path = req.url.split('?')[0];
                 return c.keys().then(function (keys) {
@@ -107,7 +110,7 @@ self.addEventListener('fetch', function (event) {
                 }).then(function () {
                     return c.put(req, copy);
                 });
-            }));
+            });
             return res;
         }
         // A site being updated, or failing, answers with its own page: the screen keeps going with its copy.
@@ -120,17 +123,16 @@ self.addEventListener('fetch', function (event) {
         });
     });
     event.waitUntil(answer.then(function () {
+        return keep;
+    }).then(function () {
         return null;
     }, function () {
         return null;
     }));
-    if (!page) {
-        event.respondWith(answer);
-        return;
-    }
-    // A network that says nothing must not leave the screen in black: after a few seconds, its copy, if it has one.
-    event.respondWith(new Promise(function (resolve) {
-        answer.then(resolve);
+    // A network that says nothing must not leave the screen in black, nor its page without its script and its styles:
+    // after a few seconds, their copy, if there is one.
+    event.respondWith(new Promise(function (resolve, reject) {
+        answer.then(resolve, reject);
         setTimeout(function () {
             fromCache(req).then(function (hit) {
                 if (hit) {

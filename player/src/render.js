@@ -1650,7 +1650,11 @@ export class Screen {
             full.setAttribute('data-sin-pie', '1');
         }
         if (item.web) {
-            put(this.qrBox(item.web, false, item.webqr));
+            // An address too long for a code gives nothing to put: the slide goes on without it.
+            const code = this.qrBox(item.web, false, item.webqr);
+            if (code.nodeType === 1) {
+                put(code);
+            }
         }
         const h2 = pie && pie.querySelector('h2');
         if (h2) {
