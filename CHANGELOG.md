@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.31.0
+
+- **The chameleon**, a new Surprise that walks in green, stops and gets the hiccups: with each one it turns yellow, pink
+  or blue, and with the big one, a rainbow wave; it leaves showing off. Its colours are in its frames.
+- **The mother duck and her ducklings**: she comes in alone and waits, very serious; her three ducklings rush in and bump
+  into each other like dominoes, line up and go, all but the last, who stays to wave and then runs after them. She stops
+  where her ducklings can always come in from out of sight.
+- Both join a centre that had chosen every other one.
+- A screen that kept a Surprise with an older player gets the files that player did not know of (the bat's peel).
+
 ## 0.30.0
 
 - **The ladybird**, a new Surprise that comes from the top: it peeps over the edge, walks down the glass, turns round,

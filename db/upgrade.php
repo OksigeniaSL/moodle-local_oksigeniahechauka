@@ -386,5 +386,18 @@ function xmldb_local_oksigeniahechauka_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026112000, 'local', 'oksigeniahechauka');
     }
 
+    if ($oldversion < 2026112100) {
+        // The chameleon and the mother duck with her ducklings: as the others, they join a centre that had chosen every one
+        // of the others.
+        $who = get_config('local_oksigeniahechauka', 'surprisewho');
+        $before = ['gusanito', 'abeja', 'mosca', 'arana', 'pulpo', 'pezglobo', 'geco', 'rana', 'petirrojo', 'bruja', 'abuelo',
+            'mariquita', 'murcielago'];
+        if ($who !== false && !array_diff($before, explode(',', (string) $who))) {
+            $all = array_unique(array_merge(explode(',', (string) $who), ['camaleon', 'patos']));
+            set_config('surprisewho', implode(',', $all), 'local_oksigeniahechauka');
+        }
+        upgrade_plugin_savepoint(true, 2026112100, 'local', 'oksigeniahechauka');
+    }
+
     return true;
 }

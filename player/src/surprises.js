@@ -15,7 +15,8 @@
 // From the top edge: what comes down and falls out by the bottom one (the ladybird, `meta.baja`) has its own plan, known
 // before it starts (`dropOf`); what hangs by its feet from the edge (the bat, `meta.cuelga`) comes down as the spider does,
 // with no thread, and flies off by its side. What it lets go of (its peel, `meta.cascara`) is a picture of its own that falls
-// from the frame the sheet no longer has it.
+// from the frame the sheet no longer has it. One that walks may tell its own steps after its gesture (`meta.secuencia`) and
+// where it stops (`meta.parada`).
 
 const LEAST_MINUTES = 15;
 // An order waits this long for the manifest that says who comes out: it may have been given right after turning them on.
@@ -87,6 +88,15 @@ export function walkOf(meta, width, scale, random) {
         // What only crosses (the witch, the grandfather on his carpet): from out of sight on one side to out on the other.
         return {dir, turns: 0, from: dir > 0 ? -ahead : width + ahead, exit: dir > 0 ? width + behind : -behind};
     }
+    if (meta.parada) {
+        // What says where it stops (the duck, waiting for her ducklings): `para` ends that far from the edge it comes in by,
+        // so that the back of its cell is on that edge or past it and what comes behind comes in from out of sight.
+        const brake = meta.estados.para.avance.reduce((total, step) => total + step[0], 0) * scale;
+        const begins = Math.min(meta.parada.atras * scale, width - meta.parada.delante * scale) - brake;
+        const whole = Math.max(1, Math.ceil((begins + ahead) / turn));
+        const at = dir > 0 ? begins : width - begins;
+        return {dir, turns: whole, from: at - dir * whole * turn, exit: dir > 0 ? width + behind : -behind};
+    }
     let into = width * (0.2 + 0.25 * random());
     if (meta.posa) {
         // What lands (the robin) comes down a good way past where `para` begins and hops on: all of it on the screen.
@@ -98,6 +108,21 @@ export function walkOf(meta, width, scale, random) {
     const turns = Math.max(1, Math.ceil((into + ahead) / turn));
     const stop = dir > 0 ? into : width - into;
     return {dir, turns, from: stop - dir * turns * turn, exit: dir > 0 ? width + behind : -behind};
+}
+
+/**
+ * The steps of one that walks, in the order its atlas says (`meta.secuencia`, with `gesto` for the gesture it plays): the
+ * first, the whole turns that bring it in; what comes between, once each; the last, round until it is out. Without one,
+ * as always: `cruza`, `para`, the gesture and `huye`.
+ *
+ * @param {object} meta the atlas's
+ * @param {string} gesture
+ * @param {number} turns of the first
+ * @returns {{state: string, times: number}[]}
+ */
+export function stepsOf(meta, gesture, turns) {
+    const seq = (meta.secuencia || ['cruza', 'para', 'gesto', 'huye']).map((state) => state === 'gesto' ? gesture : state);
+    return seq.map((state, k) => ({state, times: k === 0 ? turns : k === seq.length - 1 ? 0 : 1}));
 }
 
 /**
@@ -1275,8 +1300,12 @@ export class Surprises {
                 const gesture = gestures[Math.floor(Math.random() * gestures.length)];
                 // What comes down from the top and falls out by the bottom (the ladybug) has a way of its own.
                 const drops = !!atlas.meta.baja;
+                // One that walks in by a side and tells its own steps after the gesture (the chameleon, the ducks).
+                const cross = atlas.meta.estados.cruza;
+                const told = !drops && !atlas.meta.cuelga && !!atlas.meta.secuencia && !!atlas.meta.estados.para && !cross.hilo &&
+                    !atlas.meta.estados.entra ? stepsOf(atlas.meta, gesture, 0) : null;
                 walk = new Walk(this.layer, atlas, base, drops ? ['asoma', 'baja', 'para', gesture, 'resbala', 'cae', 'adios'] :
-                    !atlas.meta.estados.para ? ['cruza'] :
+                    told ? told.map((step) => step.state) : !atlas.meta.estados.para ? ['cruza'] :
                         ['cruza', 'para', gesture, 'huye'].concat(atlas.meta.estados.entra ? ['entra'] : []));
                 walk.bottom = height;
                 // What hangs by its feet from the top edge (the bat) stops with them on it.
@@ -1285,6 +1314,10 @@ export class Surprises {
                     atlas.meta.estados.cruza.hilo || atlas.meta.cuelga ? hangOf(atlas.meta, width, stop, scale, Math.random) :
                         (atlas.meta.estados.entra && jumpOf(atlas.meta, width, height, stop, scale, Math.random)) ||
                         walkOf(atlas.meta, width, scale, Math.random);
+                if (told) {
+                    told[0].times = plan.turns;
+                    plan.steps = told;
+                }
                 const run = (end) => walk.run(plan, stop, scale, gesture, end);
                 // What comes with water: the water rises, the creature comes a moment later and, once it is gone, the water goes down.
                 start = () => {
