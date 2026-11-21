@@ -35,6 +35,13 @@ class work {
     /** @var int What someone published that stops showing soon, named one by one; more are one alert. */
     const ENDING_ONE_BY_ONE = 3;
 
+    /** @var string[] The name of each source of the manifest, by the string of its switch. */
+    const SOURCE_NAMES = ['menus' => 'sourcemenu', 'calendar' => 'sourcecalendar', 'news' => 'sourcenews',
+        'books' => 'sourcebooks', 'photoday' => 'sourcephotoday', 'moments' => 'sourcemoments',
+        'instagram' => 'sourceinstagram', 'openacts' => 'sourceopenacts', 'channel' => 'sourcechannel',
+        'deadlines' => 'sourcedeadlines', 'birthdays' => 'sourcebirthdays', 'weather' => 'sourceweather',
+        'visits' => 'sourcevisits', 'links' => 'work_source_links'];
+
     /**
      * The door of the screens for someone, as the block takes it; none without a permission.
      *
@@ -108,6 +115,21 @@ class work {
                         'level' => 'urgent',
                     ];
                 }
+            }
+            // What comes by itself and fails (another plugin, a service): the screens go on without it, and someone should know.
+            $failing = manifest::failures();
+            if ($failing) {
+                $names = [];
+                foreach (array_keys($failing) as $source) {
+                    $key = self::SOURCE_NAMES[$source] ?? '';
+                    $names[] = $key !== '' && get_string_manager()->string_exists($key, $c) ? get_string($key, $c) : $source;
+                }
+                $since = min(array_map(function ($f) {
+                    return (int) ($f['time'] ?? 0);
+                }, $failing));
+                $alerts[] = ['text' => get_string('work_source', $c, (object) ['names' => implode(', ', $names),
+                    'since' => userdate($since, get_string('strftimedatetimeshort', 'langconfig'))]),
+                    'url' => (new \moodle_url('/local/oksigeniahechauka/centre.php'))->out(false), 'level' => 'today'];
             }
             $count = count($screens);
             if (!$count) {
