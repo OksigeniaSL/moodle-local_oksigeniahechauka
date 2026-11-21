@@ -230,14 +230,7 @@ class items {
      * @return \stored_file[]
      */
     public static function album_files(int $itemid): array {
-        return array_values(get_file_storage()->get_area_files(
-            files::context()->id,
-            files::COMPONENT,
-            files::MEDIA,
-            $itemid,
-            'id',
-            false
-        ));
+        return files::all(files::MEDIA, $itemid);
     }
 
     /**

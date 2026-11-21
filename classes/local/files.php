@@ -87,6 +87,24 @@ class files {
     }
 
     /**
+     * Every file of an item in an area, oldest first (an album's photos).
+     *
+     * @param string $area
+     * @param int $itemid
+     * @return \stored_file[]
+     */
+    public static function all(string $area, int $itemid): array {
+        if (isset(self::$primed[$area][$itemid])) {
+            $list = self::$primed[$area][$itemid];
+            usort($list, function ($a, $b) {
+                return $a->get_id() <=> $b->get_id();
+            });
+            return $list;
+        }
+        return array_values(get_file_storage()->get_area_files(self::context()->id, self::COMPONENT, $area, $itemid, 'id', false));
+    }
+
+    /**
      * How many files an item has in an area (an album's photos).
      *
      * @param string $area

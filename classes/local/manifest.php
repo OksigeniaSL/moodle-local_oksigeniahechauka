@@ -323,6 +323,8 @@ class manifest {
               ORDER BY i.sortorder, i.id";
         $records = $DB->get_records_sql($sql, ['today' => $today, 'horizon' => $horizon,
             'screen1' => $screen->id, 'screen2' => $screen->id]);
+        // The files of all of them in one reading, not one per item and area at every heartbeat.
+        files::prime([files::MEDIA, files::VIDEO, files::POSTER, files::BACKDROP], array_keys($records));
         $items = [];
         foreach ($records as $record) {
             if ($record->type === 'agenda') {
@@ -341,6 +343,7 @@ class manifest {
                 $items[] = $item;
             }
         }
+        files::prime([], []);
         return $items;
     }
 
