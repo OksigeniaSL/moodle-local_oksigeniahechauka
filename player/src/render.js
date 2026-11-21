@@ -75,7 +75,8 @@ function stripSpoils(c) {
             return true;
         }
     }
-    return !!c.querySelector('.hk-pa.hk-pa-sin-turnos, .hk-menus.hk-menus-sin-leyenda, .hk-plazos.hk-plazos-sin-que');
+    return !!c.querySelector('.hk-pa.hk-pa-sin-turnos, .hk-pa.hk-pa-sin-nota, .hk-menus.hk-menus-sin-leyenda, ' +
+        '.hk-plazos.hk-plazos-sin-que, .hk-biblio-solo-titulo, .hk-canal-sin-nombre, .hk-canal-sin-seguidores, .hk-ig-sin-pie');
 }
 const PASS_MS = 1000;
 

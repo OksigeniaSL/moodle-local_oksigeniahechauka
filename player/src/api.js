@@ -61,7 +61,7 @@ export function makeApi(endpoints, key, session, heard) {
         opts.cache = 'no-store';
         const sent = Date.now();
         return withTimeout(fetch(url, opts), ms || 20000).then(function (res) {
-            if (heard && clock !== false && res.headers && !res.headers.get('Age')) {
+            if (heard && clock !== false && res.headers && !(Number(res.headers.get('Age')) > 0)) {
                 const server = Date.parse(res.headers.get('Date') || '');
                 if (server > 0) {
                     heard(server, sent, Date.now());

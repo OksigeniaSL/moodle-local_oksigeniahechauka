@@ -69,6 +69,8 @@ class Player {
         this.turnDue = 0;
         this.errors = [];
         this.bad = {};
+        // Files that would not show and were brought again once.
+        this.broughtAgain = {};
         this.albumTurns = {};
         this.manifest = null;
         const q = query();
@@ -118,8 +120,14 @@ class Player {
                 if (!self.bad[item.id]) {
                     self.note('item ' + item.id + ': the file does not play');
                 }
-                // Gone from the browser's store (it may clear it when short of room): brought again at the next sync.
+                // Gone from the browser's store (it may clear it when short of room): brought again at the next heartbeat,
+                // once; a file that is broken is not brought again and again.
                 self.media.forget(item.media);
+                const sha1 = item.media && item.media.sha1;
+                if (sha1 && !self.broughtAgain[sha1]) {
+                    self.broughtAgain[sha1] = true;
+                    self.media.failed[sha1] = 'media ' + item.id + ': it did not show, brought again';
+                }
                 self.bad[item.id] = Date.now();
                 // A photo of an album goes by the album's name: the photo itself is what must not come back.
                 if (item.source) {
@@ -707,8 +715,9 @@ class Player {
             return;
         }
         if (this.reloadAt) {
+            // It reloads only once the server gives the page; meanwhile the turns go on, so a server that is down never
+            // leaves the screen on one slide.
             this.reload();
-            return;
         }
         const m = this.manifest;
         const wall = this.clock.wall();
@@ -831,6 +840,7 @@ class Player {
         // Each second: a part that throws (a strip, the urgent notice) must not stop the turns, the reload and the ticker.
         try {
             this.tickOnce();
+            this.tickFailed = false;
         } catch (e) {
             if (!this.tickFailed) {
                 this.note('tick: ' + (e && e.message || e));
@@ -839,51 +849,95 @@ class Player {
         }
     }
 
+    /**
+     * One part of the second's tick, on its own: what throws is noted once while it keeps throwing, and the other parts
+     * (the turns, the reload, the ticker) go on.
+     *
+     * @param {string} name
+     * @param {function} fn
+     */
+    part(name, fn) {
+        this.partsFailing = this.partsFailing || {};
+        try {
+            fn();
+            delete this.partsFailing[name];
+        } catch (e) {
+            if (!this.partsFailing[name]) {
+                this.note('tick ' + name + ': ' + (e && e.message || e));
+            }
+            this.partsFailing[name] = true;
+        }
+    }
+
     tickOnce() {
         if (!this.manifest) {
             return;
         }
+        const self = this;
         // While something is being written in the panel, its ticker line too.
         const m = this.draft ? this.withDraft() : this.manifest;
         const wall = this.clock.wall();
         // In the small hours a screen with power hours is off: it reloads then, in black.
-        this.nightly(wall);
+        this.part('nightly', function () {
+            self.nightly(wall);
+        });
         const on = isPowerOn(m.power, wall);
-        this.screen.setPower(on);
-        const urgent = urgentOf(m.items, wall);
-        this.surprises.tick(Date.now(), on && !urgent, this.mode === 'preview');
+        this.part('power', function () {
+            self.screen.setPower(on);
+        });
+        let urgent = null;
+        this.part('urgent rule', function () {
+            urgent = urgentOf(m.items, wall);
+        });
+        this.part('surprises', function () {
+            self.surprises.tick(Date.now(), on && !urgent, self.mode === 'preview');
+        });
         // An urgent notice covers everything until it is taken off; then the turns go on. With the screen off, the black goes
         // over it, and it still comes off when it ends.
         const was = this.urgentOn;
         this.urgentOn = !!urgent;
-        this.screen.showUrgent(urgent);
+        this.part('urgent', function () {
+            self.screen.showUrgent(urgent);
+        });
         const wasOn = this.wasOn;
         this.wasOn = on;
         if (!on) {
             return;
         }
-        this.screen.setDark(this.forcedTheme !== undefined ? this.forcedTheme : isDark(m.theme, wall));
-        this.screen.setClock(this.clock.date());
+        this.part('theme', function () {
+            self.screen.setDark(self.forcedTheme !== undefined ? self.forcedTheme : isDark(m.theme, wall));
+        });
+        this.part('clock', function () {
+            self.screen.setClock(self.clock.date());
+        });
         if (this.tactil) {
             // The touches go by the device's own time (they are measured, not shown); the welcome, by the screen's.
-            this.tactil.tick(Date.now());
+            this.part('touch', function () {
+                self.tactil.tick(Date.now());
+            });
         }
         // Whose birthday it is today, all day above the ticker; never on a showcase. Before a first slide is measured.
-        this.screen.showBirthdayStrip(useOf(m, wall) === 'showcase' ? null : liveItems(m.items || [], 'extra', wall).filter(function (it) {
-            return it.type === 'birthdays' && it.people && it.people.length;
-        })[0] || null);
+        this.part('strip', function () {
+            self.screen.showBirthdayStrip(useOf(m, wall) === 'showcase' ? null : liveItems(m.items || [], 'extra', wall).filter(function (it) {
+                return it.type === 'birthdays' && it.people && it.people.length;
+            })[0] || null);
+        });
         // Just on, not with what it had yesterday; and a turn that never came is not waited for.
         const lost = this.turnDue && Date.now() > this.turnDue + 60000;
         if ((was && !urgent) || wasOn === false || lost || !this.screen.comp) {
-            this.next();
+            this.part('turn', function () {
+                self.next();
+            });
         }
         if (this.reloadAt && Date.now() - this.reloadAt > 30000 && !(this.tactil && this.tactil.near)) {
+            // Only once the server gives the page (reload()); the ticker goes on meanwhile.
             this.reload();
-            return;
         }
-        this.screen.showTicker(liveItems(m.items || [], 'ticker', wall).map(function (it) {
-            return it.text;
-        }).filter(Boolean), typeof this.draftPhrase === 'string' ? this.draftPhrase : (m.centre && m.centre.phrase) || '');
+        this.part('ticker', function () {
+            self.screen.showTicker(liveItems(m.items || [], 'ticker', wall).map(function (it) {
+                return it.text;
+            }).filter(Boolean), typeof self.draftPhrase === 'string' ? self.draftPhrase : (m.centre && m.centre.phrase) || '');
+        });
     }
 
     // Once a day, in the small hours, a screen reloads itself: weeks of a page open wear any browser down.
@@ -904,12 +958,15 @@ class Player {
             location.reload();
             return;
         }
-        const now = Date.now();
+        // By the clock of the page, which no correction of the time moves.
+        const now = performance.now();
         if (this.reloadTried && now - this.reloadTried < 60000) {
             return;
         }
         this.reloadTried = now;
-        fetch(location.href, {credentials: 'omit', cache: 'no-store'}).then(function (res) {
+        // Straight to the server (the worker lets it by, and keeps nothing of it): a copy would say yes with the server down,
+        // and a page that is not ours must not become the copy.
+        fetch(location.href, {credentials: 'omit', cache: 'no-store', headers: {'X-Hechauka-Probe': '1'}}).then(function (res) {
             if (res.ok && res.headers.get('X-Hechauka-Player')) {
                 location.reload();
             }
@@ -1015,9 +1072,9 @@ class Player {
             self.played.sent();
             if (r && r.manifest && (!m || r.manifest !== m.etag)) {
                 self.refresh();
-            } else if (m && self.media.errors().length) {
+            } else if (m && self.media.errors().length && !self.media.busy) {
                 // What did not come down (a photo the server was still refusing, the network gone a moment) is asked for
-                // again at each heartbeat, not left until the content changes.
+                // again at each heartbeat, not left until the content changes; never while the list is still being brought.
                 self.media.sync(mediaOf(m));
             }
             // Asked from the panel, or a new player on the server: reload at the next change of slide.

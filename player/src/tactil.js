@@ -531,6 +531,8 @@ export class Tactil {
         if (!this.built) {
             return;
         }
+        // Taken off while somebody touches: the turns, stopped for them, go on.
+        const wasNear = this.near;
         [this.welcome, this.front, this.layer].forEach(function (n) {
             if (n && n.parentNode) {
                 n.parentNode.removeChild(n);
@@ -538,6 +540,9 @@ export class Tactil {
         });
         this.frame.classList.remove('hk-tactil', 'hk-tc-de-cerca');
         this.built = false;
+        if (wasNear && this.o.far) {
+            this.o.far();
+        }
     }
 
     build() {
@@ -1454,6 +1459,10 @@ export class Tactil {
     click(e) {
         if (!this.touch) {
             return;
+        }
+        // The OK key of a remote clicks without a finger down: it is somebody there too, and the doors stay open.
+        if (this.near && this.clock) {
+            this.clock.touched(Date.now());
         }
         if (this.swiped) {
             this.swiped = false;

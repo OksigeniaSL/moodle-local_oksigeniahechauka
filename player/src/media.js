@@ -83,17 +83,23 @@ export class MediaStore {
         if (!this.api) {
             return Promise.resolve();
         }
-        if (this.busy) {
-            // A newer list waits for the one being brought, and goes after it: never dropped.
-            this.pending = list;
-            return Promise.resolve();
-        }
-        this.busy = true;
-        const self = this;
         const wanted = {};
         list.forEach(function (m) {
             wanted[m.sha1] = m;
         });
+        const same = Object.keys(wanted).sort().join(',');
+        if (this.busy) {
+            // A newer list waits for the one being brought, and goes after it: never dropped. The very same list asked
+            // again (the heartbeat, for what failed) is the one being brought: starting it over would leave what comes after
+            // a slow file never brought.
+            if (same !== this.bringing) {
+                this.pending = list;
+            }
+            return Promise.resolve();
+        }
+        this.busy = true;
+        this.bringing = same;
+        const self = this;
         let chain = this.open().then(function (cache) {
             return self.prune(cache, wanted).then(function () {
                 return cache;
@@ -125,6 +131,7 @@ export class MediaStore {
         });
         const done = function () {
             self.busy = false;
+            self.bringing = null;
             if (self.pending) {
                 const next = self.pending;
                 self.pending = null;

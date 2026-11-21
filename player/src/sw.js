@@ -31,10 +31,10 @@ function isShell(url) {
 }
 
 // The copy of a request kept in the shell cache, with or without its query.
-function fromCache(req) {
+function fromCache(req, exact) {
     return caches.open(SHELL).then(function (c) {
         return c.match(req, {ignoreSearch: false}).then(function (hit) {
-            return hit || c.match(req, {ignoreSearch: true});
+            return hit || (exact ? null : c.match(req, {ignoreSearch: true}));
         });
     });
 }
@@ -87,7 +87,7 @@ self.addEventListener('fetch', function (event) {
         event.respondWith(media(req));
         return;
     }
-    if (req.method !== 'GET' || !isShell(req.url)) {
+    if (req.method !== 'GET' || !isShell(req.url) || req.headers.get('X-Hechauka-Probe')) {
         return;
     }
     const page = req.mode === 'navigate';
@@ -134,7 +134,8 @@ self.addEventListener('fetch', function (event) {
     event.respondWith(new Promise(function (resolve, reject) {
         answer.then(resolve, reject);
         setTimeout(function () {
-            fromCache(req).then(function (hit) {
+            // A slow network: the copy of this very file, never one of another version (?v=) next to a page that is newer.
+            fromCache(req, !page).then(function (hit) {
                 if (hit) {
                     resolve(hit);
                 }

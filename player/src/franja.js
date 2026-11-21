@@ -239,11 +239,17 @@ export function fitStrip(node, o) {
     const people = node.querySelectorAll('.hk-franja-persona');
     const track = node.querySelector('.hk-franja-pista');
     track.style.height = '';
+    each(people, function (p) {
+        const name = p.querySelector('.hk-franja-nombre');
+        name.style.fontSize = '';
+        if (name.hasAttribute('data-entero')) {
+            name.textContent = name.getAttribute('data-entero');
+        }
+    });
     const over = function () {
         let out = false;
         each(people, function (p) {
-            const t = p.querySelector('.hk-franja-texto');
-            if (t.scrollWidth > t.clientWidth + 1) {
+            if (!fits(p)) {
                 out = true;
             }
         });
@@ -259,6 +265,9 @@ export function fitStrip(node, o) {
             break;
         }
     }
+    if (!(o && o.vertical) && over()) {
+        shrinkNames(people);
+    }
     let most = 0;
     each(people, function (p) {
         most = Math.max(most, p.offsetHeight);
@@ -273,6 +282,61 @@ export function fitStrip(node, o) {
         sheet.innerHTML = paper(node.clientWidth, node.clientHeight, g ? g.clientHeight * 0.36 : 16);
     }
     return true;
+}
+
+/**
+ * Whether a person's words fit their line: the line, and the name (which keeps what does not fit to itself from 8 m).
+ *
+ * @param {HTMLElement} p
+ * @returns {boolean}
+ */
+function fits(p) {
+    const t = p.querySelector('.hk-franja-texto');
+    const name = p.querySelector('.hk-franja-nombre');
+    return t.scrollWidth <= t.clientWidth + 1 && name.scrollWidth <= name.clientWidth + 1;
+}
+
+/** Little words a name does not end in before «…». */
+const PARTICLES = ['de', 'del', 'la', 'las', 'los', 'y', 'e', 'da', 'das', 'do', 'dos', 'di', 'van', 'von', 'der'];
+
+/**
+ * A name that does not fit even in the least step (a long compound surname): smaller, for that person only, down to the
+ * least size of the screen; what still does not fit ends in «…» after a whole word (never «de…»), and, if even one
+ * word is too long, in the letters (zonas.css). Never cut in half a word without it.
+ *
+ * @param {NodeList} people
+ */
+function shrinkNames(people) {
+    each(people, function (p) {
+        const t = p.querySelector('.hk-franja-texto');
+        const name = p.querySelector('.hk-franja-nombre');
+        if (fits(p)) {
+            return;
+        }
+        const probe = el('b', 'hk-franja-nombre', '');
+        probe.style.fontSize = 'var(--hk-t-min)';
+        t.appendChild(probe);
+        const least = parseFloat(window.getComputedStyle(probe).fontSize) || 0;
+        t.removeChild(probe);
+        let size = parseFloat(window.getComputedStyle(name).fontSize);
+        while (size * 0.92 >= least && !fits(p)) {
+            size = size * 0.92;
+            name.style.fontSize = size + 'px';
+        }
+        if (fits(p)) {
+            return;
+        }
+        const whole = name.textContent;
+        name.setAttribute('data-entero', whole);
+        const words = whole.split(' ');
+        while (words.length > 2 && !fits(p)) {
+            words.pop();
+            while (words.length > 2 && PARTICLES.indexOf(words[words.length - 1].toLowerCase()) !== -1) {
+                words.pop();
+            }
+            name.textContent = words.join(' ') + '…';
+        }
+    });
 }
 
 /**
