@@ -52,10 +52,11 @@ class alerts {
         $came = [];
         foreach ($screens as $screen) {
             $info = json_decode((string) ($screen->lastinfo ?? ''), true) ?: [];
-            $down = $now - $screen->lastseen > self::DOWN_AFTER || screens::frozen($info);
+            $broken = manifest::broken_since((int) $screen->id);
+            $down = $now - $screen->lastseen > self::DOWN_AFTER || screens::frozen($info) ||
+                ($broken && $now - $broken > self::DOWN_AFTER);
             if ($down && !$screen->alerted && $screen->alerts && self::expected($screen, $now)) {
                 $went[] = $screen;
-                $DB->set_field('local_oksigeniahechauka_screen', 'alerted', $now, ['id' => $screen->id]);
                 $done['down']++;
             } else if (!$down && $screen->alerted) {
                 if ($screen->alerts) {
@@ -72,6 +73,12 @@ class alerts {
             } else {
                 foreach ($list as $screen) {
                     self::send($screen, $kind);
+                }
+            }
+            // Marked once told: a warning that could not be sent is tried again on the next pass.
+            if ($kind === 'down') {
+                foreach ($list as $screen) {
+                    $DB->set_field('local_oksigeniahechauka_screen', 'alerted', $now, ['id' => $screen->id]);
                 }
             }
         }

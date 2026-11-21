@@ -34,8 +34,11 @@ class screens {
     /** Pairings waiting at once, at most: a code is cheap to ask for, the table must not grow without end. */
     const PAIR_MAX = 100;
 
-    /** New codes one place may ask for in PAIR_MINUTES: a centre names its screens a few at a time, renewals apart. */
-    const PAIR_FROM_ONE_PLACE = 6;
+    /**
+     * Codes waiting at once from one place (an address, or its /64 in IPv6): a centre names its screens a few at a time,
+     * and renewing them does not add any.
+     */
+    const PAIR_FROM_ONE_PLACE = 10;
 
     /** Seconds an expired code that nobody claimed is kept, so that its screen, asking again, keeps it. */
     const PAIR_GRACE = 600;
@@ -66,20 +69,36 @@ class screens {
             $DB->set_field('local_oksigeniahechauka_pair', 'timeexpires', $expires, ['id' => $pair->id]);
             $code = $pair->code;
         } else {
-            // Nobody without an account may keep the centre from naming its new screens: few new codes from one place,
-            // and the most waiting counts only those nobody has claimed.
-            $from = hash('sha256', getremoteaddr() . '|' . get_site_identifier());
-            $recent = $DB->count_records_select(
+            // Nobody without an account may keep the centre from naming its new screens: few codes waiting from one place,
+            // and when too many wait in all, the oldest of the place with most goes, instead of nobody getting one.
+            $from = hash('sha256', self::place(getremoteaddr()) . '|' . get_site_identifier());
+            $waiting = 'screenid IS NULL AND timeexpires > :now';
+            $mine = $DB->count_records_select(
                 'local_oksigeniahechauka_pair',
-                'fromhash = :from AND timecreated > :since',
-                ['from' => $from, 'since' => $now - self::PAIR_MINUTES * MINSECS]
+                $waiting . ' AND fromhash = :from',
+                ['now' => $now, 'from' => $from]
             );
-            if ($recent >= self::PAIR_FROM_ONE_PLACE) {
-                endpoint::fail(429, 'busy', 'Too many new codes from here: try again in a few minutes');
+            if ($mine >= self::PAIR_FROM_ONE_PLACE) {
+                endpoint::fail(429, 'busy', 'Too many codes waiting from here: try again in a few minutes');
             }
-            if ($DB->count_records_select('local_oksigeniahechauka_pair', 'screenid IS NULL') >= self::PAIR_MAX) {
-                endpoint::fail(429, 'busy', 'Too many screens waiting to be paired');
+            if ($DB->count_records_select('local_oksigeniahechauka_pair', $waiting, ['now' => $now]) >= self::PAIR_MAX) {
+                $fullest = $DB->get_records_sql("SELECT fromhash, COUNT(1) AS n
+                                                   FROM {local_oksigeniahechauka_pair}
+                                                  WHERE $waiting
+                                               GROUP BY fromhash
+                                               ORDER BY COUNT(1) DESC", ['now' => $now], 0, 1);
+                $oldest = $DB->get_records_select(
+                    'local_oksigeniahechauka_pair',
+                    $waiting . ' AND fromhash = :from',
+                    ['now' => $now, 'from' => reset($fullest)->fromhash],
+                    'timecreated ASC',
+                    'id',
+                    0,
+                    1
+                );
+                $DB->delete_records_list('local_oksigeniahechauka_pair', 'id', array_keys($oldest));
             }
+            self::note_proxy($now);
             do {
                 $code = keys::new_code();
             } while ($DB->record_exists('local_oksigeniahechauka_pair', ['code' => $code]));
@@ -95,8 +114,7 @@ class screens {
         }
         // Short, when the site has a shortener and it is ready: the phone that reads it opens it, and a person can type it.
         // It is asked for by the task of every five minutes, never here, where anybody may ask for a code.
-        $long = (new \moodle_url('/local/oksigeniahechauka/claim.php', ['code' => $code]))->out(false);
-        $link = links::now($long, $now, get_string('claim_title', 'local_oksigeniahechauka'));
+        $link = links::now(links::claim_url($code), $now, get_string('claim_title', 'local_oksigeniahechauka'));
         $answer = [
             'code' => $code,
             'token' => $token,
@@ -111,6 +129,39 @@ class screens {
             $answer['qr_image'] = 'data:image/svg+xml;base64,' . base64_encode($link['qrsvg']);
         }
         return $answer;
+    }
+
+    /**
+     * The place a request comes from, for the codes waiting from it: its address, or the /64 of an IPv6 one (a single
+     * connection usually has a whole /64).
+     *
+     * @param string $address
+     * @return string
+     */
+    public static function place(string $address): string {
+        if (strpos($address, ':') === false) {
+            return $address;
+        }
+        $packed = @inet_pton($address);
+        return $packed === false ? $address : bin2hex(substr($packed, 0, 8)) . '::/64';
+    }
+
+    /**
+     * Behind a reverse proxy that Moodle has not been told of, every request seems to come from the proxy, and the codes
+     * waiting from one place are those of the whole Internet: noted once a day, for «Get started» to say so.
+     *
+     * @param int $now
+     * @return void
+     */
+    protected static function note_proxy(int $now): void {
+        $address = getremoteaddr();
+        $forwarded = !empty($_SERVER['HTTP_X_FORWARDED_FOR']) || !empty($_SERVER['HTTP_X_REAL_IP']);
+        $public = filter_var($address, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE);
+        $private = $address !== '' && !$public;
+        $noted = (int) get_config('local_oksigeniahechauka', 'proxyseen');
+        if ($forwarded && $private && $now - $noted > DAYSECS) {
+            set_config('proxyseen', $now, 'local_oksigeniahechauka');
+        }
     }
 
     /**
@@ -259,12 +310,12 @@ class screens {
                 ['id' => $pair->screenid, 'keyhash' => keys::hash($pair->screenkey)]
             );
         }
-        // A code nobody claimed stays a little after it expires, so that its screen, asking again, keeps it.
-        $DB->delete_records_select(
-            'local_oksigeniahechauka_pair',
-            'timeexpires < :now AND (screenid > 0 OR timeexpires < :grace)',
-            ['now' => $now, 'grace' => $now - self::PAIR_GRACE]
-        );
+        // A code nobody claimed stays a little after it expires, so that its screen, asking again, keeps it. Its short link
+        // goes with it.
+        $gone = 'timeexpires < :now AND (screenid > 0 OR timeexpires < :grace)';
+        $params = ['now' => $now, 'grace' => $now - self::PAIR_GRACE];
+        links::forget_claims($DB->get_fieldset_select('local_oksigeniahechauka_pair', 'code', $gone, $params));
+        $DB->delete_records_select('local_oksigeniahechauka_pair', $gone, $params);
     }
 
     /**
@@ -493,6 +544,7 @@ class screens {
         global $DB;
         get_file_storage()->delete_area_files(files::context()->id, files::COMPONENT, files::SHOT, $screenid);
         report::forget($screenid);
+        manifest::note_broken($screenid, time(), null);
         $DB->delete_records('local_oksigeniahechauka_member', ['screenid' => $screenid]);
         $DB->delete_records('local_oksigeniahechauka_target', ['screenid' => $screenid]);
         $DB->delete_records('local_oksigeniahechauka_screen', ['id' => $screenid]);

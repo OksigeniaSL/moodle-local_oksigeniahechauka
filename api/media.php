@@ -41,8 +41,11 @@ if (!$file || !files::readable($file)) {
     endpoint::fail(404, 'notfound');
 }
 $area = $file->get_filearea();
+// The files of an item, by its id, only in the areas of items: the pictures of «A day here» have small numbers of their own.
+$ofitem = $file->get_component() === files::COMPONENT
+    && in_array($area, [files::MEDIA, files::VIDEO, files::POSTER, files::BACKDROP]);
 $reaches = files::is_logo($file) || files::from_source($file, $screen)
-    || items::reaches((int) $file->get_itemid(), (int) $screen->id);
+    || ($ofitem && items::reaches((int) $file->get_itemid(), (int) $screen->id));
 if (!$reaches) {
     endpoint::fail(404, 'notfound');
 }

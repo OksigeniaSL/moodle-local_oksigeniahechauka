@@ -66,7 +66,7 @@ final class resilience_test extends \advanced_testcase {
     }
 
     /**
-     * Today's birthdays come although the plugin of the families throws: its photos are left as they were without it.
+     * Today's birthdays come although the plugin of the families throws, without the photos while it fails.
      */
     public function test_a_plugin_that_throws_leaves_the_birthdays(): void {
         global $DB;
@@ -145,10 +145,94 @@ final class resilience_test extends \advanced_testcase {
             birthdays::from_cifra(array_slice($all, 0, 100, true), time());
             $this->fail('a list short of most of the centre is not taken');
         } catch (\moodle_exception $e) {
-            $this->assertSame('cifraerrorincomplete', $e->errorcode);
+            $this->assertSame('cifraerrormanygone', $e->errorcode);
         }
         $this->assertSame(240, $DB->count_records(birthdays::TABLE, ['source' => birthdays::CIFRA]));
         $done = birthdays::from_cifra(array_slice($all, 0, 220, true), time());
         $this->assertSame(20, $done['gone']);
+    }
+
+    /**
+     * In a small centre, a list that comes short is not taken either; Cifra giving everyone new ids writes nothing; and the
+     * very same people missing on a third day in a row have left: they go.
+     */
+    public function test_cifra_many_gone_go_on_the_third_night(): void {
+        global $DB;
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        $all = [];
+        for ($i = 1; $i <= 60; $i++) {
+            $all[$i] = $this->pupil($i, '2015-03-04');
+        }
+        $day = mktime(23, 0, 0, 6, 1, 2027);
+        birthdays::from_cifra($all, $day);
+        $renumbered = [];
+        foreach ($all as $i => $pupil) {
+            $renumbered[1000 + $i] = ['id' => 1000 + $i] + $pupil;
+        }
+        foreach ([[array_slice($all, 0, 10, true), $day + DAYSECS], [$renumbered, $day + DAYSECS]] as [$list, $when]) {
+            try {
+                birthdays::from_cifra($list, $when);
+                $this->fail('a list short of most of a small centre is not taken');
+            } catch (\moodle_exception $e) {
+                $this->assertSame('cifraerrormanygone', $e->errorcode);
+            }
+            $this->assertSame(60, $DB->count_records(birthdays::TABLE), 'nothing written');
+        }
+        // The end of a stage: the same 50 missing, day after day.
+        $left = array_slice($all, 0, 10, true);
+        foreach ([2, 3, 4] as $n) {
+            try {
+                birthdays::from_cifra($left, $day + $n * DAYSECS);
+                $this->assertSame(4, $n, 'not before the third day in a row');
+            } catch (\moodle_exception $e) {
+                $this->assertNotSame(4, $n);
+            }
+        }
+        $this->assertSame(10, $DB->count_records(birthdays::TABLE));
+    }
+
+    /**
+     * A source that fails gives what it gave today, and is noted once: a screen that does not ask for it leaves the note
+     * as it was, and it goes when the source answers again.
+     */
+    public function test_a_source_that_fails_gives_what_it_gave_today(): void {
+        $this->resetAfterTest();
+        require_once(__DIR__ . '/../fixtures/manifest_probe.php');
+        $now = time();
+        $ok = function () {
+            return [['id' => 'a', 'type' => 'notice']];
+        };
+        $fail = function () {
+            throw new \coding_exception('down');
+        };
+        $this->assertSame($ok(), manifest_probe::source('menus', $ok, $now));
+        $this->assertSame($ok(), manifest_probe::source('menus', $fail, $now), 'what it gave today');
+        $this->assertArrayHasKey('menus', manifest::failures());
+        $this->resetDebugging();
+        $since = manifest::failures()['menus']['time'];
+        // Another screen, which does not ask for it: the note stays as it was.
+        manifest_probe::source('news', $ok, $now + 60);
+        $this->assertSame($since, manifest::failures()['menus']['time']);
+        // Another day, still failing: nothing kept from yesterday.
+        $this->assertSame([], manifest_probe::source('menus', $fail, $now + DAYSECS));
+        $this->resetDebugging();
+        manifest_probe::source('menus', $ok, $now + DAYSECS + 60);
+        $this->assertSame([], manifest::failures());
+    }
+
+    /**
+     * A screen whose manifest cannot be built goes on beating, and the panel says so after a while; once built, it is
+     * well again.
+     */
+    public function test_a_screen_without_its_manifest_is_said_in_the_panel(): void {
+        $this->resetAfterTest();
+        $screen = $this->screen();
+        $now = time();
+        $screen->lastseen = $now;
+        manifest::note_broken((int) $screen->id, $now - 300, 'Call to undefined function');
+        $this->assertSame('down', \local_oksigeniahechauka\local\home::state($screen, [], $now)['key']);
+        manifest::note_broken((int) $screen->id, $now, null);
+        $this->assertSame('on', \local_oksigeniahechauka\local\home::state($screen, [], $now)['key']);
     }
 }

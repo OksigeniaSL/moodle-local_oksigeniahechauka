@@ -140,6 +140,29 @@ final class access_test extends \advanced_testcase {
     }
 
     /**
+     * A screen is in several groups (each site is one): who publishes in one of them sees what reaches it by another, and
+     * nothing of a group none of their screens is in.
+     */
+    public function test_a_screen_in_two_groups(): void {
+        global $DB;
+        $this->resetAfterTest();
+        $infantil = $this->group('Infantil');
+        $site = $this->group('Campus norte');
+        $elsewhere = $this->group('Campus sur');
+        $teacher = (int) $this->getDataGenerator()->create_user()->id;
+        $other = (int) $this->getDataGenerator()->create_user()->id;
+        $this->give(access::PUBLISHER, $teacher);
+        access::set_editors($infantil, [$teacher]);
+        $screen = (int) $DB->insert_record('local_oksigeniahechauka_screen', (object) ['name' => 'Entrada', 'template' => 'zones',
+            'theme' => 'site', 'timecreated' => time(), 'timemodified' => time()]);
+        foreach ([$infantil, $site] as $group) {
+            $DB->insert_record('local_oksigeniahechauka_member', (object) ['groupid' => $group, 'screenid' => $screen]);
+        }
+        $this->assertTrue(access::may_see_item($this->item($other, [$site]), $teacher));
+        $this->assertFalse(access::may_see_item($this->item($other, [$elsewhere]), $teacher));
+    }
+
+    /**
      * Who runs the screens publishes everywhere and changes anything; somebody without a role, nothing.
      */
     public function test_manager_everywhere_and_nobody_nothing(): void {

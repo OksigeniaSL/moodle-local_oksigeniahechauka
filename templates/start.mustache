@@ -28,7 +28,8 @@
         "query": "", "searched": false, "results": [], "hasresults": false, "resultsjson": "[]", "place": null,
         "icons": {"search": "", "pin": "", "out": "", "check": ""},
         "sources": [{"id": "s1", "setting": "sourcecalendar", "name": "Calendario", "available": true, "checked": true, "now": "14 eventos", "link": "", "linklabel": ""}],
-        "playerurl": "https://example.com/player/", "prepareurl": "#", "paired": false, "screensurl": "#", "home": "#"
+        "playerurl": "https://example.com/player/", "prepareurl": "#", "paired": false, "screensurl": "#", "home": "#",
+        "proxyhint": true
     }
 }}
 <div class="hkp" id="hkp-start-page"{{#style}} style="{{style}}"{{/style}} data-strings="{{strings}}">
@@ -69,6 +70,7 @@
             </section>
             <section class="hkp-fs hkp-step" aria-labelledby="hkp-st-screen">
                 <h2 id="hkp-st-screen" class="hkp-label hkp-section-label"><span>5. {{#str}}start_screen, local_oksigeniahechauka{{/str}}</span><span class="hkp-step-state" data-step="screen" data-done="{{#states.screen.done}}1{{/states.screen.done}}{{^states.screen.done}}0{{/states.screen.done}}">{{states.screen.label}}</span></h2>
+                {{#proxyhint}}<p class="hkp-hint hkp-section-hint hkp-proxy-hint" role="note">{{#str}}start_proxy, local_oksigeniahechauka{{/str}}</p>{{/proxyhint}}
                 {{^paired}}<p class="hkp-hint hkp-section-hint">{{#str}}start_screen_help, local_oksigeniahechauka{{/str}}</p>
                 <p class="hkp-start-url"><code>{{playerurl}}</code></p>
                 {{#playerlong}}<p class="hkp-hint hkp-long-url">{{#str}}addscreen_short, local_oksigeniahechauka, {{playerlong}}{{/str}}</p>{{/playerlong}}

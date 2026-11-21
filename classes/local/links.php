@@ -39,6 +39,9 @@ class links {
     /** @var int How many links one run of the task asks for. */
     const MOST = 20;
 
+    /** The codes of screens waiting to be named whose link one pass asks for, after those of the manifests. */
+    const PAIRINGS_MOST = 3;
+
     /** @var int Seconds before asking again for a link or a QR the shortener did not give. */
     const RETRY = HOURSECS;
 
@@ -105,9 +108,10 @@ class links {
     }
 
     /**
-     * The short address of one address, if the shortener has already given it; the long one until then. Never asked for
-     * here: the page that names a new screen is asked for by anybody, and each would cost a link of the centre's
-     * shortener. The task of every five minutes asks for the links seen, and the next renewal of the code brings it.
+     * The short address of one address, if the shortener has already given it; the long one until then. Nothing is asked
+     * for nor written down here: the page that names a new screen is asked for by anybody, and each would cost a link of
+     * the centre's shortener. The task of every five minutes asks for those of the codes waiting (pairings()), and the next
+     * renewal of the code brings it.
      *
      * @param string $url
      * @param int $now
@@ -121,8 +125,8 @@ class links {
         if (!$shortener) {
             return $out;
         }
-        $record = self::record($url, $now);
-        if ($record->short) {
+        $record = $DB->get_record(self::TABLE, ['urlhash' => sha1($url)]);
+        if ($record && $record->short) {
             $out['url'] = $record->short;
             $file = self::file((int) $record->id);
             if ($file) {
@@ -149,15 +153,18 @@ class links {
         if (!$shortener) {
             return 'no shortener';
         }
+        $claims = $DB->sql_like('url', ':claims', false, false, true);
         $due = $DB->get_records_select(
             self::TABLE,
-            'timetried < :retry AND (short IS NULL OR (qrsvg IS NOT NULL AND qrdone = 0))',
-            ['retry' => $now - self::RETRY],
+            "timetried < :retry AND (short IS NULL OR (qrsvg IS NOT NULL AND qrdone = 0)) AND $claims",
+            ['retry' => $now - self::RETRY, 'claims' => '%' . $DB->sql_like_escape(self::CLAIM) . '%'],
             'timeseen DESC',
             '*',
             0,
             self::MOST
         );
+        // The codes of screens waiting to be named go after the manifests, a few at a time: anybody may ask for a code.
+        $due = array_merge($due, self::pairings($now));
         $made = 0;
         foreach ($due as $record) {
             if (self::ask($shortener, $record, $now)) {
@@ -165,6 +172,66 @@ class links {
             }
         }
         return count($due) . ' asked, ' . $made . ' made, ' . count($old) . ' forgotten';
+    }
+
+    /** What the address of the page that names a screen has, and no other. */
+    const CLAIM = '/local/oksigeniahechauka/claim.php?code=';
+
+    /**
+     * The links still to ask for of the newest codes of screens waiting to be named, written down now.
+     *
+     * @param int $now
+     * @return \stdClass[]
+     */
+    protected static function pairings(int $now): array {
+        global $DB;
+        $waiting = $DB->get_records_select(
+            'local_oksigeniahechauka_pair',
+            'screenid IS NULL AND timeexpires > :now',
+            ['now' => $now],
+            'timecreated DESC',
+            'id, code'
+        );
+        $out = [];
+        foreach ($waiting as $pair) {
+            $record = self::record(self::claim_url($pair->code), $now);
+            if (!$record->short && $record->timetried < $now - self::RETRY) {
+                $out[] = $record;
+            }
+            if (count($out) >= self::PAIRINGS_MOST) {
+                break;
+            }
+        }
+        return $out;
+    }
+
+    /**
+     * The page where a person names the screen that shows a code.
+     *
+     * @param string $code
+     * @return string
+     */
+    public static function claim_url(string $code): string {
+        return (new \moodle_url('/local/oksigeniahechauka/claim.php', ['code' => $code]))->out(false);
+    }
+
+    /**
+     * Forget the links of codes that are gone.
+     *
+     * @param string[] $codes
+     * @return void
+     */
+    public static function forget_claims(array $codes): void {
+        global $DB;
+        if (!$codes) {
+            return;
+        }
+        $hashes = array_map(function ($code) {
+            return sha1(self::claim_url($code));
+        }, $codes);
+        foreach ($DB->get_records_list(self::TABLE, 'urlhash', $hashes, '', 'id') as $record) {
+            self::forget((int) $record->id);
+        }
     }
 
     /**

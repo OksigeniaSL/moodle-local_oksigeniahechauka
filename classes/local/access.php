@@ -415,12 +415,22 @@ class access {
      * @return int[]|null
      */
     public static function screens_seen(?int $userid = null): ?array {
-        global $DB, $USER;
+        global $USER;
         $userid = $userid ?? (int) $USER->id;
         if (!self::limited($userid) || self::can('managescreens', $userid)) {
             return null;
         }
-        $groups = self::groups_of($userid);
+        return self::members(self::groups_of($userid));
+    }
+
+    /**
+     * The screens of some groups.
+     *
+     * @param int[] $groups
+     * @return int[]
+     */
+    protected static function members(array $groups): array {
+        global $DB;
         if (!$groups) {
             return [];
         }
@@ -452,8 +462,14 @@ class access {
             return false;
         }
         $targets = items::targets($item);
-        return $targets['all'] || array_intersect($targets['groups'], self::groups_of($userid))
-            || array_intersect($targets['screens'], $seen);
+        if (
+            $targets['all'] || array_intersect($targets['groups'], self::groups_of($userid))
+                || array_intersect($targets['screens'], $seen)
+        ) {
+            return true;
+        }
+        // A screen is in several groups (each site is one): what goes to another group of a screen they see reaches it too.
+        return (bool) array_intersect(self::members($targets['groups']), $seen);
     }
 
     /**

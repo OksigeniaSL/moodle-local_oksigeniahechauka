@@ -202,6 +202,33 @@ final class links_test extends \advanced_testcase {
     }
 
     /**
+     * The page that names a new screen, asked for by anybody, writes nothing down; the task asks for the links of a few
+     * codes waiting, after those of the manifests, and a code that goes takes its link with it.
+     */
+    public function test_codes_waiting_cost_the_shortener_little(): void {
+        global $CFG, $DB;
+        require_once($CFG->libdir . '/filelib.php');
+        $this->resetAfterTest();
+        $this->shortener();
+        shortener::$wait = 0;
+        $now = time();
+        $codes = [];
+        for ($i = 0; $i < links::PAIRINGS_MOST + 2; $i++) {
+            $codes[] = screens::start_pairing(['ua' => 'test'], $now + $i)['code'];
+        }
+        $this->assertSame(0, $DB->count_records(links::TABLE), 'nothing written by a request without an account');
+        for ($i = 0; $i < links::PAIRINGS_MOST; $i++) {
+            \curl::mock_response(json_encode(['status' => 'success', 'shorturl' => 'https://short.example/c' . $i]));
+        }
+        links::refresh($now + 60);
+        $this->assertSame(links::PAIRINGS_MOST, $DB->count_records(links::TABLE), 'a few each pass, the newest first');
+        $this->assertTrue($DB->record_exists(links::TABLE, ['urlhash' => sha1(links::claim_url(end($codes)))]));
+        // Gone, unclaimed, past its grace: its link goes too.
+        screens::purge_pairings($now + screens::PAIR_KEEP + DAYSECS);
+        $this->assertSame(0, $DB->count_records(links::TABLE));
+    }
+
+    /**
      * A destination the shortener refuses for good (outside the domains of its key) is not asked for again for a month,
      * neither by the task nor by a screen; one it refuses for now (too many at once) is, an hour later.
      */
@@ -213,6 +240,9 @@ final class links_test extends \advanced_testcase {
         shortener::$wait = 0;
         $now = time();
         \curl::mock_response(json_encode(['status' => 'fail', 'code' => 'error:domain']));
+        // Written down as a manifest does with the webs it shows.
+        $write = new \ReflectionMethod(links::class, 'record');
+        $write->invoke(null, 'https://elsewhere.example/x', $now);
         $this->assertSame('https://elsewhere.example/x', links::now('https://elsewhere.example/x', $now)['url']);
         links::refresh($now);
         $byurl = $DB->sql_compare_text('url') . ' = ' . $DB->sql_compare_text(':url');
@@ -223,7 +253,7 @@ final class links_test extends \advanced_testcase {
         $this->assertStringStartsWith('0 asked', links::refresh($now + DAYSECS));
 
         \curl::mock_response(json_encode(['status' => 'fail', 'code' => 'error:limit']));
-        links::now('https://example.org/busy', $now);
+        $write->invoke(null, 'https://example.org/busy', $now);
         links::refresh($now);
         $busy = $DB->get_record_select(links::TABLE, $byurl, ['url' => 'https://example.org/busy']);
         $this->assertSame($now, (int) $busy->timetried);

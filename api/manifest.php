@@ -34,7 +34,14 @@ use local_oksigeniahechauka\local\manifest;
 
 endpoint::method('GET');
 $screen = endpoint::screen();
-$m = manifest::build($screen, time());
+try {
+    $m = manifest::build($screen, time());
+} catch (\Throwable $e) {
+    // The screen keeps what it has, instead of taking Moodle's error page for its manifest.
+    debugging('Hechauka, manifest of screen ' . $screen->id . ': ' . $e->getMessage(), DEBUG_DEVELOPER);
+    manifest::note_broken((int) $screen->id, time(), $e->getMessage());
+    endpoint::fail(503, 'manifest');
+}
 $sent = trim((string) ($_SERVER['HTTP_IF_NONE_MATCH'] ?? ''), " \"W/");
 if ($sent !== '' && $sent === $m['etag']) {
     http_response_code(304);

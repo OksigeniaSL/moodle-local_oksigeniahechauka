@@ -33,6 +33,9 @@ class home {
     /** @var int A clock this far from the server's is said to be off (seconds). */
     const DRIFT = 120;
 
+    /** @var int A screen without a manifest that can be built for this long is said to show nothing new (seconds). */
+    const STALE_AFTER = 120;
+
     /** @var int A screenshot this recent stands for what the screen shows (seconds). */
     const FRESH = 30 * MINSECS;
 
@@ -411,6 +414,11 @@ class home {
             if (screens::frozen($info)) {
                 return ['key' => 'down', 'label' => get_string('state_frozen', $c), 'meta' => get_string('meta_frozen', $c),
                     'drift' => 0];
+            }
+            $broken = manifest::broken_since((int) ($s->id ?? 0));
+            if ($broken && $now - $broken > self::STALE_AFTER) {
+                return ['key' => 'down', 'label' => get_string('state_stale', $c),
+                    'meta' => get_string('meta_stale', $c, phrases::since($broken, $now)), 'drift' => 0];
             }
             $device = !empty($info['time']) ? (int) $s->lastseen - (int) $info['time'] : 0;
             // Since 0.25.2 the player puts a wrong clock right with the server's time, and says by how much (skew): what

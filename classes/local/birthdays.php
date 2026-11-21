@@ -511,6 +511,9 @@ class birthdays {
     /** @var string Where a row of the list comes from when Cifra brings it. */
     const CIFRA = 'cifra';
 
+    /** Nights in a row the same people must be missing from Cifra, when they are many, before they leave the list. */
+    const CIFRA_GONE_NIGHTS = 3;
+
     /** @var array|null The accounts of the site by ID number, email and name, gathered once for a whole list. */
     protected static $accounts = null;
 
@@ -1046,14 +1049,29 @@ class birthdays {
         if (!$present && $have) {
             throw new \moodle_exception('cifraerrorincomplete', 'local_oksigeniahechauka', '', 'alumnos');
         }
+        // Still at the centre, whatever comes with them: a date or a name that cannot be read leaves their row as it was.
+        $seen = [];
+        foreach ($present as $id => $person) {
+            $seen[(string) ($person['id'] ?? $id)] = true;
+        }
+        $gone = array_diff_key($have, $seen);
+        // A list that suddenly lacks a quarter of the centre is not a centre emptied overnight: nothing is written, until the
+        // same people have been missing for some nights (the end of a stage), or someone looks. Those who leave in a normal
+        // year are far fewer, and go the next night.
+        $many = count($gone) > max(5, (int) ceil(count($have) / 4));
+        if (!self::gone_for_nights($many ? $gone : [], $now)) {
+            throw new \moodle_exception(
+                'cifraerrormanygone',
+                'local_oksigeniahechauka',
+                '',
+                (object) ['gone' => count($gone), 'all' => count($have)]
+            );
+        }
         self::$accounts = null;
         self::$batch = true;
-        $seen = [];
         $counted = 0;
         foreach ($present as $id => $person) {
             $key = (string) ($person['id'] ?? $id);
-            // Still at the centre, whatever comes with them: a date or a name that cannot be read leaves their row as it was.
-            $seen[$key] = true;
             $date = self::day_month((string) ($person['fecha_nacimiento'] ?? ''));
             $name = trim(trim((string) ($person['nombre'] ?? '')) . ' ' .
                 self::first_surname(trim((string) ($person['apellido1'] ?? ''))));
@@ -1095,14 +1113,6 @@ class birthdays {
             }
             $counted++;
         }
-        $gone = array_diff_key($have, $seen);
-        // A list that suddenly lacks a quarter of the centre is not a centre emptied overnight: nothing goes, until someone
-        // looks. Those that leave in a normal year are far fewer, and go the next night.
-        if (count($gone) > max(50, (int) (count($have) / 4))) {
-            self::$accounts = null;
-            self::$batch = false;
-            throw new \moodle_exception('cifraerrorincomplete', 'local_oksigeniahechauka', '', 'alumnos');
-        }
         foreach ($gone as $row) {
             self::delete((int) $row->id);
             $done['gone']++;
@@ -1111,6 +1121,41 @@ class birthdays {
         self::$batch = false;
         $done['count'] = $counted;
         return $done;
+    }
+
+    /**
+     * Whether many people missing from Cifra may leave the list: only when the very same ones have been missing for
+     * CIFRA_GONE_NIGHTS different days in a row. Each day they are counted once; nobody missing, or few, forgets the count.
+     *
+     * @param \stdClass[] $gone the rows missing, by Cifra's id, when they are many; [] when they are few or none
+     * @param int $now
+     * @return bool
+     */
+    protected static function gone_for_nights(array $gone, int $now): bool {
+        $c = 'local_oksigeniahechauka';
+        if (!$gone) {
+            if (get_config($c, 'cifragone') !== false) {
+                unset_config('cifragone', $c);
+            }
+            return true;
+        }
+        $keys = array_map('strval', array_keys($gone));
+        sort($keys);
+        $sum = sha1(implode(',', $keys));
+        $kept = json_decode((string) get_config($c, 'cifragone'), true) ?: [];
+        $today = schedule::day($now);
+        if (($kept['sum'] ?? '') !== $sum) {
+            $kept = ['sum' => $sum, 'nights' => 1, 'day' => $today];
+        } else if ($kept['day'] !== $today) {
+            $yesterday = schedule::day($now - DAYSECS);
+            $kept = ['sum' => $sum, 'nights' => $kept['day'] === $yesterday ? $kept['nights'] + 1 : 1, 'day' => $today];
+        }
+        if ($kept['nights'] >= self::CIFRA_GONE_NIGHTS) {
+            unset_config('cifragone', $c);
+            return true;
+        }
+        set_config('cifragone', json_encode($kept), $c);
+        return false;
     }
 
     /**
@@ -1183,8 +1228,9 @@ class birthdays {
             }
             return $key ? [$api::photo_allowed_for_key($key), $api::photo_for_key($key)] : [true, null];
         } catch (\Throwable $e) {
+            // While it fails, a no it holds cannot be read: no photo, rather than one somebody said no to.
             debugging('Hechauka, Oksigenia Family: ' . $e->getMessage(), DEBUG_DEVELOPER);
-            return [true, null];
+            return [false, null];
         }
     }
 }

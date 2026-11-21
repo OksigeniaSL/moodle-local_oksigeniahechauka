@@ -43,30 +43,51 @@ class manifest {
     /** Contract version. */
     const CONTRACT = 1;
 
-    /** @var string[] The sources that failed while building the last manifest, by name: for the panel. */
+    /** @var string[] The sources that failed while building this manifest, by name: for the panel. */
     protected static $failed = [];
 
+    /** @var bool[] The sources that answered while building this manifest, by name. */
+    protected static $worked = [];
+
+    /** @var string The day of the manifest being built: what a source gave is kept only for that day. */
+    protected static $day = '';
+
     /**
-     * What a source gives, or nothing when it fails: one source that breaks (a plugin of ours with a fault, a service that
-     * answers in another way) never leaves every screen without its manifest. What failed is noted for the panel.
+     * What a source gives. When it fails, what it gave last today (one source that breaks for a moment does not empty the
+     * screens, nor make them take its pictures again), or else nothing: never every screen without its manifest. What
+     * failed is noted for the panel.
      *
      * @param string $source its name
      * @param callable $get
      * @param mixed $nothing what is given instead
+     * @param string|null $variant what makes it differ from one screen to another (a site, a scope); null keeps nothing
      * @return mixed
      */
-    protected static function guarded(string $source, callable $get, $nothing = []) {
+    protected static function guarded(string $source, callable $get, $nothing = [], ?string $variant = '') {
+        $cache = $variant === null ? null : \cache::make('local_oksigeniahechauka', 'lastgood');
+        $key = sha1($source . '|' . $variant . '|' . self::$day);
         try {
-            return $get();
+            $got = $get();
+            self::$worked[$source] = true;
+            if ($cache) {
+                $sum = sha1(serialize($got));
+                $kept = $cache->get($key);
+                if (!$kept || $kept['sum'] !== $sum) {
+                    $cache->set($key, ['sum' => $sum, 'got' => $got]);
+                }
+            }
+            return $got;
         } catch (\Throwable $e) {
             debugging('Hechauka, source ' . $source . ': ' . $e->getMessage(), DEBUG_DEVELOPER);
             self::$failed[$source] = \core_text::substr($e->getMessage(), 0, 200);
-            return $nothing;
+            $kept = $cache ? $cache->get($key) : false;
+            return $kept ? $kept['got'] : $nothing;
         }
     }
 
     /**
-     * The sources that failed, kept in the settings only when they change: the panel says which and since when.
+     * The sources that are failing, kept in the settings only when that changes: the panel says which and since when. A
+     * source this manifest did not ask (one screen's site, another's scope, only the touch screens) stays as it was.
      *
      * @param \stdClass $config the plugin's
      * @param int $now
@@ -74,23 +95,75 @@ class manifest {
      */
     protected static function note_failures(\stdClass $config, int $now): void {
         $before = json_decode((string) ($config->sourcefailures ?? ''), true) ?: [];
-        if (array_keys($before) == array_keys(self::$failed)) {
-            return;
-        }
-        $after = [];
+        $after = array_diff_key($before, self::$worked);
         foreach (self::$failed as $source => $error) {
             $after[$source] = $before[$source] ?? ['time' => $now, 'error' => $error];
+        }
+        if (!array_diff_key($after, $before) && !array_diff_key($before, $after)) {
+            return;
         }
         set_config('sourcefailures', $after ? json_encode($after) : '', 'local_oksigeniahechauka');
     }
 
     /**
-     * The sources that are failing now, with when they began and what they say.
+     * The sources that are failing now, with when they began and what they say. One the centre has switched off since is
+     * no longer failing.
      *
      * @return array source => {time, error}
      */
     public static function failures(): array {
-        return json_decode((string) get_config('local_oksigeniahechauka', 'sourcefailures'), true) ?: [];
+        $config = get_config('local_oksigeniahechauka');
+        $failing = json_decode((string) ($config->sourcefailures ?? ''), true) ?: [];
+        foreach (array_keys($failing) as $source) {
+            if (property_exists($config, 'source' . $source) && empty($config->{'source' . $source})) {
+                unset($failing[$source]);
+            }
+        }
+        return $failing;
+    }
+
+    /**
+     * A screen whose manifest cannot be built goes on beating with what it has, so it would look well in the panel: it is
+     * noted, and the note goes when it can be built again. Kept in the settings only when that changes.
+     *
+     * @param int $screenid
+     * @param int $now
+     * @param string|null $error what failed, or null when it was built
+     * @return void
+     */
+    public static function note_broken(int $screenid, int $now, ?string $error): void {
+        $broken = self::broken();
+        if ($error === null) {
+            if (!isset($broken[$screenid])) {
+                return;
+            }
+            unset($broken[$screenid]);
+        } else {
+            if (isset($broken[$screenid])) {
+                return;
+            }
+            $broken[$screenid] = ['time' => $now, 'error' => \core_text::substr($error, 0, 200)];
+        }
+        set_config('manifestbroken', $broken ? json_encode($broken) : '', 'local_oksigeniahechauka');
+    }
+
+    /**
+     * The screens whose manifest cannot be built, since when and why.
+     *
+     * @return array screen id => {time, error}
+     */
+    public static function broken(): array {
+        return json_decode((string) get_config('local_oksigeniahechauka', 'manifestbroken'), true) ?: [];
+    }
+
+    /**
+     * Since when a screen has gone without a manifest that can be built, or 0.
+     *
+     * @param int $screenid
+     * @return int
+     */
+    public static function broken_since(int $screenid): int {
+        return (int) (self::broken()[$screenid]['time'] ?? 0);
     }
 
     /**
@@ -173,11 +246,13 @@ class manifest {
             $m['sample'] = true;
         }
         self::$failed = [];
+        self::$worked = [];
+        self::$day = schedule::day($now);
         if (!empty($config->sourceweather)) {
             $where = $site && sites::has_place($site, $config) ? sites::suffix($site) : '';
             $weather = self::guarded('weather', function () use ($where, $now) {
                 return weather::summary(weather::hours($where), $now);
-            }, null);
+            }, null, $where);
             if ($weather) {
                 $m['weather'] = $weather;
             }
@@ -200,7 +275,7 @@ class manifest {
         // Each web with its short link and the QR the shortener draws, when the site has one.
         $m = self::guarded('links', function () use ($m, $now) {
             return links::apply($m, $now);
-        }, $m);
+        }, $m, null);
         self::note_failures($config, $now);
         $m['etag'] = self::etag($m);
         return $m;
@@ -398,7 +473,8 @@ class manifest {
         $items = [];
         foreach ($wanted as $source => $get) {
             if ($get) {
-                $items = array_merge($items, self::guarded($source, $get));
+                $variant = in_array($source, ['calendar', 'deadlines']) ? implode(',', $scope) : '';
+                $items = array_merge($items, self::guarded($source, $get, [], $variant));
             }
         }
         return $items;

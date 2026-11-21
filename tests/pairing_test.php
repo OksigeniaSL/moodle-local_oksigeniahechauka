@@ -33,6 +33,42 @@ use local_oksigeniahechauka\local\screens;
 #[\PHPUnit\Framework\Attributes\CoversClass(keys::class)]
 final class pairing_test extends \advanced_testcase {
     /**
+     * One place keeps at most a few codes waiting, renewals apart; an IPv6 connection counts by its /64; and when too
+     * many wait in all, the oldest of the place with most goes instead of nobody getting a code.
+     */
+    public function test_codes_waiting_from_one_place(): void {
+        global $DB;
+        $this->resetAfterTest();
+        $now = time();
+        $first = screens::start_pairing([], $now);
+        for ($i = 1; $i < screens::PAIR_FROM_ONE_PLACE; $i++) {
+            screens::start_pairing([], $now + $i);
+        }
+        // Renewing one of them adds nothing.
+        $this->assertSame($first['code'], screens::start_pairing([], $now + 20, $first['token'])['code']);
+        $this->assertSame(screens::PAIR_FROM_ONE_PLACE, $DB->count_records('local_oksigeniahechauka_pair'));
+        $this->assertSame(
+            screens::place('2001:db8:1:2:aaaa::1'),
+            screens::place('2001:db8:1:2:bbbb::7'),
+            'one connection, one /64'
+        );
+        $this->assertNotSame(screens::place('2001:db8:1:2::1'), screens::place('2001:db8:1:3::1'));
+        $this->assertSame('192.0.2.7', screens::place('192.0.2.7'));
+        // Full in all: the oldest of the fullest place goes, and the new one comes.
+        $DB->set_field('local_oksigeniahechauka_pair', 'fromhash', 'otro');
+        for ($i = 0; $i < screens::PAIR_MAX - screens::PAIR_FROM_ONE_PLACE; $i++) {
+            $DB->insert_record('local_oksigeniahechauka_pair', (object) ['code' => 'Z' . $i, 'tokenhash' => 't' . $i,
+                'device' => '{}', 'timecreated' => $now, 'timeexpires' => $now + 600, 'fromhash' => 'lleno' . ($i % 10)]);
+        }
+        $this->assertNotEmpty(screens::start_pairing([], $now + 30)['code']);
+        $this->assertSame(screens::PAIR_MAX, $DB->count_records_select('local_oksigeniahechauka_pair', 'screenid IS NULL'));
+        $this->assertFalse(
+            $DB->record_exists('local_oksigeniahechauka_pair', ['code' => $first['code']]),
+            'the oldest of the fullest'
+        );
+    }
+
+    /**
      * The whole way: code, pending, claimed, the key once, and then only its hash.
      */
     public function test_pairing(): void {

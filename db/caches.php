@@ -31,6 +31,12 @@ $definitions = [
         'simplekeys' => true,
         'ttl' => 3600,
     ],
+    // What each source of the manifest gave last today, given again while it fails for a moment.
+    'lastgood' => [
+        'mode' => cache_store::MODE_APPLICATION,
+        'simplekeys' => true,
+        'ttl' => 86400,
+    ],
     // The door of the screens in «Your work», asked on every load of the dashboard: a minute.
     'work' => [
         'mode' => cache_store::MODE_APPLICATION,

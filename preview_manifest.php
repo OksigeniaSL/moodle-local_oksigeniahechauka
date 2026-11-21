@@ -53,8 +53,10 @@ $screen = $screenid ? $DB->get_record('local_oksigeniahechauka_screen', ['id' =>
     'lastinfo' => null,
 ];
 $m = manifest::build($screen, time());
-// And sees in it only what reaches them: nothing of the other groups', nor what is hidden.
-$m['items'] = access::seen_items($m['items'] ?? []);
+// A screen of theirs shows what reaches it, all of it; the general one, only what reaches them: nothing of the other groups'.
+if (!$screenid) {
+    $m['items'] = access::seen_items($m['items'] ?? []);
+}
 // The preview shows everything, whatever the power hours say, and never sounds: the panel can have several screens
 // open at once.
 unset($m['power']);

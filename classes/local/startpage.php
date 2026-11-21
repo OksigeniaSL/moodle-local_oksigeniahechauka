@@ -227,6 +227,8 @@ class startpage {
             'paired' => $paired,
             'screensurl' => (new \moodle_url('/local/oksigeniahechauka/screens.php'))->out(false) . '#add',
             'home' => (new \moodle_url('/local/oksigeniahechauka/index.php'))->out(false),
+            // Seen behind a reverse proxy Moodle does not know of, lately: the codes for new screens would all count as one place.
+            'proxyhint' => $now - (int) ($config->proxyseen ?? 0) < 30 * DAYSECS,
         ];
     }
 
