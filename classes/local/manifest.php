@@ -443,14 +443,14 @@ class manifest {
             'news' => empty($config->sourcenews) ? null : function () use ($config, $now) {
                 return news::without_own(sources::news($now, (int) ($config->newsdays ?? 7) ?: 7));
             },
-            'books' => empty($config->sourcebooks) ? null : function () use ($config, $now) {
-                return sources::books($now, (int) ($config->booksdays ?? 14) ?: 14);
+            'books' => empty($config->sourcebooks) ? null : function () use ($config, $now, $scope) {
+                return sources::books($now, (int) ($config->booksdays ?? 14) ?: 14, $scope);
             },
             'photoday' => empty($config->sourcephotoday) ? null : function () use ($now) {
                 return photoday::items($now);
             },
-            'moments' => empty($config->sourcemoments) ? null : function () use ($now) {
-                return sources::moments($now);
+            'moments' => empty($config->sourcemoments) ? null : function () use ($now, $scope) {
+                return sources::moments($now, $scope);
             },
             'instagram' => empty($config->sourceinstagram) ? null : function () {
                 return instagram::items();
@@ -473,7 +473,7 @@ class manifest {
         $items = [];
         foreach ($wanted as $source => $get) {
             if ($get) {
-                $variant = in_array($source, ['calendar', 'deadlines']) ? implode(',', $scope) : '';
+                $variant = in_array($source, ['calendar', 'deadlines', 'books', 'moments']) ? implode(',', $scope) : '';
                 $items = array_merge($items, self::guarded($source, $get, [], $variant));
             }
         }

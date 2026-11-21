@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.34.0
+
+- **What the panel says is what happens**: a screen whose content cannot be made says «Nothing new», with what to do,
+  apart from the screens without signal; a device in another time zone says both zones; «Your work» says «has given no
+  sign of life for 13 days» instead of a date, and that Instagram cannot be read, from the first time (after a week the
+  screens stop showing what came last).
+- **A Samsung display that has opened the player once opens it without a network too**, and the player shows what it
+  keeps, as a Raspberry Pi does (the app 1.0.3).
+- **On a site with several centres**, each screen gets the new books and the moments of its centre's libraries, from the
+  course categories of its groups (Oksigenia Ayvurenda 1.2.2).
+- A touch screen showing a showcase has no doors while it does: nobody opens a door they cannot see.
+- A video the server could not make ready says so, and why, instead of «▶».
+- For any centre: «Day to day» and «Its areas» on the touch screen; the README says how to install it, which screens
+  serve and what it asks outside the site; the settings of the picture of the day and of the weather say where they come
+  from.
+- The page for a Raspberry Pi leads back to the screens, and the warning of a reverse proxy looks like one.
+
 ## 0.33.0
 
 A thorough review of everything since 0.7.14, and what it found mended.

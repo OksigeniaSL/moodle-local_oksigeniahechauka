@@ -357,18 +357,40 @@ class sources {
     }
 
     /**
+     * The library's centre of a screen, on a site with several centres (a course category each): the one of the first of
+     * its categories that belongs to one. Null on a site of one centre, or for a screen with no category, which Oksigenia
+     * Ayvurenda takes as the site's only centre.
+     *
+     * @param int[] $scope the course categories of the screen (screens::scope)
+     * @return int|null
+     */
+    public static function library_centre(array $scope): ?int {
+        if (!$scope || !method_exists('\\local_oksigeniaayvurenda\\api', 'centre_of_category')) {
+            return null;
+        }
+        foreach ($scope as $category) {
+            $centre = \local_oksigeniaayvurenda\api::centre_of_category((int) $category);
+            if ($centre) {
+                return (int) $centre;
+            }
+        }
+        return null;
+    }
+
+    /**
      * What has come to the library lately, as an item of the contract. The library is not needed: nothing, if it is not there.
      *
      * @param int $now
      * @param int $days how far back
+     * @param int[] $scope the course categories of the screen: on a site of several centres, only its centre's libraries
      * @return array items of the contract
      */
-    public static function books(int $now, int $days): array {
+    public static function books(int $now, int $days, array $scope = []): array {
         if (!self::has_books()) {
             return [];
         }
         try {
-            $list = \local_oksigeniaayvurenda\api::new_books($now - $days * DAYSECS, self::BOOKS_MOST);
+            $list = \local_oksigeniaayvurenda\api::new_books($now - $days * DAYSECS, self::BOOKS_MOST, self::library_centre($scope));
         } catch (\Throwable $e) {
             debugging('Hechauka: the books of Ayvurenda failed: ' . $e->getMessage(), DEBUG_DEVELOPER);
             return [];
@@ -415,14 +437,15 @@ class sources {
      * item of the contract. Nothing, if the library is not there or has nothing to tell.
      *
      * @param int $now
+     * @param int[] $scope the course categories of the screen: on a site of several centres, only its centre's
      * @return array items of the contract
      */
-    public static function moments(int $now): array {
+    public static function moments(int $now, array $scope = []): array {
         if (!self::has_moments()) {
             return [];
         }
         try {
-            $list = \local_oksigeniaayvurenda\api::moments(null, $now);
+            $list = \local_oksigeniaayvurenda\api::moments(self::library_centre($scope), $now);
         } catch (\Throwable $e) {
             debugging('Hechauka: the moments of Ayvurenda failed: ' . $e->getMessage(), DEBUG_DEVELOPER);
             return [];

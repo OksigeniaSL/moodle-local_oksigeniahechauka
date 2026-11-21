@@ -222,8 +222,8 @@ final class resilience_test extends \advanced_testcase {
     }
 
     /**
-     * A screen whose manifest cannot be built goes on beating, and the panel says so after a while; once built, it is
-     * well again.
+     * A screen whose manifest cannot be built goes on beating, and the panel says so after a while, as a warning and not as
+     * a screen without signal; once built, it is well again.
      */
     public function test_a_screen_without_its_manifest_is_said_in_the_panel(): void {
         $this->resetAfterTest();
@@ -231,7 +231,8 @@ final class resilience_test extends \advanced_testcase {
         $now = time();
         $screen->lastseen = $now;
         manifest::note_broken((int) $screen->id, $now - 300, 'Call to undefined function');
-        $this->assertSame('down', \local_oksigeniahechauka\local\home::state($screen, [], $now)['key']);
+        $state = \local_oksigeniahechauka\local\home::state($screen, [], $now);
+        $this->assertSame(['warn', 'stale'], [$state['key'], $state['why']], 'it beats: not «without signal»');
         manifest::note_broken((int) $screen->id, $now, null);
         $this->assertSame('on', \local_oksigeniahechauka\local\home::state($screen, [], $now)['key']);
     }

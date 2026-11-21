@@ -43,7 +43,7 @@ export const WORDS = {
     touch_more: 'Más puertas',
     touch_title: '¿Qué puerta abren?',
     touch_help: 'Toquen una. Con «Inicio», vuelve lo de siempre.',
-    touch_families: 'Para las familias',
+    touch_families: 'Del día a día',
     touch_visitors: 'Si nos visitan',
     touch_back: 'Atrás',
     touch_home: 'Inicio',

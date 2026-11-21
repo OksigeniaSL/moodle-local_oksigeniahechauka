@@ -61,7 +61,8 @@ echo $OUTPUT->render_from_template('local_oksigeniahechauka/prepare', [
     'action' => $url->out(false),
     'sesskey' => sesskey(),
     'image' => card::IMAGE,
-    'imagesize' => display_size(card::IMAGE_SIZE),
+    // In the reader's own numbers: «1,4 GB» in Spanish.
+    'imagesize' => format_float(card::IMAGE_SIZE / (1024 * 1024 * 1024), 1) . ' GB',
     'imager' => card::IMAGER,
     'typed' => card::typed(),
     'name' => $name,
@@ -70,5 +71,8 @@ echo $OUTPUT->render_from_template('local_oksigeniahechauka/prepare', [
     'add' => (new moodle_url('/local/oksigeniahechauka/screens.php'))->out(false) . '#add',
     'example' => card::hostname(get_string('prepare_name_example', $c)),
     'icons' => ['copy' => icons::svg('copy')],
+    'back' => (new moodle_url('/local/oksigeniahechauka/screens.php'))->out(false),
+    'backlabel' => get_string('tab_screens', $c),
+    'backicon' => icons::svg('back'),
 ]);
 echo $OUTPUT->footer();

@@ -24,10 +24,12 @@
     {
         "action": "#", "sesskey": "abc", "image": "https://example.com/hechauka.img.xz", "imagesize": "1.4 GB",
         "imager": "https://www.raspberrypi.com/software/", "typed": "moodle.example.org", "name": "", "keys": "",
-        "bad": false, "add": "#", "example": "hechauka-recepcion", "icons": {"copy": ""}
+        "bad": false, "add": "#", "example": "hechauka-recepcion", "icons": {"copy": ""},
+        "back": "#", "backlabel": "Pantallas", "backicon": ""
     }
 }}
 <div class="hkp" id="hkp-prepare-page">
+    <a class="hkp-back" href="{{back}}">{{{backicon}}}{{backlabel}}</a>
     <header class="hkp-head"><div class="hkp-head-title"><h1>{{#str}}prepare_title, local_oksigeniahechauka{{/str}}</h1><p class="hkp-hint">{{#str}}prepare_help, local_oksigeniahechauka{{/str}}</p></div></header>
     <div class="hkp-prepare">
         <section class="hkp-fs hkp-step" aria-labelledby="hkp-pr-need">

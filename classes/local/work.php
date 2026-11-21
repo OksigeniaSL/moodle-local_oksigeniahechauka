@@ -128,8 +128,9 @@ class work {
                     return (int) ($f['time'] ?? 0);
                 }, $failing));
                 $alerts[] = ['text' => get_string('work_source', $c, (object) ['names' => implode(', ', $names),
-                    'since' => userdate($since, get_string('strftimedatetimeshort', 'langconfig'))]),
-                    'url' => (new \moodle_url('/local/oksigeniahechauka/centre.php'))->out(false), 'level' => 'today'];
+                    'since' => phrases::since($since, $now)]),
+                    'url' => (new \moodle_url('/local/oksigeniahechauka/start.php'))->out(false) . '#hkp-st-sources',
+                    'level' => 'today'];
             }
             // Instagram, read by the task: a key that stopped working is said, and the screens keep what came last for a week.
             $instagram = instagram::failing();

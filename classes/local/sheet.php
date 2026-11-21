@@ -63,6 +63,25 @@ class sheet {
     }
 
     /**
+     * What to do about a screen's warning, for its sheet.
+     *
+     * @param array $card home::screen()
+     * @param int $screenid
+     * @return string
+     */
+    protected static function hint(array $card, int $screenid): string {
+        $c = 'local_oksigeniahechauka';
+        if ($card['state'] !== 'warn') {
+            return '';
+        }
+        if ($card['why'] === 'stale') {
+            $broken = manifest::broken()[$screenid] ?? [];
+            return get_string('sheet_stale_hint', $c, s((string) ($broken['error'] ?? '')));
+        }
+        return get_string($card['why'] === 'zone' ? 'sheet_zone_hint' : 'sheet_clock_hint', $c);
+    }
+
+    /**
      * Everything the page needs.
      *
      * @param \stdClass $screen
@@ -135,8 +154,9 @@ class sheet {
             'sesskey' => sesskey(),
             'card' => $card,
             'reload' => $card['reload'],
-            // A clock that is off says what to do about it.
-            'clockhint' => $card['state'] === 'warn' ? get_string('sheet_clock_hint', $c) : '',
+            // A warning says what to do about it: a clock that is off, another time zone, or a server that cannot make what
+            // the screen shows (the screen itself is well).
+            'clockhint' => self::hint($card, (int) $screen->id),
             'downhelp' => $card['state'] === 'down',
             'device' => self::device_lines($info),
             'reloadicon' => icons::svg('reload'),

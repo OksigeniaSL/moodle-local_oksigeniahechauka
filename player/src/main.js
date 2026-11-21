@@ -320,7 +320,8 @@ class Player {
         }
         document.documentElement.lang = (m.screen && m.screen.lang) || this.boot.lang || 'en';
         this.screen.configure(m);
-        this.tactil.configure((m.screen && m.screen.touch) || null);
+        this.touchShown = this.touchFor(m, this.clock.wall());
+        this.tactil.configure(this.touchShown);
         this.surprises.configure(m.surprises, (m.screen && m.screen.distance) || 3, Date.now());
         if (this.mode === 'screen') {
             this.keepSurprises(m.surprises);
@@ -850,6 +851,19 @@ class Player {
     }
 
     /**
+     * The doors of a screen people touch, when they can be seen: a showcase (a photo over the whole screen) has none, so
+     * nobody opens a door they do not see.
+     *
+     * @param {object} m the manifest
+     * @param {object} wall
+     * @returns {object|null}
+     */
+    touchFor(m, wall) {
+        const touch = (m.screen && m.screen.touch) || null;
+        return touch && useOf(m, wall) !== 'showcase' ? touch : null;
+    }
+
+    /**
      * One part of the second's tick, on its own: what throws is noted once while it keeps throwing, and the other parts
      * (the turns, the reload, the ticker) go on.
      *
@@ -913,6 +927,11 @@ class Player {
         if (this.tactil) {
             // The touches go by the device's own time (they are measured, not shown); the welcome, by the screen's.
             this.part('touch', function () {
+                const touch = self.touchFor(m, wall);
+                if (touch !== self.touchShown) {
+                    self.touchShown = touch;
+                    self.tactil.configure(touch);
+                }
                 self.tactil.tick(Date.now());
             });
         }

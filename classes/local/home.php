@@ -367,6 +367,7 @@ class home {
             'vertical' => $vertical,
             'shape' => $vertical ? 'v' : 'h',
             'state' => $state['key'],
+            'why' => $state['why'] ?? '',
             'label' => $state['label'],
             'meta' => $state['meta'],
             'image' => $picture,
@@ -417,7 +418,8 @@ class home {
             }
             $broken = manifest::broken_since((int) ($s->id ?? 0));
             if ($broken && $now - $broken > self::STALE_AFTER) {
-                return ['key' => 'down', 'label' => get_string('state_stale', $c),
+                // It beats: what fails is the server, which cannot make what it shows. Not «without signal».
+                return ['key' => 'warn', 'why' => 'stale', 'label' => get_string('state_stale', $c),
                     'meta' => get_string('meta_stale', $c, phrases::since($broken, $now)), 'drift' => 0];
             }
             $device = !empty($info['time']) ? (int) $s->lastseen - (int) $info['time'] : 0;
@@ -427,7 +429,7 @@ class home {
             $out['device'] = abs($device) > self::DRIFT ? (int) round($device / MINSECS) : 0;
             if (abs($drift) > self::DRIFT) {
                 $minutes = (int) round(abs($drift) / MINSECS);
-                return ['key' => 'warn', 'label' => get_string('state_clock', $c), 'meta' => get_string(
+                return ['key' => 'warn', 'why' => 'clock', 'label' => get_string('state_clock', $c), 'meta' => get_string(
                     $drift > 0 ? 'meta_late' : 'meta_ahead',
                     $c,
                     $minutes
@@ -437,8 +439,8 @@ class home {
             // at the wrong hour.
             $zone = self::zone_gap($info, (int) $s->lastseen);
             if ($zone) {
-                return ['key' => 'warn', 'label' => get_string('state_zone', $c), 'meta' => get_string('meta_zone', $c, $zone),
-                    'drift' => 0] + $out;
+                return ['key' => 'warn', 'why' => 'zone', 'label' => get_string('state_zone', $c),
+                    'meta' => get_string('meta_zone', $c, $zone), 'drift' => 0] + $out;
             }
             $out['label'] = get_string('state_on', $c);
             $out['meta'] = get_string('meta_seen', $c, phrases::ago($now - (int) $s->lastseen));
@@ -520,7 +522,13 @@ class home {
         }
         $extra = [];
         foreach ($warn as $w) {
-            $extra[] = get_string('health_clock', $c, (object) ['name' => $w['name'], 'min' => abs($w['drift'])]);
+            // A warning is the clock's unless it says otherwise.
+            $why = ($w['why'] ?? '') ?: 'clock';
+            if ($why === 'clock') {
+                $extra[] = get_string('health_clock', $c, (object) ['name' => $w['name'], 'min' => abs($w['drift'])]);
+            } else {
+                $extra[] = get_string($why === 'stale' ? 'health_stale' : 'health_zone', $c, $w['name']);
+            }
         }
         if (count($cards) > count($down) + count($warn) + $off) {
             $extra[] = get_string('health_rest', $c);
@@ -536,7 +544,8 @@ class home {
         }
         $target = $down[0] ?? $warn[0];
         return ['ok' => false, 'bold' => $sentences ? implode(' ', $sentences) : array_shift($extra),
-            'detail' => implode(' ', $extra), 'icon' => icons::svg($down ? 'plugoff' : 'clock'),
+            'detail' => implode(' ', $extra), 'icon' => icons::svg($down ? 'plugoff' :
+                ((($warn[0]['why'] ?? '') ?: 'clock') === 'stale' ? 'reload' : 'clock')),
             'see' => $managescreens ? (new \moodle_url('/local/oksigeniahechauka/screen.php', ['id' => $target['id']]))
                 ->out(false) : ''];
     }
@@ -722,7 +731,7 @@ class home {
         $data = items::data($item);
         $title = format_string($item->title);
         $thumb = self::thumb($item, $data);
-        $kind = $item->type === 'media' ? ($thumb['video'] ? 'video' : 'photo') : $item->type;
+        $kind = $item->type === 'media' ? ($thumb['isvideo'] ? 'video' : 'photo') : $item->type;
         $photos = $item->type === 'album' ? files::count(files::MEDIA, (int) $item->id) : 0;
         $meta = [];
         if ($item->type === 'notice' && !empty($data['important'])) {
@@ -815,6 +824,7 @@ class home {
             'title' => $title,
             'thumb' => $thumb,
             'kind' => get_string('kind_' . $kind, $c) . ($thumb['video'] ? ' · ' . $thumb['video'] : '') .
+                ($thumb['unready'] ? ' · ' . $thumb['unready'] : '') .
                 ($photos ? ' · ' . get_string('kind_album_photos', $c, $photos) : ''),
             'kindicon' => icons::svg(['photo' => 'photo', 'video' => 'video', 'album' => 'photo', 'notice' => 'notice',
                 'event' => 'event', 'ticker' => 'ticker', 'agenda' => 'agenda', 'table' => 'table', 'urgent' => 'urgent'][$kind]),
@@ -839,7 +849,8 @@ class home {
      * @return array
      */
     protected static function thumb(\stdClass $item, array $data): array {
-        $out = ['type' => $item->type, 'image' => '', 'vertical' => false, 'video' => '', 'important' => false,
+        $out = ['type' => $item->type, 'image' => '', 'vertical' => false, 'isvideo' => false, 'video' => '', 'unready' => '',
+            'important' => false,
             'stage' => 0, 'day' => '', 'num' => '', 'agenda' => []];
         if ($item->type === 'media' || $item->type === 'album') {
             $out['type'] = 'media';
@@ -860,7 +871,10 @@ class home {
             }
             if ($media && video::is_video($media)) {
                 $seconds = (int) round((float) ($data['videoduration'] ?? 0));
-                $out['video'] = $seconds ? floor($seconds / 60) . ':' . sprintf('%02d', $seconds % 60) : '▶';
+                $out['isvideo'] = true;
+                $out['video'] = $seconds ? floor($seconds / 60) . ':' . sprintf('%02d', $seconds % 60) : '';
+                // Without its length it was not made ready: said so when the server has no ffmpeg to do it.
+                $out['unready'] = !$seconds && !video::ffmpeg() ? get_string('video_unready', 'local_oksigeniahechauka') : '';
                 if (!empty($data['videowidth']) && !empty($data['videoheight'])) {
                     $out['vertical'] = $data['videoheight'] > $data['videowidth'];
                 }

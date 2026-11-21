@@ -1,24 +1,56 @@
 # Information screens for Moodle (Oksigenia Hechauka)
 
 [![License: GPLv3](https://img.shields.io/badge/license-GPLv3+-blue.svg)](LICENSE)
-![Moodle](https://img.shields.io/badge/Moodle-4.5%E2%80%935.3-orange)
-![Status](https://img.shields.io/badge/status-pre--alpha-red)
+![Moodle](https://img.shields.io/badge/Moodle-4.5%E2%80%936.0-orange)
+![Status](https://img.shields.io/badge/status-alpha-orange)
 [![Sponsor](https://img.shields.io/badge/sponsor-Oksigenia-00d4ff)](https://oksigenia.com/en/open-source#sponsor)
 
-**Oksigenia Hechauka** runs the information screens of a school or a university from its Moodle™ site: notices,
-pictures, videos, the events of the day and the menu of the canteen, each screen with its own schedule. What Moodle
-already knows reaches the screens by itself, and every screen can be seen from afar exactly as it is.
-*Hechauka* means "to show" in Guarani.
+**Oksigenia Hechauka** runs the information screens of any centre from its Moodle™ site (a school, a university, an
+academy, a town hall, a company): notices, pictures, videos, the events of the day and the menu of the canteen, each
+screen with its own schedule. What Moodle already knows reaches the screens by itself, and every screen can be seen from
+afar exactly as it is. *Hechauka* means "to show" in Guarani.
 
 [Leer en español](README.es.md)
 
 ## Status
 
-**Pre-alpha.** A screen opens one address and shows a code; someone gives it a name from the phone and it starts. The
-panel («Screens», in the main bar) shows each screen as it is now and what is on them; adding content puts the screen
-beside the form, changing as one types; an urgent notice covers every screen in two clicks. The menu of Oksigenia
-Meals, the events of the calendar, the site news and the weather reach the screens by themselves. Not for production
-sites.
+**Alpha**, in use since November 2026 with screens of every kind below (two Raspberry Pi and two Samsung professional
+displays, one of them a touch screen). A screen opens one address and shows a code; someone gives it a name from the
+phone and it starts. The panel («Screens», in the main bar) shows each screen as it is now and what is on it; adding
+content puts the screen beside the form, changing as one types; an urgent notice covers every screen in two clicks.
+
+## Installation
+
+1. Put the plugin in `local/oksigeniahechauka` and upgrade the site, as any plugin. Moodle 4.5 to 6.0.
+2. Open «Screens» in the main bar: the first time it is «Get started», five steps in one page (the kind of centre, its
+   look, what comes by itself, where it is and its first screen).
+3. Optional on the server: `ffmpeg` (a static build is enough, found by itself or set in the settings), so that every
+   uploaded video is made ready for every screen.
+
+## The screens
+
+One address, the player's (`https://YOUR-MOODLE/local/oksigeniahechauka/player/`), shown in «Get started» and in «Add a
+screen», with a short one when the site has a shortener:
+
+- **A TV or a small computer with a browser**: open that address in full screen (kiosk mode).
+- **A Samsung professional display** (Tizen 4 to 6.5): the same address in its URL Launcher («Install Web App»). The
+  plugin serves the signed app it asks for next to the player. See [device/README.md](device/README.md).
+- **A Raspberry Pi**: «A Raspberry Pi for the screen», in the panel, gives the card image and a file with the address of
+  the site; the device keeps itself up to date from the site, signed by Oksigenia.
+
+Each one shows a code; whoever runs the screens names it from their phone with the QR.
+
+## What it asks outside the site
+
+Nothing until the centre turns it on or gives what it needs:
+
+- **The picture of the day** (on by default, can be switched off): a list and its pictures from a server of Oksigenia,
+  `recursos.oksigenia.com`, once an hour. Nothing of the site is sent.
+- **The weather**: the place of the centre is looked up once with OpenStreetMap's Nominatim; the forecast comes from
+  MET Norway every hour. Only when the centre has a place.
+- **Instagram**: the Graph API of Meta, once an hour, only with a key of the centre.
+- **Cifra** (pupils' birthdays): only when the site has an OAuth 2 connection to it.
+- **A link shortener**: only when the site has one (the common piece `shortener`), for the QR codes.
 
 ## How it works
 
@@ -54,7 +86,7 @@ in `player/`: its sources in `player/src`, built with esbuild for the old browse
 (`npm run build`), and its tests run on Node (`npm test`). The built bundle is committed, so whoever installs the
 plugin builds nothing. `player/demo/` shows the player with example data. The panel follows [DESIGN.md](DESIGN.md): Mustache templates in
 `templates/`, `styles.css` built from the design's own sheet plus `panel/extra.css`, and two plain scripts in `panel/`
-(adding content and «Your school»). See [CONTRIBUTING.md](CONTRIBUTING.md).
+(adding content and «Your centre»). See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
 

@@ -1,23 +1,57 @@
 # Pantallas informativas para Moodle (Oksigenia Hechauka)
 
 [![Licencia: GPLv3](https://img.shields.io/badge/licencia-GPLv3+-blue.svg)](LICENSE)
-![Moodle](https://img.shields.io/badge/Moodle-4.5%E2%80%935.3-orange)
-![Estado](https://img.shields.io/badge/estado-pre--alfa-red)
+![Moodle](https://img.shields.io/badge/Moodle-4.5%E2%80%936.0-orange)
+![Estado](https://img.shields.io/badge/estado-alfa-orange)
 [![Patrocinio](https://img.shields.io/badge/patrocinio-Oksigenia-00d4ff)](https://oksigenia.com/en/open-source#sponsor)
 
-**Oksigenia Hechauka** lleva las pantallas informativas de un colegio o de una universidad desde su Moodle™: avisos,
-fotos, vídeos, los eventos del día y el menú del comedor, cada pantalla con su programación. Lo que Moodle ya sabe
-llega solo a las pantallas, y cada una se ve a distancia tal como está. *Hechauka* es «mostrar» en guaraní.
+**Oksigenia Hechauka** lleva las pantallas informativas de cualquier centro desde su Moodle™ (un colegio, una
+universidad, una academia, un ayuntamiento, una empresa): avisos, fotos, vídeos, los eventos del día y el menú del
+comedor, cada pantalla con su programación. Lo que Moodle ya sabe llega solo a las pantallas, y cada una se ve a
+distancia tal como está. *Hechauka* es «mostrar» en guaraní.
 
 [Read in English](README.md)
 
 ## Estado
 
-**Pre-alfa.** Una pantalla abre una dirección y enseña un código; alguien le pone nombre desde el móvil y empieza. El
-panel («Pantallas», en la barra principal) enseña cada pantalla tal como está y lo que sale en ellas; al añadir algo,
-la pantalla va al lado del formulario y cambia mientras se escribe; un aviso urgente cubre todas las pantallas en dos
-clics. El menú de Oksigenia Meals, los eventos del calendario, las noticias del sitio y el tiempo llegan solos a las
-pantallas. No es para sitios en producción.
+**Alfa**, en uso desde noviembre de 2026 con pantallas de todos los tipos de abajo (dos Raspberry Pi y dos pantallas
+profesionales Samsung, una de ellas táctil). Una pantalla abre una dirección y enseña un código; alguien le pone nombre
+desde el móvil y empieza. El panel («Pantallas», en la barra principal) enseña cada pantalla tal como está y lo que sale
+en ella; al añadir algo, la pantalla va al lado del formulario y cambia mientras se escribe; un aviso urgente cubre
+todas las pantallas en dos clics.
+
+## Instalación
+
+1. El plugin va en `local/oksigeniahechauka` y se actualiza el sitio, como cualquier plugin. Moodle 4.5 a 6.0.
+2. «Pantallas», en la barra principal: la primera vez es «Empezar», cinco pasos en una página (qué centro es, su
+   aspecto, lo que llega solo, dónde está y su primera pantalla).
+3. En el servidor, si se quiere: `ffmpeg` (basta una versión estática; se busca solo o se pone en los ajustes), para que
+   cada vídeo que se sube quede listo para todas las pantallas.
+
+## Las pantallas
+
+Una sola dirección, la del reproductor (`https://TU-MOODLE/local/oksigeniahechauka/player/`), que dan «Empezar» y
+«Añadir una pantalla», con una corta si el sitio tiene acortador:
+
+- **Una tele o un ordenador pequeño con navegador**: esa dirección a pantalla completa (modo quiosco).
+- **Una pantalla profesional Samsung** (Tizen 4 a 6.5): la misma dirección en su URL Launcher («Install Web App»). El
+  plugin sirve junto al reproductor la app firmada que pide. Más en [device/README.md](device/README.md).
+- **Una Raspberry Pi**: «Una Raspberry Pi para la pantalla», en el panel, da la imagen de la tarjeta y un fichero con la
+  dirección del sitio; el aparato se pone al día solo desde el sitio, con la firma de Oksigenia.
+
+Cada una enseña un código; quien lleva las pantallas le pone nombre desde su móvil con el QR.
+
+## Lo que pide fuera del sitio
+
+Nada hasta que el centro lo enciende o da lo que hace falta:
+
+- **La foto del día** (encendida de serie, se puede apagar): una lista y sus imágenes de un servidor de Oksigenia,
+  `recursos.oksigenia.com`, una vez por hora. No se envía nada del sitio.
+- **El tiempo**: el lugar del centro se busca una vez con Nominatim, de OpenStreetMap; la previsión llega de MET Norway
+  cada hora. Solo si el centro tiene lugar.
+- **Instagram**: la Graph API de Meta, una vez por hora, solo con una clave del centro.
+- **Cifra** (los cumpleaños de los alumnos): solo si el sitio tiene una conexión OAuth 2 con ella.
+- **Un acortador de enlaces**: solo si el sitio lo tiene (la pieza común `shortener`), para los códigos QR.
 
 ## Cómo funciona
 
