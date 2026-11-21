@@ -39,6 +39,8 @@ $frame = optional_param('frame', 0, PARAM_BOOL);
 $shape = optional_param('shape', '', PARAM_ALPHA);
 
 if ($frame) {
+    // Only read from here on: the previews of a panel with many screens go side by side, not one after the other.
+    \core\session\manager::write_close();
     player_page::send(player_page::preview_boot($screenid, $at), true);
 }
 

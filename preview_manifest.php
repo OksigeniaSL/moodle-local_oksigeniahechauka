@@ -34,6 +34,8 @@ use local_oksigeniahechauka\local\manifest;
 require_login(null, false);
 $context = context_system::instance();
 require_capability('local/oksigeniahechauka:view', $context);
+// Only read from here on: the previews of a panel with many screens go side by side, not one after the other.
+\core\session\manager::write_close();
 $PAGE->set_context($context);
 
 $screenid = optional_param('screen', 0, PARAM_INT);

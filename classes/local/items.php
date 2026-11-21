@@ -34,6 +34,9 @@ class items {
     /** @var int How many photos an album can have. */
     const ALBUM_MAX = 20;
 
+    /** @var array|null Where each item of a long list goes, read at once (prime_targets): itemid => [groups, screens]. */
+    protected static $primed = null;
+
     /**
      * A text for the screens: through the filters (multilang), as plain text. The player writes it with textContent,
      * so it must not come escaped («AMPA & Dirección», not «AMPA &amp; Dirección»).
@@ -264,6 +267,34 @@ class items {
     }
 
     /**
+     * Where each item of a long list goes, in one reading: targets() takes it from there (the panel's list, with hundreds).
+     * An empty list forgets it.
+     *
+     * @param int[] $itemids
+     * @return void
+     */
+    public static function prime_targets(array $itemids): void {
+        global $DB;
+        if (!$itemids) {
+            self::$primed = null;
+            return;
+        }
+        self::$primed = [];
+        foreach ($itemids as $id) {
+            self::$primed[(int) $id] = ['groups' => [], 'screens' => []];
+        }
+        foreach (array_chunk(array_values(array_unique(array_map('intval', $itemids))), 1000) as $chunk) {
+            foreach ($DB->get_records_list('local_oksigeniahechauka_target', 'itemid', $chunk) as $t) {
+                if ($t->groupid) {
+                    self::$primed[(int) $t->itemid]['groups'][] = (int) $t->groupid;
+                } else if ($t->screenid) {
+                    self::$primed[(int) $t->itemid]['screens'][] = (int) $t->screenid;
+                }
+            }
+        }
+    }
+
+    /**
      * Where an item goes: every screen, or its groups and screens.
      *
      * @param \stdClass $item
@@ -272,6 +303,9 @@ class items {
     public static function targets(\stdClass $item): array {
         global $DB;
         $out = ['all' => (bool) $item->targetall, 'groups' => [], 'screens' => []];
+        if (self::$primed !== null && isset(self::$primed[(int) $item->id])) {
+            return array_merge($out, self::$primed[(int) $item->id]);
+        }
         foreach ($DB->get_records('local_oksigeniahechauka_target', ['itemid' => $item->id]) as $t) {
             if ($t->groupid) {
                 $out['groups'][] = (int) $t->groupid;
@@ -292,6 +326,9 @@ class items {
      */
     public static function set_targets(int $itemid, array $groups, array $screens): void {
         global $DB;
+        if (self::$primed !== null) {
+            unset(self::$primed[$itemid]);
+        }
         $DB->delete_records('local_oksigeniahechauka_target', ['itemid' => $itemid]);
         foreach (array_unique(array_map('intval', $groups)) as $g) {
             $DB->insert_record('local_oksigeniahechauka_target', (object) ['itemid' => $itemid, 'groupid' => $g]);

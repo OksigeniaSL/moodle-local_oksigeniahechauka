@@ -32,6 +32,9 @@ class alerts {
     /** Seconds without a heartbeat before a screen counts as down. */
     const DOWN_AFTER = 900;
 
+    /** Screens that go (or come back) in the same pass, from which they are told together in one warning. */
+    const TOGETHER = 3;
+
     /**
      * Looks at every screen and warns about the ones that went down or came back.
      *
@@ -45,19 +48,31 @@ class alerts {
             'local_oksigeniahechauka_screen',
             'keyhash IS NOT NULL AND lastseen > 0'
         );
+        $went = [];
+        $came = [];
         foreach ($screens as $screen) {
             $info = json_decode((string) ($screen->lastinfo ?? ''), true) ?: [];
             $down = $now - $screen->lastseen > self::DOWN_AFTER || screens::frozen($info);
             if ($down && !$screen->alerted && $screen->alerts && self::expected($screen, $now)) {
-                self::send($screen, 'down');
+                $went[] = $screen;
                 $DB->set_field('local_oksigeniahechauka_screen', 'alerted', $now, ['id' => $screen->id]);
                 $done['down']++;
             } else if (!$down && $screen->alerted) {
                 if ($screen->alerts) {
-                    self::send($screen, 'back');
+                    $came[] = $screen;
                     $done['back']++;
                 }
                 $DB->set_field('local_oksigeniahechauka_screen', 'alerted', 0, ['id' => $screen->id]);
+            }
+        }
+        // A building without network is one thing to look at, not a warning for each of its screens.
+        foreach (['down' => $went, 'back' => $came] as $kind => $list) {
+            if (count($list) >= self::TOGETHER) {
+                self::send_many($list, $kind);
+            } else {
+                foreach ($list as $screen) {
+                    self::send($screen, $kind);
+                }
             }
         }
         return $done;
@@ -126,6 +141,45 @@ class alerts {
             $message->notification = 1;
             $message->contexturl = $url->out(false);
             $message->contexturlname = $a->name;
+            message_send($message);
+        }
+    }
+
+    /**
+     * One warning for several screens that went, or came back, at the same time: a building without network, a cut in the
+     * power. To everyone who runs the screens, each in their language.
+     *
+     * @param \stdClass[] $screens
+     * @param string $kind down or back
+     * @return void
+     */
+    protected static function send_many(array $screens, string $kind): void {
+        $c = 'local_oksigeniahechauka';
+        $strings = get_string_manager();
+        $url = new \moodle_url('/local/oksigeniahechauka/index.php');
+        $names = implode(', ', array_map(function ($screen) {
+            return '«' . items::plain((string) $screen->name) . '»';
+        }, $screens));
+        $a = (object) ['count' => count($screens), 'names' => $names, 'url' => $url->out(false)];
+        foreach (self::recipients() as $user) {
+            $user = \core_user::get_user($user->id);
+            if (!$user || $user->deleted || $user->suspended) {
+                continue;
+            }
+            $lang = $user->lang ?: null;
+            $message = new \core\message\message();
+            $message->component = $c;
+            $message->name = 'screendown';
+            $message->userfrom = \core_user::get_noreply_user();
+            $message->userto = $user;
+            $message->subject = $strings->get_string('alert_' . $kind . '_many_subject', $c, $a, $lang);
+            $message->fullmessage = $strings->get_string('alert_' . $kind . '_many_body', $c, $a, $lang);
+            $message->fullmessageformat = FORMAT_PLAIN;
+            $message->fullmessagehtml = '';
+            $message->smallmessage = $message->subject;
+            $message->notification = 1;
+            $message->contexturl = $url->out(false);
+            $message->contexturlname = $strings->get_string('pluginname', $c, null, $lang);
             message_send($message);
         }
     }

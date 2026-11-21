@@ -64,7 +64,16 @@ class endpoint {
         foreach ($headers as $name => $value) {
             header($name . ': ' . $value);
         }
-        echo json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        $body = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        // A manifest goes compressed to whoever takes it (every screen does): an eighth of the bytes, every hour, to each.
+        $accepts = stripos((string) ($_SERVER['HTTP_ACCEPT_ENCODING'] ?? ''), 'gzip') !== false;
+        if ($accepts && strlen($body) > 4096 && function_exists('gzencode') && !ini_get('zlib.output_compression')) {
+            $body = gzencode($body, 6);
+            header('Content-Encoding: gzip');
+            header('Vary: Accept-Encoding');
+            header('Content-Length: ' . strlen($body));
+        }
+        echo $body;
         die();
     }
 

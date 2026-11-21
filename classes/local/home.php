@@ -36,6 +36,9 @@ class home {
     /** @var int A screenshot this recent stands for what the screen shows (seconds). */
     const FRESH = 30 * MINSECS;
 
+    /** What has gone by, the most recent drawn in the list: the rest is counted. */
+    const DONE_MOST = 60;
+
     /**
      * Everything the home template needs.
      *
@@ -81,10 +84,26 @@ class home {
         $cards = [];
         $states = [];
         $reached = 0;
+        // The screens each urgent notice reaches, read once for all of them.
+        $groupscreens = [];
+        if ($urgents) {
+            foreach ($DB->get_records('local_oksigeniahechauka_member') as $m) {
+                $groupscreens[(int) $m->groupid][] = (int) $m->screenid;
+            }
+        }
+        $reach = [];
+        foreach ($urgents as $u) {
+            $targets = items::targets($u);
+            $ids = $targets['screens'];
+            foreach ($targets['groups'] as $g) {
+                $ids = array_merge($ids, $groupscreens[$g] ?? []);
+            }
+            $reach[] = [$u, $targets['all'], array_flip($ids)];
+        }
         foreach ($screens as $s) {
             $urgent = null;
-            foreach ($urgents as $u) {
-                if (items::reaches((int) $u->id, (int) $s->id)) {
+            foreach ($reach as [$u, $all, $ids]) {
+                if ($all || isset($ids[(int) $s->id])) {
                     $urgent = $u;
                 }
             }
@@ -549,10 +568,30 @@ class home {
         $out = ['now' => [], 'later' => [], 'done' => []];
         $counts = ['all' => 0, 'notice' => 0, 'media' => 0, 'event' => 0, 'ticker' => 0, 'agenda' => 0, 'table' => 0];
         $mine = 0;
+        // What has already gone by grows for ever: the most recent of it, the rest counted.
+        $moments = [];
+        $done = [];
         foreach ($items as $item) {
             // An urgent notice is on until it is taken off or its hour comes.
-            $moment = $item->type === 'urgent' ? (items::urgent_on($item, time()) ? 'now' : 'done') :
+            $moments[$item->id] = $item->type === 'urgent' ? (items::urgent_on($item, time()) ? 'now' : 'done') :
                 phrases::moment($item, $today);
+            if ($moments[$item->id] === 'done') {
+                $done[$item->id] = (int) $item->timemodified;
+            }
+        }
+        arsort($done);
+        $shown = array_slice(array_keys($done), 0, self::DONE_MOST);
+        $items = array_filter($items, function ($item) use ($moments, $shown) {
+            return $moments[$item->id] !== 'done' || in_array($item->id, $shown);
+        });
+        // Where each one goes and its pictures, read at once for the whole list.
+        $ids = array_map(function ($item) {
+            return (int) $item->id;
+        }, $items);
+        items::prime_targets($ids);
+        files::prime([files::MEDIA, files::POSTER], $ids);
+        foreach ($items as $item) {
+            $moment = $moments[$item->id];
             $row = self::row(
                 $item,
                 $moment,
@@ -593,10 +632,22 @@ class home {
             'later' => $out['later'],
             'latercount' => count($out['later']),
             'done' => $out['done'],
-            'donecount' => count($out['done']),
+            'donecount' => count($done),
+            'donemore' => count($done) > self::DONE_MOST ? get_string('group_done_most', $c, self::DONE_MOST) : '',
             'clockicon' => icons::svg('clock'),
             'chevicon' => icons::svg('chev'),
-        ];
+        ] + self::forget_primed();
+    }
+
+    /**
+     * What was read at once for the list, forgotten once it is drawn.
+     *
+     * @return array nothing, to add
+     */
+    protected static function forget_primed(): array {
+        items::prime_targets([]);
+        files::prime([], []);
+        return [];
     }
 
     /**
@@ -632,7 +683,7 @@ class home {
         $title = format_string($item->title);
         $thumb = self::thumb($item, $data);
         $kind = $item->type === 'media' ? ($thumb['video'] ? 'video' : 'photo') : $item->type;
-        $photos = $item->type === 'album' ? count(items::album_files((int) $item->id)) : 0;
+        $photos = $item->type === 'album' ? files::count(files::MEDIA, (int) $item->id) : 0;
         $meta = [];
         if ($item->type === 'notice' && !empty($data['important'])) {
             $meta[] = ['flag' => true, 'text' => get_string('flag_important', $c), 'icon' => icons::svg('urgent')];
@@ -762,9 +813,7 @@ class home {
                     $image->get_filearea(),
                     $item->id,
                     '/',
-                    $image->get_filename(),
-                    false,
-                    true
+                    $image->get_filename()
                 )->out(false);
                 $size = $image->get_imageinfo();
                 $out['vertical'] = $size && $size['height'] > $size['width'];
@@ -793,7 +842,7 @@ class home {
         $look = ['urgent' => 'notice', 'album' => 'media', 'table' => 'agenda'];
         $out['is' . ($look[$item->type] ?? $item->type)] = true;
         if ($item->type === 'album') {
-            $out['photos'] = count(items::album_files((int) $item->id));
+            $out['photos'] = files::count(files::MEDIA, (int) $item->id);
         }
         return $out;
     }

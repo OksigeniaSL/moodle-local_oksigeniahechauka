@@ -23,7 +23,7 @@
     Example context (json):
     {
         "content": {"title": "Lo que sale", "filters": [], "scope": false, "now": [], "nowcount": 0, "later": [],
-            "latercount": 0, "done": [], "donecount": 0, "clockicon": "", "chevicon": ""}
+            "latercount": 0, "done": [], "donecount": 0, "donemore": "", "clockicon": "", "chevicon": ""}
     }
 }}
 {{#content}}
@@ -61,6 +61,7 @@
     <details class="hkp-done">
         <summary>{{{chevicon}}}{{#str}}group_done, local_oksigeniahechauka{{/str}} <span class="hkp-count">{{donecount}}</span></summary>
         <ul class="hkp-items">{{#done}}<li class="hkp-item" data-type="{{type}}" data-mine="{{#mine}}1{{/mine}}{{^mine}}0{{/mine}}">{{> local_oksigeniahechauka/item_row}}</li>{{/done}}</ul>
+        {{#donemore}}<p class="hkp-done-more">{{donemore}}</p>{{/donemore}}
     </details>
     {{/donecount}}
 </section>

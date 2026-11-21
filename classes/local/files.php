@@ -31,6 +31,9 @@ class files {
     /** Component of every file. */
     const COMPONENT = 'local_oksigeniahechauka';
 
+    /** @var array The files of a long list of items, read at once (prime): area => itemid => stored_file[]. */
+    protected static $primed = [];
+
     /** The file of an item, as it was uploaded. */
     const MEDIA = 'media';
 
@@ -75,9 +78,62 @@ class files {
      * @return \stored_file|null
      */
     public static function first(string $area, int $itemid): ?\stored_file {
+        if (isset(self::$primed[$area][$itemid])) {
+            return self::$primed[$area][$itemid] ? reset(self::$primed[$area][$itemid]) : null;
+        }
         $fs = get_file_storage();
         $list = $fs->get_area_files(self::context()->id, self::COMPONENT, $area, $itemid, 'sortorder, id', false);
         return $list ? reset($list) : null;
+    }
+
+    /**
+     * How many files an item has in an area (an album's photos).
+     *
+     * @param string $area
+     * @param int $itemid
+     * @return int
+     */
+    public static function count(string $area, int $itemid): int {
+        if (isset(self::$primed[$area][$itemid])) {
+            return count(self::$primed[$area][$itemid]);
+        }
+        return count(get_file_storage()->get_area_files(self::context()->id, self::COMPONENT, $area, $itemid, 'id', false));
+    }
+
+    /**
+     * The files of many items in some areas, in one reading: first() and count() take them from there (the panel's list,
+     * with hundreds of items). An empty list of items forgets them.
+     *
+     * @param string[] $areas
+     * @param int[] $itemids
+     * @return void
+     */
+    public static function prime(array $areas, array $itemids): void {
+        global $DB;
+        self::$primed = [];
+        if (!$itemids || !$areas) {
+            return;
+        }
+        $fs = get_file_storage();
+        foreach ($areas as $area) {
+            foreach ($itemids as $id) {
+                self::$primed[$area][(int) $id] = [];
+            }
+        }
+        [$inareas, $areaparams] = $DB->get_in_or_equal($areas, SQL_PARAMS_NAMED, 'area');
+        foreach (array_chunk(array_values(array_unique(array_map('intval', $itemids))), 1000) as $chunk) {
+            [$initems, $itemparams] = $DB->get_in_or_equal($chunk, SQL_PARAMS_NAMED, 'item');
+            $rows = $DB->get_recordset_select(
+                'files',
+                "contextid = :context AND component = :component AND filearea $inareas AND itemid $initems AND filename <> '.'",
+                ['context' => self::context()->id, 'component' => self::COMPONENT] + $areaparams + $itemparams,
+                'sortorder, id'
+            );
+            foreach ($rows as $row) {
+                self::$primed[$row->filearea][(int) $row->itemid][] = $fs->get_file_instance($row);
+            }
+            $rows->close();
+        }
     }
 
     /**

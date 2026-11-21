@@ -52,8 +52,12 @@ class birthdayspage {
         $names = \core_user\fields::for_name()->get_sql('', false, '', '', false)->selects;
         $accounts = $ids ? $DB->get_records_list('user', 'id', $ids, '', 'id, ' . $names) : [];
         $unlinked = 0;
+        // The photos of the whole list in one reading: a centre has thousands of people.
+        files::prime([files::BIRTHDAY], array_map(function ($row) {
+            return (int) $row->id;
+        }, $rows));
         foreach ($rows as $row) {
-            $picture = birthdays::list_picture((int) $row->id);
+            $picture = files::first(files::BIRTHDAY, (int) $row->id);
             $account = !empty($row->userid) && isset($accounts[(int) $row->userid]) ? fullname($accounts[(int) $row->userid]) : '';
             if ($account === '') {
                 $unlinked++;
@@ -78,6 +82,7 @@ class birthdayspage {
                 'userid' => $account !== '' ? (int) $row->userid : 0,
             ];
         }
+        files::prime([], []);
         $today = array_map(function ($person) {
             return $person['name'];
         }, birthdays::on($config, schedule::day($now)));

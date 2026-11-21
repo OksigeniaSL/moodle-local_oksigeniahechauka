@@ -642,6 +642,20 @@ class sources {
         );
         $items = [];
         $zone = \core_date::get_server_timezone();
+        // The category of each course and the stage of each category, read once for all the events.
+        $courseids = array_unique(array_map(function ($ev) {
+            return (int) $ev->courseid;
+        }, array_filter($records, function ($ev) {
+            return $ev->eventtype === 'course';
+        })));
+        $coursecat = $courseids ? $DB->get_records_list('course', 'id', $courseids, '', 'id, category') : [];
+        $stages = [];
+        $stage = function (int $category) use (&$stages) {
+            if (!array_key_exists($category, $stages)) {
+                $stages[$category] = categories::of_coursecat($category);
+            }
+            return $stages[$category];
+        };
         foreach ($records as $ev) {
             $start = (int) $ev->timestart;
             $end = $start + (int) $ev->timeduration;
@@ -662,14 +676,14 @@ class sources {
                 $item['allday'] = true;
             }
             if ($ev->eventtype === 'course') {
-                $n = categories::of_coursecat((int) $DB->get_field('course', 'category', ['id' => $ev->courseid]));
+                $n = $stage((int) ($coursecat[(int) $ev->courseid]->category ?? 0));
                 if ($n) {
                     $item['color'] = $n;
                 }
             } else if ($ev->eventtype === 'category') {
                 // An event of a course category: of the categories of this screen or, if it has none, only when the centre has
                 // linked that category, in its colour.
-                $n = categories::of_coursecat((int) $ev->categoryid);
+                $n = $stage((int) $ev->categoryid);
                 if ($scope ? !in_array((int) $ev->categoryid, $scope, true) : !$n) {
                     continue;
                 }

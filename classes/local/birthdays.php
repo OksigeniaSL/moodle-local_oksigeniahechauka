@@ -389,6 +389,23 @@ class birthdays {
         // Only the photos that the birthdays of yesterday, today or the next days show (the weekend's come before it), with
         // every rule already applied.
         $now = time();
+        // A photo of the list whose person is far from those days: no, without going through every rule.
+        if ($file->get_component() === files::COMPONENT && $file->get_filearea() === files::BIRTHDAY) {
+            global $DB;
+            $row = $DB->get_record(self::TABLE, ['id' => $file->get_itemid()], 'id, day, month');
+            if (!$row) {
+                return false;
+            }
+            $near = false;
+            foreach ([-1, 0, 1, 2, 3, 4] as $add) {
+                foreach (self::days_of(schedule::day($now, $add)) as [$month, $day]) {
+                    $near = $near || ((int) $row->month === (int) $month && (int) $row->day === (int) $day);
+                }
+            }
+            if (!$near) {
+                return false;
+            }
+        }
         foreach ([-1, 0, 1, 2, 3, 4] as $add) {
             $date = schedule::day($now, $add);
             foreach (self::on($config, $date) as $person) {
