@@ -42,8 +42,15 @@ $beat = endpoint::body();
 screens::heartbeat($screen, $beat, $now);
 report::add_played($screen, $beat['played'] ?? null, $now);
 $screen = $DB->get_record('local_oksigeniahechauka_screen', ['id' => $screen->id]);
+// Whatever happens to the manifest, the orders and the new player still reach the screen: it keeps what it has.
+try {
+    $etag = manifest::build($screen, $now)['etag'];
+} catch (\Throwable $e) {
+    debugging('Hechauka, manifest of screen ' . $screen->id . ': ' . $e->getMessage(), DEBUG_DEVELOPER);
+    $etag = null;
+}
 endpoint::send([
-    'manifest' => manifest::build($screen, $now)['etag'],
+    'manifest' => $etag,
     'commands' => screens::take_commands((int) $screen->id),
     'build' => player_page::build(),
 ]);

@@ -43,6 +43,56 @@ class manifest {
     /** Contract version. */
     const CONTRACT = 1;
 
+    /** @var string[] The sources that failed while building the last manifest, by name: for the panel. */
+    protected static $failed = [];
+
+    /**
+     * What a source gives, or nothing when it fails: one source that breaks (a plugin of ours with a fault, a service that
+     * answers in another way) never leaves every screen without its manifest. What failed is noted for the panel.
+     *
+     * @param string $source its name
+     * @param callable $get
+     * @param mixed $nothing what is given instead
+     * @return mixed
+     */
+    protected static function guarded(string $source, callable $get, $nothing = []) {
+        try {
+            return $get();
+        } catch (\Throwable $e) {
+            debugging('Hechauka, source ' . $source . ': ' . $e->getMessage(), DEBUG_DEVELOPER);
+            self::$failed[$source] = \core_text::substr($e->getMessage(), 0, 200);
+            return $nothing;
+        }
+    }
+
+    /**
+     * The sources that failed, kept in the settings only when they change: the panel says which and since when.
+     *
+     * @param \stdClass $config the plugin's
+     * @param int $now
+     * @return void
+     */
+    protected static function note_failures(\stdClass $config, int $now): void {
+        $before = json_decode((string) ($config->sourcefailures ?? ''), true) ?: [];
+        if (array_keys($before) == array_keys(self::$failed)) {
+            return;
+        }
+        $after = [];
+        foreach (self::$failed as $source => $error) {
+            $after[$source] = $before[$source] ?? ['time' => $now, 'error' => $error];
+        }
+        set_config('sourcefailures', $after ? json_encode($after) : '', 'local_oksigeniahechauka');
+    }
+
+    /**
+     * The sources that are failing now, with when they began and what they say.
+     *
+     * @return array source => {time, error}
+     */
+    public static function failures(): array {
+        return json_decode((string) get_config('local_oksigeniahechauka', 'sourcefailures'), true) ?: [];
+    }
+
     /**
      * The manifest of a screen.
      *
@@ -122,9 +172,12 @@ class manifest {
         if (!empty($config->sampledata) && $DB->record_exists_select(self::ITEM, $like, ['sample' => '%"sample":true%'])) {
             $m['sample'] = true;
         }
+        self::$failed = [];
         if (!empty($config->sourceweather)) {
             $where = $site && sites::has_place($site, $config) ? sites::suffix($site) : '';
-            $weather = weather::summary(weather::hours($where), $now);
+            $weather = self::guarded('weather', function () use ($where, $now) {
+                return weather::summary(weather::hours($where), $now);
+            }, null);
             if ($weather) {
                 $m['weather'] = $weather;
             }
@@ -136,14 +189,19 @@ class manifest {
         $m['items'] = self::unique(array_merge(self::own_items($screen, $now), self::source_items($config, $now, $scope)));
         // Today's visits, only for a screen people touch: the welcome is at the door, where visitors wait.
         if ($touch && !empty($config->sourcevisits ?? 1)) {
-            $m['items'] = array_merge($m['items'], touch::visits($now));
+            $m['items'] = array_merge($m['items'], self::guarded('visits', function () use ($now) {
+                return touch::visits($now);
+            }));
         }
         // A centre that has put nothing yet: the screen says where to start, and stops saying it with the first thing.
         if (!$DB->record_exists('local_oksigeniahechauka_item', [])) {
             $m['idle'] = ['qr' => (new \moodle_url('/local/oksigeniahechauka/edit.php', ['type' => 'notice']))->out(false)];
         }
         // Each web with its short link and the QR the shortener draws, when the site has one.
-        $m = links::apply($m, $now);
+        $m = self::guarded('links', function () use ($m, $now) {
+            return links::apply($m, $now);
+        }, $m);
+        self::note_failures($config, $now);
         $m['etag'] = self::etag($m);
         return $m;
     }
@@ -295,38 +353,51 @@ class manifest {
      * @return array items of the contract
      */
     protected static function source_items(\stdClass $config, int $now, array $scope): array {
+        // Each one on its own: what one of them throws leaves the others, and the screen, as they were.
+        $wanted = [
+            'menus' => empty($config->sourcemenu) ? null : function () use ($config, $now) {
+                $centre = (int) ($config->menucentre ?? 0);
+                return sources::menus($now, self::MENU_DAYS, $centre ?: null);
+            },
+            'calendar' => empty($config->sourcecalendar) ? null : function () use ($now, $scope) {
+                return sources::events($now, self::AGENDA_DAYS, $scope);
+            },
+            'news' => empty($config->sourcenews) ? null : function () use ($config, $now) {
+                return news::without_own(sources::news($now, (int) ($config->newsdays ?? 7) ?: 7));
+            },
+            'books' => empty($config->sourcebooks) ? null : function () use ($config, $now) {
+                return sources::books($now, (int) ($config->booksdays ?? 14) ?: 14);
+            },
+            'photoday' => empty($config->sourcephotoday) ? null : function () use ($now) {
+                return photoday::items($now);
+            },
+            'moments' => empty($config->sourcemoments) ? null : function () use ($now) {
+                return sources::moments($now);
+            },
+            'instagram' => empty($config->sourceinstagram) ? null : function () {
+                return instagram::items();
+            },
+            'openacts' => empty($config->sourceopenacts) ? null : function () use ($now) {
+                return sources::open_acts($now);
+            },
+            // The «Follow us» slides: the channel of Oksigenia Marandu, and the centre's networks switched on, one each turn.
+            'channel' => function () use ($config) {
+                $channel = empty($config->sourcechannel) ? [] : sources::channel();
+                return array_merge($channel, networks::items($channel));
+            },
+            'deadlines' => empty($config->sourcedeadlines) ? null : function () use ($config, $now, $scope) {
+                return sources::deadlines($now, (int) ($config->deadlinesdays ?? 7) ?: 7, $scope);
+            },
+            'birthdays' => function () use ($config, $now) {
+                return birthdays::items($config, $now);
+            },
+        ];
         $items = [];
-        if (!empty($config->sourcemenu)) {
-            $centre = (int) ($config->menucentre ?? 0);
-            $items = array_merge($items, sources::menus($now, self::MENU_DAYS, $centre ?: null));
+        foreach ($wanted as $source => $get) {
+            if ($get) {
+                $items = array_merge($items, self::guarded($source, $get));
+            }
         }
-        if (!empty($config->sourcecalendar)) {
-            $items = array_merge($items, sources::events($now, self::AGENDA_DAYS, $scope));
-        }
-        if (!empty($config->sourcenews)) {
-            $items = array_merge($items, news::without_own(sources::news($now, (int) ($config->newsdays ?? 7) ?: 7)));
-        }
-        if (!empty($config->sourcebooks)) {
-            $items = array_merge($items, sources::books($now, (int) ($config->booksdays ?? 14) ?: 14));
-        }
-        if (!empty($config->sourcephotoday)) {
-            $items = array_merge($items, photoday::items($now));
-        }
-        if (!empty($config->sourcemoments)) {
-            $items = array_merge($items, sources::moments($now));
-        }
-        if (!empty($config->sourceinstagram)) {
-            $items = array_merge($items, instagram::items());
-        }
-        if (!empty($config->sourceopenacts)) {
-            $items = array_merge($items, sources::open_acts($now));
-        }
-        // The «Follow us» slides: the channel of Oksigenia Marandu, and the centre's networks switched on, one each turn.
-        $channel = empty($config->sourcechannel) ? [] : sources::channel();
-        $items = array_merge($items, $channel, networks::items($channel));
-        if (!empty($config->sourcedeadlines)) {
-            $items = array_merge($items, sources::deadlines($now, (int) ($config->deadlinesdays ?? 7) ?: 7, $scope));
-        }
-        return array_merge($items, birthdays::items($config, $now));
+        return $items;
     }
 }

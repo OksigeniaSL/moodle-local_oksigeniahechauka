@@ -1031,13 +1031,15 @@ class birthdays {
         self::$batch = true;
         $seen = [];
         foreach ($present as $id => $person) {
+            $key = (string) ($person['id'] ?? $id);
+            // Still at the centre, whatever comes with them: a date or a name that cannot be read leaves their row as it was.
+            $seen[$key] = true;
             $date = self::day_month((string) ($person['fecha_nacimiento'] ?? ''));
             $name = trim(trim((string) ($person['nombre'] ?? '')) . ' ' .
                 self::first_surname(trim((string) ($person['apellido1'] ?? ''))));
             if (!$date || $name === '' || !checkdate($date[1], $date[0], 2024)) {
                 continue;
             }
-            $key = (string) ($person['id'] ?? $id);
             $name = \core_text::substr($name, 0, 120);
             $group = \core_text::substr(trim((string) ($person['grupo_academico_principal']['etiqueta'] ?? '')), 0, 60);
             $fields = ['name' => $name, 'groupname' => $group, 'day' => $date[0], 'month' => $date[1],
@@ -1071,13 +1073,18 @@ class birthdays {
                     $done['added']++;
                 }
             }
-            $seen[$key] = true;
         }
-        foreach ($have as $key => $row) {
-            if (!isset($seen[$key])) {
-                self::delete((int) $row->id);
-                $done['gone']++;
-            }
+        $gone = array_diff_key($have, $seen);
+        // A list that suddenly lacks a quarter of the centre is not a centre emptied overnight: nothing goes, until someone
+        // looks. Those that leave in a normal year are far fewer, and go the next night.
+        if (count($gone) > max(50, (int) (count($have) / 4))) {
+            self::$accounts = null;
+            self::$batch = false;
+            throw new \moodle_exception('cifraerrorincomplete', 'local_oksigeniahechauka', '', 'alumnos');
+        }
+        foreach ($gone as $row) {
+            self::delete((int) $row->id);
+            $done['gone']++;
         }
         self::$accounts = null;
         self::$batch = false;
@@ -1142,15 +1149,21 @@ class birthdays {
         if (!$api) {
             return [true, null];
         }
-        if ($userid) {
-            return [$api::photo_allowed_for_user($userid), $api::photo_for_user($userid)];
+        // Oksigenia Family failing leaves the photos as they were without it, never the screens without their birthdays.
+        try {
+            if ($userid) {
+                return [$api::photo_allowed_for_user($userid), $api::photo_for_user($userid)];
+            }
+            $key = null;
+            if ($row && ($row->source ?? '') === self::CIFRA) {
+                $key = 'cifra:' . $row->sourcekey;
+            } else if ($row && trim((string) $row->idnumber) !== '') {
+                $key = $api::student_key((string) $row->idnumber, 'idnumber');
+            }
+            return $key ? [$api::photo_allowed_for_key($key), $api::photo_for_key($key)] : [true, null];
+        } catch (\Throwable $e) {
+            debugging('Hechauka, Oksigenia Family: ' . $e->getMessage(), DEBUG_DEVELOPER);
+            return [true, null];
         }
-        $key = null;
-        if ($row && ($row->source ?? '') === self::CIFRA) {
-            $key = 'cifra:' . $row->sourcekey;
-        } else if ($row && trim((string) $row->idnumber) !== '') {
-            $key = $api::student_key((string) $row->idnumber, 'idnumber');
-        }
-        return $key ? [$api::photo_allowed_for_key($key), $api::photo_for_key($key)] : [true, null];
     }
 }
