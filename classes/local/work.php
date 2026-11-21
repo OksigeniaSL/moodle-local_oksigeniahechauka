@@ -104,13 +104,13 @@ class work {
                     'url' => (new \moodle_url('/local/oksigeniahechauka/index.php'))->out(false), 'level' => 'urgent'];
             } else {
                 foreach ($silent as $screen) {
-                    $today = (int) $screen->lastseen >= usergetmidnight($now);
-                    $format = get_string($today ? 'strftimetime' : 'strftimedatetimeshort', 'langconfig');
+                    // Said as a person would: since a time today, since yesterday, or how many days.
+                    $days = phrases::days_between(schedule::day((int) $screen->lastseen), schedule::day($now));
+                    $a = (object) ['name' => items::plain((string) $screen->name), 'days' => $days,
+                        'time' => userdate($screen->lastseen, get_string('strftimetime', 'langconfig'))];
+                    $key = $days === 0 ? 'work_down' : ($days === 1 ? 'work_down_yesterday' : 'work_down_days');
                     $alerts[] = [
-                        'text' => get_string('work_down', $c, (object) [
-                            'name' => items::plain((string) $screen->name),
-                            'since' => userdate($screen->lastseen, $format),
-                        ]),
+                        'text' => get_string($key, $c, $a),
                         'url' => (new \moodle_url('/local/oksigeniahechauka/screen.php', ['id' => $screen->id]))->out(false),
                         'level' => 'urgent',
                     ];
@@ -129,6 +129,13 @@ class work {
                 }, $failing));
                 $alerts[] = ['text' => get_string('work_source', $c, (object) ['names' => implode(', ', $names),
                     'since' => userdate($since, get_string('strftimedatetimeshort', 'langconfig'))]),
+                    'url' => (new \moodle_url('/local/oksigeniahechauka/centre.php'))->out(false), 'level' => 'today'];
+            }
+            // Instagram, read by the task: a key that stopped working is said, and the screens keep what came last for a week.
+            $instagram = instagram::failing();
+            if ($instagram) {
+                $alerts[] = ['text' => get_string('work_instagram', $c, (object) ['error' => s($instagram['error']),
+                    'since' => userdate((int) $instagram['time'], get_string('strftimedatetimeshort', 'langconfig'))]),
                     'url' => (new \moodle_url('/local/oksigeniahechauka/centre.php'))->out(false), 'level' => 'today'];
             }
             $count = count($screens);

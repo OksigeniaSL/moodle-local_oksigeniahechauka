@@ -51,6 +51,9 @@ class instagram {
     /** @var int The biggest picture kept, in bytes. */
     const MOST = 8 * 1024 * 1024;
 
+    /** @var int Without a good reading for this long, the screens stop showing what came last. */
+    const STALE = 7 * DAYSECS;
+
     /** Seconds a reading may spend bringing pictures: the rest, the next hour. */
     const FETCH_SECONDS = 60;
 
@@ -141,12 +144,14 @@ class instagram {
         $pages = self::ask('me/accounts', ['fields' => 'instagram_business_account{id,username}'], $token);
         $account = self::account_of((array) ($pages['data'] ?? []), self::wanted());
         if (!$account) {
-            return 'no Instagram account: ' . (string) ($pages['error']['message'] ?? 'none linked to the key');
+            return self::failed('no Instagram account: ' . (string) ($pages['error']['message'] ?? 'none linked to the key'), $now);
         }
         $media = self::ask($account['id'] . '/media', ['fields' => self::FIELDS, 'limit' => self::POSTS_MOST], $token);
         if (!isset($media['data']) || !is_array($media['data'])) {
-            return 'no posts: ' . (string) ($media['error']['message'] ?? 'no answer');
+            return self::failed('no posts: ' . (string) ($media['error']['message'] ?? 'no answer'), $now);
         }
+        set_config('instagramgood', $now, $c);
+        unset_config('instagramerror', $c);
         $posts = self::posts_of($media['data']);
         $fs = get_file_storage();
         $context = files::context();
@@ -188,6 +193,39 @@ class instagram {
             'itemid' => self::LIST_ITEM, 'filepath' => '/', 'filename' => self::LIST_NAME];
         $fs->create_file_from_string($record, json_encode(['username' => $account['username'], 'posts' => $list]));
         return '@' . $account['username'] . ': ' . count($list) . ' posts';
+    }
+
+    /**
+     * A reading that failed (a key that no longer works, a version of the Graph API Meta has retired): noted from the first
+     * time, for «Your work».
+     *
+     * @param string $error
+     * @param int $now
+     * @return string the same, for the log of the task
+     */
+    protected static function failed(string $error, int $now): string {
+        if (!get_config('local_oksigeniahechauka', 'instagramerror')) {
+            set_config(
+                'instagramerror',
+                json_encode(['time' => $now, 'error' => \core_text::substr($error, 0, 200)]),
+                'local_oksigeniahechauka'
+            );
+        }
+        return $error;
+    }
+
+    /**
+     * Since when Instagram cannot be read, and why; null while it reads well.
+     *
+     * @return array|null {time, error}
+     */
+    public static function failing(): ?array {
+        $c = 'local_oksigeniahechauka';
+        if (!get_config($c, 'sourceinstagram')) {
+            return null;
+        }
+        $error = json_decode((string) get_config($c, 'instagramerror'), true);
+        return is_array($error) ? $error : null;
     }
 
     /**
@@ -282,6 +320,11 @@ class instagram {
         $kept = $fs->get_file($context->id, files::COMPONENT, self::AREA, self::LIST_ITEM, '/', self::LIST_NAME);
         $saved = $kept ? json_decode($kept->get_content(), true) : null;
         if (!is_array($saved) || empty($saved['posts'])) {
+            return [];
+        }
+        // A week without a good reading: what came last is no longer the centre's Instagram of now.
+        $good = (int) get_config('local_oksigeniahechauka', 'instagramgood');
+        if (self::failing() && $good && time() - $good > self::STALE) {
             return [];
         }
         $username = (string) ($saved['username'] ?? '');

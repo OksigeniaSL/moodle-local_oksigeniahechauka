@@ -114,7 +114,17 @@ final class instagram_test extends \advanced_testcase {
         $file = get_file_storage()->get_file_by_id($item['posts'][0]['media'][0]['id']);
         $this->assertTrue(files::readable($file));
         $this->assertTrue(files::from_source($file));
+        // The key stops working: said from the first time, and the screens keep what came last, for a week.
+        $this->assertNull(instagram::failing());
+        \curl::mock_response(json_encode(['error' => ['message' => 'Error validating access token']]));
+        $later = time() + 2 * HOURSECS;
+        $this->assertStringContainsString('Error validating access token', instagram::refresh($later));
+        $this->assertSame($later, instagram::failing()['time']);
+        $this->assertNotEmpty(instagram::items());
+        set_config('instagramgood', time() - 8 * DAYSECS, $c);
+        $this->assertSame([], instagram::items(), 'a week without a good reading');
         set_config('sourceinstagram', 0, $c);
-        $this->assertSame('off', instagram::refresh(time() + 2 * HOURSECS));
+        $this->assertNull(instagram::failing(), 'switched off, nothing to say');
+        $this->assertSame('off', instagram::refresh(time() + 4 * HOURSECS));
     }
 }

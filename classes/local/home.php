@@ -433,6 +433,13 @@ class home {
                     $minutes
                 ), 'drift' => $drift > 0 ? $minutes : -$minutes];
             }
+            // The player goes by the device's own wall clock: in another time zone, «today», the menus and the agenda change
+            // at the wrong hour.
+            $zone = self::zone_gap($info, (int) $s->lastseen);
+            if ($zone) {
+                return ['key' => 'warn', 'label' => get_string('state_zone', $c), 'meta' => get_string('meta_zone', $c, $zone),
+                    'drift' => 0] + $out;
+            }
             $out['label'] = get_string('state_on', $c);
             $out['meta'] = get_string('meta_seen', $c, phrases::ago($now - (int) $s->lastseen));
             return $out;
@@ -444,6 +451,31 @@ class home {
         }
         return ['key' => 'down', 'label' => get_string('state_down', $c),
             'meta' => phrases::since((int) $s->lastseen, $now), 'drift' => 0];
+    }
+
+    /**
+     * The time zone of a device that is not the centre's, as both are said (UTC+1, UTC+5:30); null when they agree or the
+     * device has not said.
+     *
+     * @param array $info what the device said last
+     * @param int $when the moment it said it
+     * @return \stdClass|null {device, centre}
+     */
+    public static function zone_gap(array $info, int $when): ?\stdClass {
+        if (!isset($info['tz_offset']) || !is_numeric($info['tz_offset'])) {
+            return null;
+        }
+        $zone = new \DateTimeZone(\core_date::get_server_timezone());
+        $centre = intdiv($zone->getOffset(new \DateTime('@' . $when)), 60);
+        $device = (int) $info['tz_offset'];
+        if ($device === $centre) {
+            return null;
+        }
+        $say = function (int $minutes): string {
+            $hours = 'UTC' . ($minutes < 0 ? '−' : '+') . intdiv(abs($minutes), 60);
+            return abs($minutes) % 60 ? $hours . ':' . sprintf('%02d', abs($minutes) % 60) : $hours;
+        };
+        return (object) ['device' => $say($device), 'centre' => $say($centre)];
     }
 
     /**

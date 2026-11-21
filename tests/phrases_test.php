@@ -112,6 +112,18 @@ final class phrases_test extends \advanced_testcase {
     }
 
     /**
+     * A device in a time zone that is not the centre's is said with both; one that agrees, or has not said, is not.
+     */
+    public function test_a_device_in_another_time_zone(): void {
+        $now = time();
+        $centre = intdiv((new \DateTimeZone(\core_date::get_server_timezone()))->getOffset(new \DateTime('@' . $now)), 60);
+        $this->assertNull(home::zone_gap(['tz_offset' => $centre], $now));
+        $this->assertNull(home::zone_gap([], $now), 'a device that has not said');
+        $gap = home::zone_gap(['tz_offset' => $centre === 330 ? 0 : 330], $now);
+        $this->assertSame($centre === 330 ? 'UTC+0' : 'UTC+5:30', $gap->device);
+    }
+
+    /**
      * The state of a screen: never seen, running, its clock off, off by its hours, without signal.
      */
     public function test_state_of_a_screen(): void {

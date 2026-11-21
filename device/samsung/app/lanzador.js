@@ -364,6 +364,15 @@
         window.location.replace(url);
     }
 
+    // To the player. The first time it is noted: from then on the display opens it without a network too.
+    function toPlayer() {
+        if (!saved.opened) {
+            saved.opened = true;
+            keep(saved);
+        }
+        go(saved.url);
+    }
+
     function shown(v) {
         return v.checked ? parse(v.url).hostname : v.url.replace(/^https?:\/\//, '').replace(/\/+$/, '');
     }
@@ -475,10 +484,15 @@
             if (mine !== token) {
                 return;
             }
-            if (answered === false) {
+            if (answered === false && saved.opened) {
+                // It opened once: the player keeps what it had, and shows it without a network, as a Pi does.
+                if (ready) {
+                    toPlayer();
+                }
+            } else if (answered === false) {
                 wait(navigator.onLine === false ? 'sin-red' : 'no-contesta');
             } else if (answered && ready) {
-                go(saved.url);
+                toPlayer();
             }
         }
         later(function () {
@@ -520,7 +534,7 @@
                 }
                 if (ok) {
                     stop();
-                    go(saved.url);
+                    toPlayer();
                 } else {
                     wait('no-contesta');
                 }

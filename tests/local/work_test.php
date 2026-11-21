@@ -98,6 +98,28 @@ final class work_test extends \advanced_testcase {
     }
 
     /**
+     * A screen without a sign of life is said as a person would: since a time today, since yesterday, or for how many days.
+     */
+    public function test_down_said_in_days(): void {
+        global $DB;
+        $this->resetAfterTest();
+        $manager = $this->getDataGenerator()->create_user();
+        $this->give((int) $manager->id, access::MANAGER);
+        $now = mktime(12, 0, 0, 11, 20, 2026);
+        $id = $DB->insert_record('local_oksigeniahechauka_screen', (object) ['name' => 'Segunda', 'keyhash' => sha1('s'),
+            'lastseen' => $now - 13 * DAYSECS, 'alerts' => 1, 'timecreated' => $now]);
+        $text = work::cards((int) $manager->id, $now)[0]['alerts'][0]['text'];
+        $this->assertSame(get_string('work_down_days', 'local_oksigeniahechauka', (object) ['name' => 'Segunda', 'days' => 13,
+            'time' => userdate($now - 13 * DAYSECS, get_string('strftimetime', 'langconfig'))]), $text);
+        $DB->set_field('local_oksigeniahechauka_screen', 'lastseen', $now - DAYSECS, ['id' => $id]);
+        \cache::make('local_oksigeniahechauka', 'work')->purge();
+        $text = work::cards((int) $manager->id, $now)[0]['alerts'][0]['text'];
+        $this->assertStringContainsString(userdate($now - DAYSECS, get_string('strftimetime', 'langconfig')), $text);
+        $this->assertSame(get_string('work_down_yesterday', 'local_oksigeniahechauka', (object) ['name' => 'Segunda',
+            'days' => 1, 'time' => userdate($now - DAYSECS, get_string('strftimetime', 'langconfig'))]), $text);
+    }
+
+    /**
      * What someone published that stops showing today or tomorrow, to them alone and in time to make it last; many are
      * one alert; an urgent notice is not among them.
      */
