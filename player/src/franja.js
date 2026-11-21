@@ -249,8 +249,11 @@ export function fitStrip(node, o) {
         });
         return out;
     };
-    const steps = ['0', '1', '2', '3', '4'];
-    for (let s = o && o.vertical ? 2 : 0; s < steps.length; s++) {
+    // A vertical screen may give a long name two lines (the heading over it); a horizontal one keeps the strip to one line,
+    // whatever name comes today: the heading gives way, then the group (Jujol, 21 November 2026: at 8 m one long name put
+    // every person in three lines and the strip ate a third of the screen).
+    const steps = o && o.vertical ? ['2', '3', '4'] : ['0', '1', 'h1', 'h2'];
+    for (let s = 0; s < steps.length; s++) {
         node.setAttribute('data-ajuste', steps[s]);
         if (!over()) {
             break;

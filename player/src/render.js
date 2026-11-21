@@ -47,6 +47,36 @@ const CAPITAL_DAYS = {en: true, de: true};
 
 /** The compositions over the whole screen, in their own layer. */
 const FULL = {'foto-completa': true, 'escaparate': true, 'reposo': true};
+// The slides with a sheet of their own: with the birthday strip under them they lose what they say (the review of 21
+// November 2026). From 8 m they always step it aside; nearer, when they do not fit with it (stripSpoils).
+const OWN_SHEET = {'menus': true, 'jornadas': true, 'fotodia': true, 'instagram': true, 'canal': true, 'tabla': true,
+    'plazos': true, 'tiempo-tercio': true, 'biblioteca': true, 'zonas': true};
+
+/**
+ * Whether a slide with a sheet of its own came out worse with the strip under it: something cut (the sheet taller than its
+ * box, a QR out of the layer) or one of the things it drops only when room is short (the turns of «Puertas abiertas», the
+ * legend of the menus, what is due).
+ *
+ * @param {HTMLElement} c the layer
+ * @returns {boolean}
+ */
+function stripSpoils(c) {
+    const boxes = c.querySelectorAll('.hk-menus, .hk-pa, .hk-fdd, .hk-ig, .hk-canal, .hk-plazos-lista, .hk-biblio, .hk-sitio-ficha-cuerpo');
+    for (let i = 0; i < boxes.length; i++) {
+        if (boxes[i].scrollHeight > boxes[i].clientHeight + 1) {
+            return true;
+        }
+    }
+    const top = c.getBoundingClientRect();
+    const codes = c.querySelectorAll('.hk-qr');
+    for (let i = 0; i < codes.length; i++) {
+        const r = codes[i].getBoundingClientRect();
+        if (r.height && (r.top < top.top - 1 || r.bottom > top.bottom + 1)) {
+            return true;
+        }
+    }
+    return !!c.querySelector('.hk-pa.hk-pa-sin-turnos, .hk-menus.hk-menus-sin-leyenda, .hk-plazos.hk-plazos-sin-que');
+}
 const PASS_MS = 1000;
 
 function el(tag, cls, text) {
@@ -1715,7 +1745,11 @@ export class Screen {
         // The birthday strip steps aside for the big birthday slide and for what covers the whole screen, before anything is
         // measured: the body is as high as what is left.
         const poster0 = comp === 'muro' && choice.extra && choice.extra.poster;
-        this.frame.classList.toggle('hk-sin-franja', comp === 'cumple' || comp === 'reposo' || comp === 'escaparate' || !!poster0);
+        // From 8 m the strip leaves the slides with a sheet of their own and the full-screen picture (its QR would reach the
+        // clock); a table, from 5 m, since it would show one row a page. It comes back with the next slide.
+        const far = this.distance === 8;
+        this.frame.classList.toggle('hk-sin-franja', comp === 'cumple' || comp === 'reposo' || comp === 'escaparate' || !!poster0 ||
+            (far && (!!OWN_SHEET[comp] || comp === 'foto-completa')) || (this.distance >= 5 && comp === 'tabla'));
         if (this.stripKey && !this.stripFitted) {
             this.stripFitted = fitBirthdayStrip(this.birthdayStrip, {vertical: !this.horizontal});
         }
@@ -1797,6 +1831,13 @@ export class Screen {
             fitWeek(layer.hkWeek, this.horizontal);
         }
         this.adjustLayer(layer);
+        // Nearer than 8 m the strip stays, unless the slide comes out cut or poorer with it: then it steps aside for this one.
+        if (OWN_SHEET[comp] && comp !== 'tabla' && this.frame.classList.contains('hk-con-franja') &&
+                !this.frame.classList.contains('hk-sin-franja') && stripSpoils(layer)) {
+            this.frame.classList.add('hk-sin-franja');
+            this.fitHeaders();
+            this.adjustLayer(layer);
+        }
         // What moves, measured with its letters.
         const fontsComing = document.fonts && document.fonts.status === 'loading';
         if (!fontsComing) {

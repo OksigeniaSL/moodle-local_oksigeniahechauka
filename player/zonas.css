@@ -983,6 +983,20 @@
     margin-left: 0;
 }
 
+/* a horizontal screen keeps to one line (franja.js): the heading gives way, then the group; the name, in the least size */
+.hk .hk-cumple-franja[data-ajuste="h1"] .hk-franja-antetitulo,
+.hk .hk-cumple-franja[data-ajuste="h2"] .hk-franja-antetitulo,
+.hk .hk-cumple-franja[data-ajuste="h2"] .hk-franja-grupo {
+    display: none;
+}
+.hk .hk-cumple-franja[data-ajuste="h1"] .hk-franja-nombre,
+.hk .hk-cumple-franja[data-ajuste="h2"] .hk-franja-nombre {
+    font-size: var(--hk-t-lista);
+}
+.hk .hk-cumple-franja[data-ajuste="h1"] .hk-franja-grupo {
+    font-size: var(--hk-t-min);
+}
+
 /* ================================================================================================================
  * 4. The centre's own sentence in the ticker, and in a headline of its own
  * ============================================================================================================= */
