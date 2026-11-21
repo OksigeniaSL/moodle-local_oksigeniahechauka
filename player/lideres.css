@@ -751,3 +751,18 @@
 .hk .hk-cinta-aviso.hk-solo-titulo span {
     display: none;
 }
+
+/* The title over its second line, each whole in its own (render.js, importantBand) */
+.hk .hk-cinta.hk-cinta-importante[data-lineas="2"] > .hk-cinta-aviso.hk-dos-renglones {
+    -webkit-box-orient: vertical;
+    flex-direction: column;
+    -webkit-box-align: start;
+    align-items: flex-start;
+    -webkit-box-pack: center;
+    justify-content: center;
+    white-space: nowrap;
+}
+.hk .hk-cinta-aviso.hk-dos-renglones span {
+    max-width: 100%;
+    margin: .3rem 0 0;
+}

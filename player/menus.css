@@ -316,6 +316,9 @@
 }
 
 /* --- The fit: the dishes and the letters come down by steps, never under the least that is read ------------------------- */
+.hk .hk-menus[data-ajuste="g"] {           /* and one step up, when the sheet has room to spare */
+    --hk-menus-t: calc(var(--hk-t-lista) * 1.18);
+}
 .hk .hk-menus[data-ajuste="1"] {
     --hk-menus-t: calc(var(--hk-t-lista) * .92);
 }

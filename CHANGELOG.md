@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.35.0
+
+What the screens showed badly, from afar or upright, mended:
+
+- **The birthday strip** moves aside for any slide that would come out cut with it, also the wall of photos and the
+  leader of «Today's menu» from 8 m; it is measured again when the QR of the shortener or the letters arrive.
+- **The urgent notice** starts at the size of 8 m at any distance and goes down only to fit, with room between its title
+  and its text; **the important notice** tries its body on a second line before leaving it out.
+- **Upright**, the weather's credit no longer covers the date of a full-screen photo, and the days of the weather go
+  short from 8 m; the card of a site and the band of today's deadlines fit.
+- **A new screen** shows its two steps in the centre's colours: scan the code, or open the address and type it; then
+  give it a name. The address breaks after its slashes instead of leaving the screen.
+- The menus take a bigger step when the sheet has room, and a dish served in another menu says «also in»; Instagram no
+  longer ends a caption in «words,…»; the name of a channel in «Follow us» never goes under the least size of its
+  distance.
+
 ## 0.34.0
 
 - **What the panel says is what happens**: a screen whose content cannot be made says «Nothing new», with what to do,

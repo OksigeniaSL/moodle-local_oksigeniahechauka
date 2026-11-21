@@ -200,16 +200,17 @@ export function buildChannel(c, item, o) {
     c.appendChild(s);
 }
 
-// A line of the card in one line if it can: its letter a step smaller each time, down to «least» (a share of its own), and
-// evened in as many lines as «lines» allows if even then it does not fit. Whether it fits.
-function fitCardLine(n, least, lines) {
+// A line of the card in one line if it can: its letter a step smaller each time, down to «least» (a share of its own) and
+// never under «floor» (px), and evened in as many lines as «lines» allows if even then it does not fit. Whether it fits.
+function fitCardLine(n, least, lines, floor) {
     if (!n) {
         return true;
     }
     n.style.fontSize = '';
     const size = parseFloat(window.getComputedStyle(n).fontSize);
+    const low = floor ? Math.max(least, Math.min(1, floor / size)) : least;
     for (let k = 0; k <= 5; k++) {
-        n.style.fontSize = k ? Math.round(size * (1 - (1 - least) * k / 5) * 10) / 10 + 'px' : '';
+        n.style.fontSize = k ? Math.round(size * (1 - (1 - low) * k / 5) * 10) / 10 + 'px' : '';
         if (linesOf(n) <= 1) {
             return true;
         }
@@ -222,7 +223,11 @@ function fitCardLine(n, least, lines) {
 function fitCardLines(s) {
     const card = s.querySelector('.hk-canal-tarjeta');
     s.classList.remove('hk-canal-sin-nombre');
-    if (!fitCardLine(card.querySelector('.hk-canal-nombre'), 0.84, 3)) {
+    // The name never under the least that is read from the distance: in two or three lines before that (the review of 21
+    // November 2026 found it at 31 px at 3 m and 55 px at 8 m).
+    const rem = parseFloat(window.getComputedStyle(document.documentElement).fontSize) || 10;
+    const least = (parseFloat(window.getComputedStyle(s).getPropertyValue('--hk-t-min')) || 0) * rem;
+    if (!fitCardLine(card.querySelector('.hk-canal-nombre'), 0.84, 3, least)) {
         s.classList.add('hk-canal-sin-nombre');
     }
     fitCardLine(card.querySelector('.hk-qr-web'), 0.78, 2);

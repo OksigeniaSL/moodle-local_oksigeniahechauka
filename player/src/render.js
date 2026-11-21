@@ -50,7 +50,7 @@ const FULL = {'foto-completa': true, 'escaparate': true, 'reposo': true};
 // The slides with a sheet of their own: with the birthday strip under them they lose what they say (the review of 21
 // November 2026). From 8 m they always step it aside; nearer, when they do not fit with it (stripSpoils).
 const OWN_SHEET = {'menus': true, 'jornadas': true, 'fotodia': true, 'instagram': true, 'canal': true, 'tabla': true,
-    'plazos': true, 'tiempo-tercio': true, 'biblioteca': true, 'zonas': true};
+    'plazos': true, 'tiempo-tercio': true, 'biblioteca': true, 'zonas': true, 'muro': true};
 
 /**
  * Whether a slide with a sheet of its own came out worse with the strip under it: something cut (the sheet taller than its
@@ -61,17 +61,25 @@ const OWN_SHEET = {'menus': true, 'jornadas': true, 'fotodia': true, 'instagram'
  * @returns {boolean}
  */
 function stripSpoils(c) {
-    const boxes = c.querySelectorAll('.hk-menus, .hk-pa, .hk-fdd, .hk-ig, .hk-canal, .hk-plazos-lista, .hk-biblio, .hk-sitio-ficha-cuerpo');
+    // (the same boxes the round's checker calls cut: the leads and the rest too, for any slide)
+    const boxes = c.querySelectorAll('.hk-menus, .hk-pa, .hk-fdd, .hk-ig, .hk-canal, .hk-plazos-lista, .hk-biblio, ' +
+        '.hk-sitio-ficha-cuerpo, .hk-lider, .hk-resto, .hk-resto-pagina, .hk-tercio-tiempo, .hk-tipografica, ' +
+        '.hk-semana-titular, .hk-aviso-fijo, .hk-mes-semana, .hk-muro-banda, .hk-muro-cartel, .hk-carrusel-pie');
     for (let i = 0; i < boxes.length; i++) {
         if (boxes[i].scrollHeight > boxes[i].clientHeight + 1) {
             return true;
         }
     }
-    const top = c.getBoundingClientRect();
+    // Measured by offsets, not by the boxes on screen: the slide may still be coming in, moved by its entrance.
     const codes = c.querySelectorAll('.hk-qr');
     for (let i = 0; i < codes.length; i++) {
-        const r = codes[i].getBoundingClientRect();
-        if (r.height && (r.top < top.top - 1 || r.bottom > top.bottom + 1)) {
+        let y = 0;
+        let e = codes[i];
+        while (e && e !== c) {
+            y += e.offsetTop;
+            e = e.offsetParent;
+        }
+        if (e === c && codes[i].offsetHeight && (y < -1 || y + codes[i].offsetHeight > c.clientHeight + 1)) {
             return true;
         }
     }
@@ -781,7 +789,7 @@ export class Screen {
         if (comp === 'menus') {
             // Every menu of the day: one page each turn (src/menus.js).
             buildMenus(c, extra && extra.item, (extra && extra.page) || 0, {distance: this.distance || 3,
-                horizontal: this.horizontal, allergensLabel: this.labelsFull().allergens || ''});
+                horizontal: this.horizontal, allergensLabel: this.labelsFull().allergens || '', alsoLabel: this.s.menus_also || ''});
             return c;
         }
         if (comp === 'canal') {
@@ -838,7 +846,9 @@ export class Screen {
                 c.appendChild(this.slot(items[0], comp));
             }
             if (this.weather && this.sky) {
-                c.appendChild(buildWeatherThird(this.weather, this.labelsFull(), this.sky, this.s.days || []));
+                // At 8 m on a vertical screen three full names do not fit their columns («MartesMiércolesJueves»).
+                const names = !this.horizontal && this.distance === 8 && this.s.days_short ? this.s.days_short : this.s.days;
+                c.appendChild(buildWeatherThird(this.weather, this.labelsFull(), this.sky, names || []));
             }
             return c;
         }
@@ -1152,6 +1162,16 @@ export class Screen {
             line.appendChild(el('span', '', n.body));
             const inside = line.querySelector('span');
             if (over() || inside.scrollWidth > inside.clientWidth + 1) {
+                // Its second line under the title, the band in two lines, before it is given up: it is often what
+                // matters («Las clases acaban a las 13:00»). Only if one of the two still does not fit, the title alone.
+                band.setAttribute('data-lineas', '2');
+                line.classList.add('hk-dos-renglones');
+                if (!over() && inside.scrollWidth <= inside.clientWidth + 1) {
+                    this.liftFull();
+                    return;
+                }
+                band.removeAttribute('data-lineas');
+                line.classList.remove('hk-dos-renglones');
                 line.classList.add('hk-solo-titulo');
             }
         }
@@ -1248,6 +1268,23 @@ export class Screen {
             if (linesOf(strip.querySelector('b')) > 1) {
                 strip.setAttribute('data-ajuste', '1');
             }
+        }
+    }
+
+    /**
+     * The birthday strip steps aside for a slide that comes out cut or poorer with it (stripSpoils), not only the ones with
+     * a sheet of their own: at 8 m a lead of «Menú de hoy» went out of its box by its last line. The body is measured again
+     * without it. It comes back with the next slide.
+     *
+     * @param {HTMLElement} layer
+     * @param {string} comp
+     */
+    stripAside(layer, comp) {
+        if (!FULL[comp] && comp !== 'tabla' && comp !== 'cumple' && this.frame.classList.contains('hk-con-franja') &&
+                !this.frame.classList.contains('hk-sin-franja') && stripSpoils(layer)) {
+            this.frame.classList.add('hk-sin-franja');
+            this.fitHeaders();
+            this.adjustLayer(layer);
         }
     }
 
@@ -1833,11 +1870,20 @@ export class Screen {
         }
         this.adjustLayer(layer);
         // Nearer than 8 m the strip stays, unless the slide comes out cut or poorer with it: then it steps aside for this one.
-        if (OWN_SHEET[comp] && comp !== 'tabla' && this.frame.classList.contains('hk-con-franja') &&
-                !this.frame.classList.contains('hk-sin-franja') && stripSpoils(layer)) {
-            this.frame.classList.add('hk-sin-franja');
-            this.fitHeaders();
-            this.adjustLayer(layer);
+        this.stripAside(layer, comp);
+        // A QR drawn by the site's shortener comes as a picture: until it arrives it measures nothing, so the slide is
+        // fitted again when it does (with the strip, the channel's QR came out cut by the top).
+        const pending = layer.querySelectorAll('.hk-qr img');
+        const selfQr = this;
+        for (let i = 0; i < pending.length; i++) {
+            if (!pending[i].complete) {
+                pending[i].addEventListener('load', function () {
+                    if (selfQr.layer === layer) {
+                        selfQr.adjustLayer(layer);
+                        selfQr.stripAside(layer, comp);
+                    }
+                });
+            }
         }
         // What moves, measured with its letters.
         const fontsComing = document.fonts && document.fonts.status === 'loading';
@@ -1856,6 +1902,8 @@ export class Screen {
                         fitWeek(layer.hkWeek, self.horizontal);
                     }
                     self.adjustLayer(layer);
+                    // (the letters make the words longer: what fitted may not fit now)
+                    self.stripAside(layer, comp);
                     self.startMoving(layer);
                 }
             });
@@ -1940,6 +1988,8 @@ export class Screen {
         const title = layer.querySelector('h1');
         const first = layer.firstChild;
         const last = this.urgentClock.previousSibling;
+        // From the headline of 8 m down to half of it: five steps (urgente.css).
+        layer.hkSteps = 4;
         fitHeadline(layer, title, this.horizontal ? 4 : 6, function () {
             const box = layer.getBoundingClientRect();
             const cs = getComputedStyle(layer);

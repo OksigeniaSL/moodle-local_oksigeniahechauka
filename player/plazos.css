@@ -275,6 +275,12 @@
 .hk-vertical .hk-plazos-lista {
     padding: 0 3rem;
 }
+/* today's band reaches the sheet's edges and not past them (4 rem overflowed the vertical list by 1 rem a side) */
+.hk.hk-vertical .hk-plazos-dia[data-hoy] {
+    margin: 0 -3rem;
+    padding-right: 3rem;
+    padding-left: 3rem;
+}
 .hk-vertical .hk-plazos-dia {
     display: block;
     padding: 1.4rem 0;

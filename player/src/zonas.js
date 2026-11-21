@@ -485,11 +485,15 @@ export function fitPlaceCard(card) {
         split();
         return overflows(body) || name.scrollWidth > name.clientWidth + 1;
     };
-    // The week goes first, then the name a step smaller each time, and at last the label over it.
+    // The week goes first, then the name a step smaller each time, and the label over it; then less room around the words,
+    // and at last today's hours, since the state already says until when (on a vertical screen at 8 m the card came out cut
+    // at the top and the bottom: the review of 21 November 2026).
     const tries = [['', '0'], ['hk-sitio-sin-semana', '0'], ['hk-sitio-sin-semana', '1'], ['hk-sitio-sin-semana', '2'],
-        ['hk-sitio-sin-semana', '3'], ['hk-sitio-sin-semana hk-sitio-sin-etiqueta', '3']];
+        ['hk-sitio-sin-semana', '3'], ['hk-sitio-sin-semana hk-sitio-sin-etiqueta', '3'],
+        ['hk-sitio-sin-semana hk-sitio-sin-etiqueta hk-sitio-justa', '3'],
+        ['hk-sitio-sin-semana hk-sitio-sin-etiqueta hk-sitio-justa hk-sitio-sin-hoy', '3']];
     for (let t = 0; t < tries.length; t++) {
-        card.classList.remove('hk-sitio-sin-semana', 'hk-sitio-sin-etiqueta');
+        card.classList.remove('hk-sitio-sin-semana', 'hk-sitio-sin-etiqueta', 'hk-sitio-justa', 'hk-sitio-sin-hoy');
         tries[t][0].split(' ').filter(Boolean).forEach(function (cls) {
             card.classList.add(cls);
         });

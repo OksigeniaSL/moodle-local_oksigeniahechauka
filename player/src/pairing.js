@@ -4,6 +4,31 @@
 
 import {HECHAUKA_EMBLEM, qrSvg} from './qr.js';
 
+const SVGNS = 'http://www.w3.org/2000/svg';
+
+// Hechauka's emblem, drawn as a picture (the first thing a centre sees when it plugs a screen in).
+function emblem() {
+    const s = document.createElementNS(SVGNS, 'svg');
+    s.setAttribute('viewBox', HECHAUKA_EMBLEM.box);
+    s.setAttribute('aria-hidden', 'true');
+    s.innerHTML = HECHAUKA_EMBLEM.svg;
+    return s;
+}
+
+// The address to type, breaking after its slashes when it does not fit (a long one went out of a vertical screen).
+function address(tag, where) {
+    const a = document.createElement(tag);
+    a.className = 'hk-emparejar-url';
+    const parts = where.split('/');
+    parts.forEach(function (part, i) {
+        a.appendChild(document.createTextNode(part + (i < parts.length - 1 ? '/' : '')));
+        if (i < parts.length - 1) {
+            a.appendChild(document.createElement('wbr'));
+        }
+    });
+    return a;
+}
+
 function el(tag, cls, text) {
     const e = document.createElement(tag);
     if (cls) {
@@ -42,13 +67,49 @@ export function pair(root, api, strings) {
             }
             const box = el('div', 'hk-emparejar');
             const text = el('div', 'hk-emparejar-texto');
+            // Hechauka's own: its emblem and its name over the title (the review of 21 November 2026: it looked like a
+            // mock-up). Then the two ways, said as two ways of one step, the next step, and that the screen is waiting.
+            const brand = el('p', 'hk-emparejar-marca');
+            brand.appendChild(emblem());
+            brand.appendChild(el('span', '', 'Hechauka'));
+            text.appendChild(brand);
             text.appendChild(el('h1', '', s.pair_title || 'New screen'));
-            text.appendChild(el('p', '', s.pair_steps || ''));
-            const c = el('p', 'hk-emparejar-codigo');
-            c.textContent = code ? code.slice(0, 3) + ' ' + code.slice(3) : '···';
-            text.appendChild(c);
-            if (url) {
-                text.appendChild(el('p', 'hk-emparejar-url', url.replace(/^https?:\/\//, '').split('?')[0]));
+            const pretty = code ? code.slice(0, 3) + ' ' + code.slice(3) : '···';
+            const where = url ? url.replace(/^https?:\/\//, '').split('?')[0] : '';
+            if (s.pair_scan && s.pair_type && s.pair_name) {
+                box.classList.add('hk-emparejar-pasos');
+                const one = el('div', 'hk-emparejar-paso');
+                one.appendChild(el('b', 'hk-emparejar-n', '1'));
+                const oneText = el('div', 'hk-emparejar-paso-texto');
+                oneText.appendChild(el('p', 'hk-emparejar-escanea', s.pair_scan));
+                if (where) {
+                    const typed = el('p', 'hk-emparejar-teclea');
+                    typed.appendChild(document.createTextNode(s.pair_type.replace('{url}', '') + ' '));
+                    typed.appendChild(address('b', where));
+                    oneText.appendChild(typed);
+                }
+                const c = el('p', 'hk-emparejar-codigo');
+                c.textContent = pretty;
+                oneText.appendChild(c);
+                one.appendChild(oneText);
+                text.appendChild(one);
+                const two = el('div', 'hk-emparejar-paso');
+                two.appendChild(el('b', 'hk-emparejar-n', '2'));
+                two.appendChild(el('p', 'hk-emparejar-nombra', s.pair_name));
+                text.appendChild(two);
+                const wait = el('p', 'hk-emparejar-espera');
+                wait.appendChild(el('i', ''));
+                wait.appendChild(document.createTextNode(s.pair_waiting || ''));
+                text.appendChild(wait);
+            } else {
+                // A server before these strings: the sentence it has.
+                text.appendChild(el('p', 'hk-emparejar-lead', s.pair_steps || ''));
+                const c = el('p', 'hk-emparejar-codigo');
+                c.textContent = pretty;
+                text.appendChild(c);
+                if (where) {
+                    text.appendChild(address('p', where));
+                }
             }
             box.appendChild(text);
             if (image) {
@@ -80,7 +141,10 @@ export function pair(root, api, strings) {
 
         function offline() {
             show('', '', '');
-            root.querySelector('.hk-emparejar-texto p').textContent = s.offline || 'No connection. Trying again…';
+            const say = root.querySelector('.hk-emparejar-espera') || root.querySelector('.hk-emparejar-lead');
+            if (say) {
+                say.textContent = s.offline || 'No connection. Trying again…';
+            }
             timer = setTimeout(start, 15000);
         }
 

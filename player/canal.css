@@ -141,7 +141,7 @@
     margin-bottom: 2rem;
     overflow-wrap: break-word;
     color: var(--hk-canal-tinta, #16191d);
-    font-size: 3.6rem;
+    font-size: var(--hk-t-min);              /* the least that is read at each distance (canal.js keeps it there) */
     font-weight: 800;
     line-height: 1.08;
 }
@@ -301,7 +301,7 @@
     padding: 4.8rem 4.8rem 4.4rem;
 }
 .hk.hk-vertical .hk-canal-nombre {
-    font-size: 4rem;
+    font-size: var(--hk-t-min);
 }
 .hk.hk-vertical .hk-canal .hk-qr-web {
     font-size: 5rem;

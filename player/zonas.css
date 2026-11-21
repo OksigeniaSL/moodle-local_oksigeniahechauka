@@ -520,6 +520,20 @@
 .hk-sitio-sin-etiqueta .hk-sitio-etiqueta {
     display: none;
 }
+/* the last two steps (zonas.js, fitPlaceCard): less room around the words, then the state alone under the name */
+.hk .hk-sitio-ficha.hk-sitio-justa {
+    padding: 3.2rem 5rem;
+}
+.hk .hk-sitio-justa .hk-sitio-estado {
+    margin-top: 1.4rem;
+}
+.hk .hk-sitio-justa .hk-sitio-semana {
+    margin-top: 2.2rem;
+    padding-top: 1.6rem;
+}
+.hk .hk-sitio-sin-hoy .hk-sitio-semana {
+    display: none;
+}
 
 /* ================================================================================================================
  * 2. The place of the screen in the header: a chip beside the clock, at 3 and 5 m; the first to go when there is no room
@@ -618,7 +632,7 @@
 }
 /* over a full-screen picture: white, on a veil of its own */
 .hk-completa .hk-con-sitio > .hk-sitio {
-    background: rgba(0, 0, 0, .34);
+    background: rgba(0, 0, 0, .5);         /* .34 gave 2.4:1 over a light picture */
 }
 .hk-completa .hk-sitio p b,
 .hk-completa .hk-sitio p span {

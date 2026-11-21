@@ -38,6 +38,11 @@ class player_page {
         return [
             'pair_title' => get_string('pair_title', $c),
             'pair_steps' => get_string('pair_steps', $c),
+            'pair_scan' => get_string('pair_scan', $c),
+            'pair_type' => get_string('pair_type', $c),
+            'pair_name' => get_string('pair_name', $c),
+            'pair_waiting' => get_string('pair_waiting', $c),
+            'menus_also' => get_string('menus_also', $c),
             'offline' => get_string('offline', $c),
             'sample' => get_string('sample', $c),
             'menu' => get_string('label_menu', $c),

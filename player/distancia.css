@@ -127,8 +127,12 @@
 .hk[data-distancia="8"] .hk-tiempo-lluvia {
     display: none;
 }
-.hk[data-distancia="8"] .hk-fecha b {
+.hk.hk-vertical[data-distancia="8"] .hk-fecha b {
     display: inline;
+}
+/* on a horizontal screen two lines are there anyway: «Lunes» over «2 de noviembre», never «Lunes 2 de / noviembre» */
+.hk:not(.hk-vertical)[data-distancia="8"] .hk-fecha b {
+    display: block;
 }
 /* On a vertical screen at 5 m the date goes in two lines over the clock; at 8 m only the weekday. */
 .hk.hk-vertical[data-distancia="5"] .hk-fecha b {

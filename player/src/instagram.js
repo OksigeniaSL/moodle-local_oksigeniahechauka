@@ -320,7 +320,7 @@ export function cutWords(words, fit) {
             return words.slice(0, k).join(' ');
         }
     }
-    return words.slice(0, Math.max(1, fit)).join(' ') + '…';
+    return words.slice(0, Math.max(1, fit)).join(' ').replace(/[,;:\-–—]+$/, '') + '…';
 }
 
 // The caption shortened to what fits (cutWords).

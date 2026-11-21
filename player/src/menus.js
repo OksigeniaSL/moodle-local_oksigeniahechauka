@@ -192,6 +192,9 @@ function nameOf(m, box) {
     }
 }
 
+// The words before the menus that share a dish («también en»), from the strings; without them, the old sign.
+let ALSO = '';
+
 // What goes in a dish's cell: the dish, its allergens after it on the same line, and who else has it.
 function dishBox(dish, same) {
     const box = el('div', 'hk-menus-celda');
@@ -201,7 +204,7 @@ function dishBox(dish, same) {
         box.appendChild(codes);
     }
     if (same) {
-        box.appendChild(el('small', 'hk-menus-igual-dice', '= ' + same));
+        box.appendChild(el('small', 'hk-menus-igual-dice', ALSO ? ALSO + ' ' + same : '= ' + same));
     }
     return box;
 }
@@ -330,9 +333,10 @@ function buildTable(data, table, tints) {
  * @param {HTMLElement} c the layer
  * @param {object} data from menusData
  * @param {number} turn which page, counting from the first time (it goes round)
- * @param {object} o {distance, horizontal, allergensLabel}
+ * @param {object} o {distance, horizontal, allergensLabel, alsoLabel: «también en», before the menus that share a dish}
  */
 export function buildMenus(c, data, turn, o) {
+    ALSO = (o && o.alsoLabel) || '';
     if (!data || !data.menus || !data.menus.length) {
         return;
     }
@@ -422,8 +426,9 @@ export function fitMenus(c) {
         states[n].forEach(function (cls) {
             s.classList.add(cls);
         });
-        for (let step = 0; step <= 3; step++) {
-            s.setAttribute('data-ajuste', String(step));
+        // A step up first, «g», where the sheet has room to spare (two short menus at 3 m left half of it white).
+        for (let step = n ? 0 : -1; step <= 3; step++) {
+            s.setAttribute('data-ajuste', step < 0 ? 'g' : String(step));
             if (fits()) {
                 return;
             }
