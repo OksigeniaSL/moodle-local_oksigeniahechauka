@@ -1032,6 +1032,7 @@ class birthdays {
         self::$accounts = null;
         self::$batch = true;
         $seen = [];
+        $counted = 0;
         foreach ($present as $id => $person) {
             $key = (string) ($person['id'] ?? $id);
             // Still at the centre, whatever comes with them: a date or a name that cannot be read leaves their row as it was.
@@ -1075,6 +1076,7 @@ class birthdays {
                     $done['added']++;
                 }
             }
+            $counted++;
         }
         $gone = array_diff_key($have, $seen);
         // A list that suddenly lacks a quarter of the centre is not a centre emptied overnight: nothing goes, until someone
@@ -1090,7 +1092,7 @@ class birthdays {
         }
         self::$accounts = null;
         self::$batch = false;
-        $done['count'] = count($seen);
+        $done['count'] = $counted;
         return $done;
     }
 

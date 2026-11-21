@@ -83,18 +83,31 @@ class photoday {
      * @return array|null
      */
     public static function of_day(array $entries, array $themes, string $date, bool $south = false): ?array {
-        $season = self::season($date, $south);
-        $entries = array_values(array_filter($entries, function ($e) use ($themes, $season) {
-            $own = is_array($e) ? (string) ($e['estacion'] ?? '') : '';
-            return is_array($e) && in_array((string) ($e['categoria'] ?? ''), $themes, true) && self::file_of($e) !== '' &&
-                ($own === '' || $own === $season);
-        }));
+        $entries = self::fitting($entries, $themes, $date, $south);
         if (!$entries) {
             return null;
         }
         $days = intdiv((int) (strtotime($date . ' 12:00 UTC') - strtotime('2024-01-01 12:00 UTC')), DAYSECS);
         $weekday = intdiv($days, 7) * 5 + min($days % 7, 4);
         return $entries[$weekday % count($entries)];
+    }
+
+    /**
+     * The entries that may be a day's picture: of the chosen themes, with a file, and of the season or of any.
+     *
+     * @param array $entries of the index
+     * @param string[] $themes
+     * @param string $date «YYYY-MM-DD»
+     * @param bool $south
+     * @return array
+     */
+    protected static function fitting(array $entries, array $themes, string $date, bool $south): array {
+        $season = self::season($date, $south);
+        return array_values(array_filter($entries, function ($e) use ($themes, $season) {
+            $own = is_array($e) ? (string) ($e['estacion'] ?? '') : '';
+            return is_array($e) && in_array((string) ($e['categoria'] ?? ''), $themes, true) && self::file_of($e) !== '' &&
+                ($own === '' || $own === $season);
+        }));
     }
 
     /**
@@ -108,8 +121,9 @@ class photoday {
         $c = 'local_oksigeniahechauka';
         $kept = json_decode((string) get_config($c, 'photodaytoday'), true) ?: [];
         if (($kept['date'] ?? '') === $date) {
-            foreach ($entries as $e) {
-                if (is_array($e) && self::file_of($e) === ($kept['file'] ?? null)) {
+            // Still of the chosen themes: another choice in «Your centre» chooses again.
+            foreach (self::fitting($entries, self::themes(), $date, self::south()) as $e) {
+                if (self::file_of($e) === ($kept['file'] ?? null)) {
                     return $e;
                 }
             }

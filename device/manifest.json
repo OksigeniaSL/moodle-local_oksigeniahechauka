@@ -3,7 +3,7 @@
   {
    "mode": "644",
    "path": "/etc/chromium/policies/managed/hechauka.json",
-   "sha256": "ea36ca044d50ea5f16917ab17732ce7b83b1cef32855418cbc597243d78fe992"
+   "sha256": "c4161fb387687ccedcc5d60732c057815f7e75571dd287b1900e208fc876827d"
   },
   {
    "mode": "644",
@@ -23,7 +23,7 @@
   {
    "mode": "644",
    "path": "/etc/hechauka/labwc/rc.xml",
-   "sha256": "fb53082408fe401177e5ef341ccb6ca841425f9c9103b38a878b24459df49710"
+   "sha256": "d6c9546b5dcb3a262d503be9650a2a411a364e7572ac913b211ec4855a17ad80"
   },
   {
    "mode": "644",
@@ -48,7 +48,7 @@
   {
    "mode": "644",
    "path": "/etc/systemd/system/hechauka-guardian.service",
-   "sha256": "e224c0be3bca071f30e22c53a1cd1fb05c28fed59449cd1ecaf00d8b93ab67fa"
+   "sha256": "3ae316a817a2c5eaf2046b54338acef0c41c9fb2ee09e5973e645aac5cb50cd2"
   },
   {
    "mode": "644",
@@ -72,6 +72,11 @@
   },
   {
    "mode": "644",
+   "path": "/etc/systemd/system/hechauka-rescate.service",
+   "sha256": "7fd9ae0a0fb7b6a005e7b0fb8aec8ab77f2ae2098c16095df4e8748e81cba437"
+  },
+  {
+   "mode": "644",
    "path": "/etc/tmpfiles.d/hechauka.conf",
    "sha256": "e732b78020d31519c347a2e32c5a7171a35453bbb830f870d64dde5152d2e6ee"
   },
@@ -83,7 +88,7 @@
   {
    "mode": "755",
    "path": "/usr/local/bin/hechauka-mide",
-   "sha256": "a53e977b1cdae45b2550aec047ade575f28ac98bf13d5befc98d5bd22378277c"
+   "sha256": "7ece84c6059bceb8c30dcc71491a27b3788a34e70913cc646d3d79606ddd6e82"
   },
   {
    "mode": "755",
@@ -93,27 +98,32 @@
   {
    "mode": "755",
    "path": "/usr/local/bin/hechauka-sesion",
-   "sha256": "4f0ae2d358eeaf2c7ae0d908370a550a26bd585fa64293942f98c7b07f1ba532"
+   "sha256": "f7ca5fbfdc316319f635c550ca4a295bc0ef2512960f92a6552d6ca206540d06"
   },
   {
    "mode": "755",
    "path": "/usr/local/lib/hechauka/actualiza.py",
-   "sha256": "7a6757dbbf4583b60a40c1f5dd670ecd66c34113d7690043e128aa937f61ba40"
+   "sha256": "302b9a8219ed123ca2064af8eaaf655c406c1c858730167e40231d134a0ecc73"
   },
   {
    "mode": "755",
    "path": "/usr/local/lib/hechauka/agente.py",
-   "sha256": "a1c69b8d9e19bce921a9a66cdbbf9f2cd995f9c4a411f3ee7b76bbc2ed2c2b2e"
+   "sha256": "a92e29fb45b5da183ad098c7021ade1f76bca056a5ccfa80aa442ad435afa83c"
   },
   {
    "mode": "755",
    "path": "/usr/local/lib/hechauka/ajuste.py",
-   "sha256": "d8b056c4a606c7e3fa3321bb768ea0afd5a60a0a018751c43dfbe0ca83a22588"
+   "sha256": "d3a32cfd5b8ecb9a4b085b9fee57e7bf52f28d8486417137762ad2a002b6f277"
   },
   {
    "mode": "755",
    "path": "/usr/local/lib/hechauka/guardian.py",
-   "sha256": "a1d93534a03520de89afeef8b66f81481247daa5c6caf749a0b0db003e9e64cc"
+   "sha256": "77a3302dbfdac0998b67e0f840b2b2a2c9546b28d9d298863c330709c41c2aab"
+  },
+  {
+   "mode": "755",
+   "path": "/usr/local/lib/hechauka/rescate.py",
+   "sha256": "6e825482cdd3098dc1600200cadfe59323b405b19f467659556b110383d19809"
   },
   {
    "mode": "644",
@@ -123,7 +133,7 @@
   {
    "mode": "644",
    "path": "/usr/share/hechauka/ajuste/ajuste.js",
-   "sha256": "95d93263292f0a2af7d7a976e44a133879299b1187cd4967354d132f53905964"
+   "sha256": "b59b93f89d7ac0c353aa4bccb1472eb02aeb3c75a2eb8a9e359b0013d4534d59"
   },
   {
    "mode": "644",
@@ -286,5 +296,6 @@
    "sha256": "2a75bc7fb95c0cf402ac330202224deec3f0bb6f68c08dc41b6de60c5cad047e"
   }
  ],
- "version": "57d0fb4ab48a5d02"
+ "serie": 2026112200,
+ "version": "4d1c2b998b769724"
 }

@@ -89,6 +89,8 @@ final class resilience_test extends \advanced_testcase {
         } finally {
             \local_oksigeniafamily\api::$on = false;
         }
+        $this->assertNotEmpty($this->getDebuggingMessages(), 'the fault is noted for whoever runs the site');
+        $this->resetDebugging();
         $this->assertNotEmpty(array_filter($m['items'], function ($it) {
             return ($it['type'] ?? '') === 'birthdays';
         }), 'the birthday is on the screen');

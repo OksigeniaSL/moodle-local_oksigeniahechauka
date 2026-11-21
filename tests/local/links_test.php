@@ -173,12 +173,15 @@ final class links_test extends \advanced_testcase {
         $this->resetAfterTest();
         $this->shortener();
         $now = time();
+        // The first code goes with its long address: nobody without an account makes the centre's shortener work.
+        $first = screens::start_pairing(['ua' => 'test'], $now);
+        $this->assertStringContainsString('/local/oksigeniahechauka/claim.php?code=', $first['claim_url']);
+        $this->assertArrayNotHasKey('qr_image', $first);
+        // The task of every five minutes asks for it.
         \curl::mock_response(self::SVG);
         \curl::mock_response(json_encode(['status' => 'success', 'shorturl' => 'https://short.example/tele1',
             'qrsvg' => 'https://short.example/svg/tele1']));
-        $first = screens::start_pairing(['ua' => 'test'], $now);
-        $this->assertSame('https://short.example/tele1', $first['claim_url']);
-        $this->assertSame('data:image/svg+xml;base64,' . base64_encode(self::SVG), $first['qr_image']);
+        links::refresh($now + 60);
 
         // Expired, it asks again with its token: the same code and link, and the shortener is not called (nothing mocked).
         $later = $now + screens::PAIR_MINUTES * MINSECS + 30;
@@ -187,6 +190,7 @@ final class links_test extends \advanced_testcase {
         $this->assertSame($first['code'], $again['code']);
         $this->assertSame($first['token'], $again['token']);
         $this->assertSame('https://short.example/tele1', $again['claim_url']);
+        $this->assertSame('data:image/svg+xml;base64,' . base64_encode(self::SVG), $again['qr_image']);
         $this->assertNotNull(screens::pairing($again['code'], $later));
         $this->assertSame(1, $DB->count_records(links::TABLE));
 
@@ -210,6 +214,7 @@ final class links_test extends \advanced_testcase {
         $now = time();
         \curl::mock_response(json_encode(['status' => 'fail', 'code' => 'error:domain']));
         $this->assertSame('https://elsewhere.example/x', links::now('https://elsewhere.example/x', $now)['url']);
+        links::refresh($now);
         $byurl = $DB->sql_compare_text('url') . ' = ' . $DB->sql_compare_text(':url');
         $record = $DB->get_record_select(links::TABLE, $byurl, ['url' => 'https://elsewhere.example/x']);
         $this->assertGreaterThan($now + 29 * DAYSECS, (int) $record->timetried);
@@ -219,6 +224,7 @@ final class links_test extends \advanced_testcase {
 
         \curl::mock_response(json_encode(['status' => 'fail', 'code' => 'error:limit']));
         links::now('https://example.org/busy', $now);
+        links::refresh($now);
         $busy = $DB->get_record_select(links::TABLE, $byurl, ['url' => 'https://example.org/busy']);
         $this->assertSame($now, (int) $busy->timetried);
     }
