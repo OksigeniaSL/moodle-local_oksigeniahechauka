@@ -9,7 +9,10 @@ It also keeps the software of the screen up to date from its Moodle (actualiza.p
 """
 import json
 import os
+import re
+import stat
 import subprocess
+import tempfile
 import time
 
 import actualiza
@@ -43,28 +46,59 @@ def uptime():
         return float(f.read().split()[0])
 
 
+def write_safely(path, text):
+    """In the folder the agent (not root) also writes in: always a new file of our own, renamed into place. A name the agent
+    left (a link to anywhere) is never opened, only replaced."""
+    fd, temporary = tempfile.mkstemp(dir=os.path.dirname(path), prefix='.hk-')
+    try:
+        os.fchmod(fd, 0o644)
+        with os.fdopen(fd, 'w', encoding='utf-8') as f:
+            f.write(text)
+        os.replace(temporary, path)
+    except OSError:
+        try:
+            os.remove(temporary)
+        except OSError:
+            pass
+        raise
+
+
+def read_small(path, most=65536):
+    """What the agent left in a file, only if it is a plain file: never through a link, and never waiting on a pipe."""
+    fd = os.open(path, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
+    try:
+        if not stat.S_ISREG(os.fstat(fd).st_mode):
+            raise OSError('not a plain file: ' + path)
+        return os.read(fd, most).decode('utf-8', 'replace')
+    finally:
+        os.close(fd)
+
+
+def tame(text):
+    """Why, in words that cannot do anything wherever they are written."""
+    return re.sub(r'[^a-z0-9 .,:-]', '', text.lower().strip())[:80]
+
+
 def publish(counts, now):
     """For the agent, which is not root: how many reboots today, and why the last one."""
     out = {'restarts_24h': len([t for t in counts['reboots'] if now - t < 24 * 3600])}
     try:
         with open(LAST, encoding='utf-8') as f:
-            out['last_reboot'] = f.read().strip()[:80]
+            out['last_reboot'] = tame(f.read())
     except OSError:
         pass
-    path = RUN + '/reinicios.json'
-    with open(path + '.new', 'w', encoding='utf-8') as f:
-        json.dump(out, f)
-    os.chmod(path + '.new', 0o644)
-    os.replace(path + '.new', path)
+    try:
+        write_safely(RUN + '/reinicios.json', json.dumps(out))
+    except OSError as e:
+        actualiza.log('guardian: %s' % e)
 
 
 def agent_state(now):
     """What the agent said last, and how long ago."""
     path = RUN + '/estado.json'
     try:
-        age = now - os.path.getmtime(path)
-        with open(path, encoding='utf-8') as f:
-            return json.load(f), age
+        age = now - os.lstat(path).st_mtime
+        return json.loads(read_small(path)), age
     except (OSError, ValueError):
         return None, uptime()
 
@@ -87,10 +121,15 @@ def main():
         except Exception as e:  # pylint: disable=broad-except
             actualiza.log('guardian: %s' % e)
         asked = RUN + '/pide'
-        if os.path.exists(asked):
-            with open(asked, encoding='utf-8') as f:
-                why = f.read().strip()[:80]
-            os.remove(asked)
+        if os.path.lexists(asked):
+            try:
+                why = tame(read_small(asked, 200))
+            except OSError:
+                why = 'asked'
+            try:
+                os.remove(asked)
+            except OSError:
+                pass
             if all(len([t for t in counts['reboots'] if now - t < span]) < limit for span, limit in REBOOTS):
                 counts['reboots'].append(now)
                 save(counts)
@@ -99,7 +138,7 @@ def main():
                 subprocess.run(['systemctl', 'reboot'], check=False)
                 continue
         try:
-            age = now - os.path.getmtime(RUN + '/estado.json')
+            age = now - os.lstat(RUN + '/estado.json').st_mtime
         except OSError:
             age = uptime()
         if age > STALE and uptime() > BOOT_GRACE and len(counts['sessions']) < SESSIONS_PER_HOUR:

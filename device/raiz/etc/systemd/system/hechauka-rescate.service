@@ -1,0 +1,6 @@
+[Unit]
+Description=Hechauka: puts back the version that the guardian does not start with
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 -B /usr/local/lib/hechauka/rescate.py

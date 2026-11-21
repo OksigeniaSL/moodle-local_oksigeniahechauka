@@ -1,11 +1,14 @@
 """The software of a Hechauka screen kept up to date from its own Moodle, by the guardian (as root).
 
 Twice a day it asks the plugin for the manifest of the device's software (api/device.php) and its signature. Only a manifest
-signed by Oksigenia (/etc/hechauka/firma.pub) is believed: whoever got into a Moodle cannot send code to its screens. What
+signed by Oksigenia (/etc/hechauka/firma.pub) is believed: whoever got into a Moodle cannot send code to its screens, nor an
+older version (all of them are public), since each carries a number that only grows («serie»). What
 changed is downloaded, each file checked against its hash, and kept aside until the screen is off by its hours or, for one
 that is never off, until the small hours of the night (a day at most, for one unplugged at night). What is kept aside
 survives a reboot: the reboot of each night comes before those 24 hours. Then it goes in, with a copy of what it replaces. If
-the agent gives no sign of life in the next ten minutes, the copy goes back and that version is not tried again.
+the agent gives no sign of life in the next ten minutes, the copy goes back and that version is not tried again. Before the
+first file goes in, the copy and the note of what is going in are on the card: a power cut half way is undone at the next boot.
+If the new guardian itself does not start, systemd runs rescate.py, which is never replaced along with it.
 """
 import hashlib
 import json
@@ -59,11 +62,28 @@ def read_json(path, default):
         return default
 
 
+def sync_dir(path):
+    """What was renamed in a folder, on the card: without it, a power cut can lose the rename."""
+    try:
+        fd = os.open(path, os.O_RDONLY)
+    except OSError:
+        return
+    try:
+        os.fsync(fd)
+    except OSError:
+        pass
+    finally:
+        os.close(fd)
+
+
 def write_json(path, value):
     with open(path + '.new', 'w', encoding='utf-8') as f:
         json.dump(value, f)
+        f.flush()
+        os.fsync(f.fileno())
     os.chmod(path + '.new', 0o644)
     os.replace(path + '.new', path)
+    sync_dir(os.path.dirname(path))
 
 
 def sha256(path):
@@ -129,6 +149,8 @@ class Updater:
     def __init__(self):
         self.next_look = time.time() + FIRST
         self.staged, self.staged_at = self.restore()
+        # When this run first saw a version just in: the ten minutes count from there, by a clock that NTP does not move.
+        self.pending_seen = None
 
     @staticmethod
     def restore():
@@ -142,7 +164,8 @@ class Updater:
             whole = all(sha256(STAGE + path) == hashes[path] for path in kept['changed'])
             if whole and kept['version'] != have.get('version') and kept['version'] not in have.get('bad', []):
                 log('version %s still ready, since %s' % (kept['version'], time.strftime('%F %T', time.localtime(kept['at']))))
-                return {'version': kept['version'], 'files': kept['files'], 'changed': kept['changed']}, kept['at']
+                return {'version': kept['version'], 'serie': kept.get('serie', 0), 'files': kept['files'],
+                        'changed': kept['changed']}, kept['at']
         except (KeyError, TypeError):
             pass
         Updater.forget()
@@ -193,6 +216,10 @@ class Updater:
         have = read_json(INSTALLED, {})
         if wanted['version'] == have.get('version') or wanted['version'] in have.get('bad', []):
             return
+        if have.get('serie') and int(wanted.get('serie') or 0) <= int(have['serie']):
+            # Never back: an older signed version would bring back what was mended since.
+            log('version %s is not newer than the one in: left alone' % wanted['version'])
+            return
         shutil.rmtree(STAGE, ignore_errors=True)
         changed = []
         for entry in wanted['files']:
@@ -211,14 +238,14 @@ class Updater:
             changed.append(path)
         with open(STAGE + '/.manifest.json', 'wb') as f:
             f.write(manifest)
-        self.staged = {'version': wanted['version'], 'files': wanted['files'], 'changed': changed}
+        self.staged = {'version': wanted['version'], 'serie': int(wanted.get('serie') or 0), 'files': wanted['files'],
+                       'changed': changed}
         self.staged_at = now
         write_json(STAGED, dict(self.staged, at=int(now)))
         log('version %s ready, %d files: %s' % (wanted['version'], len(changed), ', '.join(changed)[:300]))
 
     def install(self, now):
         staged, self.staged = self.staged, None
-        self.forget()
         modes = {e['path']: e['mode'] for e in staged['files']}
         shutil.rmtree(BACKUP, ignore_errors=True)
         created = []
@@ -228,13 +255,23 @@ class Updater:
                 shutil.copy2(path, BACKUP + path)
             else:
                 created.append(path)
+        # The copy and the note, on the card before the first file goes in: a power cut from here on is undone at the boot.
+        os.sync()
+        note = {'version': staged['version'], 'serie': staged.get('serie', 0), 'at': int(now), 'changed': staged['changed'],
+                'created': created}
+        write_json(PENDING, dict(note, installing=True))
+        self.forget()
         for path in staged['changed']:
             os.makedirs(os.path.dirname(path), exist_ok=True)
             shutil.copyfile(STAGE + path, path + '.hk-new')
+            with open(path + '.hk-new', 'rb') as f:
+                os.fsync(f.fileno())
             os.chmod(path + '.hk-new', int(modes.get(path, '644'), 8))
             os.chown(path + '.hk-new', 0, 0)
             os.replace(path + '.hk-new', path)
-        write_json(PENDING, {'version': staged['version'], 'at': int(now), 'changed': staged['changed'], 'created': created})
+        os.sync()
+        write_json(PENDING, note)
+        self.pending_seen = None
         shutil.rmtree(STAGE, ignore_errors=True)
         log('version %s in; waiting for the agent' % staged['version'])
         return self.apply(staged['changed'])
@@ -262,27 +299,45 @@ class Updater:
 
     def settle(self, pending, now, state, state_age):
         """A version just in: kept once the agent speaks with a page, undone if it does not within ten minutes."""
+        if pending.get('installing'):
+            # Cut half way, by the power or a reboot: what went in goes back. The version is not to blame, so it is tried again.
+            undo(pending)
+            os.remove(PENDING)
+            self.pending_seen = None
+            log('version %s cut half way: undone, to be tried again' % pending['version'])
+            return self.apply(pending['changed'])
         alive = state is not None and state.get('page') and state.get('at', 0) > pending['at'] + 30 and state_age < 120
         if alive:
             have = read_json(INSTALLED, {})
-            write_json(INSTALLED, {'version': pending['version'], 'at': int(now), 'bad': have.get('bad', [])[-10:]})
+            write_json(INSTALLED, {'version': pending['version'], 'serie': pending.get('serie', 0), 'at': int(now),
+                                   'bad': have.get('bad', [])[-10:]})
             os.remove(PENDING)
+            self.pending_seen = None
             log('version %s kept' % pending['version'])
             return False
-        if now - pending['at'] < CONFIRM_WITHIN:
+        if self.pending_seen is None:
+            self.pending_seen = time.monotonic()
+        if time.monotonic() - self.pending_seen < CONFIRM_WITHIN:
             return False
-        for path in pending['changed']:
-            if os.path.exists(BACKUP + path):
-                shutil.copyfile(BACKUP + path, path + '.hk-old')
-                shutil.copymode(BACKUP + path, path + '.hk-old')
-                os.replace(path + '.hk-old', path)
-        for path in pending['created']:
-            try:
-                os.remove(path)
-            except OSError:
-                pass
+        undo(pending)
         have = read_json(INSTALLED, {})
         write_json(INSTALLED, dict(have, bad=(have.get('bad', []) + [pending['version']])[-10:]))
         os.remove(PENDING)
+        self.pending_seen = None
         log('version %s undone: the agent gave no sign of life' % pending['version'])
         return self.apply(pending['changed'])
+
+
+def undo(pending):
+    """What a version put in goes back to what was there: the copy, and what it created, out."""
+    for path in pending['changed']:
+        if os.path.exists(BACKUP + path):
+            shutil.copyfile(BACKUP + path, path + '.hk-old')
+            shutil.copymode(BACKUP + path, path + '.hk-old')
+            os.replace(path + '.hk-old', path)
+    for path in pending['created']:
+        try:
+            os.remove(path)
+        except OSError:
+            pass
+    os.sync()

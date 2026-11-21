@@ -160,10 +160,17 @@
         }
     }
 
+    var asking = null;
+
     function ask() {
         var x = new XMLHttpRequest();
         x.open('GET', 'estado' + (pin ? '?pin=' + pin : ''));
         x.onload = function () {
+            // A PIN that no longer serves (the screen started again with another): stop asking, scan the new code.
+            if (x.status === 403 && asking) {
+                clearInterval(asking);
+                asking = null;
+            }
             try {
                 show(JSON.parse(x.responseText));
             } catch (e) {
@@ -205,6 +212,6 @@
         show({state: 'sin-permiso'});
     } else {
         ask();
-        setInterval(ask, 2000);
+        asking = setInterval(ask, 2000);
     }
 })();

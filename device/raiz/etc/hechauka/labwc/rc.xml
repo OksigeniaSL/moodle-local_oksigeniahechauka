@@ -5,9 +5,12 @@
     <decoration>server</decoration>
     <gap>0</gap>
   </core>
+  <!-- One binding that does nothing, so that labwc does not load its own (a terminal on Super+Return among them). -->
   <keyboard>
+    <keybind key="W-F24"><action name="None" /></keybind>
   </keyboard>
   <mouse>
+    <context name="Root"><mousebind button="Middle" action="Press"><action name="None" /></mousebind></context>
   </mouse>
   <windowRules>
     <windowRule identifier="hechauka" serverDecoration="no" skipTaskbar="yes" />

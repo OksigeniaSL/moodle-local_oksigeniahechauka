@@ -8,5 +8,7 @@
   "DefaultBrowserSettingEnabled": false,
   "PromotionalTabsEnabled": false,
   "CommandLineFlagSecurityWarningsEnabled": false,
-  "BookmarkBarEnabled": false
+  "BookmarkBarEnabled": false,
+  "URLBlocklist": ["file://*", "view-source:*"],
+  "DownloadRestrictions": 3
 }

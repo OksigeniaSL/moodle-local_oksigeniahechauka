@@ -23,6 +23,7 @@ import socket
 import ssl
 import subprocess
 import sys
+import tempfile
 import threading
 import time
 import urllib.error
@@ -178,6 +179,9 @@ def hello(base):
             final = answer.geturl()
             data = answer.read(65536)
     except urllib.error.HTTPError as e:
+        # A Moodle being updated, or a proxy with nothing behind for a moment, may answer in a while: tried again.
+        if e.code in (502, 503, 504):
+            raise Unreachable('no-contesta', host) from e
         raise Unreachable('sin-hechauka', host) from e
     except urllib.error.URLError as e:
         reason = e.reason
@@ -279,11 +283,20 @@ def keep(base, info):
 
 
 def target(url):
+    # The agent (not root) also writes in this folder: a new file of our own, renamed into place, never one it left.
     os.makedirs(RUN, exist_ok=True)
-    with open(TARGET + '.new', 'w', encoding='utf-8') as f:
-        f.write(url + '\n')
-    os.chmod(TARGET + '.new', 0o644)
-    os.replace(TARGET + '.new', TARGET)
+    fd, temporary = tempfile.mkstemp(dir=RUN, prefix='.hk-')
+    try:
+        os.fchmod(fd, 0o644)
+        with os.fdopen(fd, 'w', encoding='utf-8') as f:
+            f.write(url + '\n')
+        os.replace(temporary, TARGET)
+    except OSError:
+        try:
+            os.remove(temporary)
+        except OSError:
+            pass
+        raise
 
 
 def restart_session():
@@ -302,6 +315,7 @@ class Setup:
         self.site = ''
         self.tried = ''
         self.wrong = 0
+        self.wrong_pins = set()
         self.busy = threading.Lock()
         self.done = threading.Event()
 
@@ -317,8 +331,13 @@ class Setup:
             return False
         if secrets.compare_digest(str(pin or ''), self.pin):
             return True
-        self.wrong += 1
-        log('wrong PIN from the network (%d)' % self.wrong)
+        # Each wrong PIN counts once: a phone still asking with the PIN of before the screen started again does not close
+        # the door in seconds, and whoever tries PIN after PIN is stopped all the same.
+        given = str(pin or '')[:8]
+        if given not in self.wrong_pins:
+            self.wrong_pins.add(given)
+            self.wrong += 1
+            log('wrong PIN from the network (%d)' % self.wrong)
         return False
 
     def attempt(self, text, by, wait=True):

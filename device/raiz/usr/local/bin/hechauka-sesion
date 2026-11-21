@@ -7,4 +7,7 @@ if raspi-config nonint is_pi; then
     raspi-config nonint gpu_has_mmu || export WLR_RENDERER=pixman
 fi
 mkdir -p "$HOME/.cache/hechauka"
+# Started again when it grows: a screen runs for months.
+L="$HOME/.cache/hechauka/labwc.log"
+[ -f "$L" ] && [ "$(stat -c %s "$L")" -gt 1048576 ] && mv -f "$L" "$L.1"
 exec /usr/bin/labwc -C /etc/hechauka/labwc >> "$HOME/.cache/hechauka/labwc.log" 2>&1

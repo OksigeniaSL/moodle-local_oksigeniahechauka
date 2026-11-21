@@ -190,8 +190,13 @@ class WithMoodle(Base):
         self.assertFalse(setup.pin_ok(''))
         self.assertFalse(setup.pin_ok('x'))
         self.assertTrue(setup.pin_ok(setup.pin))
-        for _ in range(ajuste.WRONG_PINS):
-            setup.pin_ok('no')
+        # A phone asking again and again with the PIN of before a restart does not close the door.
+        for _ in range(3 * ajuste.WRONG_PINS):
+            setup.pin_ok('1111' if setup.pin != '1111' else '2222')
+        self.assertTrue(setup.pin_ok(setup.pin), 'the same wrong PIN counts once')
+        # Trying PIN after PIN does.
+        for n in range(ajuste.WRONG_PINS):
+            setup.pin_ok('x%d' % n)
         self.assertFalse(setup.pin_ok(setup.pin), 'too many wrong PINs close the door until the next boot')
 
 

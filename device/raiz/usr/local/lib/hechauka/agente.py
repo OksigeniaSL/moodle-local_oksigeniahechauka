@@ -61,6 +61,15 @@ def log(text):
         pass
 
 
+def keep_small(path, most=1024 * 1024):
+    """A log past `most` goes to .1, the one before out: never more than twice that on the card."""
+    try:
+        if os.path.getsize(path) > most:
+            os.replace(path, path + '.1')
+    except OSError:
+        pass
+
+
 class Browser:
     """Chromium, with its debugging pipe: it reads on fd 3 and writes on fd 4, messages of JSON ended by a zero byte."""
 
@@ -86,6 +95,8 @@ class Browser:
             os.dup2(to_child_r, 3)
             os.dup2(from_child_w, 4)
 
+        # Its log, started again when it grows: a screen runs for months.
+        keep_small(LOGS + '/chromium.log')
         out = open(LOGS + '/chromium.log', 'ab')
         self.process = subprocess.Popen(CHROMIUM, preexec_fn=wire, pass_fds=(3, 4), stdout=out, stderr=out)
         out.close()
@@ -258,6 +269,11 @@ def facts():
         if found:
             out['throttled'] = found.group(1).decode()
     try:
+        disk = os.statvfs('/')
+        out['disk_free'] = int(disk.f_bavail * disk.f_frsize / 1048576)
+    except OSError:
+        pass
+    try:
         with open('/proc/mounts', encoding='utf-8') as f:
             root = [line.split() for line in f if line.split()[1:2] == ['/']]
         out['disk_ro'] = any('ro' in line[3].split(',') for line in root)
@@ -320,7 +336,9 @@ def main():
     next_shot = time.time() + 180
     next_cec = 0
     restored_at = 0
-    on = True
+    # Whether the screen should be on: not known until the page says so (None). Until then the television is left as it is,
+    # so a restart of the agent out of hours does not wake it up.
+    on = None
     stuck = False
     frozen_now = False
     while True:
@@ -352,7 +370,8 @@ def main():
             browser.session = None
         no_page = 0 if info else no_page + 1
         if info:
-            on = bool(info.get('on', True))
+            told = info.get('on')
+            on = None if told is None else bool(told)
             if info.get('key'):
                 keep_key(info['key'])
             if info.get('revoked') and os.path.exists(KEYCOPY):
@@ -387,7 +406,7 @@ def main():
                 log('navigate: %s' % e)
                 browser.session = None
         # 4. The television, and a capture now and then.
-        if now >= next_cec:
+        if now >= next_cec and on is not None:
             next_cec = now + CEC_EVERY
             tv.follow(on)
         if info and on and now >= next_shot:
