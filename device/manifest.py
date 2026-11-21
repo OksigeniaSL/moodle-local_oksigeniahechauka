@@ -35,12 +35,15 @@ def main():
             before = json.load(f)
     except (OSError, ValueError):
         before = {}
-    # The same files keep their number; new ones take the plugin's version, which only grows.
+    # The same files keep their number. New ones take the plugin's version, and always more than the last number: files
+    # changed before version.php goes up would otherwise repeat the number of the version out, and every screen would
+    # turn the new one down as not newer.
     if before.get('version') == version and before.get('serie'):
         serie = before['serie']
     else:
         with open(os.path.join(HERE, '..', 'version.php'), encoding='utf-8') as f:
-            serie = int(re.search(r'\$plugin->version\s*=\s*(\d+)', f.read()).group(1))
+            plugin = int(re.search(r'\$plugin->version\s*=\s*(\d+)', f.read()).group(1))
+        serie = max(plugin, int(before.get('serie') or 0) + 1)
     with open(out, 'w', encoding='utf-8') as f:
         json.dump({'version': version, 'serie': serie, 'files': files}, f, indent=1, sort_keys=True)
         f.write('\n')

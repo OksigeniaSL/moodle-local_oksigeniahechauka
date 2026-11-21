@@ -59,8 +59,11 @@ def run(command):
 def main():
     pending = read_json(PENDING, None)
     if not pending:
-        # Nothing just in: putting anything back would be guessing. The reboot of each night tries it again.
-        log('the guardian does not start, and no version had just gone in')
+        # Nothing just in: putting anything back would be guessing. The guardian is tried again in a quarter of an hour,
+        # since the reboot of each night only comes to a screen that has been on for 20 hours.
+        log('the guardian does not start, and no version had just gone in: tried again in 15 minutes')
+        run(['systemctl', 'reset-failed', 'hechauka-guardian.service'])
+        run(['systemd-run', '--on-active=15min', '/usr/bin/systemctl', 'start', 'hechauka-guardian.service'])
         return
     for path in pending.get('changed', []):
         if os.path.exists(BACKUP + path):

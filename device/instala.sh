@@ -48,7 +48,8 @@ chmod 755 /usr/local/bin/hechauka-* /usr/local/lib/hechauka/*.py
 systemd-tmpfiles --create /etc/tmpfiles.d/hechauka.conf
 # The version of the software just installed: the guardian keeps it up to date from the screen's Moodle.
 install -d -m 755 /var/lib/hechauka
-python3 -B -c 'import json, sys; json.dump({"version": json.load(open(sys.argv[1]))["version"]}, open(sys.argv[2], "w"))' \
+python3 -B -c 'import json, sys; m = json.load(open(sys.argv[1]))
+json.dump({"version": m["version"], "serie": m.get("serie", 0)}, open(sys.argv[2], "w"))' \
     "$AQUI/manifest.json" /var/lib/hechauka/instalado.json
 
 # 3b. What is this screen's own. The card is the same for every centre; the file of the panel («Prepare a screen»),

@@ -25,6 +25,8 @@ STALE = 3 * 60
 BOOT_GRACE = 5 * 60
 SESSIONS_PER_HOUR = 3
 REBOOTS = [(6 * 3600, 2), (24 * 3600, 4)]
+# Turns in a row that fail with a version just in: it is that version, and the rescue puts the old one back.
+TICK_FAILURES = 3
 
 
 def system(command):
@@ -114,6 +116,7 @@ def agent_state(now):
 def main():
     os.makedirs(KEEP, exist_ok=True)
     updater = actualiza.Updater()
+    failures = 0
     while True:
         time.sleep(30)
         now = time.time()
@@ -126,8 +129,16 @@ def main():
             if updater.tick(now, state, age):
                 # A new guardian came in: systemd starts it again in ten seconds.
                 os._exit(0)
+            failures = 0
         except Exception as e:  # pylint: disable=broad-except
             actualiza.log('guardian: %s' % e)
+            failures += 1
+            if failures >= TICK_FAILURES and os.path.exists(actualiza.PENDING):
+                # The version just in breaks the guardian's own turn, so it would never be kept nor undone (and OnFailure=
+                # only comes when the guardian dies): the rescue puts the old one back and systemd starts this again.
+                actualiza.log('guardian: %d turns failed with a version just in: the rescue puts it back' % failures)
+                system(['systemctl', 'start', '--no-block', 'hechauka-rescate.service'])
+                os._exit(1)
         asked = RUN + '/pide'
         if os.path.lexists(asked):
             try:

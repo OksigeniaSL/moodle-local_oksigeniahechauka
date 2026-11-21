@@ -38,6 +38,7 @@ FIRST = 10 * 60                 # after the boot, before the first look
 EVERY = 12 * 3600
 RETRY = 30 * 60                 # after a look that failed
 CONFIRM_WITHIN = 10 * 60
+BOOT_ID = '/proc/sys/kernel/random/boot_id'
 WAIT_FOR_OFF = 24 * 3600
 # Hours of the night when a screen that is never off takes what is ready: before the reboot of 04:20, with nobody looking.
 NIGHT = (3,)
@@ -156,12 +157,23 @@ def run(command):
         log('%s: %s' % (' '.join(command), e))
 
 
+def boot_clock():
+    """Seconds since this boot: NTP does not move it, and every process of the boot reads the same."""
+    return time.clock_gettime(time.CLOCK_BOOTTIME)
+
+
+def boot_id():
+    try:
+        with open(BOOT_ID, encoding='ascii') as f:
+            return f.read().strip()
+    except OSError:
+        return ''
+
+
 class Updater:
     def __init__(self):
         self.next_look = time.time() + FIRST
         self.staged, self.staged_at = self.restore()
-        # When this run first saw a version just in: the ten minutes count from there, by a clock that NTP does not move.
-        self.pending_seen = None
 
     @staticmethod
     def restore():
@@ -227,7 +239,11 @@ class Updater:
         have = read_json(INSTALLED, {})
         if wanted['version'] == have.get('version') or wanted['version'] in have.get('bad', []):
             return
-        if have.get('serie') and int(wanted.get('serie') or 0) <= int(have['serie']):
+        if not wanted.get('serie'):
+            # Every manifest since 0.33.0 carries its number: one without it is older than what this code came with.
+            log('version %s has no number, it is older than the one in: left alone' % wanted['version'])
+            return
+        if int(wanted['serie']) <= int(have.get('serie') or 0):
             # Never back: an older signed version would bring back what was mended since.
             log('version %s is not newer than the one in: left alone' % wanted['version'])
             return
@@ -282,7 +298,6 @@ class Updater:
             os.replace(path + '.hk-new', path)
         os.sync()
         write_json(PENDING, note)
-        self.pending_seen = None
         shutil.rmtree(STAGE, ignore_errors=True)
         log('version %s in; waiting for the agent' % staged['version'])
         return self.apply(staged['changed'])
@@ -314,7 +329,6 @@ class Updater:
             # Cut half way, by the power or a reboot: what went in goes back. The version is not to blame, so it is tried again.
             undo(pending)
             os.remove(PENDING)
-            self.pending_seen = None
             log('version %s cut half way: undone, to be tried again' % pending['version'])
             return self.apply(pending['changed'])
         alive = state is not None and state.get('page') and state.get('at', 0) > pending['at'] + 30 and state_age < 120
@@ -323,20 +337,30 @@ class Updater:
             write_json(INSTALLED, {'version': pending['version'], 'serie': pending.get('serie', 0), 'at': int(now),
                                    'bad': have.get('bad', [])[-10:]})
             os.remove(PENDING)
-            self.pending_seen = None
             log('version %s kept' % pending['version'])
             return False
-        if self.pending_seen is None:
-            self.pending_seen = time.monotonic()
-        if time.monotonic() - self.pending_seen < CONFIRM_WITHIN:
+        if waited(pending) < CONFIRM_WITHIN:
             return False
         undo(pending)
         have = read_json(INSTALLED, {})
         write_json(INSTALLED, dict(have, bad=(have.get('bad', []) + [pending['version']])[-10:]))
         os.remove(PENDING)
-        self.pending_seen = None
         log('version %s undone: the agent gave no sign of life' % pending['version'])
         return self.apply(pending['changed'])
+
+
+def waited(pending):
+    """How long a version just in has waited for a sign of life. The count is kept in its note, by the clock of the boot:
+    a guardian that starts again, or the screen rebooting, goes on from where it was instead of starting from zero."""
+    now, boot = boot_clock(), boot_id()
+    fresh = pending.get('boot') != boot or 'since' not in pending
+    if fresh:
+        pending.update(boot=boot, since=now, before=pending.get('waited', 0))
+    total = pending['before'] + max(0, now - pending['since'])
+    if fresh or int(total // 60) != int(pending.get('waited', 0) // 60):
+        pending['waited'] = total
+        write_json(PENDING, pending)
+    return total
 
 
 def undo(pending):

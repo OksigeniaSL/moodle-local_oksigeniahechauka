@@ -105,7 +105,7 @@ class Waiting(unittest.TestCase):
         self.assertIsNone(self.updater().staged)
 
     def test_what_is_downloaded_survives_a_reboot(self):
-        manifest = json.dumps({'version': 'nueva', 'files': [
+        manifest = json.dumps({'version': 'nueva', 'serie': 2026112200, 'files': [
             {'path': self.folder.name + CHANGED, 'sha256': hashlib.sha256(BODY).hexdigest(), 'mode': '755'}]}).encode()
         answers = {'manifest.json': manifest, 'manifest.sig': b'firma', 'raiz' + self.folder.name + CHANGED: BODY}
         for name, value in (('fetch', answers.__getitem__), ('signed', lambda m, s: True)):
@@ -238,6 +238,41 @@ class Safely(unittest.TestCase):
         rescate.main()
         self.assertEqual([self.content(p) for p in self.files], ['old = 1\n', 'old = 1\n'])
 
+    def test_the_ten_minutes_go_on_across_guardians_and_reboots(self):
+        chown = os.chown
+        self.addCleanup(setattr, os, 'chown', chown)
+        os.chown = lambda *a: None
+        clock = {'t': 1000.0, 'boot': 'una'}
+        for name, value in (('boot_clock', lambda: clock['t']), ('boot_id', lambda: clock['boot'])):
+            self.addCleanup(setattr, actualiza, name, getattr(actualiza, name))
+            setattr(actualiza, name, value)
+        self.stage().install(at(6, 3))
+        # A guardian that starts again every four minutes, with the agent silent: each one is new, the count is not.
+        for _ in range(3):
+            actualiza.Updater().tick(at(6, 3, 5), None, 9999)
+            clock['t'] += 240
+        self.assertTrue(os.path.exists(actualiza.PENDING), 'eight minutes: still waiting')
+        # The screen reboots: the clock of the boot starts again, and what was waited stays.
+        clock.update(t=20.0, boot='otra')
+        actualiza.Updater().tick(at(6, 3, 15), None, 9999)
+        self.assertTrue(os.path.exists(actualiza.PENDING))
+        clock['t'] = 150.0
+        actualiza.Updater().tick(at(6, 3, 17), None, 9999)
+        self.assertFalse(os.path.exists(actualiza.PENDING), 'past ten minutes in all: undone')
+        self.assertEqual([self.content(p) for p in self.files], ['old = 1\n', 'old = 1\n'])
+        self.assertIn('nueva', actualiza.read_json(actualiza.INSTALLED, {}).get('bad', []))
+
+    def test_a_manifest_without_its_number_is_left_alone_even_by_a_screen_without_one(self):
+        actualiza.write_json(actualiza.INSTALLED, {'version': 'de-antes'})
+        unnumbered = json.dumps({'version': 'sin-numero', 'files': []}).encode()
+        answers = {'manifest.json': unnumbered, 'manifest.sig': b'firma'}
+        for name, value in (('fetch', answers.__getitem__), ('signed', lambda m, s: True)):
+            self.addCleanup(setattr, actualiza, name, getattr(actualiza, name))
+            setattr(actualiza, name, value)
+        looker = actualiza.Updater()
+        looker.look(at(7, 9))
+        self.assertIsNone(looker.staged)
+
 
 def load_rescue():
     """rescate.py, which imports nothing of the guardian."""
@@ -286,6 +321,43 @@ class Guardian(unittest.TestCase):
         with open(victim, encoding='utf-8') as f:
             self.assertEqual(f.read(), 'untouched')
         self.assertFalse(os.path.islink(run + '/reinicios.json'))
+
+    def test_a_version_that_breaks_its_turn_is_put_back_by_the_rescue(self):
+        import guardian  # pylint: disable=import-outside-toplevel
+        import subprocess  # pylint: disable=import-outside-toplevel
+        folder = tempfile.TemporaryDirectory()
+        self.addCleanup(folder.cleanup)
+        keep = folder.name
+        for module, name, value in ((guardian, 'RUN', keep), (guardian, 'KEEP', keep), (guardian, 'COUNTS', keep + '/c.json'),
+                                    (guardian, 'LAST', keep + '/u'), (actualiza, 'KEEP', keep), (actualiza, 'LOG', keep + '/r'),
+                                    (actualiza, 'STAGED', keep + '/p.json'), (actualiza, 'PENDING', keep + '/pe.json'),
+                                    (actualiza, 'INSTALLED', keep + '/i.json'), (subprocess, 'run', None)):
+            self.addCleanup(setattr, module, name, getattr(module, name))
+            setattr(module, name, value)
+        actualiza.write_json(actualiza.PENDING, {'version': 'nueva', 'at': 1, 'changed': [], 'created': []})
+
+        def broken(*args):
+            raise NameError("name 'undo_' is not defined")
+        laps, asked, exits = [], [], []
+
+        def sleep(_):
+            if len(laps) == 10:
+                raise StopIteration
+            laps.append(1)
+
+        def leave(code):
+            exits.append(code)
+            raise StopIteration
+        for module, name, value in ((actualiza.Updater, 'tick', broken), (guardian.time, 'sleep', sleep),
+                                    (guardian, 'uptime', lambda: 60.0), (guardian, 'system', asked.append),
+                                    (guardian.os, '_exit', leave)):
+            self.addCleanup(setattr, module, name, getattr(module, name))
+            setattr(module, name, value)
+        with self.assertRaises(StopIteration):
+            guardian.main()
+        self.assertEqual(len(laps), guardian.TICK_FAILURES)
+        self.assertEqual(asked, [['systemctl', 'start', '--no-block', 'hechauka-rescate.service']])
+        self.assertEqual(exits, [1])
 
 
 if __name__ == '__main__':
