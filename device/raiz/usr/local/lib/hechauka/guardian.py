@@ -27,6 +27,14 @@ SESSIONS_PER_HOUR = 3
 REBOOTS = [(6 * 3600, 2), (24 * 3600, 4)]
 
 
+def system(command):
+    """A reboot or a new session, only on a device (actualiza.on_device)."""
+    if not actualiza.on_device():
+        actualiza.log('guardian: not a device, not run: %s' % ' '.join(command))
+        return
+    subprocess.run(command, check=False)
+
+
 def load():
     try:
         with open(COUNTS, encoding='utf-8') as f:
@@ -135,7 +143,7 @@ def main():
                 save(counts)
                 with open(LAST, 'w', encoding='utf-8') as f:
                     f.write(time.strftime('%F %T ') + why)
-                subprocess.run(['systemctl', 'reboot'], check=False)
+                system(['systemctl', 'reboot'])
                 continue
         try:
             age = now - os.lstat(RUN + '/estado.json').st_mtime
@@ -144,7 +152,7 @@ def main():
         if age > STALE and uptime() > BOOT_GRACE and len(counts['sessions']) < SESSIONS_PER_HOUR:
             counts['sessions'].append(now)
             save(counts)
-            subprocess.run(['systemctl', 'restart', 'lightdm'], check=False)
+            system(['systemctl', 'restart', 'lightdm'])
 
 
 if __name__ == '__main__':

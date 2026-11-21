@@ -15,6 +15,10 @@ INSTALLED = KEEP + '/instalado.json'
 BACKUP = KEEP + '/anterior'
 PENDING = KEEP + '/pendiente.json'
 LOG = '/var/log/hechauka-actualiza.log'
+# Only a Hechauka device changes the machine it runs on: its card always brings the key that checks the updates, and a
+# computer that imports these files in a test never has it (on 21-11-2026 a test of the guardian restarted the
+# desktop of a laptop).
+DEVICE = '/etc/hechauka/firma.pub'
 
 
 def log(text):
@@ -43,6 +47,9 @@ def write_json(path, value):
 
 
 def run(command):
+    if not os.path.exists(DEVICE):
+        log('not a device, not run: %s' % ' '.join(command))
+        return
     try:
         subprocess.run(command, capture_output=True, timeout=300, check=False)
     except (OSError, subprocess.TimeoutExpired) as e:

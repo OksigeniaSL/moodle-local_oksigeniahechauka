@@ -21,6 +21,10 @@ import urllib.request
 
 CONF = '/etc/hechauka/pantalla.conf'
 PUB = '/etc/hechauka/firma.pub'
+# Only a Hechauka device changes the machine it runs on: its card always brings the key that checks the updates, and a
+# computer that imports these files in a test never has it (on 21-11-2026 a test of the guardian restarted the
+# desktop of a laptop).
+DEVICE = '/etc/hechauka/firma.pub'
 KEEP = '/var/lib/hechauka'
 INSTALLED = KEEP + '/instalado.json'
 STAGE = KEEP + '/nuevo'
@@ -138,7 +142,14 @@ def compiles(path):
         return False
 
 
+def on_device():
+    return os.path.exists(DEVICE)
+
+
 def run(command):
+    if not on_device():
+        log('not a device, not run: %s' % ' '.join(command))
+        return
     try:
         subprocess.run(command, capture_output=True, timeout=600)
     except (OSError, subprocess.TimeoutExpired) as e:

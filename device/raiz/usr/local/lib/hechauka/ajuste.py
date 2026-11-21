@@ -32,6 +32,10 @@ import urllib.request
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 CONF = '/etc/hechauka/pantalla.conf'
+# Only a Hechauka device changes the machine it runs on: its card always brings the key that checks the updates, and a
+# computer that imports these files in a test never has it (on 21-11-2026 a test of the guardian restarted the
+# desktop of a laptop).
+DEVICE = '/etc/hechauka/firma.pub'
 PENDING = '/var/lib/hechauka/por-comprobar'
 RUN = '/run/hechauka'
 TARGET = RUN + '/destino'
@@ -258,6 +262,9 @@ def set_zone(zone):
         now = subprocess.run(['timedatectl', 'show', '-p', 'Timezone', '--value'], capture_output=True, text=True,
                              timeout=10).stdout.strip()
         if now != zone:
+            if not os.path.exists(DEVICE):
+                log('not a device, time zone not set: ' + zone)
+                return
             subprocess.run(['timedatectl', 'set-timezone', zone], capture_output=True, timeout=30)
             log('time zone: ' + zone)
     except (OSError, subprocess.TimeoutExpired):
@@ -300,6 +307,9 @@ def target(url):
 
 
 def restart_session():
+    if not os.path.exists(DEVICE):
+        log('not a device, session not restarted')
+        return
     subprocess.run(['systemctl', 'restart', 'lightdm'], capture_output=True, timeout=60)
 
 

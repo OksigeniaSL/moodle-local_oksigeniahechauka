@@ -103,7 +103,7 @@
   {
    "mode": "755",
    "path": "/usr/local/lib/hechauka/actualiza.py",
-   "sha256": "302b9a8219ed123ca2064af8eaaf655c406c1c858730167e40231d134a0ecc73"
+   "sha256": "3cf06a9be9cbbc915ef2b649b267a9a33a0a74f04060f778727fa4858e125e08"
   },
   {
    "mode": "755",
@@ -113,17 +113,17 @@
   {
    "mode": "755",
    "path": "/usr/local/lib/hechauka/ajuste.py",
-   "sha256": "d3a32cfd5b8ecb9a4b085b9fee57e7bf52f28d8486417137762ad2a002b6f277"
+   "sha256": "831d7d6b6fea61d5b3a15876d1ed8fa18930503f6b516c2cf923ebd8232d7a82"
   },
   {
    "mode": "755",
    "path": "/usr/local/lib/hechauka/guardian.py",
-   "sha256": "77a3302dbfdac0998b67e0f840b2b2a2c9546b28d9d298863c330709c41c2aab"
+   "sha256": "18b645626d716c02354b83abcc9e48414c9d43e9747a6917ac21a50a2cb125b3"
   },
   {
    "mode": "755",
    "path": "/usr/local/lib/hechauka/rescate.py",
-   "sha256": "6e825482cdd3098dc1600200cadfe59323b405b19f467659556b110383d19809"
+   "sha256": "4515c422f83ff2e5ef0de6c420d9e1511491c6fce4fa6f5d69473aa5c241a7bb"
   },
   {
    "mode": "644",
@@ -297,5 +297,5 @@
   }
  ],
  "serie": 2026112200,
- "version": "4d1c2b998b769724"
+ "version": "1cdd151ed1214df2"
 }
