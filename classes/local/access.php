@@ -406,4 +406,80 @@ class access {
         }
         return self::may_target($targets['all'], $targets['groups'], $targets['screens'], $userid);
     }
+
+    /**
+     * The screens a user who publishes only in their groups may look at: those of their groups. Null for whoever sees
+     * every screen (who publishes everywhere, who runs the screens, who only looks).
+     *
+     * @param int|null $userid
+     * @return int[]|null
+     */
+    public static function screens_seen(?int $userid = null): ?array {
+        global $DB, $USER;
+        $userid = $userid ?? (int) $USER->id;
+        if (!self::limited($userid) || self::can('managescreens', $userid)) {
+            return null;
+        }
+        $groups = self::groups_of($userid);
+        if (!$groups) {
+            return [];
+        }
+        [$in, $params] = $DB->get_in_or_equal($groups, SQL_PARAMS_NAMED);
+        return array_values(array_unique(array_map('intval', $DB->get_fieldset_select(
+            'local_oksigeniahechauka_member',
+            'screenid',
+            "groupid $in",
+            $params
+        ))));
+    }
+
+    /**
+     * Whether the user may see an item and its files: anyone who sees every screen; who publishes only in their groups,
+     * what they may change and what is published for every screen, their groups or their screens.
+     *
+     * @param \stdClass $item
+     * @param int|null $userid
+     * @return bool
+     */
+    public static function may_see_item(\stdClass $item, ?int $userid = null): bool {
+        global $USER;
+        $userid = $userid ?? (int) $USER->id;
+        $seen = self::screens_seen($userid);
+        if ($seen === null || self::may_edit($item, $userid)) {
+            return true;
+        }
+        if (empty($item->visible)) {
+            return false;
+        }
+        $targets = items::targets($item);
+        return $targets['all'] || array_intersect($targets['groups'], self::groups_of($userid))
+            || array_intersect($targets['screens'], $seen);
+    }
+
+    /**
+     * Of the items of a manifest, those the user may see: what comes by itself stays, and the centre's own go through
+     * may_see_item().
+     *
+     * @param array $items of the contract
+     * @param int|null $userid
+     * @return array
+     */
+    public static function seen_items(array $items, ?int $userid = null): array {
+        global $DB;
+        if (self::screens_seen($userid) === null) {
+            return $items;
+        }
+        $records = [];
+        return array_values(array_filter($items, function ($it) use ($DB, $userid, &$records) {
+            if (!preg_match('/^i(\d+)/', (string) ($it['id'] ?? ''), $found)) {
+                return true;
+            }
+            $id = (int) $found[1];
+            if (!array_key_exists($id, $records)) {
+                $item = $DB->get_record('local_oksigeniahechauka_item', ['id' => $id]);
+                $records[$id] = $item && self::may_see_item($item, $userid);
+            }
+            return $records[$id];
+        }));
+    }
 }

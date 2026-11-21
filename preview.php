@@ -53,6 +53,14 @@ $PAGE->set_heading('');
 $PAGE->set_primary_active_tab('local_oksigeniahechauka');
 
 $screens = $DB->get_records('local_oksigeniahechauka_screen', null, 'sortorder, name', 'id, name, lastinfo');
+// Whoever publishes only in their groups chooses among their screens.
+$seen = access::screens_seen();
+if ($seen !== null) {
+    $screens = array_intersect_key($screens, array_flip($seen));
+    if ($screenid && !isset($screens[$screenid])) {
+        $screenid = 0;
+    }
+}
 $width = 1920;
 $height = 1080;
 if ($screenid && isset($screens[$screenid])) {

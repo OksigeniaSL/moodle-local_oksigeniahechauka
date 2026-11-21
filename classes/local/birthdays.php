@@ -83,7 +83,6 @@ class birthdays {
         $wanted = array_map(function ($d) {
             return sprintf('%02d-%02d', $d[0], $d[1]);
         }, self::days_of($date));
-        $zone = \core_date::get_server_timezone_object();
         $rows = $DB->get_recordset_sql(
             "SELECT d.userid, d.data
                FROM {user_info_data} d
@@ -94,7 +93,10 @@ class birthdays {
         );
         foreach ($rows as $row) {
             $time = (int) $row->data;
-            if ($time !== 0 && in_array((new \DateTime('@' . $time))->setTimezone($zone)->format('m-d'), $wanted, true)) {
+            // Moodle keeps a date of the profile as midnight in the zone of whoever wrote it: at noon in UTC it is that day
+            // for anyone from UTC-12 to UTC+11, whatever the zone of the server.
+            $day = (new \DateTime('@' . ($time + 12 * HOURSECS)))->setTimezone(new \DateTimeZone('UTC'))->format('m-d');
+            if ($time !== 0 && in_array($day, $wanted, true)) {
                 $ids[] = (int) $row->userid;
             }
         }

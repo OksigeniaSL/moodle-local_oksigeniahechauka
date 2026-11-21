@@ -142,6 +142,13 @@ changed, or the manifest with its `ETag` header:
   "use": "showcase"}]` (days 1 Monday to 7 Sunday, none for every day; an `until` before `from` crosses midnight).
 - `dayend`: when the day ends for the centre («HH:MM»). From then until midnight, «Today» shows tomorrow's events under
   «Tomorrow» and the coming days start after it; the server sends tomorrow's menu from the same hour.
+- `mealhours`: when the canteen serves, `{"from": "11:00", "to": "14:00"}`. Within those hours the menus of the day come
+  more often (every other slide on a screen by the canteen, `screen.canteen`).
+- `videosperday`: how many videos a screen plays a day, by turns among those it has (0 for none).
+- An item of type `photoday`: the picture of the day, chosen once a day from the collection by the centre's themes and
+  the season of its hemisphere: `{"id": "photoday-2026-11-21", "type": "photoday", "zone": "extra", "label": "…",
+  "image": {media}, "title": "…", "caption": "…", "credit": "…", "category": "naturaleza", "orientation": "h"}`. It
+  comes only once its picture is on the device.
 - `screen.distance`: from where it is read, in metres: `3`, `5` or `8`. Every size of the screen comes from it. From 5 m
   there is no week; from 8 m no thirds and no ticker: «Today» comes one thing at a time and the ticker's sentences come
   as slides of their own. Without it, `3`.

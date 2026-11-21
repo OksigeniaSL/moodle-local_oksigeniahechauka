@@ -34,6 +34,9 @@ class screens {
     /** Pairings waiting at once, at most: a code is cheap to ask for, the table must not grow without end. */
     const PAIR_MAX = 100;
 
+    /** New codes one place may ask for in PAIR_MINUTES: a centre names its screens a few at a time, renewals apart. */
+    const PAIR_FROM_ONE_PLACE = 6;
+
     /** Seconds an expired code that nobody claimed is kept, so that its screen, asking again, keeps it. */
     const PAIR_GRACE = 600;
 
@@ -63,7 +66,18 @@ class screens {
             $DB->set_field('local_oksigeniahechauka_pair', 'timeexpires', $expires, ['id' => $pair->id]);
             $code = $pair->code;
         } else {
-            if ($DB->count_records('local_oksigeniahechauka_pair') >= self::PAIR_MAX) {
+            // Nobody without an account may keep the centre from naming its new screens: few new codes from one place,
+            // and the most waiting counts only those nobody has claimed.
+            $from = hash('sha256', getremoteaddr() . '|' . get_site_identifier());
+            $recent = $DB->count_records_select(
+                'local_oksigeniahechauka_pair',
+                'fromhash = :from AND timecreated > :since',
+                ['from' => $from, 'since' => $now - self::PAIR_MINUTES * MINSECS]
+            );
+            if ($recent >= self::PAIR_FROM_ONE_PLACE) {
+                endpoint::fail(429, 'busy', 'Too many new codes from here: try again in a few minutes');
+            }
+            if ($DB->count_records_select('local_oksigeniahechauka_pair', 'screenid IS NULL') >= self::PAIR_MAX) {
                 endpoint::fail(429, 'busy', 'Too many screens waiting to be paired');
             }
             do {
@@ -76,9 +90,11 @@ class screens {
                 'device' => substr(json_encode($device), 0, 2000),
                 'timecreated' => $now,
                 'timeexpires' => $expires,
+                'fromhash' => $from,
             ]);
         }
-        // Short, when the site has a shortener: the phone that reads it opens it, and a person can type it.
+        // Short, when the site has a shortener and it is ready: the phone that reads it opens it, and a person can type it.
+        // It is asked for by the task of every five minutes, never here, where anybody may ask for a code.
         $long = (new \moodle_url('/local/oksigeniahechauka/claim.php', ['code' => $code]))->out(false);
         $link = links::now($long, $now, get_string('claim_title', 'local_oksigeniahechauka'));
         $answer = [

@@ -15,7 +15,8 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * What Moodle does not take away by itself on uninstalling: the plugin's roles and who has them.
+ * What Moodle does not take away by itself on uninstalling: the plugin's roles and who has them, and what each person kept
+ * of the greeting of their birthday.
  *
  * @package    local_oksigeniahechauka
  * @copyright  2026 Oksigenia SL <dev@oksigenia.cc>
@@ -37,5 +38,6 @@ function xmldb_local_oksigeniahechauka_uninstall() {
             delete_role($id);
         }
     }
+    $DB->delete_records_select('user_preferences', $DB->sql_like('name', ':name'), ['name' => 'local_oksigeniahechauka\_%']);
     return true;
 }

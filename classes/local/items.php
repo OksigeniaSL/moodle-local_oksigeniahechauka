@@ -238,7 +238,8 @@ class items {
     }
 
     /**
-     * Whether a screen may read the files of an item: the item is published and reaches the screen.
+     * Whether a screen may read the files of an item: the item is published, within the days the manifest looks at, and
+     * reaches the screen. What is prepared for later is not on any screen before its days.
      *
      * @param int $itemid
      * @param int $screenid
@@ -246,16 +247,20 @@ class items {
      */
     public static function reaches(int $itemid, int $screenid): bool {
         global $DB;
+        $now = time();
         $sql = "SELECT 1
                   FROM {local_oksigeniahechauka_item} i
                  WHERE i.id = :item AND i.visible = 1
+                       AND (i.dateuntil IS NULL OR i.dateuntil = '' OR i.dateuntil >= :today)
+                       AND (i.datefrom IS NULL OR i.datefrom = '' OR i.datefrom <= :horizon)
                        AND (i.targetall = 1
                             OR EXISTS (SELECT 1 FROM {local_oksigeniahechauka_target} t
                                         WHERE t.itemid = i.id AND t.screenid = :screen1)
                             OR EXISTS (SELECT 1 FROM {local_oksigeniahechauka_target} t
                                          JOIN {local_oksigeniahechauka_member} m ON m.groupid = t.groupid
                                         WHERE t.itemid = i.id AND m.screenid = :screen2))";
-        return $DB->record_exists_sql($sql, ['item' => $itemid, 'screen1' => $screenid, 'screen2' => $screenid]);
+        return $DB->record_exists_sql($sql, ['item' => $itemid, 'screen1' => $screenid, 'screen2' => $screenid,
+            'today' => schedule::day($now), 'horizon' => schedule::day($now, manifest::HORIZON)]);
     }
 
     /**

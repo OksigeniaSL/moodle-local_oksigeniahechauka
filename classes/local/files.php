@@ -136,9 +136,15 @@ class files {
      * the guide of the open acts, a picture of the centre's Instagram.
      *
      * @param \stored_file $file
+     * @param \stdClass|null $screen the screen that asks for it, when a screen does
      * @return bool
      */
-    public static function from_source(\stored_file $file): bool {
+    public static function from_source(\stored_file $file, ?\stdClass $screen = null): bool {
+        // What only the screen people touch shows (who receives a visit, the plan, «A day here»): only to one.
+        $door = in_array($file->get_filearea(), [touch::VISIT, touch::MAP, touch::DAY]);
+        if ($screen && $door && $file->get_component() === self::COMPONENT && !touch::contract($screen)) {
+            return false;
+        }
         if ($file->get_component() === self::COMPONENT && $file->get_filearea() === photoday::AREA) {
             return !$file->is_directory() && (int) $file->get_itemid() === 0;
         }

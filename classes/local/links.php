@@ -105,8 +105,9 @@ class links {
     }
 
     /**
-     * The short address of one address now, asking the shortener if it has to (the page that names a new screen: the
-     * screen is waiting for its code anyway). The long one when there is no shortener or it does not answer.
+     * The short address of one address, if the shortener has already given it; the long one until then. Never asked for
+     * here: the page that names a new screen is asked for by anybody, and each would cost a link of the centre's
+     * shortener. The task of every five minutes asks for the links seen, and the next renewal of the code brings it.
      *
      * @param string $url
      * @param int $now
@@ -121,9 +122,6 @@ class links {
             return $out;
         }
         $record = self::record($url, $now);
-        if (!$record->short && $record->timetried < $now - self::RETRY) {
-            self::ask($shortener, $record, $now, $title);
-        }
         if ($record->short) {
             $out['url'] = $record->short;
             $file = self::file((int) $record->id);

@@ -409,5 +409,15 @@ function xmldb_local_oksigeniahechauka_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026112101, 'local', 'oksigeniahechauka');
     }
 
+    if ($oldversion < 2026112200) {
+        // Where each new code was asked from (a hash): nobody without an account keeps the centre from naming screens.
+        $table = new xmldb_table('local_oksigeniahechauka_pair');
+        $field = new xmldb_field('fromhash', XMLDB_TYPE_CHAR, '64', null, null, null, null, 'timeexpires');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        upgrade_plugin_savepoint(true, 2026112200, 'local', 'oksigeniahechauka');
+    }
+
     return true;
 }

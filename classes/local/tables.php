@@ -44,6 +44,10 @@ class tables {
      * @return array|null {head, rows}, or null if it is neither a table nor a list
      */
     public static function parse(string $body): ?array {
+        // A sheet saved by Excel in Spanish comes in Windows-1252: its accents, not blank cells.
+        if (!mb_check_encoding($body, 'UTF-8')) {
+            $body = mb_convert_encoding($body, 'UTF-8', 'Windows-1252');
+        }
         $body = trim(preg_replace('/^\xEF\xBB\xBF/', '', $body));
         if ($body === '' || stripos($body, '<html') !== false || stripos($body, '<!doctype') !== false) {
             return null;

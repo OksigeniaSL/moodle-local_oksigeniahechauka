@@ -158,7 +158,9 @@ class agendas {
             $end = (int) $r->timeend;
             // An all-day event ends at the midnight after its last day: its last day is the one before.
             $last = $end > 0 ? ($r->allday ? $end - 60 : $end) : $start;
-            $event = ['id' => 'c' . $r->id, 'type' => 'event', 'zone' => 'side', 'title' => $r->title,
+            // The same event keeps its id from one reading to the next: the screens do not take everything again.
+            $id = 'c' . substr(sha1($r->itemid . '|' . $r->uid . '|' . $r->timestart . '|' . $r->title), 0, 12);
+            $event = ['id' => $id, 'type' => 'event', 'zone' => 'side', 'title' => $r->title,
                 'start' => schedule::stamp($start),
                 'when' => ['from' => schedule::day($start), 'until' => schedule::day($last)]];
             if ($color) {

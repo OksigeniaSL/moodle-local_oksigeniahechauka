@@ -119,6 +119,7 @@
         <FIELD NAME="screenkey" TYPE="char" LENGTH="64" NOTNULL="false" SEQUENCE="false" COMMENT="The new key, until the screen picks it up"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="timeexpires" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="fromhash" TYPE="char" LENGTH="64" NOTNULL="false" SEQUENCE="false" COMMENT="A hash of the address that asked for the code: how many new codes one place asks for"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

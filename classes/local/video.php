@@ -159,12 +159,15 @@ class video {
             self::finish($itemid, $source, ['videostate' => 'failed']);
             return 'failed';
         }
-        [, $log] = self::run([$ffmpeg, '-hide_banner', '-nostdin', '-i', $out], 60);
+        [, $log] = self::run(array_merge([$ffmpeg, '-hide_banner', '-nostdin'], self::only_files(), ['-i', $out]), 60);
         $info = self::parse_info($log);
         $poster = $dir . '/poster.jpg';
         $at = $info['duration'] > 2 ? 1.0 : $info['duration'] / 2;
-        self::run([$ffmpeg, '-hide_banner', '-nostdin', '-y', '-ss', sprintf('%.2f', $at), '-i', $out,
-            '-frames:v', '1', '-q:v', '3', $poster], 60);
+        self::run(array_merge(
+            [$ffmpeg, '-hide_banner', '-nostdin', '-y', '-ss', sprintf('%.2f', $at)],
+            self::only_files(),
+            ['-i', $out, '-frames:v', '1', '-q:v', '3', $poster]
+        ), 60);
         $backdrop = $dir . '/backdrop.jpg';
         if (is_file($poster)) {
             self::run([$ffmpeg, '-hide_banner', '-nostdin', '-y', '-i', $poster,
@@ -213,12 +216,24 @@ class video {
     public static function convert_command(string $ffmpeg, string $in, string $out): array {
         $scale = "scale=w='if(gte(iw,ih),min(iw,1920),min(iw,1080))':h='if(gte(iw,ih),min(ih,1080),min(ih,1920))'"
             . ':force_original_aspect_ratio=decrease:force_divisible_by=2,setsar=1';
-        return [$ffmpeg, '-hide_banner', '-nostdin', '-y', '-threads', '2', '-i', $in, '-t', (string) self::MAX_SECONDS,
+        return array_merge([$ffmpeg, '-hide_banner', '-nostdin', '-y', '-threads', '2'], self::only_files(), ['-i', $in,
+            '-t', (string) self::MAX_SECONDS,
             '-map', '0:v:0', '-map', '0:a:0?', '-sn', '-dn', '-vf', $scale, '-fpsmax', '30',
             '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '23', '-maxrate', '6M', '-bufsize', '12M',
             '-profile:v', 'high', '-level:v', '4.1', '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-b:a', '128k', '-ac', '2',
             '-movflags', '+faststart',
-            '-threads', '2', $out];
+            '-threads', '2', $out]);
+    }
+
+    /**
+     * What ffmpeg may open: only local files of the usual video containers, whatever the file says it is. A playlist
+     * made to look like a video never has the server fetch anything.
+     *
+     * @return string[]
+     */
+    protected static function only_files(): array {
+        return ['-protocol_whitelist', 'file,pipe',
+            '-format_whitelist', 'mov,mp4,m4a,3gp,3g2,mj2,matroska,webm,avi,mpegts,mpeg,flv,asf,ogg'];
     }
 
     /**

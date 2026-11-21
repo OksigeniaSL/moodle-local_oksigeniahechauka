@@ -51,6 +51,9 @@ class instagram {
     /** @var int The biggest picture kept, in bytes. */
     const MOST = 8 * 1024 * 1024;
 
+    /** Seconds a reading may spend bringing pictures: the rest, the next hour. */
+    const FETCH_SECONDS = 60;
+
     /** @var string What is asked of each post. */
     const FIELDS = 'id,caption,media_type,media_url,thumbnail_url,timestamp,permalink,children{media_type,media_url,thumbnail_url}';
 
@@ -149,11 +152,16 @@ class instagram {
         $context = files::context();
         $keep = [];
         $list = [];
+        $started = time();
         foreach ($posts as $post) {
             $names = [];
             foreach ($post['pictures'] as $i => $url) {
                 $name = $post['id'] . '-' . $i . '.jpg';
                 if (!$fs->file_exists($context->id, files::COMPONENT, self::AREA, 0, '/', $name)) {
+                    // A slow server never holds the task of every five minutes for long: what is left comes in an hour.
+                    if (time() - $started > self::FETCH_SECONDS) {
+                        continue;
+                    }
                     $image = self::fetch($url);
                     if ($image === null || strlen($image) > self::MOST || !@getimagesizefromstring($image)) {
                         continue;
@@ -231,6 +239,8 @@ class instagram {
         global $CFG;
         require_once($CFG->libdir . '/filelib.php');
         $curl = new \curl(['ignoresecurity' => false]);
+        // Never more than it may take, while it comes: an answer that does not end does not fill the memory of the task.
+        shortener::cap($curl, self::MOST);
         $curl->setopt(['CURLOPT_TIMEOUT' => 20, 'CURLOPT_CONNECTTIMEOUT' => 8]);
         $curl->setHeader(['Authorization: Bearer ' . $token]);
         $body = $curl->get(self::GRAPH . $path, $params);
@@ -248,6 +258,8 @@ class instagram {
         global $CFG;
         require_once($CFG->libdir . '/filelib.php');
         $curl = new \curl(['ignoresecurity' => false]);
+        // Never more than it may take, while it comes: an answer that does not end does not fill the memory of the task.
+        shortener::cap($curl, self::MOST);
         $curl->setopt(['CURLOPT_TIMEOUT' => 30, 'CURLOPT_CONNECTTIMEOUT' => 8, 'CURLOPT_MAXREDIRS' => 3,
             'CURLOPT_FOLLOWLOCATION' => true]);
         $body = $curl->get($url);

@@ -98,6 +98,30 @@ class photoday {
     }
 
     /**
+     * The picture of a day, chosen once that day: a new batch in the collection does not change it half way.
+     *
+     * @param array $entries of the index
+     * @param string $date «YYYY-MM-DD»
+     * @return array|null
+     */
+    protected static function chosen(array $entries, string $date): ?array {
+        $c = 'local_oksigeniahechauka';
+        $kept = json_decode((string) get_config($c, 'photodaytoday'), true) ?: [];
+        if (($kept['date'] ?? '') === $date) {
+            foreach ($entries as $e) {
+                if (is_array($e) && self::file_of($e) === ($kept['file'] ?? null)) {
+                    return $e;
+                }
+            }
+        }
+        $entry = self::of_day($entries, self::themes(), $date, self::south());
+        if ($entry) {
+            set_config('photodaytoday', json_encode(['date' => $date, 'file' => self::file_of($entry)]), $c);
+        }
+        return $entry;
+    }
+
+    /**
      * The season of a date, as the index names them: winter is December to February in the north and June to August in
      * the south.
      *
@@ -162,7 +186,9 @@ class photoday {
         if (!get_config($c, 'sourcephotoday')) {
             return 'off';
         }
-        if ((int) get_config($c, 'photodaytried') > $now - self::EVERY) {
+        $tried = (int) get_config($c, 'photodaytried');
+        // A new day does not wait for the hour: its picture is on the device before the screens look for it.
+        if ($tried > $now - self::EVERY && schedule::day($tried) === schedule::day($now)) {
             return 'waiting';
         }
         set_config('photodaytried', $now, $c);
@@ -179,7 +205,7 @@ class photoday {
         $fs->delete_area_files($context->id, files::COMPONENT, self::AREA, self::INDEX_ITEM);
         $fs->create_file_from_string(['contextid' => $context->id, 'component' => files::COMPONENT, 'filearea' => self::AREA,
             'itemid' => self::INDEX_ITEM, 'filepath' => '/', 'filename' => self::INDEX], json_encode($entries));
-        $entry = self::of_day($entries, self::themes(), schedule::day($now), self::south());
+        $entry = self::chosen($entries, schedule::day($now));
         if (!$entry) {
             return 'none for the chosen themes';
         }
@@ -212,6 +238,8 @@ class photoday {
         global $CFG;
         require_once($CFG->libdir . '/filelib.php');
         $curl = new \curl(['ignoresecurity' => false]);
+        // Never more than it may take, while it comes: an answer that does not end does not fill the memory of the task.
+        shortener::cap($curl, self::MOST);
         $curl->setopt(['CURLOPT_TIMEOUT' => 20, 'CURLOPT_CONNECTTIMEOUT' => 8, 'CURLOPT_MAXREDIRS' => 2,
             'CURLOPT_FOLLOWLOCATION' => true]);
         $body = $curl->get($url);
@@ -241,7 +269,7 @@ class photoday {
         if (!is_array($index)) {
             return [];
         }
-        $entry = self::of_day($index, self::themes(), schedule::day($now), self::south());
+        $entry = self::chosen($index, schedule::day($now));
         if (!$entry) {
             return [];
         }

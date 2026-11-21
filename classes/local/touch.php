@@ -76,6 +76,9 @@ class touch {
     /** @var int The longest a visit of today lasts: longer, it is a window to choose a day in, not a visit yet. */
     const VISIT_MOST = 12 * HOURSECS;
 
+    /** @var bool Whether the last reading of the visits failed (Eguahe threw): nothing is taken out then. */
+    protected static $unread = false;
+
     /** @var int The biggest picture kept, in bytes. */
     const MOST = 8 * 1024 * 1024;
 
@@ -221,6 +224,7 @@ class touch {
      * @return array items of the contract
      */
     public static function visits(int $now): array {
+        self::$unread = false;
         if (!self::has_visits()) {
             return [];
         }
@@ -228,6 +232,7 @@ class touch {
             $list = \local_oksigeniaeguahe\api::visits_today(null, $now);
         } catch (\Throwable $e) {
             debugging('Hechauka: the visits of Eguahe could not be read: ' . $e->getMessage(), DEBUG_DEVELOPER);
+            self::$unread = true;
             return [];
         }
         $visits = self::visits_of($list, $now, function ($file) {
@@ -344,7 +349,12 @@ class touch {
      */
     public static function prune(int $now): int {
         $wanted = [];
-        foreach (self::visits($now) as $item) {
+        $today = self::visits($now);
+        // Eguahe failing for a moment is not a day without visits: their pictures stay.
+        if (self::$unread) {
+            return 0;
+        }
+        foreach ($today as $item) {
             foreach ($item['visits'] as $visit) {
                 foreach ($visit['hosts'] as $host) {
                     if (isset($host['img'])) {

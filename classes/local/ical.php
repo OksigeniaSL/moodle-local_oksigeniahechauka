@@ -313,7 +313,14 @@ class ical {
         }
         $out = [];
         $made = 0;
-        for ($i = 0; $made < self::MAX_OCCURRENCES; $i++) {
+        // Without a COUNT, a daily or weekly rule that began years ago starts near the days asked for: counting its
+        // occurrences from the first one would reach the most it may make before today.
+        $i = 0;
+        if (!$count && ($freq === 'DAILY' || $freq === 'WEEKLY') && $from > $start['t']) {
+            $span = ($freq === 'DAILY' ? DAYSECS : WEEKSECS) * $interval;
+            $i = max(0, intdiv($from - $start['t'], $span) - 1);
+        }
+        for (; $made < self::MAX_OCCURRENCES; $i++) {
             $period = clone $first;
             $period->modify('+' . ($i * $interval) . ' ' . $steps[$freq]);
             if ($freq === 'MONTHLY' && (int) $period->format('j') !== (int) $first->format('j')) {

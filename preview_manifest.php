@@ -26,6 +26,7 @@ define('AJAX_SCRIPT', true);
 
 require(__DIR__ . '/../../config.php');
 
+use local_oksigeniahechauka\local\access;
 use local_oksigeniahechauka\local\endpoint;
 use local_oksigeniahechauka\local\files;
 use local_oksigeniahechauka\local\manifest;
@@ -36,6 +37,11 @@ require_capability('local/oksigeniahechauka:view', $context);
 $PAGE->set_context($context);
 
 $screenid = optional_param('screen', 0, PARAM_INT);
+// Whoever publishes only in their groups looks at their screens, or at the general one.
+$seen = access::screens_seen();
+if ($screenid && $seen !== null && !in_array($screenid, $seen, true)) {
+    $screenid = 0;
+}
 $screen = $screenid ? $DB->get_record('local_oksigeniahechauka_screen', ['id' => $screenid], '*', MUST_EXIST) : (object) [
     'id' => 0,
     'name' => get_string('preview_general', 'local_oksigeniahechauka'),
@@ -45,6 +51,8 @@ $screen = $screenid ? $DB->get_record('local_oksigeniahechauka_screen', ['id' =>
     'lastinfo' => null,
 ];
 $m = manifest::build($screen, time());
+// And sees in it only what reaches them: nothing of the other groups', nor what is hidden.
+$m['items'] = access::seen_items($m['items'] ?? []);
 // The preview shows everything, whatever the power hours say, and never sounds: the panel can have several screens
 // open at once.
 unset($m['power']);

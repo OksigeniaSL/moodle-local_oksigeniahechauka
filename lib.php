@@ -38,13 +38,27 @@ function local_oksigeniahechauka_pluginfile($course, $cm, $context, $filearea, $
     if ($context->contextlevel != CONTEXT_SYSTEM) {
         return false;
     }
-    $areas = ['media', 'video', 'poster', 'backdrop', 'logo', 'logodark', 'shot', 'birthday', 'contactmap', 'day'];
+    global $DB;
+    $areas = ['media', 'video', 'poster', 'backdrop', 'logo', 'logodark', 'shot', 'birthday', 'contactmap', 'day', 'photoday',
+        'instagram', 'guide', 'visit', 'qr'];
     if (!in_array($filearea, $areas)) {
         return false;
     }
     require_login();
     require_capability('local/oksigeniahechauka:view', $context);
     $itemid = (int) array_shift($args);
+    // Whoever publishes only in their groups gets the files of what they may see, and the screenshots of their screens.
+    $seen = \local_oksigeniahechauka\local\access::screens_seen();
+    if (in_array($filearea, ['media', 'video', 'poster', 'backdrop'])) {
+        $item = $DB->get_record('local_oksigeniahechauka_item', ['id' => $itemid]);
+        if (!$item || !\local_oksigeniahechauka\local\access::may_see_item($item)) {
+            return false;
+        }
+    } else if ($filearea === 'shot' && $seen !== null && !in_array($itemid, $seen, true)) {
+        return false;
+    } else if ($filearea === 'visit' && $seen !== null) {
+        return false;
+    }
     $filename = array_pop($args);
     $filepath = $args ? '/' . implode('/', $args) . '/' : '/';
     $file = get_file_storage()->get_file(
@@ -56,6 +70,13 @@ function local_oksigeniahechauka_pluginfile($course, $cm, $context, $filearea, $
         $filename
     );
     if (!$file || $file->is_directory()) {
+        return false;
+    }
+    // The photos of the list of birthdays: whoever runs the screens, all of them; the rest, those the screens show these days.
+    if (
+        $filearea === 'birthday' && !\local_oksigeniahechauka\local\access::can('managescreens')
+            && !\local_oksigeniahechauka\local\birthdays::may_show($file)
+    ) {
         return false;
     }
     send_stored_file($file, 0, 0, $forcedownload, $options);

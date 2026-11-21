@@ -49,17 +49,43 @@ class check_screens extends \core\task\scheduled_task {
      * @return void
      */
     public function execute(): void {
-        $done = alerts::check(time());
-        report::sample(time());
-        screens::purge_pairings(time());
-        mtrace('Screens down: ' . $done['down'] . '; back: ' . $done['back']);
-        mtrace('Short address of the player: ' . playerlink::refresh(time()));
-        mtrace('Short links of the QR codes: ' . links::refresh(time()));
-        mtrace('The picture of the day: ' . \local_oksigeniahechauka\local\photoday::refresh(time()));
-        mtrace('Instagram: ' . \local_oksigeniahechauka\local\instagram::refresh(time()));
-        $gone = \local_oksigeniahechauka\local\touch::prune(time());
-        if ($gone) {
-            mtrace('Pictures of past visits taken out: ' . $gone);
+        // Each step on its own: one that fails (a service that answers in another way) never keeps the others from running,
+        // nor makes Moodle put off the whole task, the warnings of a screen down among them.
+        $steps = [
+            'Screens down' => function () {
+                $done = alerts::check(time());
+                return $done['down'] . '; back: ' . $done['back'];
+            },
+            'The report' => function () {
+                report::sample(time());
+                return 'sampled';
+            },
+            'Codes waiting' => function () {
+                screens::purge_pairings(time());
+                return 'purged';
+            },
+            'Short address of the player' => function () {
+                return playerlink::refresh(time());
+            },
+            'Short links of the QR codes' => function () {
+                return links::refresh(time());
+            },
+            'The picture of the day' => function () {
+                return \local_oksigeniahechauka\local\photoday::refresh(time());
+            },
+            'Instagram' => function () {
+                return \local_oksigeniahechauka\local\instagram::refresh(time());
+            },
+            'Pictures of past visits taken out' => function () {
+                return (string) \local_oksigeniahechauka\local\touch::prune(time());
+            },
+        ];
+        foreach ($steps as $name => $step) {
+            try {
+                mtrace($name . ': ' . $step());
+            } catch (\Throwable $e) {
+                mtrace($name . ': failed, ' . $e->getMessage());
+            }
         }
     }
 }
