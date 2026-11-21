@@ -1,5 +1,35 @@
 # Changelog
 
+## 0.33.0
+
+A thorough review of everything since 0.7.14, and what it found mended.
+
+- **The device never stays broken by its own update.** A version that does not start, or that breaks the guardian's own
+  turn, is put back by a rescue that is never replaced with it; a power cut half way is undone at the next boot; the ten
+  minutes a version has to show a sign of life go on across restarts and reboots; and no screen ever goes back to an
+  older signed version. The device's code changes the machine (reboots, sessions, services, the time zone) only on a
+  device.
+- **One source that fails no longer empties the screens**: what it gave last today is given again while it fails, the
+  rest goes on, and «Your work» says which one fails and since when. A screen whose content cannot be made says so in the
+  panel («Nothing new») and warns as a screen down does.
+- **Who publishes in one group sees only what reaches their screens**, also by another group of a screen of theirs: the
+  preview, the files and the birthday photos of the others' stay out.
+- **New screens can always be named**: each place keeps at most a few codes waiting, the oldest goes when too many wait,
+  nobody without an account makes the centre's shortener work, and «Get started» says when the site is behind a reverse
+  proxy Moodle does not know of.
+- **Cifra**: a pupil whose date cannot be read keeps their row and photo; a list short of a quarter of the centre takes
+  nothing, until the very same people have been missing for three days in a row.
+- **The player on Chromium 56** keeps its script and styles when the network is slow or the server fails; it reloads only
+  onto its own page; a slow file no longer keeps back the rest; each part of a second's turn goes on when another throws;
+  the screen by the canteen shows the menus every other slide.
+- **The birthday strip never cuts a slide**: one line on a landscape screen, aside from 8 m for the slides with a sheet of
+  their own, and a long name smaller for that person only, ending whole.
+- **A centre with hundreds of items and screens**: the panel's home, the birthdays page and the manifest read at once, a
+  building without network is one warning, and big answers go compressed.
+- Also: a daily repetition that began years ago is not lost, a sheet in Windows-1252 keeps its accents, the picture of the
+  day keeps to its themes and comes as soon as the day changes, ffmpeg opens only local video files, and downloads are
+  capped while they come.
+
 ## 0.32.0
 
 - **The ducks in the rain**, a Surprise that comes only while it really rains where the centre is, as the rain: mother
