@@ -4,7 +4,7 @@
 *.log
 *.swp
 *.bak
-node_modules/
+node_modules
 dist/
 # The demo videos are generated (player/demo/make-videos.sh): too heavy for git.
 player/demo/media/clip-*
