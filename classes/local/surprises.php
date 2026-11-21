@@ -39,7 +39,7 @@ class surprises {
     const SEASONAL = ['nieve'];
 
     /** @var string[] Who comes only while it really rains where the centre is, and only if it asks for them. */
-    const WHEN_RAINING = ['lluvia'];
+    const WHEN_RAINING = ['lluvia', 'patoslluvia'];
 
     /** @var int[] The days of each month, leap year included: the same dates are for every year. */
     const DAYS = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];

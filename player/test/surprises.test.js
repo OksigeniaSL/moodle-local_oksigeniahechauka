@@ -574,7 +574,7 @@ test('the bat comes down from out of sight, stops with its feet on the top edge,
 });
 
 test('the chameleon and the ducks walk in, play their own steps after the gesture once each and go round the last until out', () => {
-    for (const id of ['camaleon', 'patos']) {
+    for (const id of ['camaleon', 'patos', 'patoslluvia']) {
         const one = atlasOf(id);
         const meta = one.meta;
         const gesture = meta.gestos[0];
@@ -595,23 +595,25 @@ test('the chameleon and the ducks walk in, play their own steps after the gestur
         [['cruza', 2], ['para', 1], ['gesto.susto', 1], ['huye', 0]]);
 });
 
-test('the mother duck stops where her ducklings come in from out of sight, on any screen, from either side', () => {
-    const meta = atlasOf('patos').meta;
-    const dx = (state) => meta.estados[state].avance.reduce((total, step) => total + step[0], 0);
-    for (const [width, height] of [[1920, 1080], [1080, 1920], [1366, 768]]) {
-        for (const distance of [3, 5, 8]) {
-            const scale = scaleOf(width, height, distance);
-            for (const r of [0.2, 0.8]) {
-                const w = walkOf(meta, width, scale, at(r));
-                const where = width + 'x' + height + ' at ' + distance + ' m, ' + r;
-                // Where `para` ends, from the edge it comes in by.
-                const begins = w.dir > 0 ? w.from + w.turns * dx('cruza') * scale : width - (w.from - w.turns * dx('cruza') * scale);
-                const ends = begins + dx('para') * scale;
-                assert.ok(Math.abs(ends - Math.min(meta.parada.atras * scale, width - meta.parada.delante * scale)) < 1e-6, where);
-                // The back of the cell on that edge or past it; all of it out of sight when it starts.
-                assert.ok(ends - meta.anchor.x * scale <= 1e-6, where);
-                const front = w.dir > 0 ? w.from + (meta.cell.w - meta.anchor.x) * scale : width - (w.from - (meta.cell.w - meta.anchor.x) * scale);
-                assert.ok(front <= 1e-6, where + ': starts in sight ' + front);
+test('the mother duck stops where her ducklings come in from out of sight, on any screen, from either side, also in the rain', () => {
+    for (const id of ['patos', 'patoslluvia']) {
+        const meta = atlasOf(id).meta;
+        const dx = (state) => meta.estados[state].avance.reduce((total, step) => total + step[0], 0);
+        for (const [width, height] of [[1920, 1080], [1080, 1920], [1366, 768]]) {
+            for (const distance of [3, 5, 8]) {
+                const scale = scaleOf(width, height, distance);
+                for (const r of [0.2, 0.8]) {
+                    const w = walkOf(meta, width, scale, at(r));
+                    const where = width + 'x' + height + ' at ' + distance + ' m, ' + r;
+                    // Where `para` ends, from the edge it comes in by.
+                    const begins = w.dir > 0 ? w.from + w.turns * dx('cruza') * scale : width - (w.from - w.turns * dx('cruza') * scale);
+                    const ends = begins + dx('para') * scale;
+                    assert.ok(Math.abs(ends - Math.min(meta.parada.atras * scale, width - meta.parada.delante * scale)) < 1e-6, where);
+                    // The back of the cell on that edge or past it; all of it out of sight when it starts.
+                    assert.ok(ends - meta.anchor.x * scale <= 1e-6, where);
+                    const front = w.dir > 0 ? w.from + (meta.cell.w - meta.anchor.x) * scale : width - (w.from - (meta.cell.w - meta.anchor.x) * scale);
+                    assert.ok(front <= 1e-6, where + ': starts in sight ' + front);
+                }
             }
         }
     }

@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.32.0
+
+- **The ducks in the rain**, a Surprise that comes only while it really rains where the centre is, as the rain: mother
+  duck crosses under her umbrella while her ducklings jump in the puddles; she turns to scold them, a drop falls on her
+  beak and she remembers she is a duck, closes the umbrella and they all go off getting wet. A centre that asked for the
+  rain gets them too.
+
 ## 0.31.0
 
 - **The chameleon**, a new Surprise that walks in green, stops and gets the hiccups: with each one it turns yellow, pink

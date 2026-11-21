@@ -399,5 +399,15 @@ function xmldb_local_oksigeniahechauka_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026112100, 'local', 'oksigeniahechauka');
     }
 
+    if ($oldversion < 2026112101) {
+        // The ducks in the rain come only while it rains, as the rain: a centre that asked for the rain gets them too.
+        $who = get_config('local_oksigeniahechauka', 'surprisewho');
+        if ($who !== false && in_array('lluvia', explode(',', (string) $who))) {
+            $all = array_unique(array_merge(explode(',', (string) $who), ['patoslluvia']));
+            set_config('surprisewho', implode(',', $all), 'local_oksigeniahechauka');
+        }
+        upgrade_plugin_savepoint(true, 2026112101, 'local', 'oksigeniahechauka');
+    }
+
     return true;
 }
