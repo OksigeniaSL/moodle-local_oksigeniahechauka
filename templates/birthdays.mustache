@@ -167,6 +167,7 @@
                 timer = setTimeout(function() {
                     said.hidden = true;
                 }, 2500);
+                return answer;
             }).catch(function() {
                 button.hidden = false;
             });
@@ -177,8 +178,13 @@
         input.addEventListener('change', function() {
             var way = input.closest('.hkp-bd-way');
             var n = input.files ? input.files.length : 0;
-            way.querySelector('.hkp-bd-chosen').textContent = n > 1 ? input.getAttribute('data-many').replace('%d', n) :
-                (n ? input.files[0].name : '');
+            var text = '';
+            if (n > 1) {
+                text = input.getAttribute('data-many').replace('%d', n);
+            } else if (n) {
+                text = input.files[0].name;
+            }
+            way.querySelector('.hkp-bd-chosen').textContent = text;
             way.querySelector('[data-bd-when-chosen]').hidden = !n;
         });
     });
