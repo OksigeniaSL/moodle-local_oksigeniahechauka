@@ -4,6 +4,8 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {bindShort, channelShow, channelWords, flightPath, membersWords, qrAddress, trailOf, FLIGHT} from '../src/canal.js';
+import {ENTRANCE_AT, gestureOf, LEVELS, lifeOf, objectOf, OBJECTS, WORLD_OPACITY, WORLDS, worldOf} from '../src/canal-redes.js';
+import {NETWORKS} from '../src/redes.js';
 
 const ITEM = {id: 'channel', type: 'channel', zone: 'extra', network: 'telegram', title: 'Síguenos en Telegram',
     text: 'Avisos, fotos y novedades en tu móvil', name: 'Centro de ejemplo · Avisos', members: 312,
@@ -131,8 +133,97 @@ test('the channel\'s parts are in within two seconds at every level, the card la
         const card = t.filter((x) => CANAL[x.rule][0] === '.hk-canal-tarjeta')[0];
         assert.ok(card, 'the card has its way in');
         assert.equal(card.at, Math.max.apply(null, t.map((x) => x.at)), 'the card comes last');
-        // «mensaje» moves in 0.7 s.
+        // It fades in (under 0.7 s) while its object does its gesture.
         assert.ok(card.at + 0.7 < 2, level + ': the card settles at ' + (card.at + 0.7));
+        assert.equal(ENTRANCE_AT[level], card.at, level + ': the object\'s gesture starts as its card comes in');
+    }
+});
+
+// --- Each network its object and its world (22 November 2026) ---------------------------------------------------------
+
+test('every network has its own object, and every object its world; one not known is the message that arrives', () => {
+    const seen = {};
+    for (const n of NETWORKS) {
+        const o = objectOf(n);
+        assert.ok(o, n);
+        assert.ok(WORLDS[o], o + ' has a world');
+        if (n !== 'other') {
+            assert.equal(seen[o], undefined, n + ' and ' + seen[o] + ' share ' + o);
+            seen[o] = n;
+        }
+    }
+    assert.equal(objectOf('myspace'), 'mensaje');
+    assert.equal(objectOf('telegram'), 'hoja', 'the paper plane stays with Telegram');
+});
+
+const MOVES = ['offset', 'transform', 'opacity'];
+const covers = ['revela', 'escribe', 'cubre', 'dorso', 'raya', 'nieve', 'cursor', 'clic', 'carga'];
+const rest = (t) => !t || /^(translate3d\(0rem,0rem,0\) rotate\(0deg\) scale\(1\)( scale\(1,1\))?|perspective\(160rem\) rotateY\(0deg\))$/.test(t);
+
+test('a gesture moves only transform and opacity; its object ends at rest, and nothing is left over its code', () => {
+    for (const name of new Set(Object.values(OBJECTS))) {
+        for (const level of Object.keys(LEVELS)) {
+            const list = gestureOf(name, LEVELS[level].k);
+            const own = list.filter((g) => g.p === 'objeto');
+            assert.equal(own.length, 1, name + ' moves its object once');
+            const last = own[0].frames[own[0].frames.length - 1];
+            assert.ok(rest(last.transform) && last.opacity === 1, name + ' ends at rest: ' + last.transform);
+            for (const g of list) {
+                assert.equal(g.frames[0].offset, 0, name + ' ' + g.p);
+                assert.equal(g.frames[g.frames.length - 1].offset, 1, name + ' ' + g.p);
+                for (const f of g.frames) {
+                    for (const k of Object.keys(f)) {
+                        assert.ok(MOVES.indexOf(k) !== -1, name + ' ' + g.p + ' moves ' + k);
+                    }
+                }
+                const end = g.frames[g.frames.length - 1];
+                if (covers.indexOf(g.p) !== -1) {
+                    assert.equal(end.opacity, 0, name + ': ' + g.p + ' is gone at the end');
+                }
+                if (/^cierre/.test(g.p)) {
+                    assert.equal(end.transform, 'scale(1,0)', name + ': the screen is open at the end');
+                }
+                // Shown within the first seconds of the slide: the code is read from then on.
+                assert.ok(ENTRANCE_AT[level] + (g.delay + g.duration * (g.iterations || 1)) * LEVELS[level].pace < 4.5,
+                    name + ' ' + g.p + ' at ' + level + ' is over late');
+            }
+        }
+    }
+});
+
+test('what keeps moving is never the object, nor anything over its code', () => {
+    for (const name of new Set(Object.values(OBJECTS))) {
+        for (const l of lifeOf(name, 1)) {
+            assert.notEqual(l.p, 'objeto', name);
+            assert.equal(covers.indexOf(l.p), -1, name + ' ' + l.p);
+            for (const f of l.frames) {
+                for (const k of Object.keys(f)) {
+                    assert.ok(MOVES.indexOf(k) !== -1, name + ' ' + l.p + ' moves ' + k);
+                }
+            }
+        }
+    }
+});
+
+test('a world moves only transform and opacity, a few of its pieces, and stays the same each time it is drawn', () => {
+    for (const world of new Set(Object.values(WORLDS))) {
+        for (const [w, h] of [[180, 95], [100, 170]]) {
+            const pieces = worldOf(world, w, h);
+            assert.ok(pieces.length > 0, world);
+            const moving = pieces.filter((p) => p.life);
+            assert.ok(moving.length <= 26, world + ' moves ' + moving.length + ' pieces at ' + w + '×' + h);
+            for (const p of moving) {
+                assert.equal(p.life.frames[0].offset, 0);
+                for (const f of p.life.frames) {
+                    for (const k of Object.keys(f)) {
+                        assert.ok(MOVES.indexOf(k) !== -1, world + ' moves ' + k);
+                    }
+                    // Soft behind its object: what fades never comes out stronger than the world is.
+                    assert.ok(f.opacity === undefined || f.opacity <= WORLD_OPACITY, world + ' shows a piece at ' + f.opacity);
+                }
+            }
+            assert.deepEqual(worldOf(world, w, h), pieces, world + ' is drawn the same');
+        }
     }
 });
 
@@ -152,11 +243,13 @@ const NEWER = [
     [/getAnimations|\.finished\b|\.composite\b/, 'getAnimations, Animation.finished, composite (Chrome 84)'],
 ];
 
-test('no browser API newer than Chromium 56 in canal.js', () => {
-    const code = readFileSync(new URL('../src/canal.js', import.meta.url), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '')
-        .replace(/^\s*\/\/.*$/gm, '');
-    for (const [re, what] of NEWER) {
-        assert.equal(re.test(code), false, 'canal.js uses ' + what);
+test('no browser API newer than Chromium 56 in canal.js and canal-redes.js', () => {
+    for (const file of ['canal.js', 'canal-redes.js']) {
+        const code = readFileSync(new URL('../src/' + file, import.meta.url), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '')
+            .replace(/^\s*\/\/.*$/gm, '');
+        for (const [re, what] of NEWER) {
+            assert.equal(re.test(code), false, file + ' uses ' + what);
+        }
     }
 });
 

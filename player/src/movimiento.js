@@ -133,7 +133,7 @@ const PARTS = {
         ['.hk-canal-titular', 'sube', 1],
         ['.hk-canal-linea', 'sube', 2],
         ['.hk-canal-seguidores', 'sube', 3],
-        ['.hk-canal-tarjeta', 'mensaje', 4.5],
+        ['.hk-canal-tarjeta', 'fundido', 4.5],      // its object's gesture is its movement (canal-redes.js)
     ],
     // The two zones: the wide one first (the picture, or the place's card and its words), then the column as a block, its
     // band last; the column's carousel and its pictures' slow move are its life (zonas.js, zonas.css).
@@ -425,8 +425,8 @@ export function motion(c, comp, o) {
     const stops = [];
     const settled = last + 0.8;
     if (level !== 'sobria') {
-        // The channel's block too when its plane has no sky to fly (from 5 m, or on a small screen): then the sheen is its life.
-        each(c.querySelectorAll('.hk-lider[data-tipo="menu"], .hk-lider[data-tipo="aviso"], .hk-tipografica, .hk-canal-sin-cielo'),
+        // (The channel's block no longer: its network's world is its life, 22 November 2026.)
+        each(c.querySelectorAll('.hk-lider[data-tipo="menu"], .hk-lider[data-tipo="aviso"], .hk-tipografica'),
             function (b) {
                 addSheen(b, settled + 0.4);
             });

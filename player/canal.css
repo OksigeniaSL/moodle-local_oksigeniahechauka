@@ -5,15 +5,19 @@
  *     <section class="hk-canal" data-ajuste="0–3">
  *       <div class="hk-canal-cielo"><div class="hk-canal-estela"><i>…</i></div><div class="hk-canal-avion"><svg/></div></div>
  *       <div class="hk-canal-texto"><h2 class="hk-canal-titular"/><p class="hk-canal-linea"/><p class="hk-canal-seguidores"/></div>
+ *       <div class="hk-canal-mundo"><i>…</i></div><div class="hk-canal-velo"></div>   (the world, and the words' patch)
  *       <div class="hk-canal-lado">
+ *         <div class="hk-canal-objeto">(the object's pieces, i.hk-canal-p[data-p])
  *         <div class="hk-canal-tarjeta">
  *           <p class="hk-canal-nombre"><span class="hk-canal-red"><svg/></span><span class="hk-canal-cuenta"/></p>
  *           <div class="hk-qr">(render.js's qrBox)</div></div>
  *
- * A poster in the centre's main colour: the words on one side; on the other, the channel's last message, a white card with the
- * QR in black and the short address. The QR never on the colour: a phone reads it on white, in the light theme and in the dark
- * one. Nothing crosses the words or the card: the plane flies in its sky (canal.js measures it where nothing is read), clipped
- * to it. canal.js sets --hk-canal-qr when the card needs a smaller QR, and --hk-canal-tinta, the name's colour on white.
+ * Each network its own object and its own world (22 November 2026, canal-redes.js): on the skin's surface, the words on a clean
+ * patch (the veil) on one side; on the other, the network's object (data-objeto) holding a white card with the QR in black and
+ * the short address; behind them, softly, the network's world (.hk-canal-mundo), in the skin's colours. The QR never on a
+ * colour: a phone reads it on white, in the light theme and in the dark one, and nothing covers it once its object has come in.
+ * Telegram keeps its paper plane, in its sky (canal.js measures it where nothing is read), clipped to it. canal.js sets
+ * --hk-canal-qr when the card needs a smaller QR, and --hk-canal-tinta, the centre's colour deep enough on white.
  *
  * Chromium 56: flexbox only, margins instead of gap, no clamp, no aspect-ratio, no inset. */
 .hk-cuerpo[data-composicion="canal"] {
@@ -32,9 +36,9 @@
     overflow: hidden;
     padding: 4.4rem 4.4rem 4rem 7.2rem;
     border-radius: calc(2.8rem * var(--hk-esquina));
-    background-color: var(--hk-primario);
-    background-image: radial-gradient(circle at 14% 12%, rgba(255, 255, 255, .13), rgba(255, 255, 255, 0) 46%);
-    color: var(--hk-sobre-primario);
+    background-color: var(--hk-superficie);
+    box-shadow: inset 0 0 0 .2rem var(--hk-linea);
+    color: var(--hk-texto);
 }
 
 /* --- The words ---------------------------------------------------------------------------------------------------- */
@@ -68,17 +72,17 @@
 }
 .hk .hk-canal-linea {
     margin-top: 2.8rem;
+    color: var(--hk-texto-suave);
     font-size: var(--hk-t-entrada);
     font-weight: 700;
     line-height: 1.12;
-    opacity: .92;
 }
 .hk .hk-canal-seguidores {              /* how many follow it, after a dot of the accent, as a channel says it */
     margin-top: 2.4rem;
+    color: var(--hk-texto-suave);
     font-size: var(--hk-t-lista);
     font-weight: 700;
     line-height: 1.1;
-    opacity: .92;
 }
 .hk .hk-canal-seguidores::before {
     content: "";
@@ -92,7 +96,7 @@
 }
 .hk[data-cristal] .hk-canal-linea,
 .hk[data-cristal] .hk-canal-seguidores {
-    opacity: 1;
+    color: var(--hk-texto);
 }
 
 /* --- The card's column ----------------------------------------------------------------------------------------- */
@@ -116,8 +120,13 @@
 }
 
 /* --- The card: the last message, white in both themes, with the QR in black ------------------------------------------ */
+.hk .hk-canal-objeto {                    /* the object: its gesture moves it, its pieces hang from it */
+    position: relative;
+    flex: none;
+}
 .hk .hk-canal-tarjeta {
     position: relative;
+    z-index: 0;                           /* its pieces under the code (z-index -1) stay over its white */
     flex: none;
     padding: 3rem 3rem 2.6rem;
     border-radius: 3.2rem 3.2rem 3.2rem .8rem;
@@ -158,6 +167,7 @@
     height: 100%;
 }
 .hk .hk-canal .hk-qr {
+    position: relative;                   /* what covers the code until its object shows it */
     width: var(--hk-canal-qr);
     margin: 0;
     padding: 0;
@@ -226,16 +236,16 @@
     height: 100%;
     overflow: visible;
 }
-.hk-canal-ala {
-    fill: #fff;
+.hk-canal-ala {                           /* the plane in the centre's colours, on the surface */
+    fill: var(--hk-primario);
 }
 .hk-canal-ala-lejos {
-    fill: #fff;
-    opacity: .74;
+    fill: var(--hk-marca-1);
+    opacity: .7;
 }
 .hk-canal-quilla {
-    fill: #fff;
-    opacity: .5;
+    fill: var(--hk-texto);
+    opacity: .35;
 }
 .hk .hk-canal-estela i {                 /* a dot of its trail, in the accent */
     position: absolute;
@@ -308,4 +318,769 @@
 }
 .hk.hk-vertical .hk-canal .hk-qr-llamada {
     font-size: 3.6rem;
+}
+
+/* --- The world behind, and the words' patch (canal-redes.js draws its pieces in rem; canal.js places the veil) ----------- */
+.hk .hk-canal-mundo {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    pointer-events: none;
+}
+.hk .hk-canal-mundo > i {
+    position: absolute;
+    display: block;
+    opacity: .3;                           /* canal-redes.js's WORLD_OPACITY: soft behind the object */
+    -webkit-transform-origin: 50% 50%;
+    transform-origin: 50% 50%;
+}
+.hk .hk-canal-mundo b {
+    display: block;
+}
+.hk .hk-canal-mundo .hk-mt0 { background-color: var(--hk-marca-1); }
+.hk .hk-canal-mundo .hk-mt1 { background-color: var(--hk-marca-2); }
+.hk .hk-canal-mundo .hk-mt2 { background-color: var(--hk-acento); }
+.hk .hk-canal-mundo .hk-mt3 { background-color: var(--hk-marca-3); }
+.hk .hk-canal-mundo .hk-mt4 { background-color: var(--hk-marca-4); }
+.hk .hk-canal-velo {
+    position: absolute;
+    z-index: 0;
+    border-radius: 4rem;
+    background: var(--hk-superficie);
+    box-shadow: 0 0 4rem 3rem var(--hk-superficie);
+    pointer-events: none;
+}
+/* Instagram: a wall of photos */
+.hk .hk-canal-mundo[data-mundo="fotos"] > i {
+    border-radius: 1.8rem;
+}
+/* TikTok: reels going up, and the beat */
+.hk .hk-canal-mundo .hk-mreel {
+    border-radius: 2.6rem;
+}
+.hk .hk-canal-mundo .hk-mbarra {
+    border-radius: 1rem 1rem 0 0;
+    -webkit-transform-origin: 50% 100%;
+    transform-origin: 50% 100%;
+}
+/* YouTube: a film */
+.hk .hk-canal-mundo .hk-mpelicula {
+    display: -webkit-box;
+    display: flex;
+    padding: 4rem 0 0 1.5rem;
+    box-sizing: border-box;
+    background-color: var(--hk-texto);
+    background-image: linear-gradient(var(--hk-superficie), var(--hk-superficie)), linear-gradient(var(--hk-superficie), var(--hk-superficie));
+    -webkit-transform-origin: 0 50%;
+    transform-origin: 0 50%;
+}
+.hk .hk-canal-mundo .hk-mpelicula::before,
+.hk .hk-canal-mundo .hk-mpelicula::after {   /* its holes */
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 1.2rem;
+    height: 1.6rem;
+    background-image: repeating-linear-gradient(90deg, var(--hk-superficie) 0, var(--hk-superficie) 2.2rem, transparent 2.2rem, transparent 4.4rem);
+}
+.hk .hk-canal-mundo .hk-mpelicula::after {
+    top: auto;
+    bottom: 1.2rem;
+}
+.hk .hk-canal-mundo .hk-mpelicula b {
+    flex: none;
+    width: 28rem;
+    height: 18rem;
+    margin-right: 3rem;
+    border-radius: 1rem;
+}
+/* WhatsApp and any chat: its wallpaper and bubbles */
+.hk .hk-canal-mundo .hk-mpapel {
+    opacity: .5;
+    background-image: radial-gradient(var(--hk-linea) .35rem, transparent .4rem);
+    background-size: 4.6rem 4.6rem;
+}
+.hk .hk-canal-mundo .hk-mcharla {
+    opacity: 1;
+}
+.hk .hk-canal-mundo .hk-mcharla b {        /* a message: its bubble and its lines */
+    position: absolute;
+    height: 8rem;
+    padding: 2rem 2.4rem;
+    box-sizing: border-box;
+    border-radius: 3rem 3rem 3rem .8rem;
+    opacity: .32;
+}
+.hk .hk-canal-mundo .hk-mcharla b.hk-mmio {
+    border-radius: 3rem 3rem .8rem 3rem;
+}
+.hk .hk-canal-mundo .hk-mcharla b::after {
+    content: "";
+    display: block;
+    height: 1.4rem;
+    margin-top: .6rem;
+    border-radius: .7rem;
+    background: var(--hk-superficie);
+    opacity: .7;
+}
+/* Telegram and Bluesky: clouds, and the morning's sun */
+.hk .hk-canal-mundo .hk-mnube {
+    opacity: 1;
+    border-radius: 6rem;
+    background: var(--hk-linea);
+}
+.hk .hk-canal-mundo .hk-mnube::before,
+.hk .hk-canal-mundo .hk-mnube::after {
+    content: "";
+    position: absolute;
+    border-radius: 50%;
+    background: inherit;
+}
+.hk .hk-canal-mundo .hk-mnube::before {
+    left: 16%;
+    top: -55%;
+    width: 42%;
+    height: 120%;
+}
+.hk .hk-canal-mundo .hk-mnube::after {
+    left: 46%;
+    top: -35%;
+    width: 34%;
+    height: 100%;
+}
+.hk .hk-canal-mundo .hk-msol {
+    opacity: .45;
+    border-radius: 50%;
+    background: var(--hk-acento);
+}
+/* The web and LinkedIn: knots, boxes and their lines */
+.hk .hk-canal-mundo .hk-menlace {
+    opacity: .5;
+    border-radius: .25rem;
+    background: var(--hk-linea);
+    -webkit-transform-origin: 0 50%;
+    transform-origin: 0 50%;
+}
+.hk .hk-canal-mundo .hk-mnodo {
+    border-radius: 50%;
+}
+.hk .hk-canal-mundo .hk-mcaja {
+    border-radius: 1.4rem;
+}
+/* Facebook: a board of notes */
+.hk .hk-canal-mundo .hk-mnota {
+    border-radius: .4rem;
+}
+.hk .hk-canal-mundo .hk-mnota::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: .8rem;
+    width: 1.8rem;
+    height: 1.8rem;
+    margin-left: -.9rem;
+    border-radius: 50%;
+    background: var(--hk-texto);
+}
+/* X: rows of short sentences */
+.hk .hk-canal-mundo .hk-mfila b {
+    position: absolute;
+    top: 0;
+    height: 4rem;
+    border-radius: 2rem;
+}
+/* Threads: rows of stitches */
+.hk .hk-canal-mundo .hk-mpuntada {
+    background-image: repeating-linear-gradient(90deg, transparent 0, transparent 1.8rem, var(--hk-superficie) 1.8rem, var(--hk-superficie) 4rem);
+}
+
+/* --- The objects: the card dressed as each network's thing ---------------------------------------------------------- */
+.hk .hk-canal-p {                          /* a piece of an object: a plain box, placed by its object */
+    position: absolute;
+    display: block;
+}
+.hk .hk-canal-p svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+.hk .hk-canal:not([data-objeto="bocadillo"]):not([data-objeto="mensaje"]) .hk-canal-tarjeta::after {
+    display: none;                         /* only a chat's message has a tail */
+}
+.hk .hk-canal .hk-canal-tarjeta {
+    box-shadow: 0 1.2rem 3.2rem rgba(0, 0, 0, .2), 0 0 0 .2rem rgba(0, 0, 0, .05);
+}
+/* What covers the code until the gesture shows it: never there at rest (a still screen sees the code at once). */
+.hk .hk-qr > [data-p] {
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: var(--hk-canal-qr);
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Instagram: a polaroid hanging from its tape; the photo develops into the code; whose it is, written under it. */
+.hk [data-objeto="polaroid"] .hk-canal-objeto {
+    -webkit-transform-origin: 50% -2rem;
+    transform-origin: 50% -2rem;
+}
+.hk [data-objeto="polaroid"] .hk-canal-tarjeta {
+    display: -webkit-box;
+    display: flex;
+    -webkit-box-orient: vertical;
+    flex-direction: column;
+    padding: 3rem 3rem 3.4rem;
+    border-radius: .6rem;
+    background: #fffdf8;
+}
+.hk [data-objeto="polaroid"] .hk-canal-nombre {
+    -webkit-box-ordinal-group: 3;
+    order: 2;
+    margin: 2.6rem 0 0;
+    text-align: center;
+}
+.hk [data-p="cinta"] {
+    top: -2.6rem;
+    left: 50%;
+    z-index: 2;
+    width: 20rem;
+    height: 5.4rem;
+    margin-left: -10rem;
+    background: var(--hk-acento);
+    opacity: .8;
+    -webkit-transform: rotate(-3deg);
+    transform: rotate(-3deg);
+}
+.hk [data-p="revela"] {
+    background: var(--hk-primario);
+}
+.hk [data-p="revela"]::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--hk-acento);
+    opacity: .4;
+}
+
+/* TikTok: a phone, its notch, its buttons on the side (the heart, the sound, to share), notes that fly. */
+.hk [data-objeto="movil"] .hk-canal-objeto {
+    -webkit-transform-origin: 50% 100%;
+    transform-origin: 50% 100%;
+}
+.hk [data-objeto="movil"] .hk-canal-tarjeta {
+    padding: 2.6rem 2.4rem 1.6rem;           /* with its frame, no taller than the card was: the QR keeps its size */
+    border: 1.2rem solid #111418;
+    border-radius: 5.6rem;
+    box-shadow: 0 1.6rem 4rem rgba(0, 0, 0, .3), 0 0 0 .2rem rgba(255, 255, 255, .1);
+}
+.hk [data-p="muesca"] {
+    top: .5rem;
+    left: 50%;
+    width: 11rem;
+    height: 1.6rem;
+    margin-left: -5.5rem;
+    border-radius: .8rem;
+    background: #111418;
+}
+.hk [data-p="botones"] {
+    bottom: 8rem;
+    left: -4.8rem;
+    z-index: 2;
+    width: 8rem;
+}
+.hk [data-p="botones"] b {
+    display: block;
+    width: 8rem;
+    height: 8rem;
+    margin-top: 2rem;
+    padding: 2rem;
+    box-sizing: border-box;
+    border-radius: 50%;
+    background: var(--hk-marca-4);
+    box-shadow: 0 .6rem 1.4rem rgba(0, 0, 0, .25);
+    color: #fff;
+}
+.hk [data-p="botones"] b[data-b="1"] {
+    background: var(--hk-marca-2);
+}
+.hk [data-p="botones"] b[data-b="2"] {
+    background: var(--hk-acento);
+    color: var(--hk-sobre-acento);
+}
+.hk [data-p="botones"] svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    fill: currentColor;
+}
+.hk [data-p="nota1"],
+.hk [data-p="nota2"] {
+    top: 4rem;
+    left: -3rem;
+    width: 6rem;
+    height: 6rem;
+    color: var(--hk-marca-2);
+    opacity: 0;
+}
+.hk [data-p="nota2"] {
+    top: 10rem;
+    left: -6rem;
+    color: var(--hk-acento);
+}
+.hk [data-p="nota1"] svg,
+.hk [data-p="nota2"] svg {
+    fill: currentColor;
+}
+
+/* YouTube: a television in the centre's colour, its knobs and grille on the right, its antennae and its feet; it switches on. */
+.hk [data-objeto="tele"] .hk-canal-objeto {
+    -webkit-transform-origin: 50% 100%;
+    transform-origin: 50% 100%;
+}
+.hk [data-objeto="tele"] .hk-canal-tarjeta {
+    padding: 1.6rem 2.6rem 1.4rem;           /* with its frame, no taller than the card was: the QR keeps its size */
+    border: 1.3rem solid var(--hk-primario);
+    border-left-width: 2rem;
+    border-right-width: 9rem;
+    border-radius: 4.4rem;
+}
+.hk [data-p="perilla1"],
+.hk [data-p="perilla2"] {
+    top: 2.6rem;
+    right: -7.6rem;
+    width: 6.2rem;
+    height: 6.2rem;
+    border-radius: 50%;
+    background: var(--hk-acento);
+    box-shadow: inset 0 -.5rem 0 rgba(0, 0, 0, .18);
+}
+.hk [data-p="perilla1"]::after {
+    content: "";
+    position: absolute;
+    top: .7rem;
+    left: 50%;
+    width: .8rem;
+    height: 2.6rem;
+    margin-left: -.4rem;
+    border-radius: .4rem;
+    background: var(--hk-sobre-acento);
+}
+.hk [data-p="perilla2"] {
+    top: 11rem;
+    right: -7rem;
+    width: 5rem;
+    height: 5rem;
+    background: var(--hk-superficie);
+}
+.hk [data-p="rejilla"] {
+    right: -7.2rem;
+    bottom: 3rem;
+    width: 5.2rem;
+    height: 11rem;
+    background-image: repeating-linear-gradient(0deg, rgba(0, 0, 0, .28) 0, rgba(0, 0, 0, .28) .7rem, transparent .7rem, transparent 1.8rem);
+}
+.hk [data-p="antena1"],
+.hk [data-p="antena2"] {                   /* short where the block leaves little above it (wide), long when it is tall */
+    top: -5.2rem;
+    left: 50%;
+    width: .9rem;
+    height: 6rem;
+    margin-left: -.45rem;
+    border-radius: .45rem;
+    background: var(--hk-texto);
+    -webkit-transform-origin: 50% 100%;
+    transform-origin: 50% 100%;
+    -webkit-transform: rotate(-28deg);
+    transform: rotate(-28deg);
+}
+.hk [data-p="antena2"] {
+    -webkit-transform: rotate(28deg);
+    transform: rotate(28deg);
+}
+.hk.hk-vertical [data-p="antena1"],
+.hk.hk-vertical [data-p="antena2"] {
+    top: -11rem;
+    height: 12rem;
+}
+.hk [data-p="antena1"]::before,
+.hk [data-p="antena2"]::before {
+    content: "";
+    position: absolute;
+    top: -1.1rem;
+    left: -.85rem;
+    width: 2.6rem;
+    height: 2.6rem;
+    border-radius: 50%;
+    background: var(--hk-acento);
+}
+.hk [data-p="pata1"],
+.hk [data-p="pata2"] {
+    bottom: -2.4rem;
+    left: 8rem;
+    width: 5.4rem;
+    height: 3rem;
+    border-radius: 0 0 1.4rem 1.4rem;
+    background: var(--hk-texto);
+    opacity: .75;
+}
+.hk [data-p="pata2"] {
+    left: auto;
+    right: 16rem;
+}
+.hk [data-p="cierre1"],
+.hk [data-p="cierre2"] {                   /* the dark of the screen before it switches on, in two halves */
+    top: 0;
+    left: 0;
+    z-index: 2;
+    width: 100%;
+    height: 50%;
+    background: #0b0f12;
+    -webkit-transform: scale(1, 0);
+    transform: scale(1, 0);
+    -webkit-transform-origin: 50% 0;
+    transform-origin: 50% 0;
+}
+.hk [data-p="cierre2"] {
+    top: 50%;
+    -webkit-transform-origin: 50% 100%;
+    transform-origin: 50% 100%;
+}
+.hk [data-p="raya"] {
+    top: 50%;
+    left: 0;
+    z-index: 3;
+    width: 100%;
+    height: .6rem;
+    margin-top: -.3rem;
+    background: #fff;
+    box-shadow: 0 0 2rem .4rem #fff;
+    opacity: 0;
+}
+.hk [data-p="nieve"] {
+    top: 0;
+    left: 0;
+    z-index: 2;
+    width: 100%;
+    height: 100%;
+    background-image: repeating-linear-gradient(0deg, rgba(0, 0, 0, .3) 0, rgba(0, 0, 0, .3) .3rem, rgba(255, 255, 255, .15) .3rem, rgba(255, 255, 255, .15) .7rem, rgba(0, 0, 0, .2) .7rem, rgba(0, 0, 0, .2) .9rem);
+    opacity: 0;
+}
+
+/* WhatsApp: the message that arrives (as before), «writing…» over the code a moment, and its ticks. */
+.hk [data-objeto="bocadillo"] .hk-canal-objeto,
+.hk [data-objeto="mensaje"] .hk-canal-objeto {
+    -webkit-transform-origin: 0 100%;
+    transform-origin: 0 100%;
+}
+.hk [data-p="vistos"],
+.hk [data-p="leidos"] {
+    right: 2.8rem;
+    bottom: .9rem;
+    width: 4.4rem;
+    height: 2.5rem;
+    color: #9aa3a0;
+}
+.hk [data-p="leidos"] {
+    color: var(--hk-canal-tinta, #16191d);
+}
+.hk [data-p="escribe"] {
+    display: -webkit-box;
+    display: flex;
+    -webkit-box-align: center;
+    align-items: center;
+    -webkit-box-pack: center;
+    justify-content: center;
+    background: #fff;
+}
+.hk [data-p="escribe"] b {
+    width: 3.6rem;
+    height: 3.6rem;
+    margin: 0 1rem;
+    border-radius: 50%;
+    background: #9aa3a0;
+}
+
+/* Telegram: the sheet the plane brings, with its folds. */
+.hk [data-objeto="hoja"] .hk-canal-tarjeta {
+    border-radius: .6rem;
+}
+.hk [data-p="pliegues"] {
+    top: 0;
+    left: 0;
+    z-index: -1;
+    width: 100%;
+    height: 100%;
+    background-image: linear-gradient(45deg, transparent 49.7%, rgba(0, 0, 0, .07) 50%, transparent 50.3%),
+        linear-gradient(-45deg, transparent 49.7%, rgba(0, 0, 0, .07) 50%, transparent 50.3%),
+        linear-gradient(90deg, transparent 49.8%, rgba(0, 0, 0, .05) 50%, transparent 50.2%);
+}
+
+/* The web: a browser's window; the sender's line is its address bar, with its three buttons and its loading line. */
+.hk [data-objeto="ventana"] .hk-canal-objeto {
+    -webkit-transform-origin: 0 100%;
+    transform-origin: 0 100%;
+}
+.hk [data-objeto="ventana"] .hk-canal-tarjeta {
+    padding-top: 0;
+    border-radius: 2.4rem;
+}
+.hk [data-objeto="ventana"] .hk-canal-nombre {
+    position: relative;
+    width: calc(var(--hk-canal-qr) + 6rem);  /* the bar the whole card wide (border-box) */
+    margin: 0 -3rem 2.2rem;
+    padding: 1.1rem 3rem 1.1rem 11.4rem;
+    border-radius: 2.4rem 2.4rem 0 0;
+    background: #eceae4;
+}
+.hk [data-objeto="ventana"] .hk-canal-red {
+    display: none;                         /* the window itself says it is the web */
+}
+.hk [data-p="botones-ventana"] {
+    top: 50%;
+    left: 3rem;
+    height: 2rem;
+    margin-top: -1rem;
+    white-space: nowrap;
+}
+.hk [data-p="botones-ventana"] b {
+    display: inline-block;
+    width: 2rem;
+    height: 2rem;
+    margin-right: .9rem;
+    border-radius: 50%;
+    background: var(--hk-marca-4);
+}
+.hk [data-p="botones-ventana"] b + b {
+    background: var(--hk-acento);
+}
+.hk [data-p="botones-ventana"] b + b + b {
+    background: var(--hk-marca-2);
+}
+.hk [data-p="carga"] {
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: .5rem;
+    background: var(--hk-acento);
+    opacity: 0;
+    -webkit-transform-origin: 0 50%;
+    transform-origin: 0 50%;
+}
+.hk [data-p="cubre"] {
+    background: #fff;
+}
+.hk [data-p="cursor"] {
+    top: 1.4rem;
+    right: 10rem;
+    z-index: 3;
+    width: 6rem;
+    height: 6rem;
+    opacity: 0;
+}
+.hk [data-p="clic"] {
+    top: -.6rem;
+    right: 11.4rem;
+    z-index: 2;
+    width: 7rem;
+    height: 7rem;
+    box-sizing: border-box;
+    border: .6rem solid var(--hk-acento);
+    border-radius: 50%;
+    opacity: 0;
+}
+
+/* Facebook: a note pinned to the board. */
+.hk [data-objeto="nota"] .hk-canal-objeto {
+    -webkit-transform-origin: 50% 0;
+    transform-origin: 50% 0;
+}
+.hk [data-objeto="nota"] .hk-canal-tarjeta {
+    border-radius: .4rem;
+    background: #fffef6;
+}
+.hk [data-p="chincheta"] {
+    top: -3rem;
+    left: 50%;
+    z-index: 2;
+    width: 6rem;
+    height: 6rem;
+    margin-left: -3rem;
+    border-radius: 50%;
+    background-color: var(--hk-marca-4);
+    background-image: radial-gradient(circle at 35% 30%, rgba(255, 255, 255, .55), rgba(255, 255, 255, 0) 45%);
+    box-shadow: 0 .7rem .9rem rgba(0, 0, 0, .3);
+}
+
+/* X: a comic balloon, its tail and three strokes that shout. */
+.hk [data-objeto="vineta"] .hk-canal-objeto {
+    -webkit-transform-origin: 0 100%;
+    transform-origin: 0 100%;
+}
+.hk [data-objeto="vineta"] .hk-canal-tarjeta {
+    border: .7rem solid #16191d;
+    border-radius: 5rem;
+    box-shadow: 1rem 1rem 0 rgba(0, 0, 0, .12);
+}
+.hk [data-p="cola"] {
+    bottom: -5rem;
+    left: 7rem;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 5.6rem 4.4rem 0 0;
+    border-color: #16191d transparent transparent transparent;
+}
+.hk [data-p="cola"]::after {
+    content: "";
+    position: absolute;
+    top: -6.4rem;
+    left: .9rem;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 3.8rem 2.9rem 0 0;
+    border-color: #fff transparent transparent transparent;
+}
+.hk [data-p="grito1"],
+.hk [data-p="grito2"],
+.hk [data-p="grito3"] {
+    top: -3.6rem;
+    right: 2rem;
+    width: 1.1rem;
+    height: 3.6rem;
+    border-radius: .6rem;
+    background: var(--hk-acento);
+    -webkit-transform: rotate(-40deg);
+    transform: rotate(-40deg);
+}
+.hk [data-p="grito2"] {
+    top: -4.2rem;
+    right: 6rem;
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+}
+.hk [data-p="grito3"] {
+    top: -3.6rem;
+    right: 10rem;
+    -webkit-transform: rotate(40deg);
+    transform: rotate(40deg);
+}
+
+/* LinkedIn: a business card with the centre's band; it turns over and shows its back in the centre's colour first. */
+.hk [data-objeto="tarjeta"] .hk-canal-tarjeta {
+    padding-top: 4.4rem;
+    border-radius: 1.6rem;
+}
+.hk [data-p="franja"] {
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 1.4rem;
+    border-radius: 1.6rem 1.6rem 0 0;
+    background: var(--hk-primario);
+}
+.hk [data-p="dorso"] {
+    top: 0;
+    left: 0;
+    z-index: 3;
+    width: 100%;
+    height: 100%;
+    border-radius: 1.6rem;
+    background-color: var(--hk-primario);
+    background-image: repeating-linear-gradient(45deg, rgba(255, 255, 255, .08) 0, rgba(255, 255, 255, .08) 1rem, transparent 1rem, transparent 3rem);
+    opacity: 0;
+}
+
+/* Threads: a stitched cloth that unrolls from its spool. */
+.hk [data-objeto="carrete"] .hk-canal-objeto {
+    -webkit-transform-origin: 50% 0;
+    transform-origin: 50% 0;
+}
+.hk [data-objeto="carrete"] .hk-canal-tarjeta {
+    border-radius: 3.4rem;
+}
+.hk [data-p="puntadas"] {
+    top: 1.2rem;
+    left: 1.2rem;
+    right: 1.2rem;
+    bottom: 1.2rem;
+    z-index: -1;
+    border: .4rem dashed var(--hk-canal-tinta, #16191d);
+    border-radius: 2.4rem;
+}
+.hk [data-p="bobina"] {
+    top: -3rem;
+    left: -5.6rem;
+    z-index: 2;
+    width: 7rem;
+    height: 9rem;
+}
+.hk [data-p="bobina"]::before,
+.hk [data-p="bobina"]::after {             /* its two ends */
+    content: "";
+    position: absolute;
+    left: 0;
+    width: 7rem;
+    height: 1.6rem;
+    border-radius: .8rem;
+    background: var(--hk-texto);
+}
+.hk [data-p="bobina"]::before {
+    top: 0;
+}
+.hk [data-p="bobina"]::after {
+    bottom: 0;
+}
+.hk [data-p="bobina"] b {                  /* the thread wound on it */
+    position: absolute;
+    top: 1.4rem;
+    left: 1rem;
+    width: 5rem;
+    height: 6.2rem;
+    background-color: var(--hk-marca-4);
+    background-image: repeating-linear-gradient(0deg, rgba(0, 0, 0, .15) 0, rgba(0, 0, 0, .15) .3rem, transparent .3rem, transparent .9rem);
+}
+
+/* Bluesky: a cloud, its card the body and three tops. */
+.hk [data-objeto="nube"] .hk-canal-tarjeta {
+    border-radius: 6rem;
+}
+.hk [data-p="bulto1"],
+.hk [data-p="bulto2"],
+.hk [data-p="bulto3"] {                    /* low tops where the block is wide (room above the card is short), high when tall */
+    top: 22%;
+    left: -4.4rem;
+    z-index: -1;
+    width: 15rem;
+    height: 15rem;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 1.2rem 3.2rem rgba(0, 0, 0, .2), 0 0 0 .2rem rgba(0, 0, 0, .05);   /* the card's own edge: white on a white surface */
+}
+.hk [data-p="bulto2"] {
+    top: -4.2rem;
+    left: 14%;
+    width: 22rem;
+    height: 22rem;
+}
+.hk [data-p="bulto3"] {
+    top: -3.6rem;
+    left: 56%;
+    width: 16rem;
+    height: 16rem;
+}
+.hk.hk-vertical [data-p="bulto2"] {
+    top: -8rem;
+}
+.hk.hk-vertical [data-p="bulto3"] {
+    top: -6rem;
 }

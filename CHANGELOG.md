@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.38.0
+
+- **«Follow us», each network its own.** The QR lives inside the network's object: a photo that develops (Instagram), a
+  phone that dances (TikTok), a television that switches on (YouTube), a bubble that is «typing…» (WhatsApp), the paper
+  plane that opens into a sheet (Telegram), a browser window (the web), and the rest; behind it, softly, the network's
+  world moving. In the centre's colours, light and dark, upright and from afar; the QR as big as before, with the
+  shortener's own when there is one.
+- A box of «Our networks» takes a short address of the centre's own shortener, as it is: a WhatsApp channel as
+  «nur.click/whatsapp».
+
 ## 0.37.0
 
 - **Every Instagram account the key reaches**, not only the centre's: its club, its gallery, a camp it goes to… In «Your

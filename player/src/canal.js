@@ -8,16 +8,26 @@
 // (redes.js): from metres away, which app the QR opens, and that this turn is another network than the last one. The headline
 // still says it in words; the poster, the plane and the QR stay as the art direction drew them.
 //
-// The player builds it in makeLayer (buildChannel), fits it in adjustLayer (fitChannel) and gives it its life in startMoving
-// (startChannel; leave() stops it through c.hkStop). Its entrance is movimiento.js's (PARTS.canal, and the way «mensaje»).
+// Each network its own object and its own world (22 November 2026: of three ways, the art direction's way A, with way B's world
+// behind it; canal-redes.js). The card is no longer a message on a poster of the main colour: on the skin's surface, the
+// network's object holds the QR (a polaroid for Instagram, a phone for TikTok, a television for YouTube, a chat bubble for
+// WhatsApp, a sheet that unfolds for Telegram, whose paper plane still crosses its sky, a browser's window for the web…), comes
+// in with its gesture and keeps still to be read; behind it, softly, the network's world goes on, in the skin's colours. The
+// words stay on a clean patch of the surface (the veil), so that nothing of the world crosses them.
 //
-// Chromium 56: element.animate (Web Animations, Chrome 36) for the plane and its dots, transforms and opacity only, flexbox
-// without gap. Without element.animate, or on a screen that keeps still, the plane rests on its way with its dots behind it.
+// The player builds it in makeLayer (buildChannel), fits it in adjustLayer (fitChannel) and gives it its life in startMoving
+// (startChannel; leave() stops it through c.hkStop). Its entrance is movimiento.js's (PARTS.canal): the card fades in, and its
+// object's gesture is the movement.
+//
+// Chromium 56: element.animate (Web Animations, Chrome 36) for the gestures, the worlds, the plane and its dots, transforms and
+// opacity only, flexbox without gap. Without element.animate, or on a screen that keeps still, every object is at rest, its
+// world still, and the plane rests on its way with its dots behind it.
 
 import {even} from './balance.js';
 import {fitWord, linesOf} from './lead.js';
 import {onWhite} from './qr.js';
 import {glyphSvg, knownNetwork, NETWORK_NAMES} from './redes.js';
+import {dressObject, drawWorld, ENTRANCE_AT, gestureOf, LEVELS, lifeOf, objectOf, WORLDS} from './canal-redes.js';
 
 /** The plane's flight, in seconds: it waits for the entrance to end, crosses, and comes back while the slide stays. */
 export const FLIGHT = {wait: 2.2, cross: 11, every: 20};
@@ -155,13 +165,21 @@ export function buildChannel(c, item, o) {
     }
     const words = channelWords(item, o.s);
     const s = el('section', 'hk-canal');
-    // The sky: where the plane flies, placed by fitChannel where nothing is read.
-    const sky = el('div', 'hk-canal-cielo');
-    sky.appendChild(el('div', 'hk-canal-estela'));
-    const plane = el('div', 'hk-canal-avion');
-    plane.innerHTML = PLANE;
-    sky.appendChild(plane);
-    s.appendChild(sky);
+    const object = objectOf(item.network);
+    s.setAttribute('data-objeto', object);
+    // The network's world, behind everything (drawn by fitChannel once the block is measured), and the clean patch the words
+    // stand on.
+    s.appendChild(el('div', 'hk-canal-mundo'));
+    s.appendChild(el('div', 'hk-canal-velo'));
+    if (object === 'hoja') {
+        // Telegram's sky: where the plane flies, placed by fitChannel where nothing is read.
+        const sky = el('div', 'hk-canal-cielo');
+        sky.appendChild(el('div', 'hk-canal-estela'));
+        const plane = el('div', 'hk-canal-avion');
+        plane.innerHTML = PLANE;
+        sky.appendChild(plane);
+        s.appendChild(sky);
+    }
     const text = el('div', 'hk-canal-texto');
     text.appendChild(el('h2', 'hk-canal-titular', words.title));
     if (words.line) {
@@ -171,8 +189,9 @@ export function buildChannel(c, item, o) {
         text.appendChild(el('p', 'hk-canal-seguidores', words.members));
     }
     s.appendChild(text);
-    // The channel's last message: who writes it, and the code. A message that arrives, so its tail is on the left.
+    // The network's object: who writes, and the code, on its white card (a message that arrives, for a chat).
     const side = el('div', 'hk-canal-lado');
+    const holder = el('div', 'hk-canal-objeto');
     const card = el('div', 'hk-canal-tarjeta');
     // Who writes, as over a message: the network's glyph and the account («@centro.ejemplo»), the centre's own site by its
     // name («centro.example»), or the network's name alone.
@@ -188,14 +207,17 @@ export function buildChannel(c, item, o) {
         card.appendChild(name);
     }
     const qr = o.qr(qrAddress(item), item.webqr);
-    if (qr && qr.nodeType === 1) {
+    const code = qr && qr.nodeType === 1 ? qr : null;
+    if (code) {
         // A picture from the shortener brings its own white margin: the card gives it less of its own.
-        if (qr.querySelector('img')) {
-            qr.classList.add('hk-qr-imagen');
+        if (code.querySelector('img')) {
+            code.classList.add('hk-qr-imagen');
         }
-        card.appendChild(qr);
+        card.appendChild(code);
     }
-    side.appendChild(card);
+    holder.appendChild(card);
+    dressObject(holder, card, code, object);
+    side.appendChild(holder);
     s.appendChild(side);
     c.appendChild(s);
 }
@@ -260,7 +282,8 @@ export function fitChannel(c, horizontal) {
     const qrBox = s.querySelector('.hk-qr');
     const most = horizontal ? 3 : 4;
     // The name over the QR in the centre's colour, as deep as the white card needs (a dark theme's light colour too).
-    s.style.setProperty('--hk-canal-tinta', onWhite(window.getComputedStyle(s).backgroundColor, 4.5, '#16191d'));
+    const main = window.getComputedStyle(s).getPropertyValue('--hk-primario').trim();
+    s.style.setProperty('--hk-canal-tinta', main ? onWhite(main, 4.5, '#16191d') : '#16191d');
     s.style.removeProperty('--hk-canal-qr');
     title.style.fontSize = '';
     const wanted = qrBox ? qrBox.offsetWidth : 0;
@@ -337,7 +360,10 @@ export function fitChannel(c, horizontal) {
         s.classList.add('hk-canal-sin-nombre');
     }
     s.hkQr = qrBox ? qrBox.offsetWidth : 0;
-    placeSky(s, horizontal);
+    if (s.querySelector('.hk-canal-cielo')) {
+        placeSky(s, horizontal);
+    }
+    placeWorld(s);
     // Measured again after its life had started (the letters arrived): the plane flies the new sky.
     if (c.hkChannelRestart) {
         c.hkChannelRestart();
@@ -359,6 +385,78 @@ function shownEdges(box, selector) {
     return {top, bottom};
 }
 
+// Where a node is in the block, by offsets: what the entrance or a gesture moves for a moment does not count.
+function placeIn(node, root) {
+    let x = 0;
+    let y = 0;
+    let e = node;
+    while (e && e !== root) {
+        x += e.offsetLeft;
+        y += e.offsetTop;
+        e = e.offsetParent;
+    }
+    return {x, y};
+}
+
+/**
+ * The network's world over the whole block, drawn for its size (again only when that changes), and the veil: the clean patch
+ * of the surface under the words, as wide as their lines are, with a soft edge, so that the world never crosses what is read.
+ *
+ * @param {HTMLElement} s the slide's block
+ */
+function placeWorld(s) {
+    const world = s.querySelector('.hk-canal-mundo');
+    const r = rem();
+    const w = Math.round(s.clientWidth / r);
+    const h = Math.round(s.clientHeight / r);
+    const key = s.getAttribute('data-objeto') + '/' + w + '/' + h;
+    if (world && world.hkKey !== key) {
+        world.hkKey = key;
+        drawWorld(world, WORLDS[s.getAttribute('data-objeto')] || 'charla', w, h);
+    }
+    const veil = s.querySelector('.hk-canal-velo');
+    const text = s.querySelector('.hk-canal-texto');
+    if (!veil || !text) {
+        return;
+    }
+    let left = null;
+    let top = null;
+    let right = null;
+    let bottom = null;
+    const range = document.createRange ? document.createRange() : null;
+    for (let i = 0; i < text.children.length; i++) {
+        const k = text.children[i];
+        if (!k.offsetHeight) {
+            continue;
+        }
+        const at = placeIn(k, s);
+        let wide = k.offsetWidth;
+        if (range) {
+            // As wide as its lines: the box of its text, measured from the line's own left.
+            range.selectNodeContents(k);
+            const lines = range.getBoundingClientRect();
+            const own = k.getBoundingClientRect();
+            if (lines.width > 0) {
+                wide = Math.min(k.offsetWidth, lines.right - own.left);
+            }
+        }
+        left = left === null ? at.x : Math.min(left, at.x);
+        top = top === null ? at.y : Math.min(top, at.y);
+        right = right === null ? at.x + wide : Math.max(right, at.x + wide);
+        bottom = bottom === null ? at.y + k.offsetHeight : Math.max(bottom, at.y + k.offsetHeight);
+    }
+    if (left === null) {
+        veil.style.display = 'none';
+        return;
+    }
+    const pad = 2 * r;
+    veil.style.display = '';
+    veil.style.left = Math.round(left - pad) + 'px';
+    veil.style.top = Math.round(top - pad) + 'px';
+    veil.style.width = Math.round(right - left + 2 * pad) + 'px';
+    veil.style.height = Math.round(bottom - top + 2 * pad) + 'px';
+}
+
 // The sky is the part of the block where nothing is read: on a wide screen, the corner above the words and left of the card (the
 // plane comes in by the left edge and leaves by the top one); on a tall one, the band between the words and the card, edge to
 // edge (it comes in by the left and leaves by the right). Too small a sky has no plane.
@@ -368,7 +466,9 @@ function placeSky(s, horizontal) {
     s.classList.remove('hk-canal-sin-cielo');
     const box = s.getBoundingClientRect();
     const words = shownEdges(s.querySelector('.hk-canal-texto'), '.hk-canal-texto > *');
-    const card = s.querySelector('.hk-canal-tarjeta').getBoundingClientRect();
+    // The card's place, not where its gesture has it this moment.
+    const at = placeIn(s.querySelector('.hk-canal-tarjeta'), s);
+    const card = {left: box.left + at.x, top: box.top + at.y};
     const air = 3 * rem();
     let r;
     if (horizontal) {
@@ -493,25 +593,96 @@ function moveTo(n, x, y, a) {
 }
 
 /**
- * The slide's life: the plane crosses its sky slowly once the entrance is over, leaving dots that fade behind it, and comes back
- * every FLIGHT.every seconds while the slide stays. On a still screen, or without Web Animations, the plane rests at two thirds
- * of its way with the dots it has left.
+ * The level of movement of the centre's skin (cumple.js's partyOf, read here so that canal.js needs no page to be tested).
+ *
+ * @returns {string} sobria, elegante or juguetona
+ */
+function levelNow() {
+    const html = document.documentElement;
+    const said = (html.getAttribute('data-fiesta') || window.getComputedStyle(html).getPropertyValue('--hk-fiesta') || '').trim();
+    return LEVELS[said] ? said : 'elegante';
+}
+
+// The node a gesture or a life moves: the object itself, one of its pieces, or a child of one («botones.1»).
+function partOf(s, p) {
+    if (p === 'objeto') {
+        return s.querySelector('.hk-canal-objeto');
+    }
+    const m = /^([a-z0-9-]+)\.(\d)$/.exec(p);
+    const host = s.querySelector('[data-p="' + (m ? m[1] : p) + '"]');
+    return m && host ? host.children[+m[2]] || null : host;
+}
+
+// Plays a list of gestures or lives from the card's way in; what is missing (a piece of a code that did not come) is skipped.
+function play(s, list, level, forever) {
+    const pace = LEVELS[level].pace;
+    const from = ENTRANCE_AT[level];
+    const out = [];
+    list.forEach(function (g) {
+        const n = partOf(s, g.p);
+        if (!n) {
+            return;
+        }
+        out.push(n.animate(g.frames, {duration: Math.round(g.duration * pace * 1000), delay: Math.round((from + g.delay * pace) * 1000),
+            easing: g.easing || 'ease-out', direction: g.direction || 'normal', iterations: forever ? Infinity : (g.iterations || 1),
+            fill: forever ? 'both' : 'backwards'}));
+    });
+    return out;
+}
+
+/**
+ * The slide's life. The object comes in with its gesture, once (fitting the slide again does not repeat it); then only what is
+ * off the code moves (a phone's buttons, a television's antennae) and the network's world goes on behind. Telegram's paper plane
+ * crosses its sky slowly once the entrance is over, leaving dots that fade behind it, and comes back every FLIGHT.every seconds.
+ * On a still screen, or without Web Animations, the object is at rest, its world still, and the plane rests at two thirds of its
+ * way with the dots it has left.
  *
  * @param {HTMLElement} c the layer, in the page and fitted
  * @param {object} o {still}
  * @returns {function} what stops it
  */
 export function startChannel(c, o) {
-    stopChannel(c);
+    stopLoops(c);
     const s = c.querySelector('.hk-canal');
-    const sky = s && s.hkSky;
     c.hkChannelRestart = function () {
         startChannel(c, o);
     };
-    if (!sky) {
-        return function () {
-            stopChannel(c);
-        };
+    const stop = function () {
+        stopChannel(c);
+    };
+    if (!s) {
+        return stop;
+    }
+    const moves = !(o && o.still) && typeof s.animate === 'function';
+    const running = [];
+    if (moves) {
+        const level = levelNow();
+        const name = s.getAttribute('data-objeto');
+        if (!c.hkChannelGesture) {
+            c.hkChannelGesture = play(s, gestureOf(name, LEVELS[level].k), level, false);
+        }
+        play(s, lifeOf(name, LEVELS[level].k), level, true).forEach(function (a) {
+            running.push(a);
+        });
+        const pieces = s.querySelectorAll('.hk-canal-mundo > *');
+        for (let i = 0; i < pieces.length; i++) {
+            const l = pieces[i].hkLife;
+            if (l) {
+                running.push(pieces[i].animate(l.frames, {duration: Math.round(l.duration * 1000), delay: Math.round(l.delay * 1000),
+                    easing: l.easing, direction: l.direction, iterations: Infinity, fill: 'both'}));
+            }
+        }
+    }
+    flyPlane(c, s, o, running);
+    c.hkChannelRun = running;
+    return stop;
+}
+
+// Telegram's paper plane, in its sky: its flight, or at rest on its way with its dots.
+function flyPlane(c, s, o, running) {
+    const sky = s.hkSky;
+    if (!sky || !s.querySelector('.hk-canal-avion')) {
+        return;
     }
     const plane = s.querySelector('.hk-canal-avion');
     const trail = s.querySelector('.hk-canal-estela');
@@ -535,9 +706,7 @@ export function startChannel(c, o) {
             n.style.opacity = dots[i].s < path[k].s - 0.05 ? '1' : '0';
         });
         s.classList.add('hk-canal-quieto');
-        return function () {
-            stopChannel(c);
-        };
+        return;
     }
     const every = FLIGHT.every;
     const share = FLIGHT.cross / every;
@@ -549,7 +718,7 @@ export function startChannel(c, o) {
     // Out of its sky until it comes back.
     frames.push({offset: 1, transform: frames[frames.length - 1].transform});
     const timing = {duration: every * 1000, delay: FLIGHT.wait * 1000, iterations: Infinity, easing: 'linear', fill: 'both'};
-    const running = [plane.animate(frames, timing)];
+    running.push(plane.animate(frames, timing));
     // Each dot shows as the plane's tail passes it, and fades a little after.
     let length = 0;
     for (let i = 1; i < path.length; i++) {
@@ -570,18 +739,25 @@ export function startChannel(c, o) {
             {offset: 1, opacity: 0},
         ], timing));
     });
-    c.hkChannelRun = running;
-    return function () {
-        stopChannel(c);
-    };
 }
 
-/** Stops the slide's life: render.js's leave() calls it through c.hkStop. */
-export function stopChannel(c) {
+// Stops what loops (the object's life, its world, the plane), not the gesture: fitting the slide again restarts them.
+function stopLoops(c) {
     if (c && c.hkChannelRun) {
         c.hkChannelRun.forEach(function (a) {
             a.cancel();
         });
         c.hkChannelRun = null;
+    }
+}
+
+/** Stops the slide's life, its gesture too: render.js's leave() calls it through c.hkStop. */
+export function stopChannel(c) {
+    stopLoops(c);
+    if (c && c.hkChannelGesture) {
+        c.hkChannelGesture.forEach(function (a) {
+            a.cancel();
+        });
+        c.hkChannelGesture = null;
     }
 }
