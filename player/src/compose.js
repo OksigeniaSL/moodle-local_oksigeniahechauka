@@ -334,12 +334,18 @@ export class Composer {
             this.sincePhotoday = 1;
             return pick('fotodia', [], 15, {item: o.photoday});
         }
-        // The centre's Instagram posts, one a turn: never right after a network, which would read as the same slide twice.
+        // The Instagram posts, one a turn: never right after a network, which would read as the same slide twice. With
+        // several accounts (the centre's, its club's…), the next account each turn, and in each its next post.
         this.sinceInstagram = (this.sinceInstagram === undefined ? INSTAGRAM_EVERY - 6 : this.sinceInstagram) + 1;
         if (o.instagram && this.sinceInstagram > INSTAGRAM_EVERY && this.last !== 'canal') {
             this.sinceInstagram = 1;
-            this.instagramPage = (this.instagramPage === undefined ? -1 : this.instagramPage) + 1;
-            return pick('instagram', [], 15, {item: o.instagram, page: this.instagramPage});
+            const accounts = o.instagrams && o.instagrams.length ? o.instagrams : [o.instagram];
+            this.instagramTurn = (this.instagramTurn === undefined ? -1 : this.instagramTurn) + 1;
+            const account = accounts[this.instagramTurn % accounts.length];
+            const key = account.id || account.name || '';
+            this.instagramPages = this.instagramPages || {};
+            this.instagramPages[key] = (this.instagramPages[key] === undefined ? -1 : this.instagramPages[key]) + 1;
+            return pick('instagram', [], 15, {item: account, page: this.instagramPages[key]});
         }
         // One network a turn, in the manifest's order. Instagram's turn is its posts' when they come: they carry its QR.
         const networks = (o.channels || (o.channel ? [o.channel] : [])).filter(function (it) {

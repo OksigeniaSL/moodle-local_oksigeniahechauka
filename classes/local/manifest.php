@@ -261,7 +261,10 @@ class manifest {
         $m += surprises::contract($screen, $config);
         $m['categories'] = categories::contract();
         $scope = screens::scope((int) $screen->id);
-        $m['items'] = self::unique(array_merge(self::own_items($screen, $now), self::source_items($config, $now, $scope)));
+        $m['items'] = self::unique(array_merge(
+            self::own_items($screen, $now),
+            self::source_items($config, $now, $scope, screens::groups_of((int) $screen->id))
+        ));
         // Today's visits, only for a screen people touch: the welcome is at the door, where visitors wait.
         if ($touch && !empty($config->sourcevisits ?? 1)) {
             $m['items'] = array_merge($m['items'], self::guarded('visits', function () use ($now) {
@@ -428,9 +431,10 @@ class manifest {
      * @param \stdClass $config
      * @param int $now
      * @param int[] $scope the course categories of the screen
+     * @param int[] $groups the groups of the screen
      * @return array items of the contract
      */
-    protected static function source_items(\stdClass $config, int $now, array $scope): array {
+    protected static function source_items(\stdClass $config, int $now, array $scope, array $groups = []): array {
         // Each one on its own: what one of them throws leaves the others, and the screen, as they were.
         $wanted = [
             'menus' => empty($config->sourcemenu) ? null : function () use ($config, $now) {
@@ -452,8 +456,8 @@ class manifest {
             'moments' => empty($config->sourcemoments) ? null : function () use ($now, $scope) {
                 return sources::moments($now, $scope);
             },
-            'instagram' => empty($config->sourceinstagram) ? null : function () {
-                return instagram::items();
+            'instagram' => empty($config->sourceinstagram) ? null : function () use ($groups, $now) {
+                return instagram::items($groups, $now);
             },
             'openacts' => empty($config->sourceopenacts) ? null : function () use ($now) {
                 return sources::open_acts($now);
@@ -473,7 +477,8 @@ class manifest {
         $items = [];
         foreach ($wanted as $source => $get) {
             if ($get) {
-                $variant = in_array($source, ['calendar', 'deadlines', 'books', 'moments']) ? implode(',', $scope) : '';
+                $variant = in_array($source, ['calendar', 'deadlines', 'books', 'moments']) ? implode(',', $scope) :
+                    ($source === 'instagram' ? implode(',', $groups) : '');
                 $items = array_merge($items, self::guarded($source, $get, [], $variant));
             }
         }

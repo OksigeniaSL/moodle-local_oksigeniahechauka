@@ -558,9 +558,8 @@ class Player {
             channels: extra.filter(function (it) {
                 return it.type === 'channel' && channelShow(it);
             }),
-            instagram: instagramReady(extra.filter(function (it) {
-                return it.type === 'instagram';
-            })[0], media),
+            instagram: this.instagramsOf(extra, media)[0] || null,
+            instagrams: this.instagramsOf(extra, media),
             openacts: openActsNow((m.items || []).filter(function (it) {
                 return it.type === 'openacts';
             })[0], now),
@@ -690,6 +689,22 @@ class Player {
     }
 
     /**
+     * Every Instagram account among the items, each with only the posts whose pictures are on the device; none that has
+     * nothing to show yet.
+     *
+     * @param {Object[]} items
+     * @param {Object|null} media
+     * @returns {Object[]}
+     */
+    instagramsOf(items, media) {
+        return items.filter(function (it) {
+            return it.type === 'instagram';
+        }).map(function (it) {
+            return instagramReady(it, media);
+        }).filter(Boolean);
+    }
+
+    /**
      * Whether the photos of the birthdays are on the device, or failed: the big celebration waits for them, ten minutes at
      * most from when the item is first seen, and then comes with the creature for what did not arrive.
      *
@@ -803,9 +818,9 @@ class Player {
                     return it.type === 'channel' && channelShow(it);
                 }),
                 // Only the pictures already on the device, as the picture of the day: never an empty frame after a start.
-                instagram: instagramReady(liveItems(m.items || [], 'extra', wall).filter(function (it) {
-                    return it.type === 'instagram';
-                })[0], media),
+                // Every account the screen shows, one a turn (the centre's, its club's…).
+                instagram: this.instagramsOf(liveItems(m.items || [], 'extra', wall), media)[0] || null,
+                instagrams: this.instagramsOf(liveItems(m.items || [], 'extra', wall), media),
                 tables: liveItems(m.items || [], 'extra', wall).filter(function (it) {
                     return it.type === 'table';
                 }),

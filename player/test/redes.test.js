@@ -140,6 +140,20 @@ test('Instagram: its own turn, never right after a network; Instagram\'s network
     assert.deepEqual(pages.slice(0, 3), [0, 1, 2]);
 });
 
+test('Instagram with several accounts: the next account each turn, and in each its next post', () => {
+    const club = Object.assign({}, IG, {id: 'instagram-902', name: '@club.ejemplo'});
+    const c = new Composer();
+    const seen = [];
+    for (let i = 0; i < 120; i++) {
+        const r = c.next(queue, 2, true, {instagram: IG, instagrams: [IG, club], distance: 3});
+        if (r.comp === 'instagram') {
+            seen.push(r.extra.item.name + ':' + r.extra.page);
+        }
+    }
+    assert.ok(seen.length >= 6, seen.join(' '));
+    assert.deepEqual(seen.slice(0, 4), [IG.name + ':0', '@club.ejemplo:0', IG.name + ':1', '@club.ejemplo:1']);
+});
+
 test('the panel\'s preview shows a network or the posts as the screens will', () => {
     assert.deepEqual(draftChoice(net('tiktok'), 'canal', [], true, 'info'), {comp: 'canal', items: [], seconds: 0, extra: {item: net('tiktok')}});
     assert.equal(draftChoice(IG, 'main', [], false, 'info').comp, 'instagram');

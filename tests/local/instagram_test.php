@@ -43,14 +43,15 @@ final class instagram_test extends \advanced_testcase {
      * @return array
      */
     protected function media(): array {
+        $day = fn($n) => gmdate('Y-m-d\TH:i:sO', time() - $n * DAYSECS);
         return [
-            ['id' => '11', 'media_type' => 'CAROUSEL_ALBUM', 'caption' => 'Una salida', 'timestamp' => '2026-11-12T11:00:00+0000',
+            ['id' => '11', 'media_type' => 'CAROUSEL_ALBUM', 'caption' => 'Una salida', 'timestamp' => $day(2),
                 'children' => ['data' => [
                     ['media_type' => 'IMAGE', 'media_url' => 'https://cdn.example.com/a.jpg'],
                     ['media_type' => 'VIDEO', 'media_url' => 'https://cdn.example.com/b.mp4',
                         'thumbnail_url' => 'https://cdn.example.com/b.jpg'],
                 ]]],
-            ['id' => '12', 'media_type' => 'VIDEO', 'caption' => 'Un reel', 'timestamp' => '2026-11-13T11:00:00+0000',
+            ['id' => '12', 'media_type' => 'VIDEO', 'caption' => 'Un reel', 'timestamp' => $day(1),
                 'thumbnail_url' => 'https://cdn.example.com/c.jpg'],
             ['id' => '13', 'media_type' => 'IMAGE', 'caption' => 'Una foto', 'media_url' => 'https://cdn.example.com/d.jpg'],
             ['id' => '14', 'media_type' => 'VIDEO', 'caption' => 'Sin portada'],
@@ -72,16 +73,109 @@ final class instagram_test extends \advanced_testcase {
     }
 
     /**
-     * The account named in «Our networks» among those of the key, else the first.
+     * Every account of the key, the one named in «Our networks» first; none twice, none without an Instagram.
      */
-    public function test_account_of(): void {
+    public function test_accounts_of(): void {
         $pages = [['id' => '1', 'name' => 'Sin Instagram'],
-            ['id' => '2', 'instagram_business_account' => ['id' => '901', 'username' => 'centro.uno']],
-            ['id' => '3', 'instagram_business_account' => ['id' => '902', 'username' => 'Centro.Dos']]];
-        $this->assertSame('902', instagram::account_of($pages, 'centro.dos')['id']);
-        $this->assertSame('901', instagram::account_of($pages, '')['id']);
-        $this->assertSame('901', instagram::account_of($pages, 'otro')['id']);
-        $this->assertNull(instagram::account_of([['id' => '1']], ''));
+            ['id' => '2', 'name' => 'Centro uno', 'instagram_business_account' => ['id' => '901', 'username' => 'centro.uno']],
+            ['id' => '3', 'name' => 'Club', 'instagram_business_account' => ['id' => '902', 'username' => 'Centro.Dos',
+                'media_count' => 7, 'profile_picture_url' => 'https://cdn.example.com/p.jpg']],
+            ['id' => '4', 'name' => 'Repetida', 'instagram_business_account' => ['id' => '902', 'username' => 'Centro.Dos']]];
+        $this->assertSame(['902', '901'], array_column(instagram::accounts_of($pages, 'centro.dos'), 'id'));
+        $this->assertSame(['901', '902'], array_column(instagram::accounts_of($pages, ''), 'id'));
+        $club = instagram::accounts_of($pages, 'otro')[1];
+        $this->assertSame(['Club', 7, 'https://cdn.example.com/p.jpg'], [$club['title'], $club['count'], $club['picture']]);
+        $this->assertSame([], instagram::accounts_of([['id' => '1']], ''));
+    }
+
+    /**
+     * What speaks of the centre: any of its words, without minding capitals or accents; a post still news, from the last
+     * 90 days or without a date; the words as a person writes them.
+     */
+    public function test_speaks_of_fresh_and_split(): void {
+        $this->assertTrue(instagram::speaks_of('Campamento de 6º Primaria del NURYANA', ['Nuryana']));
+        $this->assertTrue(instagram::speaks_of('Con @colegio.nuryana en la feria', ['Otro', '@colegio.nuryana']));
+        $this->assertTrue(instagram::speaks_of('La excursión a Güímar', ['guimar']));
+        $this->assertFalse(instagram::speaks_of('La terraza de las bicis', ['Nuryana']));
+        $this->assertFalse(instagram::speaks_of('Nuryana', [' ', '']));
+        $now = time();
+        $this->assertTrue(instagram::fresh(gmdate('Y-m-d\TH:i:sO', $now - 89 * DAYSECS), $now));
+        $this->assertFalse(instagram::fresh('2020-11-18T10:00:00+0000', $now));
+        $this->assertTrue(instagram::fresh('', $now));
+        $this->assertSame(['Nuryana', '#campa'], instagram::split(' Nuryana ,, #campa, nuryana '));
+    }
+
+    /**
+     * Several accounts: the centre's own shows all, another nothing until switched on; one shows only what speaks of the
+     * centre, and only on the screens of its groups; what is no longer news, never; a collaboration, once.
+     */
+    public function test_several_accounts(): void {
+        global $CFG, $DB;
+        require_once($CFG->libdir . '/filelib.php');
+        $this->resetAfterTest();
+        $c = 'local_oksigeniahechauka';
+        set_config('sourceinstagram', 1, $c);
+        set_config('instagramtoken', \core\encryption::encrypt('clave-de-ejemplo'), $c);
+        $day = fn($n) => gmdate('Y-m-d\TH:i:sO', time() - $n * DAYSECS);
+        $pages = ['data' => [
+            ['id' => '1', 'name' => 'Centro', 'instagram_business_account' => ['id' => '901', 'username' => 'centro.ejemplo']],
+            ['id' => '2', 'name' => 'Campamento', 'instagram_business_account' => ['id' => '902', 'username' => 'campa.ejemplo']],
+            ['id' => '3', 'name' => 'Galería', 'instagram_business_account' => ['id' => '903', 'username' => 'galeria.ejemplo']],
+        ]];
+        $own = ['data' => [
+            ['id' => '21', 'media_type' => 'IMAGE', 'caption' => 'Hoy', 'timestamp' => $day(1),
+                'media_url' => 'https://cdn.example.com/21.jpg'],
+            ['id' => '22', 'media_type' => 'IMAGE', 'caption' => 'Juntos', 'timestamp' => $day(2),
+                'media_url' => 'https://cdn.example.com/22.jpg'],
+        ]];
+        $camp = ['data' => [
+            ['id' => '22', 'media_type' => 'IMAGE', 'caption' => 'Juntos con el Centro', 'timestamp' => $day(2),
+                'media_url' => 'https://cdn.example.com/22.jpg'],
+            ['id' => '31', 'media_type' => 'IMAGE', 'caption' => 'La terraza', 'timestamp' => $day(3),
+                'media_url' => 'https://cdn.example.com/31.jpg'],
+            ['id' => '32', 'media_type' => 'IMAGE', 'caption' => 'Los de 4.º del CENTRO', 'timestamp' => $day(4),
+                'media_url' => 'https://cdn.example.com/32.jpg'],
+            ['id' => '33', 'media_type' => 'IMAGE', 'caption' => 'Centro, hace años', 'timestamp' => $day(400),
+                'media_url' => 'https://cdn.example.com/33.jpg'],
+        ]];
+        $gallery = ['data' => [['id' => '41', 'media_type' => 'IMAGE', 'timestamp' => '2020-11-18T10:00:00+0000',
+            'media_url' => 'https://cdn.example.com/41.jpg']]];
+        $read = function (array $answers) {
+            // The answers come last first.
+            foreach (array_reverse($answers) as $answer) {
+                \curl::mock_response(is_array($answer) ? json_encode($answer) : $answer);
+            }
+        };
+        // First: the centre's own, all; the others, not shown (only their last post is asked).
+        $read([$pages, $own, $this->png(), $this->png(), ['data' => [$camp['data'][0]]], $gallery]);
+        $this->assertSame('@centro.ejemplo: 2 posts', instagram::refresh(time()));
+        $items = instagram::items([]);
+        $this->assertSame(['instagram'], array_column($items, 'id'));
+        $this->assertSame(['21', '22'], array_column($items[0]['posts'], 'id'));
+        // The camp, only what speaks of the centre and only on the screens of «Pabellón»; the gallery, all of it.
+        $pabellon = $DB->insert_record('local_oksigeniahechauka_group', (object) ['name' => 'Pabellón', 'timecreated' => time(),
+            'timemodified' => time()]);
+        $this->assertTrue(instagram::change('902', 'centre', 'Centro', [$pabellon]));
+        $this->assertTrue(instagram::change('903', 'all', '', []));
+        $this->assertFalse(instagram::change('999', 'all', '', []), 'not an account of the key');
+        $this->assertFalse(instagram::change('903', 'some', '', []), 'not a way');
+        $read([$pages, $own, $camp, $this->png(), $gallery]);
+        $this->assertStringContainsString('@campa.ejemplo: 1 posts', instagram::refresh(time()));
+        $everywhere = instagram::items([]);
+        $this->assertSame(['instagram'], array_column($everywhere, 'id'), 'the camp only in «Pabellón»; the gallery, nothing new');
+        $there = instagram::items([$pabellon]);
+        $this->assertSame(['instagram', 'instagram-902'], array_column($there, 'id'));
+        $this->assertSame(['32'], array_column($there[1]['posts'], 'id'), 'the shared post once; the terrace, the old one, never');
+        $this->assertSame('Campamento', $there[1]['title']);
+        $this->assertSame('@campa.ejemplo', $there[1]['name']);
+        $this->assertSame('https://www.instagram.com/campa.ejemplo/', $there[1]['web']);
+        // The panel: each account with its way, its words and its screens; the gallery, said to be old.
+        $panel = instagram::panel(time());
+        $this->assertSame(['all', 'centre', 'all'], array_column($panel['accounts'], 'show'));
+        $this->assertSame('Centro', $panel['accounts'][1]['words']);
+        $this->assertFalse($panel['accounts'][1]['all']);
+        $this->assertTrue($panel['accounts'][2]['stale']);
+        $this->assertSame('@centro.ejemplo', $panel['accounts'][1]['always']);
     }
 
     /**

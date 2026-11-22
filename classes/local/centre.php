@@ -174,6 +174,8 @@ class centre {
             'networks' => ['boxes' => networks::boxes(),
                 'save' => (new \moodle_url('/local/oksigeniahechauka/networks.php'))->out(false),
                 'words' => self::network_words()],
+            // Every Instagram account the key reaches, with its way and its screens; false without a key.
+            'instagram' => instagram::panel($now) ?: false,
             'frame' => (new \moodle_url('/local/oksigeniahechauka/preview.php', ['frame' => 1, 'screen' => $first]))->out(false),
             'placename' => $place['name'] ?? '',
             'admin' => has_capability('moodle/site:config', \context_system::instance()) ?
