@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.37.0
+
+- **Every Instagram account the key reaches**, not only the centre's: its club, its gallery, a camp it goes to… In «Your
+  centre», each account says what comes out of it (nothing, everything, or only the posts whose text names the centre,
+  with words the centre writes) and on which screens (all, or those of some groups). The centre's own account shows
+  everything until the centre says otherwise; the others, nothing until they are switched on.
+- The screens show one account a turn, the next one each time, as often as Instagram came before. A post older than 90
+  days no longer comes out: an account that has stopped posting says so in the panel and shows nothing.
+
 ## 0.36.0
 
 The panel, gone over page by page:

@@ -7240,3 +7240,197 @@ input.hkp-red-cuenta:focus {
     border-radius: 999px;
     background: var(--hkp-accent);
 }
+
+/* «Las cuentas de Instagram» in «Tu centro» (centre_instagram.mustache, panel/instagram.js): a card per account, as it
+   reads in Instagram (its picture on Instagram's ring, grey when nothing of it comes out), what comes out in three, its
+   words when it is «only the centre's», and where. Each gesture saves by itself; the line under it says so. */
+.hkp-ig-lista {
+    /* stylelint-disable-next-line csstree/validator */
+    container: hkp-ig / inline-size;
+    display: grid;
+    gap: .75rem;
+    margin: .75rem 0 0;
+    padding: 0;
+    list-style: none;
+}
+.hkp-ig-cuenta {
+    display: grid;
+    /* By columns, not areas: a piece that is not there (the words, the warning, an empty line) leaves no row. */
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: .7rem 1rem;
+    padding: .9rem 1rem;
+    border: 1px solid var(--hkp-line);
+    border-radius: var(--hkp-radius-sm);
+    background: var(--hkp-card);
+    transition: background-color .2s ease, opacity .2s ease;
+}
+.hkp-ig-cuenta[data-show="off"] {
+    border-style: dashed;
+    background: var(--hkp-sunk);
+}
+.hkp-ig-cuenta.is-saving {
+    opacity: .85;
+}
+.hkp-ig-quien {
+    display: flex;
+    grid-column: 1;
+    align-items: center;
+    gap: .75rem;
+    min-width: 0;
+}
+.hkp-ig-foto {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    padding: 2px;
+    border-radius: 50%;
+    background: conic-gradient(from 210deg, #feda75, #fa7e1e, #d62976, #962fbf, #4f5bd5, #feda75);
+    color: #fff;
+    font-size: 1.25rem;
+    font-weight: 800;
+}
+.hkp-ig-foto img {
+    width: 100%;
+    height: 100%;
+    border: 2px solid var(--hkp-card);
+    border-radius: 50%;
+    object-fit: cover;
+}
+.hkp-ig-cuenta[data-show="off"] .hkp-ig-foto {
+    opacity: .55;
+    filter: grayscale(1);
+}
+.hkp-ig-nombre {
+    display: grid;
+    min-width: 0;
+    line-height: 1.3;
+}
+.hkp-ig-nombre b {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.hkp-ig-nombre span,
+.hkp-ig-nombre small {
+    color: var(--hkp-muted);
+    font-size: .8125rem;
+}
+.hkp-ig-modo {
+    grid-column: 2;
+}
+.hkp-ig-modo button {
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+}
+.hkp-ig-modo .hkp-i {
+    width: 1rem;
+    height: 1rem;
+}
+.hkp-seg button[aria-checked="true"] {
+    background: var(--hkp-card);
+    color: var(--hkp-accent-ink);
+    font-weight: 700;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, .12), inset 0 0 0 1px var(--hkp-accent-line);
+}
+.hkp-ig-palabras {
+    grid-column: 1 / -1;
+}
+.hkp-ig-cuenta:not([data-show="centre"]) .hkp-ig-palabras {
+    display: none;
+}
+.hkp-ig-palabras .hkp-hint {
+    margin: 0;
+}
+.hkp-ig-words {
+    margin: .35rem 0 0;
+}
+.hkp-ig-donde {
+    display: flex;
+    flex-wrap: wrap;
+    grid-column: 1 / -1;
+    align-items: center;
+    gap: .5rem 1.25rem;
+}
+.hkp-ig-cuenta[data-show="off"] .hkp-ig-donde,
+.hkp-ig-cuenta[data-show="off"] .hkp-ig-aviso {
+    display: none;
+}
+.hkp-ig-grupos {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .4rem;
+}
+.hkp-ig-grupos[hidden] {
+    display: none;
+}
+.hkp-ig-grupos .hkp-hint {
+    margin: 0 .2rem 0 0;
+}
+.hkp-ig-aviso {
+    grid-column: 1 / -1;
+    margin: 0;
+    padding: .5rem .75rem;
+    border-radius: var(--hkp-radius-sm);
+    background: var(--hkp-warn-tint);
+    color: var(--hkp-warn-ink);
+    font-size: .875rem;
+}
+.hkp-ig-estado {
+    grid-column: 1 / -1;
+    margin: 0;
+    color: var(--hkp-muted);
+    font-size: .8125rem;
+}
+.hkp-ig-estado:empty {
+    display: none;
+}
+.hkp-ig-estado[data-kind="ok"] {
+    color: var(--hkp-ok-ink);
+}
+.hkp-ig-estado[data-kind="bad"] {
+    color: var(--hkp-bad-ink);
+}
+/* By the width of the list itself (in «Tu centro» it lives in the form's column): narrow, the three choices under the
+   account and the whole width. */
+/* stylelint-disable-next-line csstree/validator */
+@container hkp-ig (max-width: 46rem) {
+    .hkp-ig-cuenta {
+        grid-template-columns: minmax(0, 1fr);
+    }
+    .hkp-ig-modo {
+        display: flex;
+        grid-column: 1;
+    }
+    .hkp-ig-modo button {
+        flex: 1 1 auto;
+        justify-content: center;
+        padding: .2rem .5rem;
+        font-size: .875rem;
+        white-space: nowrap;
+    }
+}
+/* A phone: the three in thirds and without their icon, the words on two lines when they need them, so that nothing goes out
+   of the card in any language. */
+/* stylelint-disable-next-line csstree/validator */
+@container hkp-ig (max-width: 26rem) {
+    .hkp-ig-modo {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        border-radius: 1rem;
+    }
+    .hkp-ig-modo .hkp-i {
+        display: none;
+    }
+    .hkp-ig-modo button {
+        padding: .3rem .35rem;
+        border-radius: .8rem;
+        line-height: 1.15;
+        text-align: center;
+        white-space: normal;
+    }
+}

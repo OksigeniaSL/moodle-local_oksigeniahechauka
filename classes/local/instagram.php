@@ -161,7 +161,13 @@ class instagram {
         set_config('instagramtried', $now, $c);
         $fields = 'name,instagram_business_account{id,username,media_count,profile_picture_url}';
         $pages = self::ask('me/accounts', ['fields' => $fields, 'limit' => 50], $token);
-        $accounts = self::accounts_of((array) ($pages['data'] ?? []), self::wanted());
+        // The centre's own account: the one of «Our networks»; else the one it had (before there were several, the only
+        // one); else the first.
+        $own = self::wanted();
+        if ($own === '') {
+            $own = (string) (self::saved()[0]['username'] ?? '');
+        }
+        $accounts = self::accounts_of((array) ($pages['data'] ?? []), $own);
         if (!$accounts) {
             return self::failed('no Instagram account: ' . (string) ($pages['error']['message'] ?? 'none linked to the key'), $now);
         }
@@ -606,6 +612,9 @@ class instagram {
         $groups = $DB->get_records('local_oksigeniahechauka_group', null, 'name', 'id, name');
         $fs = get_file_storage();
         $context = files::context();
+        $day = function (int $time): string {
+            return userdate($time, get_string('strftimedate', 'langconfig'));
+        };
         $accounts = [];
         foreach ($saved as $i => $account) {
             $id = (string) $account['id'];
@@ -615,7 +624,7 @@ class instagram {
             $last = (string) ($account['last'] ?? '') === '' ? false : strtotime((string) $account['last']);
             $accounts[] = [
                 'id' => $id,
-                'username' => '@' . $account['username'],
+                'username' => (string) $account['username'],
                 'title' => (string) ($account['title'] ?? ''),
                 'picture' => $face ? \moodle_url::make_pluginfile_url(
                     $context->id,
@@ -626,7 +635,7 @@ class instagram {
                     $face->get_filename()
                 )->out(false) : '',
                 'count' => (int) ($account['count'] ?? 0),
-                'last' => $last ? userdate($last, get_string('strftimedate', 'langconfig')) : '',
+                'last' => $last ? get_string('ig_on', 'local_oksigeniahechauka', $day($last)) : '',
                 'stale' => $show !== 'off' && $last !== false && !self::fresh((string) $account['last'], $now),
                 'show' => $show,
                 'words' => implode(', ', self::words_of($id, $settings, [])),

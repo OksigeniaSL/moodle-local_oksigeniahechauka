@@ -1,0 +1,76 @@
+{{!
+    This file is part of Moodle - https://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_oksigeniahechauka/centre_instagram
+
+    «Tu centro»: the Instagram accounts the screens read, one card each, as the account reads in Instagram (its picture,
+    @name, its page's name, how much it has published and when last). What comes out of it is chosen in three: «No sale»,
+    «Todo» or «Solo lo del centro», and then its words (as the categories' key words: a post comes out if its text says
+    one of them). Where: on every screen, or, turning that off, only on those of some groups. Each gesture saves by itself
+    (panel/instagram.js), and a line under the card says so; if the save fails, the card goes back as it was and says
+    why. An account that shows but has published nothing in 90 days says that it will not come out until it does.
+    Nothing without the key or without accounts.
+
+    Example context (json):
+    {
+        "instagram": {"save": "https://example.com/local/oksigeniahechauka/instagram.php", "sesskey": "abc", "hasaccounts": true,
+            "accounts": [{"id": 1, "username": "colegio.ejemplo", "title": "Colegio Ejemplo", "picture": "", "count": 128,
+                "last": "hace 3 días", "show": "all", "words": "Colegio Ejemplo, @colegio.ejemplo", "all": true, "stale": false,
+                "groups": [{"id": 1, "name": "Pabellón", "checked": false}]}]},
+        "icons": {"plus": "", "x": ""}
+    }
+}}
+{{#instagram}}{{#hasaccounts}}
+<section class="hkp-fs hkp-ig" id="hkp-ig" aria-labelledby="hkp-ig-h" data-save="{{save}}" data-sesskey="{{sesskey}}"
+    data-saving="{{#str}}networks_saving, local_oksigeniahechauka{{/str}}" data-saved="{{#str}}networks_saved, local_oksigeniahechauka{{/str}}"
+    data-error="{{#str}}networks_error, local_oksigeniahechauka{{/str}}" data-pick="{{#str}}ig_groups_pick, local_oksigeniahechauka{{/str}}"
+    data-wordadd="{{#str}}centre_word_add, local_oksigeniahechauka{{/str}}" data-wordremove="{{#str}}centre_word_remove, local_oksigeniahechauka, %s{{/str}}">
+    <h2 id="hkp-ig-h" class="hkp-label hkp-section-label">{{#str}}ig_title, local_oksigeniahechauka{{/str}}</h2>
+    <p class="hkp-hint hkp-section-hint">{{#str}}ig_help, local_oksigeniahechauka{{/str}}</p>
+    <ul class="hkp-ig-lista">
+        {{#accounts}}
+        <li class="hkp-ig-cuenta" data-account="{{id}}" data-show="{{show}}" data-username="{{username}}">
+            <div class="hkp-ig-quien">
+                <span class="hkp-ig-foto">{{#picture}}<img src="{{picture}}" alt="">{{/picture}}</span>
+                <span class="hkp-ig-nombre"><b>@{{username}}</b>{{#title}}<span>{{title}}</span>{{/title}}
+                    <small>{{#str}}ig_count, local_oksigeniahechauka, {{count}}{{/str}} · {{#str}}ig_last, local_oksigeniahechauka, {{last}}{{/str}}</small></span>
+            </div>
+            <div class="hkp-seg hkp-ig-modo" role="radiogroup" aria-label="{{#str}}ig_show_label, local_oksigeniahechauka, @{{username}}{{/str}}">
+                <button type="button" role="radio" aria-checked="false" data-show="off"><svg class="hkp-i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 3l18 18"/><path d="M10.6 10.6a2 2 0 0 0 2.8 2.8"/><path d="M9.4 5.3A9.6 9.6 0 0 1 12 5c4.5 0 8 4 9 7-.4 1.1-1 2.2-1.9 3.2M6.6 6.6C4.6 8 3.4 10 3 12c1 3 4.5 7 9 7 1.6 0 3-.4 4.3-1.1"/></svg>{{#str}}ig_show_off, local_oksigeniahechauka{{/str}}</button>
+                <button type="button" role="radio" aria-checked="false" data-show="all"><svg class="hkp-i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/></svg>{{#str}}ig_show_all, local_oksigeniahechauka{{/str}}</button>
+                <button type="button" role="radio" aria-checked="false" data-show="centre"><svg class="hkp-i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 9h16M4 15h16M10 3 8 21M16 3l-2 18"/></svg>{{#str}}ig_show_centre, local_oksigeniahechauka{{/str}}</button>
+            </div>
+            <div class="hkp-ig-palabras">
+                <p class="hkp-hint">{{#str}}ig_words, local_oksigeniahechauka{{/str}}</p>
+                <div class="hkp-cat-words hkp-ig-words" role="group" aria-label="{{#str}}ig_words, local_oksigeniahechauka{{/str}}" data-words="{{words}}">
+                    <button type="button" class="hkp-word-add" data-word-add title="{{#str}}centre_word_add, local_oksigeniahechauka{{/str}}">{{{icons.plus}}}{{#str}}centre_word_add, local_oksigeniahechauka{{/str}}</button>
+                </div>
+            </div>
+            <div class="hkp-ig-donde">
+                <div class="form-switch form-check"><input class="form-check-input" type="checkbox" role="switch" id="hkp-ig-all-{{id}}" data-all{{#all}} checked{{/all}}><label class="form-check-label" for="hkp-ig-all-{{id}}">{{#str}}ig_everywhere, local_oksigeniahechauka{{/str}}</label></div>
+                <div class="hkp-chips hkp-ig-grupos" role="group" aria-label="{{#str}}ig_groups, local_oksigeniahechauka{{/str}}"{{#all}} hidden{{/all}}>
+                    <span class="hkp-hint">{{#str}}ig_groups, local_oksigeniahechauka{{/str}}</span>
+                    {{#groups}}<button type="button" class="hkp-chip is-small" data-group="{{id}}" aria-pressed="{{#checked}}true{{/checked}}{{^checked}}false{{/checked}}">{{name}}</button>{{/groups}}
+                </div>
+            </div>
+            {{#stale}}<p class="hkp-ig-aviso">{{#str}}ig_stale, local_oksigeniahechauka, {{last}}{{/str}}</p>{{/stale}}
+            <p class="hkp-ig-estado" aria-live="polite"></p>
+        </li>
+        {{/accounts}}
+    </ul>
+</section>
+{{/hasaccounts}}{{/instagram}}
