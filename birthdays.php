@@ -159,6 +159,12 @@ if ($action !== '' && confirm_sesskey()) {
         birthdays::delete($id);
         $message = get_string('birthdays_deleted', $c);
     }
+    // A switch or a choice saved by itself from the page: a short answer, and nothing left over for the next page.
+    if (optional_param('quiet', 0, PARAM_BOOL)) {
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode(['ok' => $kind !== notification::NOTIFY_ERROR, 'message' => $message]);
+        die();
+    }
     redirect($url, $message, null, $kind);
 }
 

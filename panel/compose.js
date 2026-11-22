@@ -412,6 +412,22 @@
                     });
                     chips.appendChild(b);
                 });
+                // One row that slides: its ends fade while there is more that way, and the chosen one is in sight.
+                const ends = function () {
+                    chips.classList.toggle('is-more-before', chips.scrollLeft > 2);
+                    chips.classList.toggle('is-more-after', chips.scrollLeft + chips.clientWidth < chips.scrollWidth - 2);
+                };
+                if (!chips.hasAttribute('data-ends')) {
+                    chips.setAttribute('data-ends', '1');
+                    chips.addEventListener('scroll', ends, {passive: true});
+                    window.addEventListener('resize', ends);
+                }
+                const chosen = chips.querySelector('[aria-pressed="true"]');
+                if (chosen && (chosen.offsetLeft < chips.scrollLeft ||
+                        chosen.offsetLeft + chosen.offsetWidth > chips.scrollLeft + chips.clientWidth)) {
+                    chips.scrollLeft = chosen.offsetLeft - 48;
+                }
+                ends();
             }
             const pvnote = q('#hkp-pv-note');
             if (pvnote) {

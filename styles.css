@@ -1264,6 +1264,48 @@
     margin: 0;
 }
 
+/* «Add», which screen the preview is: one row that slides sideways, however many screens the centre has (with 19 they
+   took six rows and left the screen half out of a 768 window). The ends fade while there is more to see that way, and
+   the chosen one is brought into sight. */
+.hkp-preview #hkp-pv-screens {
+    position: relative;
+    flex-wrap: nowrap;
+    padding: .1rem .1rem .45rem;
+    overflow-x: auto;
+    scrollbar-width: thin;
+    overscroll-behavior-x: contain;
+}
+.hkp-preview #hkp-pv-screens > .hkp-chip {
+    flex: none;
+}
+.hkp-preview #hkp-pv-screens.is-more-after {
+    mask-image: linear-gradient(to right, #000 calc(100% - 2.5rem), transparent);
+}
+.hkp-preview #hkp-pv-screens.is-more-before {
+    mask-image: linear-gradient(to right, transparent, #000 2.5rem);
+}
+.hkp-preview #hkp-pv-screens.is-more-before.is-more-after {
+    mask-image: linear-gradient(to right, transparent, #000 2.5rem, #000 calc(100% - 2.5rem), transparent);
+}
+/* On a phone the bar of the form keeps «Publish» whole and the other two side by side under it, smaller: two rows, not
+   three, and the form keeps its room. */
+/* stylelint-disable-next-line csstree/validator */
+@container hkp (max-width: 36rem) {
+    .hkp-compose > .hkp-foot {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: .5rem;
+    }
+    .hkp-compose > .hkp-foot .btn-primary,
+    .hkp-compose > .hkp-foot .hkp-hint {
+        grid-column: 1 / -1;
+    }
+    .hkp-compose > .hkp-foot .btn:not(.btn-primary) {
+        padding: .4rem .5rem;
+        font-size: .9375rem;
+    }
+}
+
 /* «Cuándo»: the shortcuts, the sentence it makes and the two weeks it covers. */
 .hkp-sentence {
     display: grid;
@@ -1383,7 +1425,8 @@
     gap: .5rem;
 }
 .hkp-time .form-control {
-    width: 7.5rem;
+    width: auto;
+    min-width: 7.5rem;
 }
 
 /* --- The preview pane: the screen as it will look, always beside the form ---------------------------------------- */
@@ -2558,7 +2601,11 @@ body.hkp-page #page.drawers .main-inner {
 
 /* The form: the two fields of the hours of an event take their size, and the strip leaves a gap between its weeks. */
 .hkp-row .hkp-field-time {
-    flex: 0 1 8rem;
+    flex: 0 0 auto;
+    min-width: 8rem;
+}
+.hkp-row .hkp-field-time .form-control {
+    width: auto;
 }
 
 .hkp-strip .hkp-strip-gap {
@@ -3694,6 +3741,255 @@ dialog.hkp-dialog > footer {
     flex: none;
     color: var(--hkp-muted);
     font-size: .875rem;
+}
+
+/* The birthdays without the look of a form. The switches save as they change, with «Saved» for a moment. Someone new
+   is written on a calendar page: the month on its band and the day big, both the page's own choosers; the name and the
+   group on lines, as on a card; the photo in its round frame beside. Many at once: three ways side by side. */
+/* stylelint-disable-next-line csstree/validator */
+@container hkp (min-width: 60rem) {
+    .hkp-birthdays {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        align-items: start;
+    }
+    .hkp-birthdays > .hkp-fs:nth-child(n + 3) {
+        grid-column: 1 / -1;
+    }
+}
+/* «Saved», for a moment, where a choice saves by itself (the birthdays, a group's category). */
+.hkp-saved-note {
+    margin: .5rem 0 0;
+    color: var(--hkp-ok-ink, var(--bs-success-text-emphasis, #1c6c2d));
+    font-weight: 600;
+}
+.hkp-saved-note[hidden] {
+    display: none;
+}
+.hkp-bd-new {
+    display: grid;
+    grid-template-columns: 7.5rem minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 1rem 1.5rem;
+    padding: 1.1rem 1.25rem;
+    border-radius: var(--hkp-radius);
+    background: var(--hkp-sunk);
+}
+.hkp-bd-cal {
+    position: relative;
+    display: grid;
+    overflow: hidden;
+    border-radius: 12px;
+    background: var(--hkp-card);
+    box-shadow: 0 0 0 1px var(--hkp-line), 0 10px 18px -14px rgba(0, 0, 0, .55);
+}
+.hkp-bd-cal select {
+    width: 100%;
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    font: inherit;
+    text-align: center;
+    text-align-last: center;
+    cursor: pointer;
+    appearance: none;
+}
+.hkp-bd-cal select:focus-visible {
+    outline: 3px solid var(--hkp-accent);
+    outline-offset: -3px;
+}
+.hkp-bd-cal option {
+    color: var(--hkp-ink);
+    background: var(--hkp-card);
+}
+.hkp-bd-cal .hkp-bd-cal-month {
+    padding: .5rem .25rem .45rem;
+    color: var(--hkp-card);
+    background: var(--hkp-accent);
+    font-size: .8125rem;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+.hkp-bd-cal .hkp-bd-cal-day {
+    padding: .35rem 0 .6rem;
+    color: var(--hkp-ink);
+    font-size: 3rem;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.05;
+}
+.hkp-bd-person {
+    display: grid;
+    gap: .9rem;
+    min-width: 0;
+}
+.hkp-bd-pair {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+}
+.hkp-bd-line {
+    display: grid;
+    gap: .1rem;
+    margin: 0;
+}
+.hkp-bd-line span {
+    color: var(--hkp-muted);
+    font-size: .8125rem;
+}
+.hkp-bd-line input {
+    width: 100%;
+    padding: .25rem 0;
+    border: 0;
+    border-bottom: 1.5px solid var(--hkp-edge);
+    border-radius: 0;
+    color: var(--hkp-ink);
+    background: transparent;
+    font-size: 1rem;
+}
+.hkp-bd-line.is-name input {
+    font-size: 1.3rem;
+    font-weight: 600;
+}
+.hkp-bd-line input:focus {
+    border-bottom-color: var(--hkp-accent);
+    outline: none;
+    box-shadow: 0 1.5px 0 var(--hkp-accent);
+}
+.hkp-bd-snap {
+    display: grid;
+    justify-items: center;
+    gap: .35rem;
+    margin: 0;
+    color: var(--hkp-muted);
+    font-size: .8125rem;
+    cursor: pointer;
+}
+.hkp-bd-snap-face {
+    display: grid;
+    place-items: center;
+    width: 5.5rem;
+    height: 5.5rem;
+    overflow: hidden;
+    border: 2px dashed var(--hkp-edge);
+    border-radius: 50%;
+    color: var(--hkp-muted);
+    background: var(--hkp-card);
+}
+.hkp-bd-snap-face svg {
+    width: 1.9rem;
+    height: 1.9rem;
+}
+.hkp-bd-snap-face img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.hkp-bd-snap:hover .hkp-bd-snap-face,
+.hkp-bd-snap:focus-within .hkp-bd-snap-face {
+    border-color: var(--hkp-accent);
+    color: var(--hkp-accent);
+}
+.hkp-bd-snap:focus-within .hkp-bd-snap-face {
+    outline: 3px solid color-mix(in srgb, var(--hkp-accent) 35%, transparent);
+    outline-offset: 2px;
+}
+.hkp-bd-add {
+    grid-column: 1 / -1;
+    justify-self: end;
+}
+.hkp-birthdays .hkp-bd-many {
+    margin: 1.5rem 0 .6rem;
+    font-size: 1rem;
+    font-weight: 700;
+}
+.hkp-bd-ways {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: .75rem;
+}
+.hkp-birthdays form.hkp-bd-ways-form {
+    display: contents;
+    margin: 0;
+}
+.hkp-bd-way {
+    display: flex;
+    flex-direction: column;
+    gap: .6rem;
+    min-width: 0;
+    padding: 1rem;
+    border: 1px solid var(--hkp-line);
+    border-radius: var(--hkp-radius);
+    background: var(--hkp-card);
+}
+.hkp-bd-way h4 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 700;
+}
+.hkp-bd-way h4 label {
+    margin: 0;
+}
+.hkp-bd-way .hkp-hint {
+    margin: 0;
+}
+.hkp-bd-way-icon {
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 10px;
+    color: var(--hkp-accent);
+    background: color-mix(in srgb, var(--hkp-accent) 12%, var(--hkp-card));
+}
+.hkp-bd-way-icon svg {
+    width: 1.4rem;
+    height: 1.4rem;
+}
+.hkp-bd-way-do {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .5rem;
+    margin-top: auto;
+}
+.hkp-bd-way > .btn {
+    align-self: flex-start;
+}
+.hkp-bd-way > textarea + .hkp-hint + .btn {
+    margin-top: auto;
+}
+.hkp-bd-file:focus-within {
+    box-shadow: 0 0 0 .25rem color-mix(in srgb, var(--hkp-accent) 35%, transparent);
+}
+.hkp-bd-chosen {
+    min-width: 0;
+    overflow-wrap: anywhere;
+    color: var(--hkp-muted);
+}
+/* stylelint-disable-next-line csstree/validator */
+@container hkp (max-width: 48rem) {
+    .hkp-bd-new {
+        grid-template-columns: 6.5rem minmax(0, 1fr);
+    }
+    .hkp-bd-snap {
+        grid-column: 1;
+        justify-self: center;
+    }
+    .hkp-bd-add {
+        grid-column: 2;
+        align-self: center;
+    }
+    .hkp-bd-ways {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+/* stylelint-disable-next-line csstree/validator */
+@container hkp (max-width: 30rem) {
+    .hkp-bd-pair {
+        grid-template-columns: minmax(0, 1fr);
+    }
 }
 
 /* The icon of an event. */

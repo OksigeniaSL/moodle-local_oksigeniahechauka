@@ -17,7 +17,10 @@
 {{!
     @template local_oksigeniahechauka/birthdays
 
-    The birthdays: whether the screens show them, the field of the profile and the list kept here.
+    The birthdays: whether the screens show them, the field of the profile and the list kept here. Nothing to press to
+    save a switch or a choice: each one saves as it changes (the button is there only without a script). Someone new is
+    written on a calendar page (the month on its band, the day big, the name and the group on its lines, a photo beside);
+    many at once come in three ways side by side: a sheet, a pasted list or several photos.
 
     Example context (json):
     {
@@ -37,57 +40,79 @@
         <section class="hkp-fs" aria-labelledby="hkp-bd-on">
             <h2 id="hkp-bd-on" class="hkp-label hkp-section-label">{{#str}}birthdays_screens, local_oksigeniahechauka{{/str}}</h2>
             <p class="hkp-hint hkp-section-hint">{{#str}}birthdays_help, local_oksigeniahechauka{{/str}}</p>
-            <form method="post" action="{{action}}">
+            <form method="post" action="{{action}}" data-saves>
                 <input type="hidden" name="sesskey" value="{{sesskey}}"><input type="hidden" name="action" value="settings">
                 <div class="form-switch form-check hkp-field"><input class="form-check-input" type="checkbox" role="switch" id="hkp-bd-switch" name="on" value="1"{{#on}} checked{{/on}}><label class="form-check-label" for="hkp-bd-switch">{{#str}}birthdays_on, local_oksigeniahechauka{{/str}}</label></div>
                 {{#hasfields}}<div class="hkp-field"><label class="form-label" for="hkp-bd-field">{{#str}}birthdays_field, local_oksigeniahechauka{{/str}}</label><select class="form-select" id="hkp-bd-field" name="field">{{#fields}}<option value="{{value}}"{{#selected}} selected{{/selected}}>{{label}}</option>{{/fields}}</select><p class="hkp-hint">{{#str}}birthdays_field_help, local_oksigeniahechauka{{/str}}</p></div>{{/hasfields}}
                 {{^hasfields}}<p class="hkp-hint">{{#str}}birthdays_field_empty, local_oksigeniahechauka{{/str}}</p>{{/hasfields}}
                 {{#family}}<div class="form-switch form-check hkp-field"><input class="form-check-input" type="checkbox" role="switch" id="hkp-bd-family" name="family" value="1"{{#on}} checked{{/on}}><label class="form-check-label" for="hkp-bd-family">{{#str}}birthdays_family, local_oksigeniahechauka{{/str}}</label><p class="hkp-hint">{{#str}}birthdays_family_help, local_oksigeniahechauka{{/str}}</p></div>{{/family}}
                 {{#cifra}}<div class="form-switch form-check hkp-field"><input class="form-check-input" type="checkbox" role="switch" id="hkp-bd-cifra" name="cifra" value="1"{{#on}} checked{{/on}}><label class="form-check-label" for="hkp-bd-cifra">{{#str}}birthdays_cifra, local_oksigeniahechauka{{/str}}</label><p class="hkp-hint">{{status}}</p></div>{{/cifra}}
-                <div class="hkp-foot"><button type="submit" class="btn btn-primary">{{#str}}centre_save, local_oksigeniahechauka{{/str}}</button></div>
+                <div class="hkp-foot" data-without-script><button type="submit" class="btn btn-primary">{{#str}}centre_save, local_oksigeniahechauka{{/str}}</button></div>
+                <p class="hkp-saved-note" role="status" hidden>{{#str}}birthdays_saved, local_oksigeniahechauka{{/str}}</p>
             </form>
             <p class="hkp-hint hkp-bd-today">{{#hastoday}}{{#str}}birthdays_today, local_oksigeniahechauka, {{today}}{{/str}}{{/hastoday}}{{^hastoday}}{{#str}}birthdays_today_none, local_oksigeniahechauka{{/str}}{{/hastoday}}</p>
         </section>
         <section class="hkp-fs" aria-labelledby="hkp-bd-moodle">
             <h2 id="hkp-bd-moodle" class="hkp-label hkp-section-label">{{#str}}birthdays_moodle, local_oksigeniahechauka{{/str}}</h2>
             <p class="hkp-hint hkp-section-hint">{{#str}}birthdays_moodle_help, local_oksigeniahechauka{{/str}}</p>
-            <form method="post" action="{{action}}">
+            <form method="post" action="{{action}}" data-saves>
                 <input type="hidden" name="sesskey" value="{{sesskey}}"><input type="hidden" name="action" value="greeting">
                 <div class="form-switch form-check hkp-field"><input class="form-check-input" type="checkbox" role="switch" id="hkp-bd-greetcard" name="card" value="1"{{#greetcard}} checked{{/greetcard}}><label class="form-check-label" for="hkp-bd-greetcard">{{#str}}birthdays_greetcard, local_oksigeniahechauka{{/str}}</label><p class="hkp-hint">{{#str}}birthdays_greetcard_help, local_oksigeniahechauka{{/str}}</p></div>
                 <div class="form-switch form-check hkp-field"><input class="form-check-input" type="checkbox" role="switch" id="hkp-bd-greetnotify" name="notify" value="1"{{#greetnotify}} checked{{/greetnotify}}><label class="form-check-label" for="hkp-bd-greetnotify">{{#str}}birthdays_greetnotify, local_oksigeniahechauka{{/str}}</label><p class="hkp-hint">{{#str}}birthdays_greetnotify_help, local_oksigeniahechauka{{/str}}</p></div>
-                <div class="hkp-foot"><button type="submit" class="btn btn-primary">{{#str}}centre_save, local_oksigeniahechauka{{/str}}</button></div>
+                <div class="hkp-foot" data-without-script><button type="submit" class="btn btn-primary">{{#str}}centre_save, local_oksigeniahechauka{{/str}}</button></div>
+                <p class="hkp-saved-note" role="status" hidden>{{#str}}birthdays_saved, local_oksigeniahechauka{{/str}}</p>
             </form>
         </section>
         <section class="hkp-fs" aria-labelledby="hkp-bd-add">
             <h2 id="hkp-bd-add" class="hkp-label hkp-section-label">{{#str}}birthdays_add, local_oksigeniahechauka{{/str}}</h2>
             <p class="hkp-hint hkp-section-hint">{{#str}}birthdays_add_help, local_oksigeniahechauka{{/str}}</p>
-            <form method="post" action="{{action}}" enctype="multipart/form-data">
+            <form method="post" action="{{action}}" enctype="multipart/form-data" class="hkp-bd-new">
                 <input type="hidden" name="sesskey" value="{{sesskey}}"><input type="hidden" name="action" value="add">
-                <div class="hkp-row">
-                    <div class="hkp-field"><label class="form-label" for="hkp-bd-name">{{#str}}birthdays_name, local_oksigeniahechauka{{/str}}</label><input class="form-control" id="hkp-bd-name" name="name" maxlength="120" required autocomplete="off"></div>
-                    <div class="hkp-field"><label class="form-label" for="hkp-bd-group">{{#str}}birthdays_group, local_oksigeniahechauka{{/str}}</label><input class="form-control" id="hkp-bd-group" name="group" maxlength="60" autocomplete="off"></div>
+                <div class="hkp-bd-cal">
+                    <label class="visually-hidden sr-only" for="hkp-bd-month">{{#str}}birthdays_month, local_oksigeniahechauka{{/str}}</label><select class="hkp-bd-cal-month" id="hkp-bd-month" name="month">{{#months}}<option value="{{value}}">{{label}}</option>{{/months}}</select>
+                    <label class="visually-hidden sr-only" for="hkp-bd-day">{{#str}}birthdays_day, local_oksigeniahechauka{{/str}}</label><select class="hkp-bd-cal-day" id="hkp-bd-day" name="day">{{#days}}<option value="{{.}}">{{.}}</option>{{/days}}</select>
                 </div>
-                <div class="hkp-row">
-                    <div class="hkp-field"><label class="form-label" for="hkp-bd-day">{{#str}}birthdays_day, local_oksigeniahechauka{{/str}}</label><select class="form-select" id="hkp-bd-day" name="day">{{#days}}<option value="{{.}}">{{.}}</option>{{/days}}</select></div>
-                    <div class="hkp-field"><label class="form-label" for="hkp-bd-month">{{#str}}birthdays_month, local_oksigeniahechauka{{/str}}</label><select class="form-select" id="hkp-bd-month" name="month">{{#months}}<option value="{{value}}">{{label}}</option>{{/months}}</select></div>
-                    <div class="hkp-field"><label class="form-label" for="hkp-bd-idnumber">{{#str}}birthdays_idnumber, local_oksigeniahechauka{{/str}}</label><input class="form-control" id="hkp-bd-idnumber" name="idnumber" maxlength="100"></div>
-                    <div class="hkp-field"><label class="form-label" for="hkp-bd-photo">{{#str}}birthdays_photo, local_oksigeniahechauka{{/str}}</label><input class="form-control" type="file" id="hkp-bd-photo" name="photo" accept="image/jpeg,image/png"></div>
+                <div class="hkp-bd-person">
+                    <label class="hkp-bd-line is-name"><span>{{#str}}birthdays_name, local_oksigeniahechauka{{/str}}</span><input id="hkp-bd-name" name="name" maxlength="120" required autocomplete="off"></label>
+                    <div class="hkp-bd-pair">
+                        <label class="hkp-bd-line"><span>{{#str}}birthdays_group, local_oksigeniahechauka{{/str}}</span><input id="hkp-bd-group" name="group" maxlength="60" autocomplete="off"></label>
+                        <label class="hkp-bd-line"><span>{{#str}}birthdays_idnumber, local_oksigeniahechauka{{/str}}</span><input id="hkp-bd-idnumber" name="idnumber" maxlength="100" autocomplete="off"></label>
+                    </div>
                 </div>
-                <div class="hkp-foot"><button type="submit" class="btn btn-outline-secondary">{{#str}}birthdays_add_button, local_oksigeniahechauka{{/str}}</button></div>
+                <label class="hkp-bd-snap"><input class="visually-hidden sr-only" type="file" id="hkp-bd-photo" name="photo" accept="image/jpeg,image/png" data-bd-face><span class="hkp-bd-snap-face"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8.5h3l1.6-2.5h6.8L17 8.5h3v10H4z"/><circle cx="12" cy="13" r="3.2"/></svg></span><span>{{#str}}birthdays_photo, local_oksigeniahechauka{{/str}}</span></label>
+                <div class="hkp-bd-add"><button type="submit" class="btn btn-primary">{{#str}}birthdays_add_button, local_oksigeniahechauka{{/str}}</button></div>
             </form>
-            <form method="post" action="{{action}}" enctype="multipart/form-data">
-                <input type="hidden" name="sesskey" value="{{sesskey}}"><input type="hidden" name="action" value="import">
-                <div class="hkp-field"><label class="form-label" for="hkp-bd-sheet">{{#str}}birthdays_sheet, local_oksigeniahechauka{{/str}}</label><input class="form-control" type="file" id="hkp-bd-sheet" name="sheet" accept=".csv,text/csv,text/plain">
-                    <p class="hkp-hint">{{#str}}birthdays_sheet_help, local_oksigeniahechauka{{/str}} <a href="{{modelurl}}" download>{{#str}}birthdays_model, local_oksigeniahechauka{{/str}}</a></p></div>
-                <div class="hkp-field"><label class="form-label" for="hkp-bd-list">{{#str}}birthdays_import, local_oksigeniahechauka{{/str}}</label><textarea class="form-control" id="hkp-bd-list" name="list" rows="4"></textarea><p class="hkp-hint">{{#str}}birthdays_import_help, local_oksigeniahechauka{{/str}}</p></div>
-                <div class="hkp-foot"><button type="submit" class="btn btn-outline-secondary">{{#str}}birthdays_import_button, local_oksigeniahechauka{{/str}}</button></div>
-            </form>
-            <form method="post" action="{{action}}" enctype="multipart/form-data">
-                <input type="hidden" name="sesskey" value="{{sesskey}}"><input type="hidden" name="action" value="photos">
-                <div class="hkp-field"><label class="form-label" for="hkp-bd-photos">{{#str}}birthdays_photos, local_oksigeniahechauka{{/str}}</label><input class="form-control" type="file" id="hkp-bd-photos" name="photos[]" accept="image/jpeg,image/png" multiple><p class="hkp-hint">{{#str}}birthdays_photos_help, local_oksigeniahechauka{{/str}}</p>
-                    <p class="hkp-hint">{{#str}}birthdays_photos_moodle, local_oksigeniahechauka{{/str}} {{#moodlepictures}}{{#str}}birthdays_photos_moodle_here, local_oksigeniahechauka{{/str}} <a href="{{moodlepictures}}">{{#str}}uploadpictures, tool_uploaduser{{/str}}</a>.{{/moodlepictures}}{{^moodlepictures}}{{#str}}birthdays_photos_moodle_admin, local_oksigeniahechauka{{/str}}{{/moodlepictures}}</p></div>
-                <div class="hkp-foot"><button type="submit" class="btn btn-outline-secondary">{{#str}}birthdays_photos_button, local_oksigeniahechauka{{/str}}</button></div>
-            </form>
+            <h3 class="hkp-label hkp-bd-many">{{#str}}birthdays_many, local_oksigeniahechauka{{/str}}</h3>
+            <div class="hkp-bd-ways">
+                <form method="post" action="{{action}}" enctype="multipart/form-data" class="hkp-bd-ways-form">
+                    <input type="hidden" name="sesskey" value="{{sesskey}}"><input type="hidden" name="action" value="import">
+                    <div class="hkp-bd-way">
+                        <span class="hkp-bd-way-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="2"/><path d="M3.5 9h17M3.5 14.5h17M9.5 3.5v17"/></svg></span>
+                        <h4>{{#str}}birthdays_sheet, local_oksigeniahechauka{{/str}}</h4>
+                        <p class="hkp-hint">{{#str}}birthdays_sheet_help, local_oksigeniahechauka{{/str}} <a href="{{modelurl}}" download>{{#str}}birthdays_model, local_oksigeniahechauka{{/str}}</a></p>
+                        <div class="hkp-bd-way-do"><label class="btn btn-outline-secondary hkp-bd-file"><input class="visually-hidden sr-only" type="file" id="hkp-bd-sheet" name="sheet" accept=".csv,text/csv,text/plain" data-bd-chosen>{{#str}}birthdays_choose_sheet, local_oksigeniahechauka{{/str}}</label><small class="hkp-bd-chosen" aria-live="polite"></small></div>
+                        <button type="submit" class="btn btn-primary" data-bd-when-chosen hidden>{{#str}}birthdays_import_button, local_oksigeniahechauka{{/str}}</button>
+                    </div>
+                    <div class="hkp-bd-way">
+                        <span class="hkp-bd-way-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6.5h11M9 12h11M9 17.5h11"/><circle cx="4.5" cy="6.5" r="1"/><circle cx="4.5" cy="12" r="1"/><circle cx="4.5" cy="17.5" r="1"/></svg></span>
+                        <h4><label for="hkp-bd-list">{{#str}}birthdays_import, local_oksigeniahechauka{{/str}}</label></h4>
+                        <textarea class="form-control" id="hkp-bd-list" name="list" rows="4" aria-describedby="hkp-bd-list-help"></textarea>
+                        <p class="hkp-hint" id="hkp-bd-list-help">{{#str}}birthdays_import_help, local_oksigeniahechauka{{/str}}</p>
+                        <button type="submit" class="btn btn-outline-secondary">{{#str}}birthdays_import_button, local_oksigeniahechauka{{/str}}</button>
+                    </div>
+                </form>
+                <form method="post" action="{{action}}" enctype="multipart/form-data" class="hkp-bd-ways-form">
+                    <input type="hidden" name="sesskey" value="{{sesskey}}"><input type="hidden" name="action" value="photos">
+                    <div class="hkp-bd-way">
+                        <span class="hkp-bd-way-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6.5" y="3.5" width="14" height="12" rx="2"/><path d="M3.5 8v10.5a2 2 0 0 0 2 2H16"/><circle cx="11" cy="8" r="1.5"/><path d="m20.5 13-4-4-6.5 6.5"/></svg></span>
+                        <h4>{{#str}}birthdays_photos, local_oksigeniahechauka{{/str}}</h4>
+                        <p class="hkp-hint">{{#str}}birthdays_photos_help, local_oksigeniahechauka{{/str}}</p>
+                        <p class="hkp-hint">{{#str}}birthdays_photos_moodle, local_oksigeniahechauka{{/str}} {{#moodlepictures}}{{#str}}birthdays_photos_moodle_here, local_oksigeniahechauka{{/str}} <a href="{{moodlepictures}}">{{#str}}uploadpictures, tool_uploaduser{{/str}}</a>.{{/moodlepictures}}{{^moodlepictures}}{{#str}}birthdays_photos_moodle_admin, local_oksigeniahechauka{{/str}}{{/moodlepictures}}</p>
+                        <div class="hkp-bd-way-do"><label class="btn btn-outline-secondary hkp-bd-file"><input class="visually-hidden sr-only" type="file" id="hkp-bd-photos" name="photos[]" accept="image/jpeg,image/png" multiple data-bd-chosen data-many="{{#str}}birthdays_chosen_many, local_oksigeniahechauka, %d{{/str}}">{{#str}}birthdays_choose_photos, local_oksigeniahechauka{{/str}}</label><small class="hkp-bd-chosen" aria-live="polite"></small></div>
+                        <button type="submit" class="btn btn-primary" data-bd-when-chosen hidden>{{#str}}birthdays_photos_button, local_oksigeniahechauka{{/str}}</button>
+                    </div>
+                </form>
+            </div>
         </section>
         <section class="hkp-fs" aria-labelledby="hkp-bd-people">
             <h2 id="hkp-bd-people" class="hkp-label hkp-section-label">{{#str}}birthdays_list, local_oksigeniahechauka, {{count}}{{/str}}</h2>
@@ -117,6 +142,62 @@
     var sesskey = page.getAttribute('data-sesskey');
     var dialog = page.querySelector('#hkp-link-dialog');
     var form = page.querySelector('#hkp-link-form');
+    // A switch or a choice saves as it changes; without a script, its button is there. Turning Cifra on goes the whole
+    // way (it reads the pupils at once and says what it found), and if a save fails the button comes back.
+    page.querySelectorAll('form[data-saves]').forEach(function(saves) {
+        var button = saves.querySelector('[data-without-script]');
+        var said = saves.querySelector('.hkp-saved-note');
+        var timer = 0;
+        button.hidden = true;
+        saves.addEventListener('change', function(e) {
+            if (e.target.name === 'cifra' && e.target.checked) {
+                saves.submit();
+                return;
+            }
+            var body = new FormData(saves);
+            body.append('quiet', '1');
+            fetch(saves.getAttribute('action'), {method: 'POST', body: body, credentials: 'same-origin'}).then(function(res) {
+                return res.json();
+            }).then(function(answer) {
+                if (!answer.ok) {
+                    throw new Error(answer.message);
+                }
+                said.hidden = false;
+                clearTimeout(timer);
+                timer = setTimeout(function() {
+                    said.hidden = true;
+                }, 2500);
+            }).catch(function() {
+                button.hidden = false;
+            });
+        });
+    });
+    // A file chosen says its name (or how many), and only then its button comes.
+    page.querySelectorAll('[data-bd-chosen]').forEach(function(input) {
+        input.addEventListener('change', function() {
+            var way = input.closest('.hkp-bd-way');
+            var n = input.files ? input.files.length : 0;
+            way.querySelector('.hkp-bd-chosen').textContent = n > 1 ? input.getAttribute('data-many').replace('%d', n) :
+                (n ? input.files[0].name : '');
+            way.querySelector('[data-bd-when-chosen]').hidden = !n;
+        });
+    });
+    // The photo of someone new, seen on the page before it is added.
+    var face = page.querySelector('[data-bd-face]');
+    if (face) {
+        face.addEventListener('change', function() {
+            var file = face.files && face.files[0];
+            var art = face.parentNode.querySelector('.hkp-bd-snap-face');
+            if (!file) {
+                return;
+            }
+            var img = document.createElement('img');
+            img.alt = '';
+            img.src = URL.createObjectURL(file);
+            art.textContent = '';
+            art.appendChild(img);
+        });
+    }
     if (!dialog || !form) {
         return;
     }

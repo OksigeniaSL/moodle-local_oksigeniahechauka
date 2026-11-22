@@ -72,6 +72,12 @@ if ($action !== '' && confirm_sesskey()) {
         );
     }
     $message = groupspage::act($action, $now);
+    // A group's category saved by itself from the page: a short answer, and nothing left over for the next page.
+    if (optional_param('quiet', 0, PARAM_BOOL)) {
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode(['ok' => $message !== null, 'message' => (string) $message]);
+        die();
+    }
     redirect(
         new moodle_url($url, [], strpos($action, 'everywhere') !== false ? 'hkp-all' :
             (strpos($action, 'manager') !== false ? 'hkp-managers' : 'hkp-group-' . optional_param('group', 0, PARAM_INT))),

@@ -63,7 +63,8 @@
                     {{^site}}<p class="hkp-hint">{{#str}}site_none, local_oksigeniahechauka{{/str}} <a href="{{siteurl}}">{{#str}}site_make, local_oksigeniahechauka{{/str}}</a></p>{{/site}}
                 </div>
                 {{#hascoursecats}}<div><label class="hkp-k" for="hkp-gc-{{id}}">{{#str}}groups_category, local_oksigeniahechauka{{/str}}</label>
-                    <form method="post" action="{{action}}" class="hkp-find"><input type="hidden" name="sesskey" value="{{sesskey}}"><input type="hidden" name="action" value="groupcategory"><input type="hidden" name="group" value="{{id}}"><select class="form-select" id="hkp-gc-{{id}}" name="coursecat">{{#coursecats}}<option value="{{value}}"{{#selected}} selected{{/selected}}>{{label}}</option>{{/coursecats}}</select><button type="submit" class="btn btn-outline-secondary">{{#str}}centre_save, local_oksigeniahechauka{{/str}}</button></form>
+                    <form method="post" action="{{action}}" class="hkp-find" data-saves><input type="hidden" name="sesskey" value="{{sesskey}}"><input type="hidden" name="action" value="groupcategory"><input type="hidden" name="group" value="{{id}}"><select class="form-select" id="hkp-gc-{{id}}" name="coursecat">{{#coursecats}}<option value="{{value}}"{{#selected}} selected{{/selected}}>{{label}}</option>{{/coursecats}}</select><button type="submit" class="btn btn-outline-secondary" data-without-script>{{#str}}centre_save, local_oksigeniahechauka{{/str}}</button></form>
+                    <p class="hkp-saved-note" role="status" hidden>{{#str}}groups_category_saved, local_oksigeniahechauka{{/str}}</p>
                     <p class="hkp-hint">{{#str}}groups_category_help, local_oksigeniahechauka{{/str}}</p>
                 </div>{{/hascoursecats}}
                 <div><span class="hkp-k">{{#str}}groups_people, local_oksigeniahechauka{{/str}}</span>
@@ -137,6 +138,32 @@
     var people = page.getAttribute('data-people');
     var sesskey = page.getAttribute('data-sesskey');
     var form = page.querySelector('#hkp-people-form');
+    // A group's category saves as it is chosen, as the rest of the page; without a script, its button is there, and it
+    // comes back if a save fails.
+    page.querySelectorAll('form[data-saves]').forEach(function(saves) {
+        var button = saves.querySelector('[data-without-script]');
+        var said = saves.parentNode.querySelector('.hkp-saved-note');
+        var timer = 0;
+        button.hidden = true;
+        saves.addEventListener('change', function() {
+            var body = new FormData(saves);
+            body.append('quiet', '1');
+            fetch(saves.getAttribute('action'), {method: 'POST', body: body, credentials: 'same-origin'}).then(function(res) {
+                return res.json();
+            }).then(function(answer) {
+                if (!answer.ok) {
+                    throw new Error(answer.message);
+                }
+                said.hidden = false;
+                clearTimeout(timer);
+                timer = setTimeout(function() {
+                    said.hidden = true;
+                }, 2500);
+            }).catch(function() {
+                button.hidden = false;
+            });
+        });
+    });
     // Each list of people, with its actions: a group, those who publish everywhere, those who run the screens.
     var actions = {
         group: ['addeditor', 'removeeditor', 'telleditor'],
