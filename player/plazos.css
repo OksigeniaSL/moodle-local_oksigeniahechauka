@@ -1,4 +1,4 @@
-/* Oksigenia Hechauka 0.8: what falls due in the courses (Gaudí, 2 November 2026). Goes after composiciones.css and identidad.css.
+/* Oksigenia Hechauka 0.8: what falls due in the courses (2 November 2026). Goes after composiciones.css and identidad.css.
  *
  * Rows to be run down at a walk: the day on the left, the course first and largest, then what is due and the hour if it says anything.
  * The agenda is about the centre, with bars of colour; this is about one's own course, so it is a sheet, with a mark of the colour of
@@ -314,7 +314,7 @@
     margin: .5rem 0 0;
 }
 
-/* --- Today (Gaudí, 8 November 2026, with the movement), a band of the accent across the sheet, and its hours in the accent ----------------------------
+/* --- Today (8 November 2026, with the movement), a band of the accent across the sheet, and its hours in the accent ----------------------------
  * From the corridor every day weighed the same; what falls due today is what someone has to see first. The band is the accent
  * at low opacity (Chromium 56 cannot mix a colour), under the words. And the days share the height of the page, so a page that
  * is not full does not leave its bottom empty. */

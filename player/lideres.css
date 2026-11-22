@@ -1,4 +1,4 @@
-/* Oksigenia Hechauka 0.8: each thing, its object (Gaudí, 2 November 2026). Goes after jerarquia.css.
+/* Oksigenia Hechauka 0.8: each thing, its object (2 November 2026). Goes after jerarquia.css.
  *
  * From a distance one reads the shape and the colour first, the label afterwards. All the leads were the same white card with
  * a stripe, half empty, and from the corridor a menu could not be told from a notice. Now each kind is a real object anybody
@@ -555,7 +555,7 @@
     flex: 2 1 0px;
     height: auto;
 }
-/* the gutter between the three is the body's, as between any two zones (Jujol, 12 November 2026) */
+/* the gutter between the three is the body's, as between any two zones (12 November 2026) */
 .hk .hk-cuerpo[data-composicion="tres-verticales"] > .hk-pareja > .hk-medio + .hk-medio {
     margin-left: var(--hk-hueco);
 }

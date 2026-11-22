@@ -2,7 +2,7 @@
 // when one of the centre's screens is touched. What the doors of the same names show, drawn as they show it and written
 // on it. Each gesture saves by itself through reception.php (Hechauka): a line when it is left or Enter is pressed, a
 // picture when it is chosen, a moment moved or taken out when its button is touched. The answer is the whole block
-// again (touch::panel()): what is in hand is kept, the rest is repainted from it. Jujol, 18 November 2026.
+// again (touch::panel()): what is in hand is kept, the rest is repainted from it.
 (function () {
     'use strict';
     const block = document.getElementById('hkp-recepcion');

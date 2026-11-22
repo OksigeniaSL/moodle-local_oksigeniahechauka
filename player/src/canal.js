@@ -1,12 +1,12 @@
 // «Síguenos en el canal», a slide of its own: the centre's messaging channel (Telegram today, another app tomorrow), so that
 // whoever passes follows it from the screen. A poster in the centre's main colour: its words on one side, and on the other the
 // channel's last message, a white card with the QR and the short address; a paper plane crosses slowly where nothing is read,
-// leaving a trail of dots. No logo of any app: the app is named only in the words. Gaudí, 8 November 2026.
+// leaving a trail of dots. No logo of any app: the app is named only in the words.
 //
-// Every network of the centre since «Nuestras redes» (Jujol, 14 November 2026): Instagram, TikTok, YouTube… one a turn in the
+// Every network of the centre since «Nuestras redes» (14 November 2026): Instagram, TikTok, YouTube… one a turn in the
 // same place (compose.js). With several, the card's sender line carries the network's glyph in the card's ink before the account
 // (redes.js): from metres away, which app the QR opens, and that this turn is another network than the last one. The headline
-// still says it in words; the poster, the plane and the QR stay Gaudí's.
+// still says it in words; the poster, the plane and the QR stay as the art direction drew them.
 //
 // The player builds it in makeLayer (buildChannel), fits it in adjustLayer (fitChannel) and gives it its life in startMoving
 // (startChannel; leave() stops it through c.hkStop). Its entrance is movimiento.js's (PARTS.canal, and the way «mensaje»).

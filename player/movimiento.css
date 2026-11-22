@@ -1,4 +1,4 @@
-/* Oksigenia Hechauka: how the slides move (Gaudí, 8 November 2026; MOTION.md). Goes after every sheet of the player but
+/* Oksigenia Hechauka: how the slides move (8 November 2026; MOTION.md). Goes after every sheet of the player but
  * pieles.css, fondos.css and letras.css, which only set variables.
  *
  * src/movimiento.js marks each part of a slide with .hk-mv, data-mv-como (how it comes in) and its delay, and the layer with
@@ -224,7 +224,7 @@
     transform: translate3d(8rem, 0, 0) rotate(-80deg);
 }
 
-/* the channel's card, its last message, arrives from its tail (Gaudí, 8 November 2026) */
+/* the channel's card, its last message, arrives from its tail (8 November 2026) */
 .hk-capa[data-mv] .hk-mv[data-mv-como="mensaje"] {     /* a message arrives: from its tail, at the bottom left */
     -webkit-transform: translate3d(0, 2rem, 0) scale(.84);
     transform: translate3d(0, 2rem, 0) scale(.84);
@@ -260,7 +260,7 @@
     50% { opacity: .38; }
 }
 /* a sheen passes over a block of colour once it is in, and again every 30 s (25 in juguetona): about once a slide, so that it
-   is not read as an ornament (Gaudí, 8 November 2026); never over a white card */
+   is not read as an ornament (8 November 2026); never over a white card */
 .hk .hk-mv-brillo-caja {             /* .hk: over «.hk-tipografica > *», which keeps the words over it */
     position: absolute;
     top: 0;

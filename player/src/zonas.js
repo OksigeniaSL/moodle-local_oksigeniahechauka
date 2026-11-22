@@ -1,4 +1,4 @@
-// «zonas»: two zones at once, one more composition of the rotation and never a fixed layout (Jujol, 12 November 2026). A
+// «zonas»: two zones at once, one more composition of the rotation and never a fixed layout (12 November 2026). A
 // column with a carousel of its own (portrait pictures, the weather, the coming days) beside a wide zone (a landscape
 // picture or video, or the card of the screen's place). On a vertical screen the wide zone is a 16:9 band on top and the
 // column fills the rest under it. What fails goes, and what stays grows: a column item that does not load is skipped, a
@@ -225,7 +225,7 @@ export function buildZones(c, o) {
     }
     marks.style.display = entries.length > 1 ? '' : 'none';
     // Only words in the column (the coming days, or the weather): on a vertical screen it is as high as they are, and the wide
-    // zone above takes the rest; never an empty box under them (Gaudí's review, 12 November 2026).
+    // zone above takes the rest; never an empty box under them (the review of 12 November 2026).
     if (entries.length === 1 && entries[0].kind !== 'foto') {
         col.classList.add('hk-zonas-col-justa');
     }

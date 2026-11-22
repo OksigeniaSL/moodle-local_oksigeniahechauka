@@ -1,4 +1,4 @@
-// The birthday strip (Jujol, 12 November 2026; a party, not one more information band: Gaudí's review, the same day): whoever
+// The birthday strip (12 November 2026; a party, not one more information band: the art direction's review, the same day): whoever
 // has their birthday today, all day long, in a strip above the ticker, over every composition but the big birthday slide
 // (which says it bigger, cumple.js) and never on a showcase.
 //
@@ -256,7 +256,7 @@ export function fitStrip(node, o) {
         return out;
     };
     // A vertical screen may give a long name two lines (the heading over it); a horizontal one keeps the strip to one line,
-    // whatever name comes today: the heading gives way, then the group (Jujol, 21 November 2026: at 8 m one long name put
+    // whatever name comes today: the heading gives way, then the group (21 November 2026: at 8 m one long name put
     // every person in three lines and the strip ate a third of the screen).
     const steps = o && o.vertical ? ['2', '3', '4'] : ['0', '1', 'h1', 'h2'];
     for (let s = 0; s < steps.length; s++) {

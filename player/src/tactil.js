@@ -1,4 +1,4 @@
-// Oksigenia Hechauka: the touch screen, the way of the doors (Enrique chose it on 18 November 2026: «Vamos con las
+// Oksigenia Hechauka: the touch screen, the way of the doors (chosen on 18 November 2026: «Vamos con las
 // puertas»). Only on a screen that can be touched (the manifest's screen.touch); without it the screen is the one of
 // always and none of this is built.
 //

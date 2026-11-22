@@ -1,5 +1,5 @@
 // «En nuestro Instagram»: the centre's last posts on the screens, one a turn, so that whoever passes sees what the centre lives
-// and follows it from there (Jujol, 14 November 2026, for Hechauka's «Nuestras redes»; Enrique: «un QR para que nos sigan en
+// and follows it from there (14 November 2026, for Hechauka's «Nuestras redes»; as asked: «un QR para que nos sigan en
 // Instagram»). A sibling of «Síguenos en …» (canal.js): the same poster in the centre's main colour, and on it the post as the
 // app shows it, the picture first and big, whole; beside it (under it on an upright screen) who posts and when, its words, and
 // the white card with the QR to follow it and «Síguenos en Instagram».
@@ -23,7 +23,7 @@ export const CAROUSEL = {every: 3.6, most: 5};
 const PICTURE_LEAST = 0.4;
 
 /** On a wide screen, the share of the poster's width the picture may take, and the most lines its words take beside it: who
- *  passes looks at the picture, and reads three or four lines, not six (Gaudí, 14 November 2026). */
+ *  passes looks at the picture, and reads three or four lines, not six (14 November 2026). */
 const PICTURE_WIDE = 0.45;
 const CAPTION_LINES = 4;
 
@@ -379,7 +379,7 @@ export function fitInstagram(c, horizontal) {
     if (horizontal) {
         // The words want room for ten letters of who posts a line, at the least; the card keeps its own column beside them.
         // The picture leads, as on Instagram: up to PICTURE_WIDE of the poster's width, as far as the words keep ten letters
-        // of who posts a line and the card its column (Gaudí, 14 November 2026).
+        // of who posts a line and the card its column (14 November 2026).
         const least = 10 * px(who, 'fontSize');
         const w = Math.min(roomW * PICTURE_WIDE, roomW - px(side, 'marginLeft') - column.offsetWidth - px(column, 'marginLeft') - least);
         setFrame(frameOf(w, roomH - dotsH, s.hkAspect, true, 0));

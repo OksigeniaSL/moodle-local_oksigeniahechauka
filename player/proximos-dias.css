@@ -1,4 +1,4 @@
-/* «Próximos días» inside «Hoy» (Gaudí, 31 October 2026, for Hechauka). Goes after composiciones.css.
+/* «Próximos días» inside «Hoy» (31 October 2026, for Hechauka). Goes after composiciones.css.
  *
  * Markup, after today's events in the same column:
  *   <section class="hk-bloque hk-proximos">
@@ -82,7 +82,7 @@
     line-height: 1.12;
 }
 
-/* The countdown's day and group under its title, small: «Jue 5 · 3º ESO» (Gaudí, 31 October 2026). */
+/* The countdown's day and group under its title, small: «Jue 5 · 3º ESO» (31 October 2026). */
 .hk-hoy-col .hk-cuenta span small {
     display: block;
     color: var(--hk-texto-suave);

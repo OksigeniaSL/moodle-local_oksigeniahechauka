@@ -1,7 +1,7 @@
 // One thing big in each slide (the art direction's 0.7.0, «jerarquia.css»): what leads (.hk-lider: the menu, a notice,
 // the important notice, an event or the countdown, a different one each time) and the rest in a third (.hk-resto: the
 // important notice fixed on top, then the other things of «Today» as lines under their group, a page with each slide).
-// From the art direction's demo (Gaudí, 1 November 2026: construirLider, construirResto, paginarResto, mostrarPagina,
+// From the art direction's demo (1 November 2026: construirLider, construirResto, paginarResto, mostrarPagina,
 // ajustarTitular, equilibrar), on the data of «Today» as the player makes it (todayOf in main.js).
 
 import {dayNumber, weekdayOf} from './rules.js';
@@ -14,7 +14,7 @@ export const MARK = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill-rule
 
 const MAX_PAGES = 6;
 
-// The plate of a menu: a plate seen from above, with its fork and knife on it (Gaudí, 2 November 2026). One geometry for
+// The plate of a menu: a plate seen from above, with its fork and knife on it (2 November 2026). One geometry for
 // every centre; its colours come from the sheet (lideres.css).
 export const PLATE = '<svg viewBox="0 0 200 200" aria-hidden="true">' +
     '<circle class="hk-plato-sombra" cx="100" cy="104" r="96"/>' +

@@ -1,7 +1,7 @@
 // «Entregas de esta semana»: what falls due in the courses. What no other signage knows, and above all for universities and
 // academies: someone goes by, looks for their course, and if it is theirs they stop. So the course is what is read first, its day
 // beside it, in rows that can be run down at a walk. How many fit depends on the distance it is read from; the composer sends the
-// next page with the next turn. Gaudí, 2 November 2026.
+// next page with the next turn.
 
 import {dayLabel} from './agenda.js';
 import {stage} from './today.js';

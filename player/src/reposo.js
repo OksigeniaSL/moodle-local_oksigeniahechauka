@@ -1,7 +1,7 @@
 // The screen with nothing to show yet: a screen just paired, or a centre with no pictures, nothing today and no agenda. It may
 // spend days like this in a hall, so it has to look like a decision and be worth having on the wall. One idea: the day goes by on
 // it. The sun of the centre's colours crosses a sky of its colours, one step a minute, over the ground that holds whose screen this
-// is and what time it is. Gaudí, 2 November 2026.
+// is and what time it is.
 
 function el(tag, cls, text) {
     const n = document.createElement(tag);

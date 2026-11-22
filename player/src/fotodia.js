@@ -1,5 +1,5 @@
 // «La foto del día»: one curious and beautiful picture a day (a galaxy, a bug under the microscope, a painting) for whoever
-// passes to stop and look (Jujol, 13 November 2026). The picture leads: as big as the body lets it, whole (a painting is
+// passes to stop and look (13 November 2026). The picture leads: as big as the body lets it, whole (a painting is
 // never cut), on a mat of the skin's surface; its credit under it, always, as the licence of many of them asks. Beside it
 // (under it on an upright screen) a small label with the pictogram of its kind, the title, and the caption, a «did you
 // know…?» for a child, in big letters. The frame is measured here from the picture's own shape and the room: the words

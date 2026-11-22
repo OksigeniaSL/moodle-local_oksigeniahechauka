@@ -1,7 +1,7 @@
 // «La semana» on the page: five days side by side (one under the other on a vertical screen), each with its events;
 // holidays striped; bands across days. Each day fits its list once it is in the page: the largest scale at which
 // nothing overflows and no title takes three lines; if nothing fits, the last ones give way to «+2 more». From the
-// art direction (Gaudí, 31 October 2026, «construirSemana» and «ajustarSemana» in its demo; semana.css).
+// art direction (31 October 2026, «construirSemana» and «ajustarSemana» in its demo; semana.css).
 
 import {stage} from './today.js';
 

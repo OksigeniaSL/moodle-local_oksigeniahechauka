@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.36.0
+
+The panel, gone over page by page:
+
+- **«Your centre» saves with one bar**, the same as a screen's sheet: it comes up at the foot as soon as something
+  changes («There are unsaved changes · Save changes · Undo»), also for a word or a category added or taken out.
+- **The Surprises are a cast of cards** in the page, each with its portrait, what it does and «See it», in grey when it
+  does not come out; the screen stays alone on the right, in sight all the way down.
+- **«Birthdays» saves its switches as they change**, and a group's course category saves when it is chosen. Someone new
+  is written on a calendar page, with their picture seen before adding it; many at once come in three cards: a sheet, a
+  pasted list or several pictures.
+- **«Add»** slides its screens in one row, with the chosen one in sight, and on a phone its bar takes two rows. The hours
+  read whole at 12 hours.
+- **The touch screen**: «Our networks» shows six posts with whole two-line captions when the networks go under them; its
+  QR codes have no caption; today's card says «today» only when all it says is today's. A screen's sheet shows the doors
+  this site cannot fill, and why, and its screen opens the doors as they are being chosen.
+- **What a screen can be**, under the player's address in «Get started» and «Add a screen»: a television or a small
+  computer with a browser, a professional Samsung, or a Raspberry Pi; and a page for a professional Samsung, step by
+  step, with what to do when its timer switches it on to nothing.
+- From 8 m, the menus fit the width of the screen in Chromium 56.
+- The guide says the three kinds of screen, and the help of «Your centre» and «Birthdays» shows the pages as they are.
+
 ## 0.35.0
 
 What the screens showed badly, from afar or upright, mended:
@@ -170,7 +192,7 @@ A thorough review of everything since 0.7.14, and what it found mended.
   Threads, Bluesky, Telegram, WhatsApp) and one for the centre's web, filled with the account («@…») or its address, and
   saved by itself. An empty box makes nothing; each filled one has its switch, and the screens show the ones switched on,
   one each turn, as «Follow us on …» with the network's glyph, the account and its QR. An address pasted in another
-  network's box goes to its own. The channel of Oksigenia Marandu is the Telegram box. Design by Jujol.
+  network's box goes to its own. The channel of Oksigenia Marandu is the Telegram box.
 - **The latest posts of the centre's Instagram** have their slide ready, one post each time, a carousel through its
   pictures, with the QR to follow it; it shows once the site is connected to Instagram.
 - Items of the same order keep the manifest's order on every screen (Chromium 56 does not sort them stably).

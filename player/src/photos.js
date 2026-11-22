@@ -1,4 +1,4 @@
-// The photos of an album: the carousel in a third and the wall (the art direction's «fotos.css», Gaudí, 1 November 2026).
+// The photos of an album: the carousel in a third and the wall (the art direction's «fotos.css», 1 November 2026).
 // A photo goes where its shape fits, and only one thing changes at a time: the eye is never pulled to two places. From the
 // art direction's demo: ponerFoto, construirCarrusel, arrancarCarrusel, construirMuroCeldas, arrancarMuro.
 

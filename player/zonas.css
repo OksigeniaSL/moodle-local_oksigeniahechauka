@@ -1,4 +1,4 @@
-/* Oksigenia Hechauka: two zones at once, the birthday strip, the place of the screen and the centre's own sentence (Jujol, 12
+/* Oksigenia Hechauka: two zones at once, the birthday strip, the place of the screen and the centre's own sentence (12
  * November 2026). Goes after every sheet of the player but pieles.css, fondos.css, letras.css, actividad.css and
  * movimiento.css (the player page's list and the demo's).
  *
@@ -643,7 +643,7 @@
 }
 
 /* ================================================================================================================
- * 3. The birthday strip, above the ticker: a party, not one more band (Gaudí's review, 12 November 2026)
+ * 3. The birthday strip, above the ticker: a party, not one more band (the review of 12 November 2026)
  * ============================================================================================================= */
 .hk-cumple-franja {
     display: none;

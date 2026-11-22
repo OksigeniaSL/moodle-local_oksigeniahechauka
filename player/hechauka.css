@@ -519,7 +519,7 @@ body {
 
 /* --- Pairing: a new screen shows its code and a QR, readable from across the room ------------------------------- */
 /* In Hechauka's colours, its navy and its light blue, with its emblem: the first thing a centre sees when it plugs a screen in
-   (Jujol, 21 November 2026). One step with two ways (the camera, or the address and the code), then the name; and that the
+   (21 November 2026). One step with two ways (the camera, or the address and the code), then the name; and that the
    screen is waiting, with a dot that breathes. */
 .hk-emparejar {
     display: flex;

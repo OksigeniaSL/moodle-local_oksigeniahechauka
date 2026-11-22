@@ -1,5 +1,5 @@
 // «La semana»: the next five school days, each with its events; holidays as holidays; events of more than a day as a
-// band across their days (on a vertical screen, a flag on a pole). From the art direction (Gaudí, 31 October 2026,
+// band across their days (on a vertical screen, a flag on a pole). From the art direction (31 October 2026,
 // «semanaDe» in its demo). Nothing here touches the page, so it is tested on its own.
 
 import {dayNumber, weekdayOf} from './rules.js';

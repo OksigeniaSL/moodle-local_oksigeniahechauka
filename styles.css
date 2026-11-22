@@ -6413,7 +6413,7 @@ dialog.hkp-dialog > footer {
     }
 }
 
-/* --- The place of a screen and the centre's sentence, without the look of a form (Jujol, 12 Nov 2026) -------------
+/* --- The place of a screen and the centre's sentence, without the look of a form (12 Nov 2026) -------------
    The hours are the sign on the door of the place: a board hung by its string, a line per span of days, the hours in
    large figures on dotted lines. The days it closes are leaves of the calendar with their red binding. The sentence is
    written on the band of the screen itself, with the seal of the centre on its left. */
@@ -6566,7 +6566,7 @@ dialog.hkp-dialog > footer {
     }
 }
 
-/* --- «Nuestras redes»: a box for each network, as a profile reads in the network itself (Jujol, 14 Nov 2026) -------
+/* --- «Nuestras redes»: a box for each network, as a profile reads in the network itself (14 Nov 2026) -------
    Its glyph and name, the account written as the network writes it («@centro.ejemplo») on a line, not in a field's box,
    and its switch «En las pantallas». Empty, a dashed outline waiting for it; filled, a card; on the screens, in the
    accent. Each gesture saves by itself (panel/redes.js), and says so under the box for a moment. */
@@ -6730,7 +6730,7 @@ input.hkp-red-cuenta:focus {
     }
 }
 
-/* ==================== The touch screen in the panel (Jujol, 18 November 2026) ====================
+/* ==================== The touch screen in the panel (18 November 2026) ====================
  * The card «Se puede tocar» of a screen's sheet, with its doors drawn as the screen draws them; «Cómo llegar» and «Conoce el
  * centro» in «Tu centro», drawn as their doors show them and written on; and the row of the report. No form look: what is
  * touched is the thing itself. */

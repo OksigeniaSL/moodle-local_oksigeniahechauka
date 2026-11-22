@@ -1,5 +1,5 @@
-// «Hoy cumplen años», a slide of its own where each person has their moment (Gaudí, 7 November 2026; replaces the grid
-// of 2 November). Enrique: «a veces habrá muchos, a veces pocos, a veces ninguno, pero cada persona debe tener su
+// «Hoy cumplen años», a slide of its own where each person has their moment (7 November 2026; replaces the grid
+// of 2 November). As asked: «a veces habrá muchos, a veces pocos, a veces ninguno, pero cada persona debe tener su
 // momento», and «a este panel le falta acción, movimiento, efectos».
 //
 // - Nobody: there is no slide (birthdaysShow says so, for the composer).

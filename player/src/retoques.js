@@ -1,4 +1,4 @@
-// Design retouches of the slides redone with the movement that need the page (Gaudí, 8 November 2026): the counterpart in
+// Design retouches of the slides redone with the movement that need the page (8 November 2026): the counterpart in
 // script of retoques.css. render.js calls them where LEEME.md says.
 
 import {even} from './balance.js';

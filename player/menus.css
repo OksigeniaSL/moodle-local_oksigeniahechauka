@@ -1,4 +1,4 @@
-/* Oksigenia Hechauka: «Los menús de hoy», every menu of the day on a slide of its own (Jujol, 13 November 2026). Goes after
+/* Oksigenia Hechauka: «Los menús de hoy», every menu of the day on a slide of its own (13 November 2026). Goes after
  * alergenos.css, whose allergen discs it uses.
  *
  *   <div class="hk-cuerpo hk-capa" data-composicion="menus">
@@ -368,10 +368,15 @@
 .hk .hk-menus-cartel .hk-menus-letra b {
     --hk-menus-letra: calc(var(--hk-t-entrada) * 1.3);
 }
+/* The table takes what the door leaves, said in numbers: Chromium 56 (Tizen 4) does not shrink a table that is a flex
+ * item, and with «auto» it grew to its dishes in one line and went out of the sheet. Its margins of -hueco each side, as
+ * everywhere, so the width counts them. Its columns by what they hold (it has no row of heads to fix them by): the
+ * course as wide as its word, the dish the rest. */
 .hk .hk-menus-mesa-cartel {
-    flex: 1 1 auto;
-    width: auto;
+    flex: none;
+    width: calc(68% - 3rem + var(--hk-menus-hueco) * 2);
     min-width: 0;
+    table-layout: auto;
 }
 .hk.hk-vertical .hk-menus-cartel {
     flex-direction: column;
@@ -380,6 +385,9 @@
 .hk.hk-vertical .hk-menus-puerta {
     width: auto;
     margin: 0 0 2rem;
+}
+.hk.hk-vertical .hk-menus-mesa-cartel {
+    width: calc(100% + var(--hk-menus-hueco) * 2);
 }
 
 /* --- Upright: the head stays, the tables one over the other ------------------------------------------------------------- */

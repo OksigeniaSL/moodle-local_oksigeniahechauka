@@ -1,4 +1,4 @@
-/* Oksigenia Hechauka 0.7.0: what each screen is for (Gaudí, 1 November 2026). Replaces the plugin's provisional
+/* Oksigenia Hechauka 0.7.0: what each screen is for (1 November 2026). Replaces the plugin's provisional
  * player/usos.css, on the same markup (plugin commit 76fe193). Goes last of the 0.7.0 sheets, before the client's.
  *
  * <div class="hk" data-uso="info|showcase|mixed">
@@ -444,7 +444,7 @@
     opacity: 0;
 }
 
-/* --- The countdown (Gaudí, 8 November 2026, with the movement), its number as a board of flaps beside its words ---------------------
+/* --- The countdown (8 November 2026, with the movement), its number as a board of flaps beside its words ---------------------
  * Its figure was the size of its title, top left, with two thirds of the block empty: from 8 m one read «Acampada» before the
  * «3». Now the number is the slide, as the lead's board: a split-flap of the height of the block, and the words beside it.
  *

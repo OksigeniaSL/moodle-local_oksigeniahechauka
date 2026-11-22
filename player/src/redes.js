@@ -1,7 +1,7 @@
 // The centre's networks, as a screen names them: each one's glyph, in one ink, beside its account on the card of «Síguenos en …»
 // (canal.js) and on the slide of the centre's Instagram posts (instagram.js). The words say the network; the glyph tells, from
 // metres away and before the phone is out, which app the QR opens, and that the network changed from one turn to the next.
-// Jujol, 14 November 2026, for Hechauka's «Nuestras redes».
+// For «Nuestras redes», 14 November 2026.
 //
 // The glyphs are the brands' own marks as Simple Icons draws them (CC0 1.0, simpleicons.org); LinkedIn's, the web's globe and the
 // link of any other, from Tabler Icons (MIT License, © 2020-2024 Paweł Kuna, tabler.io/icons). Never recoloured to the brand:

@@ -436,7 +436,7 @@ export class Screen {
         }
         p.sitio.setAttribute('data-estado', line.state === this.placeWords.place_open ? 'abierto' : 'cerrado');
         const words = p.sitio.querySelector('p');
-        // From 5 m the chip says only the state, so that it stays beside the clock (the coordinator, 12 November 2026).
+        // From 5 m the chip says only the state, so that it stays beside the clock (12 November 2026).
         const named = this.place.name && this.distance !== 5;
         words.firstChild.textContent = named ? this.place.name + ' · ' + line.state : line.state;
         words.lastChild.textContent = line.more;
@@ -1057,7 +1057,7 @@ export class Screen {
                 self.movedAt = Date.now();
             }});
         } else if (comp === 'cumple') {
-            // Each person their moment: as long as the people of the day take (Gaudí, 7 November 2026).
+            // Each person their moment: as long as the people of the day take (7 November 2026).
             c.hkSeconds = startBirthdays(c, {still: this.keepsStill()});
         } else if (comp === 'canal') {
             // The paper plane crosses where nothing is read; leave() stops it.
@@ -1072,7 +1072,7 @@ export class Screen {
                 stopInstagram(c);
             };
         }
-        // The parts of the slide in the order they are read, and its life while it stands (Gaudí, 8 November 2026): only the
+        // The parts of the slide in the order they are read, and its life while it stands (8 November 2026): only the
         // compositions movimiento.js knows; the others keep their pass.
         if (!c.hkMotion) {
             c.hkMotion = motion(c, comp, {still: this.keepsStill(), seconds: c.hkFor || 0});
@@ -1087,7 +1087,7 @@ export class Screen {
         const c = today && today.countdown;
         if (x.type === 'cuenta' && c) {
             // The number is the slide: a board of flaps as tall as the block, «Faltan» over it, and the words beside it
-            // (Gaudí, 8 November 2026), so that from afar the figure is read before the name.
+            // (8 November 2026), so that from afar the figure is read before the name.
             const board = el('div', 'hk-tipografica-marcador');
             board.appendChild(el('p', 'hk-tipografica-etiqueta', l.countdown));
             const flaps = el('div', 'hk-paletas hk-tipografica-paletas');
@@ -1225,7 +1225,7 @@ export class Screen {
                 // at all, rather than covering the picture. Also one portrait beside «Today», which from 8 m is narrow.
                 pie.classList.remove('hk-pie-corto');
                 pie.style.display = '';
-                // A word wider than its picture would be cut at the edge: rather no caption (Jujol, 12 November 2026).
+                // A word wider than its picture would be cut at the edge: rather no caption (12 November 2026).
                 const cut = function () {
                     return !!h2 && h2.scrollWidth > h2.clientWidth + 1;
                 };

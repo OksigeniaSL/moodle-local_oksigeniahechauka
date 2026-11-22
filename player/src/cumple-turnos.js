@@ -1,5 +1,5 @@
 // «Hoy cumplen años», without a page: who comes out in this slide, how long it lasts and where the next one goes on.
-// Nothing here touches the page, so it is tested on its own (test/cumple.test.js). Gaudí, 7 November 2026.
+// Nothing here touches the page, so it is tested on its own (test/cumple.test.js).
 //
 // Nobody: no slide. One to three: the stage, each person alone and big, and with two or three a group photo at the end.
 // Four or more: the parade, one person at a time in the centre and the rest hanging from the garland; at most PARADE_MOST

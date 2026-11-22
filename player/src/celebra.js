@@ -1,4 +1,4 @@
-// «La biblioteca celebra», a slide of its own (Jujol, 13 November 2026): what Ayvurenda celebrates this week, one moment at
+// «La biblioteca celebra», a slide of its own (13 November 2026): what Ayvurenda celebrates this week, one moment at
 // a time, in the library's own words. A party, but a small one beside the birthdays': the library's rosette (or the cover of
 // the book, with the rosette pinned on it), the sentence large and a few streamers printed on the paper, still. Each turn,
 // the next moment; its marks under the words, one per moment, in the four colours of the skin.

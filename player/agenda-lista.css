@@ -1,6 +1,6 @@
-/* Oksigenia Hechauka 0.8: the agenda as a list, over the whole body (Gaudí, 2 November 2026). Goes after agenda.css, which it restyles.
+/* Oksigenia Hechauka 0.8: the agenda as a list, over the whole body (2 November 2026). Goes after agenda.css, which it restyles.
  *
- * Enrique: «prefiero el formato agenda […] que vaya haciendo scroll si hay eventos futuros que no entran en una sola pantalla.
+ * As asked: «prefiero el formato agenda […] que vaya haciendo scroll si hay eventos futuros que no entran en una sola pantalla.
  * Algo mejor que esa tabla». So no week table and no month grid: from today on, each day with something, its number on the left
  * and its events as bars of the colour of whom they are for, the way a calendar's agenda view reads. It goes up a stretch at a time and
  * stands still to be read (agendaview.js): what moves is what reads worst.

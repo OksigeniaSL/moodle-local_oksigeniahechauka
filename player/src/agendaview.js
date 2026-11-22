@@ -1,4 +1,4 @@
-// The agenda that goes up (the art direction's «agenda.css», Gaudí, 1 November 2026): the month with its days marked and
+// The agenda that goes up (the art direction's «agenda.css», 1 November 2026): the month with its days marked and
 // a diary of the next thirty days. It rises by stretches and stops to be read: what moves is what reads worst. From 8 m,
 // and 5 m behind glass, the month and the diary take turns over the whole body. Nothing is ever cut: at a stop, what does
 // not fit whole does not show. From the art direction's demo: construirMes, construirAgenda, partirDias, paradasAgenda,

@@ -1,4 +1,4 @@
-// «Los menús de hoy»: every menu of the day on one slide, for the canteen's queue (Jujol, 13 November 2026). Hechauka's «Today»
+// «Los menús de hoy»: every menu of the day on one slide, for the canteen's queue (13 November 2026). Hechauka's «Today»
 // leads with the first menu and says the others in a line; at lunch time whoever waits in the queue wants all of them,
 // whole. A table: the menus are its columns and the courses its rows, so that each course is read across. A dish two
 // menus side by side share is one cell over both, and one shared by every menu of the day a band across the table; one
@@ -268,7 +268,7 @@ function buildTable(data, table, tints) {
         const th = el('th', 'hk-menus-menu');
         th.setAttribute('scope', 'col');
         // The letter (or number) first and big, as on the canteen's door, which is what a child looks for from afar
-        // (Enrique, 13 November 2026); a word, smaller; «Menú» and the kind, small, around it.
+        // (13 November 2026); a word, smaller; «Menú» and the kind, small, around it.
         const cell = el('div', 'hk-menus-celda');
         nameOf(m, cell);
         th.appendChild(cell);

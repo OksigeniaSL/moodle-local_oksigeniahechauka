@@ -1,4 +1,4 @@
-// Which composition comes next, and with which pictures or videos: the rule table of the art direction (Gaudí, 31
+// Which composition comes next, and with which pictures or videos: the rule table of the art direction (31
 // October 2026, «Cuándo sale cada una»). Nothing here touches the page, so it is tested on its own.
 //
 // foto-hoy        a landscape picture or video, and «Today» beside it (under it on a vertical screen)
@@ -241,7 +241,7 @@ export class Composer {
         // The turn of the coming days. From 5 and 8 m, the agenda: «La semana» reads only from close, and there it keeps
         // Mondays and Fridays, when the week is what matters; the other turns are the agenda's.
         const flagDay = !!(o.week && (o.week.weekday === 1 || o.week.weekday === 5));
-        // The coming days are always the agenda (Enrique, 2 November 2026: «prefiero el formato agenda»): there is no week table.
+        // The coming days are always the agenda (2 November 2026: «prefiero el formato agenda»): there is no week table.
         const useAgenda = !!(o.agenda && !o.noToday);
         const albumOf = (min) => {
             const list = (o.albums || []).filter((a) => a.count >= min);
@@ -393,7 +393,7 @@ export class Composer {
                 return pick('titular', [], 9, {type: 'frase', text: phrases[this.phrase]});
             }
         }
-        // The two zones, now and then and never fixed: a column with its own carousel beside a wide zone (Jujol, 12
+        // The two zones, now and then and never fixed: a column with its own carousel beside a wide zone (12
         // November 2026). Only when both have something; never on a showcase, never right after what it repeats.
         this.sinceZones = (this.sinceZones === undefined ? 0 : this.sinceZones) + 1;
         if (this.sinceZones > ZONES_EVERY && !o.noToday && this.last !== 'agenda' && this.last !== 'tiempo-tercio') {
@@ -401,7 +401,7 @@ export class Composer {
             if (z) {
                 this.sinceZones = 1;
                 // A screen with a place gives the wide zone in turns: the picture one time, the place's card the next
-                // (the coordinator, 12 November 2026).
+                // (12 November 2026).
                 this.zonesTurn = (this.zonesTurn || 0) + 1;
                 if (z.wide && o.place && this.zonesTurn % 2 === 0) {
                     z = {items: z.items.slice(1), wide: null, extra: Object.assign({}, z.extra, {wide: false, place: true})};

@@ -1,6 +1,6 @@
 // Headlines in even lines (Chromium 56 has no «text-wrap: balance»): each word is measured and the breaks go where
 // each line is closest to the same width, as <br>. Only headlines, never paragraphs; the box keeps its width. If the
-// even breaks would add a line, it stays as it was. The art direction's «equilibrar» (Gaudí, 1 November 2026).
+// even breaks would add a line, it stays as it was. The art direction's «equilibrar» (1 November 2026).
 
 import {linesOf} from './lead.js';
 

@@ -1,5 +1,5 @@
 // «Puertas abiertas»: the acts Eguahe opens to the families who are getting to know the centre (an open day, a talk, a
-// festival with open sign-up), on the centre's screens (Jujol, 17 November 2026). Two faces:
+// festival with open sign-up), on the centre's screens (17 November 2026). Two faces:
 //   - the days before (up to 30): an invitation in the centre's colour, the day on a calendar leaf, the hours and the place,
 //     the turns (the full ones struck out), and the QR on a white card to sign up; full, its stamp instead of the QR;
 //   - the day, while it lasts: the welcome, with the centre's guide (its dog) waving and its words in a bubble, the hours

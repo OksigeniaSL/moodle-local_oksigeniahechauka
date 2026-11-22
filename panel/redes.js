@@ -4,7 +4,6 @@
 // when it is turned. The answer says how the box stays: the account as it is written, its address, whether it shows, and where an
 // address of another network went (to its own box: this one stays as it was). While a box is in hand, the screen beside shows its
 // «Síguenos en …», as the screens will; leaving the block, the screen goes back to its samples (centre.js).
-// Jujol, 14 November 2026.
 //
 // The glyphs are the brands' own marks as Simple Icons draws them (CC0 1.0); LinkedIn's, the web's globe and any other's link,
 // from Tabler Icons (MIT License, © 2020-2024 Paweł Kuna). The same as the player's src/redes.js.

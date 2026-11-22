@@ -333,7 +333,7 @@ test('the QR codes the site\'s link shortener draws are kept like any picture', 
     assert.deepEqual(shas, ['p', 'q1', 'q3', 'q4', 'q5']);
 });
 
-test('from afar, on a landscape screen, two portraits go one at a time, never as a pair (Jujol, 13 November 2026)', () => {
+test('from afar, on a landscape screen, two portraits go one at a time, never as a pair (13 November 2026)', () => {
     const near = new Composer();
     near.sinceFull = -100;
     assert.equal(near.next([tall('a'), tall('b')], 3, true, {distance: 3}).comp, 'dos-verticales');

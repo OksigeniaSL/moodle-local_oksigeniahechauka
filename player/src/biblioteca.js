@@ -1,5 +1,5 @@
 // «Novedades de la biblioteca», a slide of its own: a shelf. One book stands out, with its code, and the next ones stand beside it;
-// there are as many pages as books, so each one gets its turn with its code. Gaudí, 2 November 2026.
+// there are as many pages as books, so each one gets its turn with its code.
 
 import {fitWord, linesOf} from './lead.js';
 

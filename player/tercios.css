@@ -1,4 +1,4 @@
-/* Oksigenia Hechauka 0.7.0: the picture in two thirds with its band, and the weather in a third (Gaudí, 1 November
+/* Oksigenia Hechauka 0.7.0: the picture in two thirds with its band, and the weather in a third (1 November
  * 2026). Goes after jerarquia.css. Drawn on the player's own markup (plugin commit 76fe193): the slot is the usual
  * .hk-medio with its .hk-diapo and .hk-pie, and the weather is what buildWeatherThird() writes. Nothing new to build
  * but the composition «apaisado».

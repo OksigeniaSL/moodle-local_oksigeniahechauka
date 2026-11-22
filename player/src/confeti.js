@@ -1,5 +1,4 @@
 // The party of «Hoy cumplen años»: paper confetti in a single canvas, and balloons that rise slowly at the back.
-// Gaudí, 7 November 2026.
 //
 // Confetti: at most 80 pieces alive, drawn at half resolution (a quarter of the pixels; paper does not need more) and
 // only while there is something in the air: once the last piece has fallen the loop stops and the canvas is cleared.

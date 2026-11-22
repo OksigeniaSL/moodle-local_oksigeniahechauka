@@ -2,7 +2,7 @@
 // one column or six, two rows or a hundred, numbers, hours or words, and cells of any length side by side. So nothing here is decided by
 // counting: it is laid out with the real letter of the real screen and measured. A proper table while it reads as one; if it does not
 // fit, or its cells would go to too many lines, each row becomes a card, with its column's name beside each value. Only if a card does
-// not fit on the sheet even so, from afar, it keeps its first columns. No word is cut. Gaudí, 2 November 2026.
+// not fit on the sheet even so, from afar, it keeps its first columns. No word is cut.
 
 function el(tag, cls, text) {
     const n = document.createElement(tag);

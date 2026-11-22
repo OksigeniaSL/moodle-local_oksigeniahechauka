@@ -1,4 +1,4 @@
-// How the slides move: one language for all of them (Gaudí, 8 November 2026; MOTION.md). The player calls motion()
+// How the slides move: one language for all of them (8 November 2026; MOTION.md). The player calls motion()
 // once the layer is in the page, measured and with its letters, before .hk-dentro is added: it marks the parts of the slide in
 // the order they are read (the frame first, then the headline, what explains it, the object, the third from the top), each
 // with how it comes in and when; movimiento.css does the rest with transform and opacity. Then the little life of the slide
@@ -16,7 +16,7 @@ import {partyOf} from './cumple.js';
 /**
  * The timings of each level, in seconds: wait (the old slide has gone), step (between two parts), line (between two lines of a
  * list), flips (of a countdown's flaps), flip (each). The flaps start from yesterday's number at every level: one turn, and
- * never a number that is not (Gaudí, 8 November 2026).
+ * never a number that is not (8 November 2026).
  */
 export const TIMING = {
     sobria: {wait: 0.32, step: 0.06, line: 0.045, flips: 1, flip: 0.34},
@@ -116,8 +116,8 @@ const PARTS = {
         ['.hk-celebra-sitio', 'sube', 4],
         ['.hk-celebra-marcas', 'sube', 5],
     ],
-    // The channel: its words, and then its last message arrives, the card with the QR (Gaudí, 8 November 2026).
-    // The centre's Instagram: the post's picture as a photo comes, who posts it, its words, and the card to follow it (Jujol,
+    // The channel: its words, and then its last message arrives, the card with the QR (8 November 2026).
+    // The centre's Instagram: the post's picture as a photo comes, who posts it, its words, and the card to follow it (
     // 14 November 2026).
     'instagram': [
         ['.hk-ig', 'marco', 0],

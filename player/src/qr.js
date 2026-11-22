@@ -55,7 +55,7 @@ export function shortWeb(url) {
 /** The modules' ink: pure black. Any colour, even a deep one, costs readings to the decoders that read edges (zbar). */
 export const QR_INK = '#000000';
 
-/** Hechauka's own mark («Dos pantallas», Gaudí), for the screens that are still nobody's: the pairing. */
+/** Hechauka's own mark («Dos pantallas»), for the screens that are still nobody's: the pairing. */
 export const HECHAUKA_EMBLEM = {
     box: '0 0 64 64',
     svg: '<path d="M55.542,10.727 Q56.208,11.033 56.604,11.65 Q57,12.267 57,13 L57,51 Q57,51.733 56.604,52.35 Q56.208,' +
