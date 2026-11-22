@@ -119,7 +119,9 @@ export function dressObject(object, card, qr, name) {
         piece(card, 'leidos', TICKS);
         over('escribe', '<b></b><b></b><b></b>');
     } else if (name === 'hoja') {
+        // Paper: its folds, and the corner turned down from which the paper plane leaves.
         piece(card, 'pliegues');
+        piece(card, 'oreja');
     } else if (name === 'ventana') {
         // The address bar is the sender's line: its three buttons and its loading line go in it.
         const bar = card.querySelector('.hk-canal-nombre');
@@ -138,15 +140,32 @@ export function dressObject(object, card, qr, name) {
         piece(object, 'grito2');
         piece(object, 'grito3');
     } else if (name === 'tarjeta') {
+        // A business card lies landscape: the code on one side; on the other, who it is and the address, as a name and its
+        // details. They stay in the code's box (its address is read with it, close), placed beside it; the card keeps their
+        // room. Another card behind it, a little turned, as a few on a desk.
+        const words = el('div', 'hk-canal-tarjeta-texto');
+        const who = card.querySelector('.hk-canal-nombre');
+        if (who) {
+            words.appendChild(who);
+        }
+        if (qr) {
+            const lines = qr.querySelectorAll('.hk-qr-web, .hk-qr-llamada');
+            for (let i = 0; i < lines.length; i++) {
+                words.appendChild(lines[i]);
+            }
+            qr.appendChild(words);
+        } else {
+            card.appendChild(words);
+        }
         piece(card, 'franja');
         piece(card, 'dorso');
+        piece(object, 'otra');
     } else if (name === 'carrete') {
         piece(card, 'puntadas');
         piece(object, 'bobina', '<b></b>');
     } else if (name === 'nube') {
-        piece(object, 'bulto1');
-        piece(object, 'bulto2');
-        piece(object, 'bulto3');
+        // The cloud's outline, drawn round the card once it is measured (canal.js, cloudSvg).
+        piece(object, 'silueta');
     }
 }
 
@@ -242,7 +261,7 @@ export function gestureOf(name, k) {
                 {offset: 0.4, opacity: 1, transform: tr(0, 0, -4 * a) + ' scale(.55,.5)'},
                 {offset: 0.78, opacity: 1, transform: tr(0, 0, 1 * a) + ' scale(1.02,1)'},
                 {offset: 1, opacity: 1, transform: REST + ' scale(1,1)'},
-            ], 1.1)];
+            ], 1.1), appear('oreja', 0.45, 1.05)];
         case 'ventana':
             // The window opens, the pointer comes and clicks, the address loads, and the page is the code.
             return [pop(0.3, 0.7),
@@ -274,11 +293,12 @@ export function gestureOf(name, k) {
         case 'tarjeta':
             // The business card turns over: its back in the centre's colour, then its face with the code.
             return [g('objeto', [
-                {offset: 0, opacity: 0, transform: 'perspective(160rem) rotateY(-180deg)'},
-                {offset: 0.1, opacity: 1, transform: 'perspective(160rem) rotateY(-162deg)'},
-                {offset: 0.5, opacity: 1, transform: 'perspective(160rem) rotateY(-90deg)'},
-                {offset: 0.8, opacity: 1, transform: 'perspective(160rem) rotateY(' + (8 * a) + 'deg)'},
-                {offset: 1, opacity: 1, transform: 'perspective(160rem) rotateY(0deg)'},
+                // A far eye: the edge that comes near grows little, and the card stays in its block while it turns.
+                {offset: 0, opacity: 0, transform: 'perspective(320rem) rotateY(-180deg)'},
+                {offset: 0.1, opacity: 1, transform: 'perspective(320rem) rotateY(-162deg)'},
+                {offset: 0.5, opacity: 1, transform: 'perspective(320rem) rotateY(-90deg)'},
+                {offset: 0.8, opacity: 1, transform: 'perspective(320rem) rotateY(' + (8 * a) + 'deg)'},
+                {offset: 1, opacity: 1, transform: 'perspective(320rem) rotateY(0deg)'},
             ], 1.2, 0, 'ease-in-out'), g('dorso', [{offset: 0, opacity: 1}, {offset: 0.5, opacity: 1}, {offset: 0.501, opacity: 0},
                 {offset: 1, opacity: 0}], 1.2, 0, 'ease-in-out')];
         case 'carrete':
@@ -291,13 +311,14 @@ export function gestureOf(name, k) {
             ], 1.1), g('bobina', [{offset: 0, transform: tr(0, 0, 0)}, {offset: 1, transform: tr(0, 0, 900 * a)}], 1.1, 0),
             g('puntadas', [{offset: 0, opacity: 0}, {offset: 1, opacity: 1}], 0.5, 1, 'linear')];
         case 'nube':
-            // The cloud drifts in, sways, and puffs up its tops.
+            // The cloud drifts in, sways, and puffs up once as it stops.
             return [g('objeto', [
-                {offset: 0, opacity: 0, transform: tr(-28 * a, 2)},
-                {offset: 0.3, opacity: 1, transform: tr(-16 * a, 0.6)},
-                {offset: 0.75, opacity: 1, transform: tr(1.5 * a, -0.8)},
+                {offset: 0, opacity: 0, transform: tr(-28 * a, 2, 0, 1)},
+                {offset: 0.3, opacity: 1, transform: tr(-16 * a, 0.6, 0, 1)},
+                {offset: 0.7, opacity: 1, transform: tr(1.5 * a, -0.8, 0, 1)},
+                {offset: 0.85, opacity: 1, transform: tr(0, 0, 0, 1 + 0.04 * a)},
                 {offset: 1, opacity: 1, transform: REST},
-            ], 1.4), appear('bulto1', 0.5, 0.95), appear('bulto2', 0.5, 1.05), appear('bulto3', 0.5, 1.15)];
+            ], 1.6)];
         default:
             return [pop(0.3)];
     }
@@ -333,6 +354,52 @@ export function lifeOf(name, k) {
             loop('antena2', [{offset: 0, transform: tr(0, 0, 28 + 2 * a)}, {offset: 1, transform: tr(0, 0, 28 - 2 * a)}], 2.1, 1.3, 'alternate')];
     }
     return [];
+}
+
+/**
+ * Bluesky's cloud round its card: scallops all along its edges (arcs that bulge out between points spaced along the card),
+ * white, with a soft shadow under the whole outline. In px, for a card of w × h, with «pad» of room round it. Pure.
+ *
+ * @param {number} w the card's width
+ * @param {number} h its height
+ * @param {number} pad the room round it the drawing has (the scallops come out up to about 0.8 of it)
+ * @param {number} r the scallops' radius
+ * @returns {string} the <svg>, pad + w + pad wide
+ */
+export function cloudSvg(w, h, pad, r) {
+    const e = r * 0.1;
+    const x0 = pad - e;
+    const y0 = pad - e;
+    const x1 = pad + w + e;
+    const y1 = pad + h + e;
+    const round = function (v) {
+        return Math.round(v * 10) / 10;
+    };
+    // The points along each edge, clockwise; between two of them, an arc that bulges out.
+    const pts = [];
+    const edge = function (ax, ay, bx, by) {
+        const len = Math.sqrt((bx - ax) * (bx - ax) + (by - ay) * (by - ay));
+        const n = Math.max(2, Math.round(len / (r * 1.9)));
+        for (let i = 0; i < n; i++) {
+            pts.push([ax + (bx - ax) * i / n, ay + (by - ay) * i / n]);
+        }
+    };
+    edge(x0, y0, x1, y0);
+    edge(x1, y0, x1, y1);
+    edge(x1, y1, x0, y1);
+    edge(x0, y1, x0, y0);
+    let d = 'M' + round(pts[0][0]) + ' ' + round(pts[0][1]);
+    for (let i = 1; i <= pts.length; i++) {
+        const p = pts[i % pts.length];
+        d += 'A' + round(r) + ' ' + round(r) + ' 0 0 1 ' + round(p[0]) + ' ' + round(p[1]);
+    }
+    d += 'Z';
+    const W = round(w + 2 * pad);
+    const H = round(h + 2 * pad);
+    return '<svg viewBox="0 0 ' + W + ' ' + H + '" width="' + W + '" height="' + H + '" aria-hidden="true" focusable="false">' +
+        '<defs><filter id="hk-nube-sombra" x="-10%" y="-10%" width="120%" height="125%"><feGaussianBlur stdDeviation="' + round(r * 0.32) +
+        '"/></filter></defs><path d="' + d + '" fill="rgba(0,0,0,.18)" transform="translate(0 ' + round(r * 0.22) + ')" ' +
+        'filter="url(#hk-nube-sombra)"/><path d="' + d + '" fill="#fff"/></svg>';
 }
 
 // --- The worlds ------------------------------------------------------------------------------------------------------------
@@ -475,17 +542,24 @@ export function worldOf(world, w, h) {
         }
     } else if (world === 'organigrama') {
         // A chart of people: one, three, six, joined by their lines; three of them breathe.
+        // Where the block is free: wide, above the words and left of the card; tall, between the words and the card.
+        const wide = w > h;
         const rows = [[0.5], [0.2, 0.5, 0.8], [0.1, 0.26, 0.42, 0.58, 0.74, 0.9]];
-        const bw = 16;
-        const bh = 8;
+        const ys = wide ? [0.07, 0.21, 0.35] : [0.275, 0.335, 0.395];
+        const span = wide ? [0.03, 0.55] : [0.04, 0.96];
+        const bw = wide ? 11 : 12;
+        const bh = wide ? 6.5 : 4.5;
+        const xOf = function (fx) {
+            return w * (span[0] + fx * (span[1] - span[0]));
+        };
         rows.forEach(function (row, r) {
-            const y = h * (0.12 + r * 0.32);
+            const y = h * ys[r];
             row.forEach(function (fx, i) {
-                const x = w * fx - bw / 2;
+                const x = xOf(fx) - bw / 2;
                 if (r > 0) {
                     const up = rows[r - 1][Math.min(rows[r - 1].length - 1, Math.floor(i * rows[r - 1].length / row.length))];
-                    const ux = w * up;
-                    const uy = h * (0.12 + (r - 1) * 0.32) + bh;
+                    const ux = xOf(up);
+                    const uy = h * ys[r - 1] + bh;
                     const dx = x + bw / 2 - ux;
                     const dy = y - uy;
                     add('hk-menlace', ux, uy, Math.sqrt(dx * dx + dy * dy), 0.5, null, Math.atan2(dy, dx) * 180 / Math.PI);

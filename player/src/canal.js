@@ -27,7 +27,7 @@ import {even} from './balance.js';
 import {fitWord, linesOf} from './lead.js';
 import {onWhite} from './qr.js';
 import {glyphSvg, knownNetwork, NETWORK_NAMES} from './redes.js';
-import {dressObject, drawWorld, ENTRANCE_AT, gestureOf, LEVELS, lifeOf, objectOf, WORLDS} from './canal-redes.js';
+import {cloudSvg, dressObject, drawWorld, ENTRANCE_AT, gestureOf, LEVELS, lifeOf, objectOf, WORLDS} from './canal-redes.js';
 
 /** The plane's flight, in seconds: it waits for the entrance to end, crosses, and comes back while the slide stays. */
 export const FLIGHT = {wait: 2.2, cross: 11, every: 20};
@@ -40,12 +40,13 @@ const DOT_STAYS = 2.6;
 const QR_LEAST = 32;
 
 // The paper plane in three quarters: the far wing behind, a little in shadow; the keel under it, in its shadow; and the near wing
-// in front, whole, with the crease of its fold. White in canal.css, so it belongs to any skin. The nose points right, at (100, 30).
-const PLANE = '<svg viewBox="0 0 100 62" aria-hidden="true">' +
+// in front, whole, with the crease of its fold. Of the sheet's own paper (canal.css). It leaves the sheet's turned-down corner
+// and flies away from the card, so its nose points left, at (0, 30).
+const PLANE = '<svg viewBox="0 0 100 62" aria-hidden="true"><g transform="matrix(-1 0 0 1 100 0)">' +
     '<path class="hk-canal-ala-lejos" d="M100 30 L16 0 L36 29 Z"/>' +
     '<path class="hk-canal-quilla" d="M100 30 L36 30 L26 60 Z"/>' +
     '<path class="hk-canal-ala" d="M100 30 L0 15 L36 30 L41 40 Z"/>' +
-    '</svg>';
+    '</g></svg>';
 
 function el(tag, cls, text) {
     const n = document.createElement(tag);
@@ -364,6 +365,7 @@ export function fitChannel(c, horizontal) {
         placeSky(s, horizontal);
     }
     placeWorld(s);
+    drawCloud(s);
     // Measured again after its life had started (the letters arrived): the plane flies the new sky.
     if (c.hkChannelRestart) {
         c.hkChannelRestart();
@@ -383,6 +385,27 @@ function shownEdges(box, selector) {
         }
     }
     return {top, bottom};
+}
+
+// Bluesky's card is the cloud: its outline drawn round the card as it is now (again only when its size changes).
+function drawCloud(s) {
+    const out = s.querySelector('[data-p="silueta"]');
+    const card = s.querySelector('.hk-canal-tarjeta');
+    if (!out || !card) {
+        return;
+    }
+    const r = rem();
+    const key = card.offsetWidth + 'x' + card.offsetHeight;
+    if (out.hkKey === key) {
+        return;
+    }
+    out.hkKey = key;
+    const pad = 4.2 * r;
+    out.style.left = -pad + 'px';
+    out.style.top = -pad + 'px';
+    out.style.width = (card.offsetWidth + 2 * pad) + 'px';
+    out.style.height = (card.offsetHeight + 2 * pad) + 'px';
+    out.innerHTML = cloudSvg(card.offsetWidth, card.offsetHeight, pad, 4.6 * r);
 }
 
 // Where a node is in the block, by offsets: what the entrance or a gesture moves for a moment does not count.
@@ -470,12 +493,18 @@ function placeSky(s, horizontal) {
     const at = placeIn(s.querySelector('.hk-canal-tarjeta'), s);
     const card = {left: box.left + at.x, top: box.top + at.y};
     const air = 3 * rem();
+    // The sky reaches the sheet: the plane comes out from behind its turned-down corner (2.5 rem into it) and flies away. Wide,
+    // the corner is the sheet's top left, by the sky; tall, its top right, so that the plane crosses the band over it.
+    const corner = 2.5 * rem();
+    const sheet = s.querySelector('.hk-canal-tarjeta').offsetWidth;
     let r;
     if (horizontal) {
-        r = {top: 0, width: card.left - box.left - air * 1.4, height: (words.top || box.bottom) - box.top - air, exit: 'top'};
+        const width = card.left - box.left;
+        r = {top: 0, width, height: (words.top || box.bottom) - box.top - air, exit: 'corner', cx: width, cy: card.top - box.top + corner};
     } else {
         const from = (words.bottom || box.top) - box.top + air * 0.6;
-        r = {top: from, width: box.width, height: card.top - box.top - from - air, exit: 'right'};
+        const height = card.top - box.top - from + corner;
+        r = {top: from, width: box.width, height, exit: 'corner', cx: card.left - box.left + sheet - corner, cy: height};
     }
     sky.style.top = Math.round(r.top) + 'px';
     sky.style.width = Math.max(0, Math.round(r.width)) + 'px';
@@ -484,7 +513,8 @@ function placeSky(s, horizontal) {
     const ph = plane.offsetHeight;
     const room = pw > 0 && r.width > pw * 4 && r.height > ph * 1.5;
     s.classList.toggle('hk-canal-sin-cielo', !room);
-    s.hkSky = room ? {w: Math.round(r.width), h: Math.round(r.height), pw, ph, exit: r.exit} : null;
+    s.hkSky = room ? {w: Math.round(r.width), h: Math.round(r.height), pw, ph, exit: r.exit, cx: Math.round(r.cx || 0),
+        cy: Math.round(r.cy || 0)} : null;
 }
 
 /**
@@ -504,7 +534,21 @@ export function flightPath(sky, n) {
     // The whole plane in its sky while it is in sight: its centre at least about half its size from the long edges.
     const low = h - ph * 0.75;
     const high = ph * 0.75;
-    const p = sky.exit === 'top' ? [
+    const away = sky.exit === 'corner';
+    const cy = Math.max(high, Math.min(low, sky.cy || 0));
+    // From the sheet's corner (cx, cy), behind it at first, away from the card: wide, it dips and climbs out by the top, on the
+    // left; tall (the corner at the sky's foot, on the right), it rises, crosses the band in a wave and leaves by the left.
+    const p = away && sky.cx >= w - 1 ? [
+        [w + pw * 0.7, cy],
+        [w * 0.62, cy + (low - cy) * 0.7],
+        [w * 0.3, high + (low - high) * 0.2],
+        [w * 0.1, -ph * 1.2],
+    ] : away ? [
+        [sky.cx - pw * 0.3, sky.h + ph * 0.8],
+        [sky.cx - w * 0.3, high],
+        [w * 0.3, low],
+        [-pw * 0.7, high + (low - high) * 0.4],
+    ] : sky.exit === 'top' ? [
         [-pw * 0.7, low - (low - high) * 0.25],
         [w * 0.38, low],
         [w * 0.62, high + (low - high) * 0.35],
@@ -548,7 +592,13 @@ export function flightPath(sky, n) {
         // The nose follows the way, a little less steep than it: a plane that glides, not one that turns.
         const a0 = at(Math.max(0, f0.t - 0.02));
         const a1 = at(Math.min(1, f1.t + 0.02));
-        const angle = Math.atan2(a1[1] - a0[1], a1[0] - a0[0]) * 180 / Math.PI * 0.8;
+        let angle = Math.atan2(a1[1] - a0[1], a1[0] - a0[0]) * 180 / Math.PI;
+        if (away) {
+            // The plane faces left: its turn is the way's angle less a half turn.
+            angle = angle - 180;
+            angle = angle < -180 ? angle + 360 : angle > 180 ? angle - 360 : angle;
+        }
+        angle *= 0.8;
         out.push({x: f0.x + (f1.x - f0.x) * k, y: f0.y + (f1.y - f0.y) * k, a: Math.round(angle * 10) / 10, s: want / total});
     }
     return out;

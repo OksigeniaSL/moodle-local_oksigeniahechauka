@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.38.1
+
+- «Follow us», finished: LinkedIn is a landscape business card with another one behind it; Telegram, a folded letter
+  with the paper plane flying out from behind its corner; Bluesky's card is a cloud.
+
 ## 0.38.0
 
 - **«Follow us», each network its own.** The QR lives inside the network's object: a photo that develops (Instagram), a

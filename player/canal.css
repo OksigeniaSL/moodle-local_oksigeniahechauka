@@ -236,16 +236,23 @@
     height: 100%;
     overflow: visible;
 }
-.hk-canal-ala {                           /* the plane in the centre's colours, on the surface */
-    fill: var(--hk-primario);
+.hk-canal-ala {                           /* the plane, of the sheet's paper, its edges drawn */
+    fill: #fffdf6;
+    stroke: rgba(0, 0, 0, .28);
+    stroke-width: 1.2;
+    stroke-linejoin: round;
 }
 .hk-canal-ala-lejos {
-    fill: var(--hk-marca-1);
-    opacity: .7;
+    fill: #e9e3d3;
+    stroke: rgba(0, 0, 0, .22);
+    stroke-width: 1.2;
+    stroke-linejoin: round;
 }
 .hk-canal-quilla {
-    fill: var(--hk-texto);
-    opacity: .35;
+    fill: #d6cdb6;
+    stroke: rgba(0, 0, 0, .2);
+    stroke-width: 1.2;
+    stroke-linejoin: round;
 }
 .hk .hk-canal-estela i {                 /* a dot of its trail, in the accent */
     position: absolute;
@@ -811,17 +818,41 @@
 
 /* Telegram: the sheet the plane brings, with its folds. */
 .hk [data-objeto="hoja"] .hk-canal-tarjeta {
-    border-radius: .6rem;
+    border-radius: 0 .4rem .4rem .4rem;
+    background: #fffdf6;
+    box-shadow: 0 1.2rem 3rem rgba(0, 0, 0, .22), 0 0 0 .1rem rgba(0, 0, 0, .06);
 }
-.hk [data-p="pliegues"] {
+.hk [data-p="pliegues"] {                  /* a letter folded in three: its two folds, a light and a shade each */
     top: 0;
     left: 0;
     z-index: -1;
     width: 100%;
     height: 100%;
-    background-image: linear-gradient(45deg, transparent 49.7%, rgba(0, 0, 0, .07) 50%, transparent 50.3%),
-        linear-gradient(-45deg, transparent 49.7%, rgba(0, 0, 0, .07) 50%, transparent 50.3%),
-        linear-gradient(90deg, transparent 49.8%, rgba(0, 0, 0, .05) 50%, transparent 50.2%);
+    background-image: linear-gradient(180deg, rgba(0, 0, 0, .025) 0, rgba(0, 0, 0, 0) 33.2%, rgba(0, 0, 0, .09) 33.3%,
+        rgba(255, 255, 255, 0) 34.2%, rgba(0, 0, 0, .035) 34.3%, rgba(0, 0, 0, 0) 66.5%, rgba(0, 0, 0, .09) 66.6%,
+        rgba(255, 255, 255, 0) 67.5%, rgba(0, 0, 0, .025) 67.6%, rgba(0, 0, 0, 0) 100%);
+}
+.hk.hk-vertical [data-objeto="hoja"] .hk-canal-tarjeta {
+    border-radius: .4rem 0 .4rem .4rem;   /* tall, the corner turned down is the top right: the plane crosses the band */
+}
+.hk.hk-vertical [data-p="oreja"] {
+    left: auto;
+    right: -.1rem;
+    background-image: linear-gradient(225deg, var(--hk-superficie) 0, var(--hk-superficie) 50%, #e6dfcc 50%, #f3eee0 100%);
+    box-shadow: -.5rem .5rem .9rem -.4rem rgba(0, 0, 0, .3);
+    -webkit-transform-origin: 100% 0;
+    transform-origin: 100% 0;
+}
+.hk [data-p="oreja"] {                     /* the corner turned down: what is cut shows the surface, the flap its back */
+    top: -.1rem;
+    left: -.1rem;
+    z-index: 2;
+    width: 7.2rem;
+    height: 7.2rem;
+    background-image: linear-gradient(135deg, var(--hk-superficie) 0, var(--hk-superficie) 50%, #e6dfcc 50%, #f3eee0 100%);
+    box-shadow: .5rem .5rem .9rem -.4rem rgba(0, 0, 0, .3);
+    -webkit-transform-origin: 0 0;
+    transform-origin: 0 0;
 }
 
 /* The web: a browser's window; the sender's line is its address bar, with its three buttons and its loading line. */
@@ -977,8 +1008,37 @@
 
 /* LinkedIn: a business card with the centre's band; it turns over and shows its back in the centre's colour first. */
 .hk [data-objeto="tarjeta"] .hk-canal-tarjeta {
-    padding-top: 4.4rem;
+    padding: 4.4rem calc(var(--hk-canal-qr) * .62 + 6.4rem) 3rem 3.2rem;   /* the right side keeps the words' room */
     border-radius: 1.6rem;
+}
+.hk .hk-canal-tarjeta-texto {              /* who it is and the address, beside the code, as on a business card */
+    position: absolute;
+    top: 50%;
+    left: 100%;
+    width: calc(var(--hk-canal-qr) * .62);
+    margin-left: 3.2rem;
+    text-align: left;
+    -webkit-transform: translate3d(0, -50%, 0);
+    transform: translate3d(0, -50%, 0);
+}
+.hk [data-objeto="tarjeta"] .hk-canal-nombre {
+    width: auto;
+    margin-bottom: 2.4rem;
+}
+.hk .hk-canal[data-objeto="tarjeta"] .hk-qr-web {
+    margin-top: 0;
+}
+.hk [data-p="otra"] {                      /* another card behind it, a little turned */
+    top: 0;
+    left: 0;
+    z-index: -1;
+    width: 100%;
+    height: 100%;
+    border-radius: 1.6rem;
+    background: #f3f1ea;
+    box-shadow: 0 1rem 2.4rem rgba(0, 0, 0, .18);
+    -webkit-transform: rotate(-4deg);
+    transform: rotate(-4deg);
 }
 .hk [data-p="franja"] {
     top: 0;
@@ -1052,35 +1112,15 @@
 
 /* Bluesky: a cloud, its card the body and three tops. */
 .hk [data-objeto="nube"] .hk-canal-tarjeta {
-    border-radius: 6rem;
+    border-radius: 3rem;
 }
-.hk [data-p="bulto1"],
-.hk [data-p="bulto2"],
-.hk [data-p="bulto3"] {                    /* low tops where the block is wide (room above the card is short), high when tall */
-    top: 22%;
-    left: -4.4rem;
+.hk .hk-canal[data-objeto="nube"] .hk-canal-tarjeta {
+    box-shadow: none;                      /* the cloud's outline brings its own shadow */
+}
+.hk [data-p="silueta"] {
     z-index: -1;
-    width: 15rem;
-    height: 15rem;
-    border-radius: 50%;
-    background: #fff;
-    box-shadow: 0 1.2rem 3.2rem rgba(0, 0, 0, .2), 0 0 0 .2rem rgba(0, 0, 0, .05);   /* the card's own edge: white on a white surface */
 }
-.hk [data-p="bulto2"] {
-    top: -4.2rem;
-    left: 14%;
-    width: 22rem;
-    height: 22rem;
-}
-.hk [data-p="bulto3"] {
-    top: -3.6rem;
-    left: 56%;
-    width: 16rem;
-    height: 16rem;
-}
-.hk.hk-vertical [data-p="bulto2"] {
-    top: -8rem;
-}
-.hk.hk-vertical [data-p="bulto3"] {
-    top: -6rem;
+.hk [data-p="silueta"] svg {
+    display: block;
+    overflow: visible;
 }

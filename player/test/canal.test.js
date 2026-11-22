@@ -4,7 +4,7 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {bindShort, channelShow, channelWords, flightPath, membersWords, qrAddress, trailOf, FLIGHT} from '../src/canal.js';
-import {ENTRANCE_AT, gestureOf, LEVELS, lifeOf, objectOf, OBJECTS, WORLD_OPACITY, WORLDS, worldOf} from '../src/canal-redes.js';
+import {cloudSvg, ENTRANCE_AT, gestureOf, LEVELS, lifeOf, objectOf, OBJECTS, WORLD_OPACITY, WORLDS, worldOf} from '../src/canal-redes.js';
 import {NETWORKS} from '../src/redes.js';
 
 const ITEM = {id: 'channel', type: 'channel', zone: 'extra', network: 'telegram', title: 'Síguenos en Telegram',
@@ -83,6 +83,41 @@ test('the plane comes in by the left edge and leaves its sky by the top (wide) o
     }
 });
 
+// Telegram's plane leaves the sheet's turned-down corner and flies away from the card (22 November 2026): wide, the corner at the
+// sky's right edge, by the card; tall, at its foot, on the right, where the card begins.
+const CORNER_WIDE = {w: 1274, h: 402, pw: 130, ph: 81, exit: 'corner', cx: 1274, cy: 70};
+const CORNER_TALL = {w: 1000, h: 230, pw: 130, ph: 81, exit: 'corner', cx: 740, cy: 230};
+
+test('the plane leaves from behind the sheet\'s corner, away from the card, gliding with its nose ahead', () => {
+    for (const sky of [CORNER_WIDE, CORNER_TALL]) {
+        const p = flightPath(sky, 48);
+        assert.equal(p.length, 48);
+        assert.ok(Math.abs(p[0].x - sky.cx) < sky.pw * 0.8 && Math.abs(p[0].y - sky.cy) < sky.ph * 1.2, 'it starts at the corner');
+        assert.ok(p[0].x + sky.pw / 2 > sky.w || p[0].y - sky.ph / 2 > sky.h, 'out of its sky: behind the card');
+        const last = p[p.length - 1];
+        assert.ok(last.x + sky.pw / 2 <= 0 || last.y + sky.ph / 2 <= 0, 'it leaves by the left or the top');
+        assert.ok(last.x < p[0].x, 'away from the card');
+        for (const q of p) {
+            assert.ok(Math.abs(q.a) < 50, 'it glides, it does not dive: ' + q.a);
+            assert.ok(q.y + sky.ph / 2 <= sky.h + sky.ph * 1.4, 'never under its sky');
+        }
+        const dots = trailOf(p, sky);
+        assert.ok(dots.length > 6, dots.length + ' dots');
+    }
+});
+
+test('Bluesky\'s cloud: one outline of scallops round the card, inside its drawing', () => {
+    const svg = cloudSvg(480, 620, 42, 46);
+    const d = /<path d="([^"]+)" fill="#fff"/.exec(svg)[1];
+    const arcs = d.match(/A/g).length;
+    assert.ok(arcs >= 16 && arcs <= 40, arcs + ' scallops');
+    const nums = d.replace(/[MAZ]/g, ' ').trim().split(/\s+/).map(Number);
+    for (let i = 0; i < nums.length; i++) {
+        assert.ok(nums[i] >= 0 && nums[i] <= 704 + 1, 'inside the drawing: ' + nums[i]);
+    }
+    assert.ok(/feGaussianBlur/.test(svg), 'with its soft shadow');
+});
+
 test('the plane flies at one speed, with its nose along its way', () => {
     const p = flightPath(TALL, 48);
     const steps = [];
@@ -158,7 +193,7 @@ test('every network has its own object, and every object its world; one not know
 
 const MOVES = ['offset', 'transform', 'opacity'];
 const covers = ['revela', 'escribe', 'cubre', 'dorso', 'raya', 'nieve', 'cursor', 'clic', 'carga'];
-const rest = (t) => !t || /^(translate3d\(0rem,0rem,0\) rotate\(0deg\) scale\(1\)( scale\(1,1\))?|perspective\(160rem\) rotateY\(0deg\))$/.test(t);
+const rest = (t) => !t || /^(translate3d\(0rem,0rem,0\) rotate\(0deg\) scale\(1\)( scale\(1,1\))?|perspective\(320rem\) rotateY\(0deg\))$/.test(t);
 
 test('a gesture moves only transform and opacity; its object ends at rest, and nothing is left over its code', () => {
     for (const name of new Set(Object.values(OBJECTS))) {
