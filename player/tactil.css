@@ -1070,15 +1070,22 @@
     height: 30rem;
     object-fit: cover;
 }
+/* Two whole lines of a caption, never one and a half (margins, not padding: a clamped box shows no third line). */
 .hk-tc-post span {
     display: block;
+    display: -webkit-box;
     overflow: hidden;
-    height: 6.6rem;
-    padding: 1.4rem 1.8rem;
+    max-height: 6.44rem;
+    margin: 1.4rem 1.8rem;
     font-size: 2.8rem;
     line-height: 1.15;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
 }
+/* The networks under the posts keep their size: the posts give way, not them. */
 .hk-tc-canal {
+    -webkit-box-flex: 0;
+    flex: none;
     margin-top: 2rem;
     padding: 3rem 4rem;
 }
@@ -1145,6 +1152,12 @@
 .hk-tc-momento .hk-qr {
     width: 42rem;
     margin: 6rem auto 0;
+}
+/* On the touch screen a code says nothing under it: each room says what it opens (and its own words, of «ustedes»), and
+   the small address went over the words of the room. */
+.hk-tactil .hk-qr .hk-qr-web,
+.hk-tactil .hk-qr .hk-qr-llamada {
+    display: none;
 }
 
 /* Today's visit: who receives them, with her face and her words; how it will be, with the drawn plan of the centre. */

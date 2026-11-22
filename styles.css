@@ -6795,6 +6795,28 @@ input.hkp-red-cuenta:focus {
 .hkp-door-move button:disabled {
     opacity: .3;
 }
+/* A door this centre cannot open now: it can be chosen, for the day it has what fills it, but it is drawn shut and hatched,
+   with no light, and says why under its name. */
+.hkp-door.is-away .hkp-door-leaf {
+    border: 2px solid var(--hkp-line);
+    background: repeating-linear-gradient(135deg, var(--hkp-sunk) 0 .3rem, var(--hkp-card) .3rem .6rem);
+    color: var(--hkp-muted);
+    box-shadow: none;
+}
+.hkp-door.is-away.is-on .hkp-door-leaf {
+    border-color: var(--hkp-door, var(--hkp-accent));
+}
+.hkp-door.is-away .hkp-door-name {
+    color: var(--hkp-muted);
+}
+.hkp-door-away {
+    display: block;
+    margin-top: .2rem;
+    color: var(--hkp-muted);
+    font-size: .6875rem;
+    line-height: 1.2;
+    text-align: center;
+}
 .hkp-touch-none {
     margin: .6rem 0 0;
     color: var(--hkp-warn-ink);

@@ -760,6 +760,8 @@ export class Tactil {
             lines.push([this.word('touch_in_canteen') + ', ', dish.text, '.']);
         }
         const next = this.nextEvent(d);
+        // «Today» heads the card only while all it says is today's: with the next event on another day, the date alone.
+        const later = !!(next && !next.day.today);
         if (next) {
             lines.push([capital(next.day.label || next.day.weekday) + (next.ev.time ? ', ' + next.ev.time : '') + ': ', next.ev.title,
                 next.ev.group ? ' · ' + next.ev.group : '']);
@@ -776,7 +778,8 @@ export class Tactil {
         const card = el('div', 'hk-tc-tarjeta hk-tc-hoy');
         const date = new Date(d.now);
         const weekday = ((d.s || this.s).days || [])[date.getDay()];
-        card.appendChild(el('h2', '', this.word('touch_today') + (weekday ? ', ' + String(weekday).toLowerCase() + ' ' + date.getDate() : '')));
+        card.appendChild(el('h2', '', later && weekday ? capital(String(weekday).toLowerCase()) + ' ' + date.getDate() :
+            this.word('touch_today') + (weekday ? ', ' + String(weekday).toLowerCase() + ' ' + date.getDate() : '')));
         lines.forEach(function (l) {
             const p = el('p');
             p.appendChild(document.createTextNode(l[0]));
@@ -1193,7 +1196,8 @@ export class Tactil {
     networksRoom(room, d) {
         const self = this;
         const box = el('div', 'hk-tc-llena hk-tc-redes');
-        const posts = ((d.instagram && d.instagram.posts) || []).slice(0, 9);
+        // Nine posts, or six when the networks' cards come under them: all whole, nothing squeezed.
+        const posts = ((d.instagram && d.instagram.posts) || []).slice(0, (d.channels || []).length ? 6 : 9);
         if (posts.length) {
             const grid = el('div', 'hk-tc-posts');
             posts.forEach(function (p) {

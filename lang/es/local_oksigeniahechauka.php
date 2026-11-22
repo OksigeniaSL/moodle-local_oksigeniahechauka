@@ -1587,6 +1587,7 @@ $string['sheet_touch_doors_help'] = 'Así salen sus puertas. Toca una para encen
 $string['sheet_touch_none'] = 'Con todas apagadas, la pantalla no abre ninguna puerta.';
 $string['sheet_touch_before'] = 'Antes: {$a}';
 $string['sheet_touch_after'] = 'Después: {$a}';
+$string['sheet_touch_away'] = 'No sale: la trae {$a}.';
 $string['sheet_zone_hint'] = 'Lo de cada día cambia a la hora del aparato: ponle la zona horaria del centro en su menú, o pide que la cambien.';
 $string['reception_contact_help'] = 'Lo que sale en la puerta «Cómo llegar» de las pantallas que se tocan. Cada línea se guarda sola al salir de ella. Sin plano, la pantalla enseña un QR con el camino hasta el centro.';
 $string['reception_map_none'] = 'Sin plano: la pantalla enseña el QR del camino';

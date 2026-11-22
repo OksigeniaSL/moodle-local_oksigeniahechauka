@@ -39,9 +39,9 @@
     <div class="hkp-touch-doors" data-touch-doors{{^on}} hidden{{/on}}>
         <p class="hkp-hint">{{#str}}sheet_touch_doors_help, local_oksigeniahechauka{{/str}}</p>
         <div class="hkp-touch-hall"><p class="hkp-touch-hall-name">{{#str}}touch_families, local_oksigeniahechauka{{/str}}</p>
-            <ol data-hall="families">{{#doors}}{{^visitors}}<li class="hkp-door{{#on}} is-on{{/on}}" data-door="{{key}}"{{#colour}} style="--hkp-door: {{colour}}"{{/colour}}>{{> local_oksigeniahechauka/sheet_touch_door }}</li>{{/visitors}}{{/doors}}</ol></div>
+            <ol data-hall="families">{{#doors}}{{^visitors}}<li class="hkp-door{{#on}} is-on{{/on}}{{#away}} is-away{{/away}}" data-door="{{key}}"{{#colour}} style="--hkp-door: {{colour}}"{{/colour}}>{{> local_oksigeniahechauka/sheet_touch_door }}</li>{{/visitors}}{{/doors}}</ol></div>
         <div class="hkp-touch-hall"><p class="hkp-touch-hall-name">{{#str}}touch_visitors, local_oksigeniahechauka{{/str}}</p>
-            <ol data-hall="visitors">{{#doors}}{{#visitors}}<li class="hkp-door{{#on}} is-on{{/on}}" data-door="{{key}}"{{#colour}} style="--hkp-door: {{colour}}"{{/colour}}>{{> local_oksigeniahechauka/sheet_touch_door }}</li>{{/visitors}}{{/doors}}</ol></div>
+            <ol data-hall="visitors">{{#doors}}{{#visitors}}<li class="hkp-door{{#on}} is-on{{/on}}{{#away}} is-away{{/away}}" data-door="{{key}}"{{#colour}} style="--hkp-door: {{colour}}"{{/colour}}>{{> local_oksigeniahechauka/sheet_touch_door }}</li>{{/visitors}}{{/doors}}</ol></div>
         <span data-touch-inputs>{{#doors}}{{#on}}<input type="hidden" name="doors[]" value="{{key}}">{{/on}}{{/doors}}</span>
         <p class="hkp-touch-none" data-touch-none hidden>{{#str}}sheet_touch_none, local_oksigeniahechauka{{/str}}</p>
     </div>
@@ -96,6 +96,20 @@
         card.querySelector('[data-touch-none]').hidden = !!card.querySelector('[data-door].is-on');
         on.dispatchEvent(new Event('change', {bubbles: true}));
     };
+    // The screen beside the sheet opens its doors as they are being set (before they are saved); none if it is not touched.
+    var show = function() {
+        var frame = document.getElementById('hkp-spv');
+        if (!frame || !frame.contentWindow) {
+            return;
+        }
+        var list = [];
+        if (on.checked) {
+            card.querySelectorAll('[data-door].is-on').forEach(function(li) {
+                list.push(li.getAttribute('data-door'));
+            });
+        }
+        frame.contentWindow.postMessage({hkDoors: list}, location.origin);
+    };
     var arrows = function() {
         card.querySelectorAll('ol[data-hall]').forEach(function(ol) {
             var items = ol.querySelectorAll('[data-door]');
@@ -107,6 +121,7 @@
     };
     on.addEventListener('change', function() {
         doors.hidden = !on.checked;
+        show();
     });
     var yes = card.querySelector('[data-touch-yes]');
     if (yes) {

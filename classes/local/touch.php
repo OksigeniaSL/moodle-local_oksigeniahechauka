@@ -392,10 +392,20 @@ class touch {
         $config = get_config(self::C);
         $skin = skins::get(skins::chosen($config) ?: skins::first());
         $tones = $skin['light'] ?? [];
+        // The doors filled by another product the site does not have: they can be chosen, for the day it does, but the
+        // card says they do not come out now, and why.
+        $away = array_filter([
+            'menu' => sources::has_meals() ? '' : 'Oksigenia Meals',
+            'library' => sources::has_books() ? '' : 'Oksigenia Ayvurenda',
+            'openacts' => sources::has_open_acts() ? '' : 'Oksigenia Eguahe',
+            'visit' => self::has_visits() ? '' : 'Oksigenia Eguahe',
+        ]);
         $doors = [];
         foreach ($order as $door) {
             $doors[] = ['key' => $door, 'label' => get_string('door_' . $door, self::C), 'on' => in_array($door, $on),
-                'visitors' => in_array($door, self::VISITORS), 'colour' => (string) ($tones[self::COLOURS[$door]] ?? '')];
+                'visitors' => in_array($door, self::VISITORS), 'colour' => (string) ($tones[self::COLOURS[$door]] ?? ''),
+                'away' => isset($away[$door]),
+                'awaywhy' => isset($away[$door]) ? get_string('sheet_touch_away', self::C, $away[$door]) : ''];
         }
         return [
             'on' => !empty($screen->touch),

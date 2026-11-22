@@ -1587,6 +1587,7 @@ $string['sheet_touch_doors_help'] = 'This is how its doors come out. Touch one t
 $string['sheet_touch_none'] = 'With all of them off, the screen opens no door.';
 $string['sheet_touch_before'] = 'Before: {$a}';
 $string['sheet_touch_after'] = 'After: {$a}';
+$string['sheet_touch_away'] = 'Not shown: it comes with {$a}.';
 $string['sheet_zone_hint'] = 'What changes each day changes at the device\'s hour: give it the centre\'s time zone in its menu, or ask for it.';
 $string['reception_contact_help'] = 'What the door “Getting here” shows on the screens people touch. Each line saves by itself when you leave it. Without a map, the screen shows a QR code with the way to the centre.';
 $string['reception_map_none'] = 'No map: the screen shows the QR code of the way';

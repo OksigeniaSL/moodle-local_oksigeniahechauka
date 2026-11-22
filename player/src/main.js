@@ -222,6 +222,23 @@ class Player {
                     // «Tu centro»: to see what a character does before choosing it.
                     self.surprises.askNow(ev.data.hkSurprise);
                 }
+                if (Array.isArray(ev.data.hkDoors)) {
+                    // The sheet: the doors of a touch screen as they are being set, open, before they are saved; none
+                    // if it is not touched. Only here, in the panel's preview.
+                    const was = (self.manifest && self.manifest.screen && self.manifest.screen.touch) || {};
+                    self.draftTouch = {doors: ev.data.hkDoors.filter(function (k) {
+                        return typeof k === 'string';
+                    }), idle: was.idle || 60, links: was.links || {}};
+                    // At once, not in the tick: out of the screen's hours the tick stops before the doors, and the
+                    // sheet is also set at night.
+                    if (self.manifest) {
+                        self.touchShown = self.touchFor(self.manifest, self.clock.wall());
+                        self.tactil.configure(self.touchShown);
+                    }
+                    if (self.touchShown && self.touchShown.doors.length) {
+                        self.tactil.openHome();
+                    }
+                }
                 if (ev.data.hkTheme) {
                     // «Tu centro»: the colours being chosen, and light or dark, before they are saved.
                     self.screen.applyTheme(Object.assign({}, (self.manifest && self.manifest.theme) || {},
@@ -859,7 +876,9 @@ class Player {
      * @returns {object|null}
      */
     touchFor(m, wall) {
-        const touch = (m.screen && m.screen.touch) || null;
+        // In the panel's preview, the doors being set in the sheet go before the saved ones (the same object each time,
+        // so that the doors are not built again every second).
+        const touch = this.draftTouch ? (this.draftTouch.doors.length ? this.draftTouch : null) : (m.screen && m.screen.touch) || null;
         return touch && useOf(m, wall) !== 'showcase' ? touch : null;
     }
 
