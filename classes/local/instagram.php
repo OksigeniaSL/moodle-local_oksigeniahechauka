@@ -342,7 +342,7 @@ class instagram {
      * What always makes a post speak of the centre: its own Instagram account (the first of the key: the one of «Our
      * networks», or the first), as «@account».
      *
-     * @param array[] $accounts the accounts of the key, the centre's own first; none, those of the last reading
+     * @param array[]|null $accounts the accounts of the key, the centre's own first; null, those of the last reading
      * @return string[]
      */
     protected static function words_wanted(?array $accounts = null): array {
