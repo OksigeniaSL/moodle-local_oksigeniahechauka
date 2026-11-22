@@ -160,6 +160,9 @@ class groupspage {
             'playerlong' => playerlink::short() !== '' ? playerlink::long() : '',
             'claim' => (new \moodle_url('/local/oksigeniahechauka/claim.php'))->out(false),
             'prepare' => (new \moodle_url('/local/oksigeniahechauka/prepare.php'))->out(false),
+            // What can be a screen, under the address: a browser, a professional Samsung, a Raspberry Pi.
+            'screenkinds' => ['prepare' => (new \moodle_url('/local/oksigeniahechauka/prepare.php'))->out(false),
+                'samsung' => (new \moodle_url('/local/oksigeniahechauka/samsung.php'))->out(false)],
             'people' => (new \moodle_url('/local/oksigeniahechauka/people.php'))->out(false),
             'admin' => has_capability('moodle/site:config', \context_system::instance()) ?
                 (new \moodle_url('/admin/settings.php', ['section' => 'local_oksigeniahechauka_settings']))->out(false) : '',

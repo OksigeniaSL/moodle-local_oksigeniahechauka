@@ -224,6 +224,9 @@ class startpage {
             'playerurl' => playerlink::shown(),
             'playerlong' => playerlink::short() !== '' ? playerlink::long() : '',
             'prepareurl' => (new \moodle_url('/local/oksigeniahechauka/prepare.php'))->out(false),
+            // What can be a screen, under the address: a browser, a professional Samsung, a Raspberry Pi.
+            'screenkinds' => ['prepare' => (new \moodle_url('/local/oksigeniahechauka/prepare.php'))->out(false),
+                'samsung' => (new \moodle_url('/local/oksigeniahechauka/samsung.php'))->out(false)],
             'paired' => $paired,
             'screensurl' => (new \moodle_url('/local/oksigeniahechauka/screens.php'))->out(false) . '#add',
             'home' => (new \moodle_url('/local/oksigeniahechauka/index.php'))->out(false),

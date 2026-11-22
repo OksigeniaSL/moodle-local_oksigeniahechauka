@@ -1,0 +1,79 @@
+{{!
+    This file is part of Moodle - https://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_oksigeniahechauka/samsung
+
+    A professional Samsung for a screen (samsung.php), the sister of the Raspberry Pi's page: what it needs, the player
+    installed with its URL Launcher (the whole address, which it looks beside for its package), starting with it, and the
+    address and the name. Each path of the screen's menus as the remote walks it. What to do if it does not install, and
+    how to leave it as it was.
+
+    Example context (json):
+    {
+        "long": "https://moodle.example.org/local/oksigeniahechauka/player/", "short": "https://ejem.plo/AB12",
+        "hasshort": true, "add": "#", "icons": {"copy": ""}, "back": "#", "backlabel": "Pantallas", "backicon": ""
+    }
+}}
+<div class="hkp" id="hkp-samsung-page">
+    <a class="hkp-back" href="{{back}}">{{{backicon}}}{{backlabel}}</a>
+    <header class="hkp-head"><div class="hkp-head-title"><h1>{{#str}}samsung_title, local_oksigeniahechauka{{/str}}</h1><p class="hkp-hint">{{#str}}samsung_help, local_oksigeniahechauka{{/str}}</p></div></header>
+    <div class="hkp-prepare">
+        <section class="hkp-fs hkp-step" aria-labelledby="hkp-sg-need">
+            <h2 id="hkp-sg-need" class="hkp-label hkp-section-label"><span>1. {{#str}}samsung_need, local_oksigeniahechauka{{/str}}</span></h2>
+            <ul class="hkp-prepare-list">
+                <li>{{#str}}samsung_need_screen, local_oksigeniahechauka{{/str}}</li>
+                <li>{{#str}}samsung_need_network, local_oksigeniahechauka{{/str}}</li>
+                <li>{{#str}}samsung_need_remote, local_oksigeniahechauka{{/str}}</li>
+            </ul>
+        </section>
+        <section class="hkp-fs hkp-step" aria-labelledby="hkp-sg-install">
+            <h2 id="hkp-sg-install" class="hkp-label hkp-section-label"><span>2. {{#str}}samsung_install, local_oksigeniahechauka{{/str}}</span></h2>
+            <p class="hkp-samsung-path">{{#str}}samsung_install_path, local_oksigeniahechauka{{/str}}</p>
+            <p class="hkp-prepare-text">{{#str}}samsung_install_help, local_oksigeniahechauka{{/str}}</p>
+            <div class="hkp-find"><input class="form-control hkp-prepare-address hkp-mono" id="hkp-sg-long" value="{{long}}" readonly aria-label="{{#str}}samsung_install_address, local_oksigeniahechauka{{/str}}"><button type="button" class="btn btn-outline-secondary" data-copy="hkp-sg-long">{{{icons.copy}}}{{#str}}addscreen_copy, local_oksigeniahechauka{{/str}}</button></div>
+        </section>
+        <section class="hkp-fs hkp-step" aria-labelledby="hkp-sg-play">
+            <h2 id="hkp-sg-play" class="hkp-label hkp-section-label"><span>3. {{#str}}samsung_play, local_oksigeniahechauka{{/str}}</span></h2>
+            <p class="hkp-samsung-path">{{#str}}samsung_play_path, local_oksigeniahechauka{{/str}}</p>
+            <p class="hkp-prepare-text">{{#str}}samsung_play_help, local_oksigeniahechauka{{/str}}</p>
+        </section>
+        <section class="hkp-fs hkp-step" aria-labelledby="hkp-sg-name">
+            <h2 id="hkp-sg-name" class="hkp-label hkp-section-label"><span>4. {{#str}}samsung_name, local_oksigeniahechauka{{/str}}</span></h2>
+            <p class="hkp-prepare-text">{{#hasshort}}{{#str}}samsung_name_short, local_oksigeniahechauka, {{short}}{{/str}}{{/hasshort}}{{^hasshort}}{{#str}}samsung_name_help, local_oksigeniahechauka{{/str}}{{/hasshort}}</p>
+            <div class="hkp-foot"><a class="btn btn-primary" href="{{add}}">{{#str}}addscreen, local_oksigeniahechauka{{/str}}</a></div>
+        </section>
+        <section class="hkp-fs hkp-samsung-notes" aria-labelledby="hkp-sg-if">
+            <h2 id="hkp-sg-if" class="hkp-label hkp-section-label">{{#str}}samsung_if, local_oksigeniahechauka{{/str}}</h2>
+            <ul class="hkp-prepare-list">
+                <li>{{#str}}samsung_if_install, local_oksigeniahechauka{{/str}}</li>
+                <li>{{#str}}samsung_if_timer, local_oksigeniahechauka{{/str}}</li>
+                <li>{{#str}}samsung_if_back, local_oksigeniahechauka{{/str}}</li>
+            </ul>
+        </section>
+    </div>
+</div>
+{{#js}}
+document.querySelectorAll('#hkp-samsung-page [data-copy]').forEach(function(b) {
+    b.addEventListener('click', function() {
+        var field = document.getElementById(b.getAttribute('data-copy'));
+        field.select();
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(field.value);
+        }
+    });
+});
+{{/js}}

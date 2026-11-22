@@ -4911,6 +4911,70 @@ dialog.hkp-dialog > footer {
 .hkp-prepare-text {
     margin: 0 0 1rem;
 }
+/* What can be a screen, under the player's address («Get started» and «Add a screen»): three rows, each with its
+   drawing, a line, and the way to its page. Rows, not columns, so that they read the same in the narrow dialog. */
+.hkp-kinds {
+    display: grid;
+    gap: .5rem;
+    margin: .75rem 0 1rem;
+    padding: 0;
+    list-style: none;
+}
+.hkp-kind {
+    display: grid;
+    grid-template-columns: 3.25rem minmax(0, 1fr);
+    align-items: start;
+    gap: .85rem;
+    padding: .7rem .85rem;
+    border: 1px solid var(--hkp-line);
+    border-radius: var(--hkp-radius-sm);
+    background: var(--hkp-sunk);
+}
+.hkp-kind-art {
+    display: grid;
+    place-items: center;
+    width: 3.25rem;
+    height: 2.75rem;
+    border-radius: 10px;
+    background: var(--hkp-card);
+    color: var(--hkp-accent);
+}
+.hkp-kind-art svg {
+    width: 2.4rem;
+    height: 2rem;
+}
+.hkp-kind-words {
+    min-width: 0;
+}
+.hkp-kind-words b,
+.hkp-kind-words small {
+    display: block;
+}
+.hkp-kind-words small {
+    margin-top: .1rem;
+    color: var(--hkp-muted);
+    font-size: .875rem;
+}
+.hkp-kind-words a {
+    display: inline-block;
+    margin-top: .3rem;
+    font-weight: 600;
+}
+/* A professional Samsung (samsung.php): each path of the screen's menus as a bar of a television's menu. */
+.hkp-samsung-path {
+    display: inline-block;
+    margin: 0 0 .75rem;
+    padding: .45rem .85rem;
+    border-radius: var(--hkp-radius-sm);
+    color: var(--hkp-card);
+    background: var(--hkp-ink);
+    font-family: "DejaVu Sans Mono", Menlo, Consolas, monospace;
+    font-size: .9375rem;
+    font-weight: 600;
+}
+.hkp-samsung-notes .hkp-prepare-list {
+    margin-bottom: 0;
+}
 .hkp-prepare-way .hkp-prepare-address {
     flex: 1 1 auto;
     min-width: 0;

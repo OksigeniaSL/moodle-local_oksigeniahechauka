@@ -1,0 +1,31 @@
+{{!
+    This file is part of Moodle - https://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_oksigeniahechauka/screen_kinds
+
+    What can be a screen, under the player's address («Get started», step 5, and «Add a screen»): a television or a small
+    computer with a browser, a professional Samsung with its URL Launcher, or a Raspberry Pi with its card. Each with its
+    drawing, a line, and a way to its own page where it has one.
+
+    Example context (json):
+    {"prepare": "https://example.com/local/oksigeniahechauka/prepare.php", "samsung": "https://example.com/local/oksigeniahechauka/samsung.php"}
+}}
+<ul class="hkp-kinds" aria-label="{{#str}}kinds_label, local_oksigeniahechauka{{/str}}">
+    <li class="hkp-kind"><span class="hkp-kind-art"><svg viewBox="0 0 48 40" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="4" y="4" width="40" height="25" rx="2.5"/><path d="M18 35h12M24 29v6"/><rect x="31" y="31.5" width="11" height="5" rx="1.2"/></svg></span><span class="hkp-kind-words"><b>{{#str}}kinds_browser, local_oksigeniahechauka{{/str}}</b><small>{{#str}}kinds_browser_help, local_oksigeniahechauka{{/str}}</small></span></li>
+    <li class="hkp-kind"><span class="hkp-kind-art"><svg viewBox="0 0 48 40" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="3" y="5" width="42" height="26" rx="1.5"/><path d="M14 31l-3 6M34 31l3 6"/><path d="M9 11h12"/><circle cx="39" cy="26" r="1" fill="currentColor"/></svg></span><span class="hkp-kind-words"><b>{{#str}}kinds_samsung, local_oksigeniahechauka{{/str}}</b><small>{{#str}}kinds_samsung_help, local_oksigeniahechauka{{/str}}</small><a href="{{samsung}}">{{#str}}kinds_samsung_go, local_oksigeniahechauka{{/str}}</a></span></li>
+    <li class="hkp-kind"><span class="hkp-kind-art"><svg viewBox="0 0 48 40" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="5" y="8" width="38" height="25" rx="3"/><rect x="11" y="14" width="10" height="10" rx="1"/><path d="M27 14h10M27 19h10M27 24h6M5 13H2M5 18H2M5 23H2"/><circle cx="9" cy="29" r="1.2"/><circle cx="39" cy="29" r="1.2"/></svg></span><span class="hkp-kind-words"><b>{{#str}}kinds_pi, local_oksigeniahechauka{{/str}}</b><small>{{#str}}kinds_pi_help, local_oksigeniahechauka{{/str}}</small><a href="{{prepare}}">{{#str}}kinds_pi_go, local_oksigeniahechauka{{/str}}</a></span></li>
+</ul>
