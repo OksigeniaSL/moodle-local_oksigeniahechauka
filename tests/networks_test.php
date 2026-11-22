@@ -79,6 +79,23 @@ final class networks_test extends \advanced_testcase {
     }
 
     /**
+     * A short address of the centre's own shortener fits any network's box, as it is; one of another shortener does not, and
+     * neither does the shortener alone.
+     */
+    public function test_read_own_short(): void {
+        $this->resetAfterTest();
+        $this->assertNull(networks::read('whatsapp', 'nur.click/whatsapp'), 'without a shortener');
+        set_config('shortenerapi', 'https://nur.click/api/', 'local_oksigeniahechauka');
+        set_config('shortenerkey', 'clave-de-ejemplo', 'local_oksigeniahechauka');
+        $whatsapp = networks::read('whatsapp', 'nur.click/whatsapp');
+        $this->assertSame(['url' => 'https://nur.click/whatsapp', 'account' => ''], $whatsapp);
+        $telegram = networks::read('telegram', 'http://nur.click/telegram');
+        $this->assertSame(['url' => 'https://nur.click/telegram', 'account' => ''], $telegram);
+        $this->assertNull(networks::read('whatsapp', 'otro.click/whatsapp'));
+        $this->assertNull(networks::read('whatsapp', 'nur.click/'));
+    }
+
+    /**
      * An address of a known network is recognised; an account alone, or the web, is not.
      */
     public function test_recognise(): void {

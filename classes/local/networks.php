@@ -88,6 +88,12 @@ class networks {
             return null;
         }
         $bare = preg_replace('/^(www|m|mobile)\./', '', $host);
+        // A short address of the centre's own shortener («nur.click/whatsapp») fits any box: it is the centre's, and it
+        // opens the network.
+        $shortener = shortener::of_site();
+        if ($network !== 'web' && $shortener && $shortener->owns($url) && trim((string) ($parts['path'] ?? ''), '/') !== '') {
+            return ['url' => 'https://' . substr($url, strlen($scheme) + 3), 'account' => ''];
+        }
         if ($network === 'web') {
             foreach (self::KNOWN as $hosts) {
                 if (self::of($bare, $hosts['hosts'])) {
