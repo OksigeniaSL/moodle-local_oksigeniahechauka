@@ -174,10 +174,12 @@ class surprises {
         $every = self::every($config);
         $chosen = self::chosen($config);
         $row = function ($id) use ($chosen, $c) {
-            return ['id' => $id, 'name' => get_string('surprise_' . $id, $c),
+            $name = get_string('surprise_' . $id, $c);
+            return ['id' => $id, 'name' => $name,
                 'help' => get_string('surprise_' . $id . '_help', $c), 'picture' => self::url($id, 'retrato.webp'),
                 'atlas' => self::url($id, 'spr.' . $id . '.atlas.json'),
-                'checked' => in_array($id, $chosen), 'see' => get_string('surprise_see', $c)];
+                'checked' => in_array($id, $chosen), 'see' => get_string('surprise_see', $c),
+                'seewho' => get_string('surprise_see_who', $c, $name)];
         };
         // Until it has its own, from today and for a month: it means the same in both hemispheres.
         $today = new \DateTimeImmutable('now', \core_date::get_user_timezone_object());

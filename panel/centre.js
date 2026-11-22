@@ -10,17 +10,36 @@
     const frame = document.getElementById('hkp-cpv');
     let mode = 'light';
 
-    // What was changed is not lost by searching for a place or by going away.
+    // What was changed is not lost by searching for a place or by going away, and the bar at the foot says so as soon as
+    // it happens (the sheet's): the one way to save the page, or to undo it all. What the script changes by itself (a
+    // word, a category added, taken out or unlinked) calls changed() too.
     const form = document.getElementById('hkp-centre-form');
+    const bar = document.getElementById('hkp-savebar');
     let dirty = false;
+    const changed = () => {
+        dirty = true;
+        if (bar) {
+            bar.hidden = false;
+        }
+    };
     page.addEventListener('input', (ev) => {
-        dirty = dirty || ev.target.form === form;
+        if (form && ev.target.form === form) {
+            changed();
+        }
     });
     page.addEventListener('change', (ev) => {
-        dirty = dirty || ev.target.form === form;
+        if (form && ev.target.form === form) {
+            changed();
+        }
     });
     if (form) {
         form.addEventListener('submit', () => {
+            dirty = false;
+        });
+    }
+    const undo = bar ? bar.querySelector('[data-undo]') : null;
+    if (undo) {
+        undo.addEventListener('click', () => {
             dirty = false;
         });
     }
@@ -273,7 +292,7 @@
         page.querySelector('input[name="skincorners"][value="round"]').checked = true;
     };
     reset.addEventListener('click', () => {
-        dirty = true;
+        changed();
         picked('skin').dispatchEvent(new Event('change'));
     });
     // Choosing a skin brings its colours and undoes what was changed over the other; touching them makes them the centre's own.
@@ -338,6 +357,7 @@
     const removable = (row, button) => {
         button.addEventListener('click', () => {
             row.remove();
+            changed();
             send();
             if (add) {
                 add.hidden = list.children.length >= max;
@@ -360,6 +380,7 @@
             unlink.addEventListener('click', () => {
                 row.querySelector('[data-coursecat]').value = '0';
                 row.removeAttribute('data-linked');
+                changed();
                 const icon = row.querySelector('.hkp-cat-link');
                 if (icon) {
                     icon.remove();
@@ -375,6 +396,7 @@
         const sync = () => {
             hidden.value = Array.prototype.map.call(box.querySelectorAll('.hkp-word'), (w) => w.firstChild.textContent)
                 .join(', ');
+            changed();
         };
         const pill = (word) => {
             const span = document.createElement('span');
@@ -445,6 +467,7 @@
             row.querySelector('[data-category]').value = palette[list.children.length % palette.length] || '#1f5f8b';
             list.appendChild(row);
             wire(row);
+            changed();
             const none = page.querySelector('#hkp-cats-none');
             if (none) {
                 none.hidden = true;

@@ -3182,8 +3182,78 @@ dialog.hkp-dialog > footer {
     width: auto;
 }
 
-/* The screen stays in sight all the way down, and nothing goes over anything: the column fits the window, the screen
-   takes what it needs, and what is under it scrolls in the room left, with its button in sight. */
+/* In the form, the Surprises are a cast: two cards a row, each character with its portrait, what it does and «See it»
+   by its name (on the screen on the right, always in sight). The card of one who comes out takes the accent, with its
+   tick on the portrait's corner; one who does not, its portrait in grey. */
+.hkp-centre-form .hkp-surprises {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
+    gap: .6rem;
+}
+.hkp-centre-form .hkp-surprise {
+    position: relative;
+    display: block;
+    padding: .7rem .8rem;
+    border-color: transparent;
+    border-radius: var(--hkp-radius);
+    background: var(--hkp-sunk);
+}
+.hkp-centre-form .hkp-surprise:has(input:checked) {
+    border-color: color-mix(in srgb, var(--hkp-accent) 45%, var(--hkp-card));
+    background: color-mix(in srgb, var(--hkp-accent) 7%, var(--hkp-card));
+}
+.hkp-centre-form .hkp-surprise label {
+    display: grid;
+    grid-template-columns: 3.75rem minmax(0, 1fr);
+    align-items: start;
+    gap: .75rem;
+}
+.hkp-centre-form .hkp-surprise input[type="checkbox"] {
+    position: absolute;
+    top: .5rem;
+    left: .5rem;
+    z-index: 1;
+    width: 1.15rem;
+    height: 1.15rem;
+    margin: 0;
+    accent-color: var(--hkp-accent);
+}
+.hkp-centre-form .hkp-surprise img {
+    width: 3.75rem;
+    height: 3.75rem;
+    transition: filter .2s, opacity .2s;
+}
+.hkp-centre-form .hkp-surprise:not(:has(input:checked)) img {
+    filter: grayscale(1);
+    opacity: .5;
+}
+.hkp-centre-form .hkp-surprise b {
+    display: flex;
+    align-items: center;
+    min-height: 1.9rem;
+    padding-right: 4.75rem;
+}
+.hkp-centre-form .hkp-surprise small {
+    font-size: .8125rem;
+    line-height: 1.35;
+}
+.hkp-centre-form .hkp-surprise .btn {
+    position: absolute;
+    top: .7rem;
+    right: .8rem;
+}
+.hkp-centre-form .hkp-surprise-dates {
+    margin-top: .6rem;
+}
+/* stylelint-disable-next-line csstree/validator */
+@container hkp (max-width: 36rem) {
+    .hkp-centre-form .hkp-surprises {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+/* The screen stays in sight all the way down: the column fits the window and holds the screen alone (the Surprises went
+   to the form, where they are seen whole, and the page saves with its bar). */
 .hkp-centre-side {
     position: sticky;
     top: calc(61px + 1rem);
@@ -3206,19 +3276,6 @@ dialog.hkp-dialog > footer {
     /* stylelint-disable-next-line csstree/validator */
     width: min(100%, calc(38vh * 16 / 9));
 }
-.hkp-centre-side > .hkp-fs {
-    flex: 1 1 auto;
-    min-height: 0;
-    padding-bottom: 0;
-    overflow-y: auto;
-}
-.hkp-centre-side > .hkp-fs > .hkp-foot {
-    position: sticky;
-    z-index: 1;
-    bottom: 0;
-    padding: .6rem 0;
-    background: var(--hkp-card);
-}
 
 @media (max-height: 56rem) {
     .hkp-centre-side .hkp-preview-note {
@@ -3230,9 +3287,6 @@ dialog.hkp-dialog > footer {
     .hkp-centre-side {
         position: static;
         max-height: none;
-    }
-    .hkp-centre-side > .hkp-fs {
-        overflow-y: visible;
     }
 }
 
@@ -3247,9 +3301,6 @@ dialog.hkp-dialog > footer {
     }
     .hkp-centre-side .hkp-stage .hkp-bezel {
         width: 100%;
-    }
-    .hkp-centre-side > .hkp-fs > .hkp-foot {
-        position: static;
     }
 }
 
