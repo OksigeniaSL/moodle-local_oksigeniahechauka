@@ -93,6 +93,15 @@ In a few seconds the screen starts showing what is its. The code changes every f
 
 ![What a new screen shows.](img/en/alta-tele.jpg)
 
+How the address is opened depends on what the screen is:
+
+- **A television or a small computer with a browser**: open the address in its browser, full screen (F11 or its kiosk
+  mode).
+- **A professional Samsung**: it is installed once, with its URL Launcher and the remote. The steps are in «A
+  professional Samsung for the screen», from **Add a screen**.
+- **A Raspberry Pi**: its card is prepared from the panel, in «A Raspberry Pi for the screen», and it starts the player
+  by itself.
+
 <a id="panel"></a>
 
 ## What is on

@@ -92,6 +92,15 @@ En unos segundos la pantalla empieza a enseñar lo suyo. El código cambia cada 
 
 ![Lo que enseña una pantalla nueva.](img/alta-tele.jpg)
 
+Cómo se abre la dirección depende de qué sea la pantalla:
+
+- **Una tele o un miniordenador con navegador**: se abre la dirección en su navegador, a pantalla completa (F11 o su
+  modo quiosco).
+- **Una Samsung profesional**: se instala una sola vez con su URL Launcher y el mando. Los pasos, en «Una Samsung
+  profesional para la pantalla», desde **Añadir una pantalla**.
+- **Una Raspberry Pi**: su tarjeta se prepara desde el panel, en «Una Raspberry Pi para la pantalla», y arranca sola con
+  el reproductor.
+
 <a id="panel"></a>
 
 ## Lo que sale
