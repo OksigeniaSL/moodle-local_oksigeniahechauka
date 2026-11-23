@@ -89,6 +89,7 @@ class birthdayspage {
         return [
             'tabs' => home::tabs('centre', true, 'cumpleanos'),
             'howto' => howto::button('cumpleanos'),
+            'proposal' => proposal::button(get_string('birthdays_title', $c)),
             'hastabs' => true,
             'centre' => (new \moodle_url('/local/oksigeniahechauka/centre.php'))->out(false),
             'action' => (new \moodle_url('/local/oksigeniahechauka/birthdays.php'))->out(false),

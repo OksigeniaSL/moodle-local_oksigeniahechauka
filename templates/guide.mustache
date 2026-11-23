@@ -31,6 +31,7 @@
     <header class="hkp-head">
         <div class="hkp-head-title">
             <h1>{{#str}}guide_title, local_oksigeniahechauka{{/str}}</h1>
+            {{#proposal}}{{> local_oksigeniahechauka/proposal_button }}{{/proposal}}
             <p class="hkp-head-sub">{{#str}}guide_sub, local_oksigeniahechauka{{/str}}</p>
         </div>
         {{#pdf}}<div class="hkp-head-actions"><a class="btn btn-outline-secondary hkp-guide-pdf" href="{{pdf}}" target="_blank" rel="noopener">{{{pdficon}}}{{#str}}guide_pdf, local_oksigeniahechauka{{/str}}</a></div>{{/pdf}}

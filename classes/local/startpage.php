@@ -182,6 +182,7 @@ class startpage {
         return [
             'tabs' => home::tabs('centre', true, 'pantalla'),
             'hastabs' => true,
+            'proposal' => proposal::button(get_string('start_title', $c)),
             'action' => $action,
             'sesskey' => sesskey(),
             'frame' => $centre['frame'],

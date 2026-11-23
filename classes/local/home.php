@@ -135,6 +135,7 @@ class home {
         $groupnames = array_map('format_string', array_intersect_key($groups, array_flip($mygroups)));
         $context = [
             'title' => get_string('panel_title', $c),
+            'proposal' => proposal::button(get_string('tab_home', $c)),
             'sub' => $limited ? ($groupnames ? get_string('panel_sub_groups', $c, phrases::join($groupnames)) :
                 get_string('publish_nogroups', $c)) : '',
             'actions' => $actions,

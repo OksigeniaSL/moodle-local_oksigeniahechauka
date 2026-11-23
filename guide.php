@@ -52,6 +52,7 @@ echo $OUTPUT->header();
 echo $OUTPUT->render_from_template('local_oksigeniahechauka/guide', [
     'tabs' => home::tabs('guide', $managescreens),
     'hastabs' => $managescreens,
+    'proposal' => \local_oksigeniahechauka\local\proposal::button(get_string('tab_guide', 'local_oksigeniahechauka')),
     'back' => (new moodle_url('/local/oksigeniahechauka/index.php'))->out(false),
     'backicon' => icons::svg('back'),
     'pdf' => $pdf,

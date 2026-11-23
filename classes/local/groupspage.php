@@ -140,6 +140,7 @@ class groupspage {
         return [
             'style' => home::stages(),
             'title' => get_string('panel_title', $c),
+            'proposal' => proposal::button(get_string('tab_screens', $c)),
             'tabs' => home::tabs('screens', true),
             'howtoscreen' => howto::button('pantalla'),
             'howtoperms' => howto::button('permisos'),

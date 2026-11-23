@@ -338,6 +338,7 @@ class compose {
             'howto' => howto::button('publicar'),
             'editing' => (bool) $item,
             'title' => get_string($item ? 'compose_edit' : 'compose_add', $c),
+            'proposal' => proposal::button(get_string($item ? 'compose_edit' : 'compose_add', $c)),
             'back' => (new \moodle_url('/local/oksigeniahechauka/index.php'))->out(false),
             'backicon' => icons::svg('back'),
             'action' => (new \moodle_url('/local/oksigeniahechauka/edit.php'))->out(false),

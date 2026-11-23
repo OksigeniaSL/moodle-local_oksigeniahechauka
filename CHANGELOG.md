@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.40.0
+
+- **«Propose an improvement» beside the title of each page of the panel**, where Oksigenia Marandu is on the site: the
+  person marks on a picture of what they see what they would change and says how, and it reaches whoever gathers the
+  improvements. Only for whoever may propose; without Marandu, nothing changes.
+
 ## 0.39.1
 
 - The Moodle CI passes again: the copies of the plugin may write over its git files.

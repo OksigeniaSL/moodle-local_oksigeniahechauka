@@ -147,6 +147,7 @@ class sheet {
             'id' => (int) $screen->id,
             'name' => format_string($screen->name),
             'rawname' => $screen->name,
+            'proposal' => proposal::button(get_string('tab_screens', $c) . ' · ' . format_string($screen->name)),
             'back' => (new \moodle_url('/local/oksigeniahechauka/screens.php'))->out(false),
             'backlabel' => get_string('tab_screens', $c),
             'backicon' => icons::svg('back'),

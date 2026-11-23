@@ -105,6 +105,7 @@ $template = place::view($query, $now, $suffix) + [
     'back' => $back->out(false),
     'backicon' => icons::svg('back'),
     'title' => get_string('site_title', $c, format_string($group->name)),
+    'proposal' => \local_oksigeniahechauka\local\proposal::button(get_string('site_title', $c, format_string($group->name))),
     'action' => $url->out(false),
     'sesskey' => sesskey(),
     'groupid' => $groupid,

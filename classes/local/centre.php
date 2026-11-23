@@ -131,6 +131,7 @@ class centre {
         return [
             'style' => home::stages(),
             'title' => get_string('panel_title', $c),
+            'proposal' => proposal::button(get_string('tab_centre', $c)),
             'tabs' => home::tabs('centre', true),
             'howto' => howto::button('centro'),
             'hastabs' => true,

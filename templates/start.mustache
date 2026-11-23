@@ -33,7 +33,7 @@
     }
 }}
 <div class="hkp" id="hkp-start-page"{{#style}} style="{{style}}"{{/style}} data-strings="{{strings}}">
-    <header class="hkp-head"><div class="hkp-head-title"><h1>{{#str}}start_title, local_oksigeniahechauka{{/str}}</h1><p class="hkp-hint">{{#str}}start_help, local_oksigeniahechauka{{/str}}</p></div></header>
+    <header class="hkp-head"><div class="hkp-head-title"><h1>{{#str}}start_title, local_oksigeniahechauka{{/str}}</h1>{{#proposal}}{{> local_oksigeniahechauka/proposal_button }}{{/proposal}}<p class="hkp-hint">{{#str}}start_help, local_oksigeniahechauka{{/str}}</p></div></header>
     <div class="hkp-centre">
         <div class="hkp-centre-form">
             <form method="post" action="{{action}}" id="hkp-start-form" class="hkp-centre-form">

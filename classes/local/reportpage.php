@@ -238,6 +238,7 @@ class reportpage {
         return [
             'tabs' => home::tabs('report', true),
             'hastabs' => true,
+            'proposal' => proposal::button(get_string('tab_report', $c)),
             'title' => get_string('report_heading', $c, userdate(report::bounds($month)[0], get_string('report_month_format', $c))),
             'centre' => manifest::centre_name(),
             'inprogress' => $month === $current,
