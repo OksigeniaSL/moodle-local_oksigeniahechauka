@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.40.1
+
+- The test of the strings checks those of another plugin only where that plugin is on the site.
+
 ## 0.40.0
 
 - **«Propose an improvement» beside the title of each page of the panel**, where Oksigenia Marandu is on the site: the

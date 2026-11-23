@@ -28,7 +28,8 @@ namespace local_oksigeniahechauka;
 #[\PHPUnit\Framework\Attributes\CoversNothing]
 final class strings_test extends \advanced_testcase {
     /**
-     * Each get_string() with a written identifier, in the plugin's component or in Moodle's.
+     * Each get_string() with a written identifier, in the plugin's component or in Moodle's, or of another plugin that is
+     * on the site.
      */
     public function test_strings_exist(): void {
         $root = dirname(__DIR__);
@@ -72,6 +73,10 @@ final class strings_test extends \advanced_testcase {
                     continue;
                 }
                 $component = !empty($call[2]) ? $call[2] : (!empty($call[3]) ? 'local_oksigeniahechauka' : 'moodle');
+                if ($component !== 'moodle' && \core_component::get_component_directory($component) === null) {
+                    // A string of another plugin, asked only where that plugin is (Marandu's «Propose an improvement»).
+                    continue;
+                }
                 $checked++;
                 if (!$manager->string_exists($call[1], $component)) {
                     $missing[] = $call[1] . ' / ' . $component . ' in ' . substr($path, strlen($root) + 1);
