@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.38.2
+
+- **The menus of the nursery and of the youngest ones come out on the screens.** A menu given without choosing was taken
+  for a diet's and left out; now only a diet's is, as Oksigenia Meals says (0.115.0 and later; with an earlier one, as
+  before). On a day when only the nursery opens, the screens have its menu.
+- The words of the menus as plain text («Mac & cheese»), and each dish's drawing asked of Meals as it offers it.
+- The full Moodle CI runs on a version tag or by hand; every push is checked on the laptop first.
+
 ## 0.38.1
 
 - «Follow us», finished: LinkedIn is a landscape business card with another one behind it; Telegram, a folded letter
