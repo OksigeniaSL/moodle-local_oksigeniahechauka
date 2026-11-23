@@ -169,52 +169,74 @@ class sources {
         $item = ['type' => 'menu', 'zone' => 'side', 'date' => $data['day']];
         if (!empty($data['closed'])) {
             $item['closed'] = true;
-            $item['title'] = (string) ($data['title'] ?? '');
+            $item['title'] = items::plain((string) ($data['title'] ?? ''));
             return $item;
         }
         if (empty($data['served'])) {
             return null;
         }
+        // The drawing of each dish, with the dictionary of Meals itself (its pix/food), for the canteen's door: by its API
+        // where it has it, else by the class it had before.
+        $drawing = null;
+        foreach ([['\local_oksigeniameals\api', 'dish_drawing'], ['\local_oksigeniameals\local\food', 'of']] as $call) {
+            if (method_exists($call[0], $call[1])) {
+                $drawing = function (string $dish) use ($call): string {
+                    try {
+                        return (string) call_user_func($call, $dish);
+                    } catch (\Throwable $e) {
+                        return '';
+                    }
+                };
+                break;
+            }
+        }
+        return self::menu_of($item, $data, (bool) get_config('local_oksigeniahechauka', 'menuallergens'), $drawing);
+    }
+
+    /**
+     * The menus of a day as the screens show them, from what Meals gives: every menu but those of a diet, which are for
+     * whoever needs them (Meals says so with «diet»; before it did, a menu not chosen was taken for one, which also left out
+     * those given without choosing, as a nursery's). Its words as plain text. Pure, but for the drawing.
+     *
+     * @param array $item the item so far: type, zone, date
+     * @param array $data what Meals gives for the day
+     * @param bool $allergens whether the allergens go
+     * @param callable|null $drawing the drawing of a dish, or null
+     * @return array|null the item, or null when there is no menu to show
+     */
+    public static function menu_of(array $item, array $data, bool $allergens, ?callable $drawing): ?array {
         $menus = [];
         $names = [];
-        $allergens = (bool) get_config('local_oksigeniahechauka', 'menuallergens');
-        // The drawing of each dish, with the dictionary of Meals itself (its pix/food), for the canteen's door.
-        $drawing = method_exists('\local_oksigeniameals\local\food', 'of') ? function (string $dish): string {
-            try {
-                return (string) \local_oksigeniameals\local\food::of($dish);
-            } catch (\Throwable $e) {
-                return '';
-            }
-        } : null;
         foreach ($data['meals'] ?? [] as $meal) {
             foreach ($meal['menus'] ?? [] as $menu) {
-                if (isset($menu['chosen']) && !$menu['chosen']) {
-                    // A menu of a diet: it is for whoever needs it, not for the screens.
+                $diet = array_key_exists('diet', $menu) ? !empty($menu['diet']) : (isset($menu['chosen']) && !$menu['chosen']);
+                if ($diet) {
                     continue;
                 }
                 $courses = [];
                 foreach ($menu['dishes'] ?? [] as $dish) {
-                    $part = (string) ($dish['part'] ?? '');
+                    $part = items::plain((string) ($dish['part'] ?? ''));
+                    $name = items::plain((string) ($dish['name'] ?? ''));
                     if (!isset($courses[$part])) {
                         $courses[$part] = ['label' => $part, 'dishes' => []];
                     }
-                    $courses[$part]['dishes'][] = (string) ($dish['name'] ?? '');
+                    $courses[$part]['dishes'][] = $name;
                     if ($drawing) {
                         // One per dish, in its order; '' when the dish has none.
-                        $courses[$part]['icons'][] = $drawing((string) ($dish['name'] ?? ''));
+                        $courses[$part]['icons'][] = (string) $drawing($name);
                     }
                     if ($allergens) {
                         // One list per dish, in its order. An empty one says nothing about the dish, never that it has none.
                         $codes = [];
                         foreach ($dish['allergens'] ?? [] as $allergen) {
                             $codes[] = (string) $allergen['code'];
-                            $names[$allergen['code']] = (string) $allergen['name'];
+                            $names[$allergen['code']] = items::plain((string) $allergen['name']);
                         }
                         $courses[$part]['allergens'][] = $codes;
                     }
                 }
                 if ($courses) {
-                    $menus[] = ['name' => (string) ($menu['name'] ?? ''), 'courses' => array_values($courses)];
+                    $menus[] = ['name' => items::plain((string) ($menu['name'] ?? '')), 'courses' => array_values($courses)];
                 }
             }
         }
