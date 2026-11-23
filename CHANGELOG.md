@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.38.3
+
+- From 8 m, menus that are the same dish by dish share one poster, with all their names at its door: the nursery's three
+  fit on one page instead of three that came out cut.
+
 ## 0.38.2
 
 - **The menus of the nursery and of the youngest ones come out on the screens.** A menu given without choosing was taken

@@ -3,7 +3,7 @@
 
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {menuShort, menusData, menusPages, rowCells} from '../src/menus.js';
+import {menuShort, menusData, menusPages, menuTwins, rowCells} from '../src/menus.js';
 import {rulesOf} from '../src/movimiento.js';
 
 const dish = (label, text, codes) => ({label, dishes: [text], allergens: [codes || []]});
@@ -79,6 +79,20 @@ test('the same dish with other allergens is not the same cell', () => {
     const d = menusData(other, 'Menú');
     // B's dessert, with milk: A alone, B alone, C and D together.
     assert.deepEqual(rowCells(d, [0, 1, 2, 3], 'postre').map((c) => c.menus), [[0], [1], [2, 3]]);
+});
+
+test('menus the same dish by dish go together, and the same words with other allergens do not', () => {
+    // The nursery's three of 24 November 2026, after the four of the school: one sign at 8 m, not three.
+    const nursery = (name) => ({name, courses: [dish('Primero', 'Crema de verduras con pescado', ['fish']),
+        dish('Segundo', 'Pescado con papas', ['fish']), dish('Postre', 'Compota')]});
+    const day = JSON.parse(JSON.stringify(item));
+    day.menus.push(nursery('Drago y Casita'), nursery('Rinconcito'), nursery('Arcoíris'));
+    assert.deepEqual(menuTwins(menusData(day, 'Menú')), [[0], [1], [2], [3], [4, 5, 6]]);
+    // With another allergen in one of them, it goes alone.
+    day.menus[5].courses[2].allergens = [['milk']];
+    assert.deepEqual(menuTwins(menusData(day, 'Menú')), [[0], [1], [2], [3], [4, 6], [5]]);
+    // A course one has and the other has not: not the same.
+    assert.deepEqual(menuTwins(menusData(item, 'Menú')), [[0], [1], [2], [3]]);
 });
 
 test('the slide has its movement: the plate, the label, the letters, the rows', () => {

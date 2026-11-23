@@ -6,7 +6,9 @@
 // nothing says «sin primero». The allergens, when the centre has them on, under each dish and once in a legend.
 //
 // Pages by distance: on a wide screen 4 menus at 3 m and 3 at 5 m; on an upright one 2 menus a table, two tables one over
-// the other at 3 m and one at 5 m. At 8 m one menu a page, as the sign of its door: its letter huge beside its dishes (upright, over them). The menus
+// the other at 3 m and one at 5 m. At 8 m one menu a page, as the sign of its door: its letter huge beside its dishes (upright, over them);
+// menus the same dish by dish share one sign, their names together on its door (the nursery's three of 24 November 2026
+// were three pages saying «= the other two» under every dish, and did not fit). The menus
 // are spread evenly over the pages (5 at 3 m: 3 and 2, never 4 and 1), each turn the next page, with its marks (never
 // «y N más»). Chromium 56: a <table> (no grid there), flexbox, margins for gaps.
 import {PLATE, fitWord, menuKind} from './lead.js';
@@ -124,6 +126,31 @@ export function menusPages(count, horizontal, distance) {
 }
 
 /**
+ * The menus that are the same dish by dish (with the same allergens), together, in the order they first come: at 8 m
+ * they share one sign.
+ *
+ * @param {object} data from menusData
+ * @returns {number[][]} groups of menu indexes; a menu like no other, alone
+ */
+export function menuTwins(data) {
+    const groups = [];
+    const at = {};
+    data.menus.forEach(function (m, i) {
+        const key = data.courses.map(function (course) {
+            const dish = m.by[course.key];
+            return dish ? dish.same + '#' + dish.allergens.join() : '';
+        }).join('|');
+        if (at[key] === undefined) {
+            at[key] = groups.length;
+            groups.push([i]);
+        } else {
+            groups[at[key]].push(i);
+        }
+    });
+    return groups;
+}
+
+/**
  * The cells of a row of a table: the menus side by side that share the dish go in one, with its span.
  *
  * @param {object} data from menusData
@@ -218,13 +245,16 @@ function othersOf(data, key, dish, inCell) {
     }).join(', ');
 }
 
-// One menu as the sign of its door (8 m): its letter beside (or over) its courses, one a row.
-function buildSign(data, i, tints) {
-    const m = data.menus[i];
+// One menu as the sign of its door (8 m): its letter beside (or over) its courses, one a row. Menus the same dish by
+// dish share it, their names one under the other on the door.
+function buildSign(data, group, tints) {
+    const m = data.menus[group[0]];
     const sign = el('div', 'hk-menus-cartel');
-    const door = el('div', 'hk-menus-puerta');
+    const door = el('div', 'hk-menus-puerta' + (group.length > 1 ? ' hk-menus-puerta-varios' : ''));
     const cell = el('div', 'hk-menus-celda');
-    nameOf(m, cell);
+    group.forEach(function (i) {
+        nameOf(data.menus[i], cell);
+    });
     door.appendChild(cell);
     sign.appendChild(door);
     const t = el('table', 'hk-menus-mesa hk-menus-mesa-cartel');
@@ -240,7 +270,7 @@ function buildSign(data, i, tints) {
         th.appendChild(el('div', 'hk-menus-celda', course.label));
         tr.appendChild(th);
         const td = el('td', 'hk-menus-plato');
-        const others = othersOf(data, course.key, dish, [i]);
+        const others = othersOf(data, course.key, dish, group);
         if (others) {
             const k = dish.same + '|' + course.key;
             if (!tints.map[k]) {
@@ -340,7 +370,17 @@ export function buildMenus(c, data, turn, o) {
     if (!data || !data.menus || !data.menus.length) {
         return;
     }
-    const pages = menusPages(data.menus.length, o.horizontal, o.distance || 3);
+    // At 8 m a page is a sign, and menus the same dish by dish share one; elsewhere each menu is its own column.
+    const far = (o.distance || 3) >= 8;
+    const units = far ? menuTwins(data) : data.menus.map(function (m, i) {
+        return [i];
+    });
+    const menusOf = function (table) {
+        return [].concat.apply([], table.map(function (u) {
+            return units[u];
+        }));
+    };
+    const pages = menusPages(units.length, o.horizontal, o.distance || 3);
     const at = ((turn || 0) % pages.length + pages.length) % pages.length;
     const s = el('section', 'hk-menus');
     s.setAttribute('data-ajuste', '0');
@@ -364,14 +404,14 @@ export function buildMenus(c, data, turn, o) {
     const tables = el('div', 'hk-menus-mesas');
     const tints = {map: {}, n: 0};
     pages[at].forEach(function (table) {
-        tables.appendChild((o.distance || 3) >= 8 && table.length === 1 ? buildSign(data, table[0], tints) :
-            buildTable(data, table, tints));
+        tables.appendChild(far && table.length === 1 ? buildSign(data, units[table[0]], tints) :
+            buildTable(data, menusOf(table), tints));
     });
     s.appendChild(tables);
     // The allergens of the page, with their names, once.
     const seen = [];
     pages[at].forEach(function (table) {
-        table.forEach(function (i) {
+        menusOf(table).forEach(function (i) {
             const by = data.menus[i].by;
             Object.keys(by).forEach(function (k) {
                 by[k].allergens.forEach(function (code) {
@@ -406,7 +446,8 @@ export function buildMenus(c, data, turn, o) {
 
 /**
  * Fitted after it is on the screen: the dishes go down by steps (0.9, 0.8 and 0.72 of their size) until the tables fit;
- * then the legend goes; never under the least that is read, and a word wider than its column, alone, smaller.
+ * then the legend goes, and last the «= …» of the dishes shared with other menus (their tint still says it); never
+ * under the least that is read, and a word wider than its column, alone, smaller.
  *
  * @param {HTMLElement} c the layer
  */
@@ -416,13 +457,19 @@ export function fitMenus(c) {
         return;
     }
     const tables = s.querySelector('.hk-menus-mesas');
-    s.classList.remove('hk-menus-sin-leyenda');
+    const all = ['hk-menus-sin-leyenda', 'hk-menus-sin-iguales'];
+    const clear = function () {
+        all.forEach(function (cls) {
+            s.classList.remove(cls);
+        });
+    };
+    clear();
     const fits = function () {
         return s.scrollHeight <= s.clientHeight + 1 && tables.scrollWidth <= tables.clientWidth + 1;
     };
-    const states = [[], ['hk-menus-sin-leyenda']];
+    const states = [[], ['hk-menus-sin-leyenda'], all];
     for (let n = 0; n < states.length; n++) {
-        s.classList.remove('hk-menus-sin-leyenda');
+        clear();
         states[n].forEach(function (cls) {
             s.classList.add(cls);
         });
