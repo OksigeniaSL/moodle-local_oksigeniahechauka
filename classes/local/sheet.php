@@ -203,6 +203,20 @@ class sheet {
             'off' => $window['off'],
             'bars' => $bars,
             'sentence' => self::sentence($power, $names),
+            // Every window, each with its days and hours (none yet: Monday to Friday, as a new screen's).
+            'power' => [
+                'always' => !$power,
+                'windows' => array_map(function ($w, $i) use ($letters, $names) {
+                    $on = $w['days'] ?: [1, 2, 3, 4, 5, 6, 7];
+                    $days = [];
+                    for ($d = 1; $d <= 7; $d++) {
+                        $days[] = ['n' => $d, 'letter' => $letters[$d - 1], 'name' => $names[$d - 1], 'on' => in_array($d, $on)];
+                    }
+                    return ['i' => $i, 'days' => $days, 'on' => $w['on'], 'off' => $w['off'], 'first' => $i === 0];
+                }, $power ?: [$window], array_keys($power ?: [$window])),
+                'bars' => $bars,
+                'sentence' => self::sentence($power, $names),
+            ],
             'alerts' => !empty($screen->alerts),
             'sound' => !empty($screen->sound),
             'uses' => array_map(function ($u) use ($screen, $c) {
@@ -230,6 +244,8 @@ class sheet {
             'strings' => json_encode([
                 'always' => get_string('sheet_power_always', $c),
                 'on' => get_string('sheet_power_on', $c),
+                'part' => get_string('sheet_power_part', $c),
+                'many' => get_string('sheet_power_on_many', $c),
                 'rest' => get_string('sheet_power_rest', $c),
                 'every' => get_string('sheet_days_every', $c),
                 'weekdays' => get_string('sheet_days_weekdays', $c),
@@ -294,20 +310,104 @@ class sheet {
         if (!$power) {
             return get_string('sheet_power_always', $c);
         }
-        $w = $power[0];
-        $days = $w['days'] ?: [1, 2, 3, 4, 5, 6, 7];
-        if (count($days) === 7) {
-            $said = get_string('sheet_days_every', $c);
-        } else if ($days === [1, 2, 3, 4, 5]) {
-            $said = get_string('sheet_days_weekdays', $c);
-        } else {
-            $plural = [6 => get_string('compose_plural_saturday', $c), 7 => get_string('compose_plural_sunday', $c)];
-            $said = get_string('sheet_days_some', $c, phrases::join(array_map(function ($d) use ($names, $plural) {
+        $plural = [6 => get_string('compose_plural_saturday', $c), 7 => get_string('compose_plural_sunday', $c)];
+        $said = function (array $w) use ($c, $names, $plural): string {
+            $days = $w['days'] ?: [1, 2, 3, 4, 5, 6, 7];
+            if (count($days) === 7) {
+                return get_string('sheet_days_every', $c);
+            }
+            if ($days === [1, 2, 3, 4, 5]) {
+                return get_string('sheet_days_weekdays', $c);
+            }
+            return get_string('sheet_days_some', $c, phrases::join(array_map(function ($d) use ($names, $plural) {
                 return $plural[$d] ?? $names[$d - 1];
             }, $days)));
+        };
+        if (count($power) === 1) {
+            $w = $power[0];
+            return get_string('sheet_power_on', $c, (object) ['days' => $said($w), 'from' => $w['on'], 'to' => $w['off']]) .
+                ' ' . get_string('sheet_power_rest', $c);
         }
-        return get_string('sheet_power_on', $c, (object) ['days' => $said, 'from' => $w['on'], 'to' => $w['off']]) . ' ' .
-            get_string('sheet_power_rest', $c);
+        $parts = array_map(function ($w) use ($c, $said) {
+            return get_string('sheet_power_part', $c, (object) ['days' => $said($w), 'from' => $w['on'], 'to' => $w['off']]);
+        }, $power);
+        return get_string('sheet_power_on_many', $c, phrases::join($parts)) . ' ' . get_string('sheet_power_rest', $c);
+    }
+
+    /**
+     * The power windows the sheet sends, each with its days and hours, as they are kept: none with a day twice where their
+     * hours meet. Pure.
+     *
+     * @param array $wdays by the window's index: its days, «1,2,3» (1 is Monday)
+     * @param array $won by the window's index: «HH:MM»
+     * @param array $woff by the window's index: «HH:MM»
+     * @return array [windows, the key of the error string or '']
+     */
+    public static function windows_from(array $wdays, array $won, array $woff): array {
+        $windows = [];
+        ksort($won);
+        foreach ($won as $i => $on) {
+            $days = array_values(array_unique(array_filter(
+                array_map('intval', explode(',', (string) ($wdays[$i] ?? ''))),
+                function ($d) {
+                    return $d >= 1 && $d <= 7;
+                }
+            )));
+            sort($days);
+            $on = trim((string) $on);
+            $off = trim((string) ($woff[$i] ?? ''));
+            if (!$days) {
+                return [[], 'power_nodays'];
+            }
+            if (!schedule::is_hour($on) || !schedule::is_hour($off)) {
+                return [[], 'wronghour'];
+            }
+            $windows[] = ['days' => count($days) === 7 ? [] : $days, 'on' => $on, 'off' => $off];
+        }
+        if (!$windows) {
+            return [[], 'power_nodays'];
+        }
+        // Two windows that light the same day at the same hours would say two different things.
+        $spans = array_map([self::class, 'week_spans'], $windows);
+        foreach ($spans as $a => $mine) {
+            foreach (array_slice($spans, $a + 1) as $theirs) {
+                foreach ($mine as [$s1, $e1]) {
+                    foreach ($theirs as [$s2, $e2]) {
+                        if ($s1 < $e2 && $s2 < $e1) {
+                            return [[], 'power_overlap'];
+                        }
+                    }
+                }
+            }
+        }
+        return [$windows, ''];
+    }
+
+    /**
+     * A window as minutes of the week (Monday 00:00 is 0): one span a day, or two when it crosses midnight, Sunday's into
+     * Monday's.
+     *
+     * @param array $w days, on, off
+     * @return array[] [start, end]
+     */
+    protected static function week_spans(array $w): array {
+        $on = self::minutes($w['on']);
+        $off = self::minutes($w['off']);
+        $week = 7 * 1440;
+        $out = [];
+        foreach ($w['days'] ?: [1, 2, 3, 4, 5, 6, 7] as $d) {
+            $start = ($d - 1) * 1440;
+            if ($on === $off) {
+                $out[] = [$start, $start + 1440];
+            } else if ($on < $off) {
+                $out[] = [$start + $on, $start + $off];
+            } else {
+                $out[] = [$start + $on, $start + 1440];
+                $next = ($start + 1440) % $week;
+                $out[] = [$next, $next + $off];
+            }
+        }
+        return $out;
     }
 
     /**
@@ -336,7 +436,18 @@ class sheet {
         sort($days);
         $on = optional_param('on', '', PARAM_RAW_TRIMMED);
         $off = optional_param('off', '', PARAM_RAW_TRIMMED);
-        if (!$always) {
+        $won = optional_param_array('won', [], PARAM_RAW_TRIMMED);
+        $windows = null;
+        if (!$always && $won) {
+            [$windows, $wrong] = self::windows_from(
+                optional_param_array('wdays', [], PARAM_SEQUENCE),
+                $won,
+                optional_param_array('woff', [], PARAM_RAW_TRIMMED)
+            );
+            if ($wrong !== '') {
+                $errors['power'] = get_string($wrong, $c);
+            }
+        } else if (!$always) {
             if (!$days) {
                 $errors['power'] = get_string('power_nodays', $c);
             } else if (!schedule::is_hour($on) || !schedule::is_hour($off)) {
@@ -352,7 +463,10 @@ class sheet {
             return $errors;
         }
         $power = null;
-        if (!$always) {
+        if (!$always && $windows) {
+            $power = json_encode($windows);
+        } else if (!$always) {
+            // The one window of a card that edits only the first: the others are kept as they are.
             $windows = schedule::power($screen->power);
             $windows[0] = ['days' => count($days) === 7 ? [] : $days, 'on' => $on, 'off' => $off];
             $power = json_encode(array_values($windows));
