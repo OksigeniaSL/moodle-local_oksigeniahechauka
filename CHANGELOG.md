@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.39.1
+
+- The Moodle CI passes again: the copies of the plugin may write over its git files.
+
 ## 0.39.0
 
 - **A screen's hours on in several windows**: Monday to Friday at one time and Saturday at another, each with its days

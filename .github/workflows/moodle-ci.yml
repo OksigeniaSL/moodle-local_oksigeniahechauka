@@ -68,6 +68,10 @@ jobs:
         with:
           path: plugin
 
+      # Git writes its .rev files read-only since November 2026, and moodle-plugin-ci copies the plugin over them again.
+      - name: Let the copies of the plugin write over its git files
+        run: chmod -R u+w plugin/.git
+
       - name: Set up PHP ${{ matrix.php }}
         uses: shivammathur/setup-php@v2
         with:
@@ -163,6 +167,10 @@ jobs:
         uses: actions/checkout@v4
         with:
           path: plugin
+
+      # Git writes its .rev files read-only since November 2026, and moodle-plugin-ci copies the plugin over them again.
+      - name: Let the copies of the plugin write over its git files
+        run: chmod -R u+w plugin/.git
 
       - name: Set up PHP 8.3
         uses: shivammathur/setup-php@v2
