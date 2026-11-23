@@ -212,7 +212,7 @@ class sheet {
                     for ($d = 1; $d <= 7; $d++) {
                         $days[] = ['n' => $d, 'letter' => $letters[$d - 1], 'name' => $names[$d - 1], 'on' => in_array($d, $on)];
                     }
-                    return ['i' => $i, 'days' => $days, 'on' => $w['on'], 'off' => $w['off'], 'first' => $i === 0];
+                    return ['i' => $i, 'n' => $i + 1, 'days' => $days, 'on' => $w['on'], 'off' => $w['off'], 'first' => $i === 0];
                 }, $power ?: [$window], array_keys($power ?: [$window])),
                 'bars' => $bars,
                 'sentence' => self::sentence($power, $names),
@@ -244,8 +244,11 @@ class sheet {
             'strings' => json_encode([
                 'always' => get_string('sheet_power_always', $c),
                 'on' => get_string('sheet_power_on', $c),
-                'part' => get_string('sheet_power_part', $c),
-                'many' => get_string('sheet_power_on_many', $c),
+                'window' => get_string('sheet_power_window', $c),
+                'many' => get_string('sheet_power_many', $c),
+                'clash' => get_string('sheet_power_clash', $c),
+                'row' => get_string('sheet_power_row', $c),
+                'remove' => get_string('sheet_power_remove', $c),
                 'rest' => get_string('sheet_power_rest', $c),
                 'every' => get_string('sheet_days_every', $c),
                 'weekdays' => get_string('sheet_days_weekdays', $c),
@@ -329,9 +332,9 @@ class sheet {
                 ' ' . get_string('sheet_power_rest', $c);
         }
         $parts = array_map(function ($w) use ($c, $said) {
-            return get_string('sheet_power_part', $c, (object) ['days' => $said($w), 'from' => $w['on'], 'to' => $w['off']]);
+            return get_string('sheet_power_window', $c, (object) ['days' => $said($w), 'from' => $w['on'], 'to' => $w['off']]);
         }, $power);
-        return get_string('sheet_power_on_many', $c, phrases::join($parts)) . ' ' . get_string('sheet_power_rest', $c);
+        return get_string('sheet_power_many', $c, phrases::join($parts)) . ' ' . get_string('sheet_power_rest', $c);
     }
 
     /**

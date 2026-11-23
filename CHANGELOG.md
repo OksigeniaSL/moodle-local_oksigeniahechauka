@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.39.0
+
+- **A screen's hours on in several windows**: Monday to Friday at one time and Saturday at another, each with its days
+  and its hours, in the sheet's card «Hours on» (+ Another window). The week in bars and the sentence follow as they are
+  touched; two windows lighting the same day at the same hours are said at once and are not kept.
+
 ## 0.38.3
 
 - From 8 m, menus that are the same dish by dish share one poster, with all their names at its door: the nursery's three

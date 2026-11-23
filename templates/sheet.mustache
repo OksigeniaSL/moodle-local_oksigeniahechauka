@@ -29,9 +29,10 @@
         "vertical": false, "shot": "", "shotwhen": "",
         "facts": [{"term": "Señal", "value": "Hace 1 min"}],
         "groups": [{"id": 1, "name": "Zonas comunes", "checked": true}], "hasgroups": true,
-        "always": false, "days": [{"n": 1, "letter": "L", "name": "lunes", "on": true}], "on": "07:30", "off": "18:30",
-        "bars": [{"letter": "L", "segments": [{"left": 31.25, "right": 22.92}]}],
-        "sentence": "Encendida de lunes a viernes, de 07:30 a 18:30.", "alerts": true, "sound": false, "uses": [], "plan": {"on": false, "days": [], "from": "00:00", "until": "23:59", "uses": []}, "distances": [], "glass": false, "canteen": {"on": true}, "place": {"name": "Biblioteca", "on": true, "maxlength": 40, "asks": true, "feminine": true, "masculine": false, "rows": [{"i": 0, "n": 1, "days": [{"n": 1, "letter": "L", "name": "lunes", "on": true}], "from": "08:00", "until": "17:00", "hidden": false, "removable": false, "remove": "Quitar el horario 1"}], "closed": [{"day": "2026-12-08"}], "xicon": ""}, "surprises": {"centreon": false, "on": true, "now": "", "centre": ""},
+        "power": {"always": false, "windows": [{"i": 0, "n": 1, "days": [{"n": 1, "letter": "L", "name": "lunes", "on": true},
+            {"n": 6, "letter": "S", "name": "sábado", "on": false}], "on": "07:30", "off": "18:30"}],
+            "bars": [{"letter": "L", "segments": [{"left": 31.25, "right": 22.92}]}],
+            "sentence": "Encendida de lunes a viernes, de 07:30 a 18:30."}, "alerts": true, "sound": false, "uses": [], "plan": {"on": false, "days": [], "from": "00:00", "until": "23:59", "uses": []}, "distances": [], "glass": false, "canteen": {"on": true}, "place": {"name": "Biblioteca", "on": true, "maxlength": 40, "asks": true, "feminine": true, "masculine": false, "rows": [{"i": 0, "n": 1, "days": [{"n": 1, "letter": "L", "name": "lunes", "on": true}], "from": "08:00", "until": "17:00", "hidden": false, "removable": false, "remove": "Quitar el horario 1"}], "closed": [{"day": "2026-12-08"}], "xicon": ""}, "surprises": {"centreon": false, "on": true, "now": "", "centre": ""},
         "themes": [{"value": "site", "label": "Como el sitio", "checked": true}], "remove": "#",
         "errors": {}, "haserrors": false, "strings": "{}"
     }
@@ -90,14 +91,28 @@
                     </div>
                 </section>
                 <section class="hkp-card"><h2>{{#str}}power, local_oksigeniahechauka{{/str}}</h2>
+                    {{#power}}
                     <div class="form-switch form-check"><input class="form-check-input" type="checkbox" role="switch" id="hkp-always" name="always" value="1"{{#always}} checked{{/always}}><label class="form-check-label" for="hkp-always"><b>{{#str}}sheet_always, local_oksigeniahechauka{{/str}}</b></label></div>
                     <div id="hkp-power-hours"{{#always}} hidden{{/always}}>
-                        <div class="hkp-field"><span class="hkp-label" id="hkp-pd-l">{{#str}}compose_days, local_oksigeniahechauka{{/str}}</span><div class="hkp-days" role="group" aria-labelledby="hkp-pd-l">{{#days}}<button type="button" aria-pressed="{{#on}}true{{/on}}{{^on}}false{{/on}}" data-day="{{n}}" aria-label="{{name}}">{{letter}}</button>{{/days}}</div><div id="hkp-days-inputs">{{#days}}{{#on}}<input type="hidden" name="days[]" value="{{n}}">{{/on}}{{/days}}</div></div>
-                        <div class="hkp-time"><label for="hkp-on">{{#str}}compose_hour_from, local_oksigeniahechauka{{/str}}</label><input class="form-control" type="time" id="hkp-on" name="on" value="{{on}}"><label for="hkp-off">{{#str}}compose_hour_to, local_oksigeniahechauka{{/str}}</label><input class="form-control" type="time" id="hkp-off" name="off" value="{{off}}"></div>
+                        <div id="hkp-power-rows">
+                        {{#windows}}
+                        <fieldset class="hkp-power-row" data-power-row="{{i}}">
+                            <legend class="hkp-label" data-power-legend>{{#str}}sheet_power_row, local_oksigeniahechauka, {{n}}{{/str}}</legend>
+                            <div class="hkp-days" role="group" aria-label="{{#str}}compose_days, local_oksigeniahechauka{{/str}}">{{#days}}<button type="button" aria-pressed="{{#on}}true{{/on}}{{^on}}false{{/on}}" data-power-day="{{n}}" aria-label="{{name}}">{{letter}}</button>{{/days}}</div>
+                            <input type="hidden" name="wdays[{{i}}]" value="{{#days}}{{#on}}{{n}},{{/on}}{{/days}}" data-power-days>
+                            <div class="hkp-time"><label for="hkp-won{{i}}">{{#str}}compose_hour_from, local_oksigeniahechauka{{/str}}</label><input class="form-control" type="time" id="hkp-won{{i}}" name="won[{{i}}]" value="{{on}}" data-power-on><label for="hkp-woff{{i}}">{{#str}}compose_hour_to, local_oksigeniahechauka{{/str}}</label><input class="form-control" type="time" id="hkp-woff{{i}}" name="woff[{{i}}]" value="{{off}}" data-power-off><button type="button" class="btn btn-sm btn-outline-secondary btn-icon" data-power-remove aria-label="{{#str}}sheet_power_remove, local_oksigeniahechauka, {{n}}{{/str}}" title="{{#str}}sheet_power_remove, local_oksigeniahechauka, {{n}}{{/str}}">{{{place.xicon}}}</button></div>
+                            <p class="hkp-power-clash" data-power-clash role="status" hidden></p>
+                        </fieldset>
+                        {{/windows}}
+                        </div>
+                        {{! A new window, as the first one with no day on: the script gives it its index and its first free day. }}
+                        <template id="hkp-power-new">{{#windows.0}}<fieldset class="hkp-power-row" data-power-row="__i__"><legend class="hkp-label" data-power-legend></legend><div class="hkp-days" role="group" aria-label="{{#str}}compose_days, local_oksigeniahechauka{{/str}}">{{#days}}<button type="button" aria-pressed="false" data-power-day="{{n}}" aria-label="{{name}}">{{letter}}</button>{{/days}}</div><input type="hidden" name="wdays[__i__]" value="" data-power-days><div class="hkp-time"><label for="hkp-won__i__">{{#str}}compose_hour_from, local_oksigeniahechauka{{/str}}</label><input class="form-control" type="time" id="hkp-won__i__" name="won[__i__]" value="09:00" data-power-on><label for="hkp-woff__i__">{{#str}}compose_hour_to, local_oksigeniahechauka{{/str}}</label><input class="form-control" type="time" id="hkp-woff__i__" name="woff[__i__]" value="14:00" data-power-off><button type="button" class="btn btn-sm btn-outline-secondary btn-icon" data-power-remove>{{{place.xicon}}}</button></div><p class="hkp-power-clash" data-power-clash role="status" hidden></p></fieldset>{{/windows.0}}</template>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" id="hkp-power-more">+ {{#str}}sheet_power_more, local_oksigeniahechauka{{/str}}</button>
                         {{#errors.power}}<p class="hkp-hint"><b class="text-danger">{{errors.power}}</b></p>{{/errors.power}}
                     </div>
                     <div class="hkp-power" id="hkp-power-bars" aria-hidden="true"{{#always}} hidden{{/always}}>{{#bars}}<b>{{letter}}</b><span>{{#segments}}<i style="left:{{left}}%;right:{{right}}%"></i>{{/segments}}</span>{{/bars}}<div class="hkp-power-scale"><span>0</span><span>6</span><span>12</span><span>18</span><span>24</span></div></div>
                     <p class="hkp-hint" id="hkp-power-sentence" aria-live="polite">{{sentence}}</p>
+                    {{/power}}
                 </section>
                 <section class="hkp-card"><h2>{{#str}}sheet_ifdown, local_oksigeniahechauka{{/str}}</h2>
                     <div class="form-switch form-check"><input class="form-check-input" type="checkbox" role="switch" id="hkp-al" name="alerts" value="1"{{#alerts}} checked{{/alerts}}><div><label class="form-check-label" for="hkp-al"><b>{{#str}}sheet_alerts, local_oksigeniahechauka{{/str}}</b></label><p class="hkp-hint">{{#str}}sheet_alerts_help, local_oksigeniahechauka{{/str}}</p></div></div>
@@ -137,26 +152,125 @@
     var join = function(list) {
         return list.length < 2 ? (list[0] || '') : list.slice(0, -1).join(', ') + ' ' + words.and + ' ' + list[list.length - 1];
     };
+    // The windows of the power: each its days and its two hours. Read from the page as they are now.
+    var rows = function() {
+        return Array.prototype.slice.call(page.querySelectorAll('[data-power-row]'));
+    };
+    var minutes = function(value) {
+        var m = /^(\d{1,2}):(\d{2})/.exec(value || '');
+        return m ? Number(m[1]) * 60 + Number(m[2]) : null;
+    };
+    var windowOf = function(row) {
+        var days = [];
+        row.querySelectorAll('[data-power-day][aria-pressed="true"]').forEach(function(b) {
+            days.push(Number(b.getAttribute('data-power-day')));
+        });
+        var on = row.querySelector('[data-power-on]').value;
+        var off = row.querySelector('[data-power-off]').value;
+        return {row: row, days: days, on: on, off: off, from: minutes(on), to: minutes(off)};
+    };
+    // «de lunes a viernes», «todos los días», «los sábados», «los lunes y miércoles».
+    var daysSaid = function(days) {
+        if (days.length === 7) {
+            return words.every;
+        }
+        if (days.join() === '1,2,3,4,5') {
+            return words.weekdays;
+        }
+        return words.some.replace('{$a}', join(days.map(function(d) {
+            return d > 5 ? words.plural[d - 6] : words.names[d - 1];
+        })));
+    };
+    // The stretches of a window on each day, in minutes; one past midnight goes on into the next day.
+    var stretches = function(w) {
+        var out = [];
+        if (w.from === null || w.to === null || w.from === w.to) {
+            return out;
+        }
+        w.days.forEach(function(d) {
+            if (w.from < w.to) {
+                out.push({day: d, from: w.from, to: w.to});
+            } else {
+                out.push({day: d, from: w.from, to: 1440});
+                out.push({day: d % 7 + 1, from: 0, to: w.to});
+            }
+        });
+        return out;
+    };
     var say = function() {
         var node = page.querySelector('#hkp-power-sentence');
         if (page.querySelector('#hkp-always').checked) {
             node.textContent = words.always;
             return;
         }
-        var days = [];
-        page.querySelectorAll('[data-day][aria-pressed="true"]').forEach(function(b) {
-            days.push(Number(b.getAttribute('data-day')));
+        var windows = rows().map(windowOf).filter(function(w) {
+            return w.days.length;
         });
-        var said = words.some.replace('{$a}', join(days.map(function(d) {
-            return d > 5 ? words.plural[d - 6] : words.names[d - 1];
-        })));
-        if (days.length === 7) {
-            said = words.every;
-        } else if (days.join() === '1,2,3,4,5') {
-            said = words.weekdays;
-        }
-        node.textContent = words.on.replace('{$a->days}', said).replace('{$a->from}', page.querySelector('#hkp-on').value)
-            .replace('{$a->to}', page.querySelector('#hkp-off').value) + ' ' + words.rest;
+        var said = windows.map(function(w) {
+            return words.window.replace('{$a->days}', daysSaid(w.days)).replace('{$a->from}', w.on).replace('{$a->to}', w.off);
+        });
+        // Three windows or more, apart by «;»: each one has a comma of its own.
+        var all = said.length > 2 ? said.slice(0, -1).join('; ') + ' ' + words.and + ' ' + said[said.length - 1] : join(said);
+        node.textContent = (said.length ? words.many.replace('{$a}', all) + ' ' : '') + words.rest;
+        bars(windows);
+        clashes(windows);
+    };
+    // The week in bars, Monday to Sunday, every window on it.
+    var bars = function(windows) {
+        var box = page.querySelector('#hkp-power-bars');
+        var all = [];
+        windows.forEach(function(w) {
+            all = all.concat(stretches(w));
+        });
+        Array.prototype.forEach.call(box.children, function(child, k) {
+            if (child.tagName !== 'SPAN') {
+                return;
+            }
+            var day = (k + 1) / 2;
+            child.textContent = '';
+            all.filter(function(x) {
+                return x.day === day;
+            }).forEach(function(x) {
+                var i = document.createElement('i');
+                i.style.left = (x.from / 14.4) + '%';
+                i.style.right = (100 - x.to / 14.4) + '%';
+                child.appendChild(i);
+            });
+        });
+    };
+    // A day in two windows that meet: said on the later one, where it was touched, with the days and the other window.
+    // The days two windows both light at the same hours.
+    var shared = function(mine, theirs) {
+        var days = [];
+        mine.forEach(function(x) {
+            theirs.forEach(function(y) {
+                if (x.day === y.day && x.from < y.to && y.from < x.to && days.indexOf(x.day) < 0) {
+                    days.push(x.day);
+                }
+            });
+        });
+        return days;
+    };
+    var clashes = function(windows) {
+        rows().forEach(function(row) {
+            var p = row.querySelector('[data-power-clash]');
+            p.hidden = true;
+            p.textContent = '';
+            row.classList.remove('is-clash');
+        });
+        windows.forEach(function(w, b) {
+            for (var a = 0; a < b; a++) {
+                var days = shared(stretches(w), stretches(windows[a]));
+                if (days.length) {
+                    var p = w.row.querySelector('[data-power-clash]');
+                    p.textContent = words.clash.replace('{$a->n}', rows().indexOf(windows[a].row) + 1)
+                        .replace('{$a->days}', daysSaid(days.sort()));
+                    p.hidden = false;
+                    w.row.classList.add('is-clash');
+                    return;
+                }
+            }
+        });
     };
     page.querySelectorAll('[data-see]').forEach(function(b) {
         b.addEventListener('click', function() {
@@ -167,24 +281,77 @@
             page.querySelector('#hkp-see-real').hidden = b.getAttribute('data-see') === 'pv';
         });
     });
-    page.querySelectorAll('[data-day]').forEach(function(b) {
-        b.addEventListener('click', function() {
-            var on = b.getAttribute('aria-pressed') !== 'true';
-            if (!on && page.querySelectorAll('[data-day][aria-pressed="true"]').length === 1) {
-                return;
-            }
-            b.setAttribute('aria-pressed', on ? 'true' : 'false');
-            var box = page.querySelector('#hkp-days-inputs');
-            box.textContent = '';
-            page.querySelectorAll('[data-day][aria-pressed="true"]').forEach(function(x) {
-                var input = document.createElement('input');
-                input.type = 'hidden';
-                input.name = 'days[]';
-                input.value = x.getAttribute('data-day');
-                box.appendChild(input);
+    // Each window: its days (never none), its hours, and its «×» while there is another; «+ Otro horario» adds one
+    // with the first day no window has.
+    var number = function() {
+        var list = rows();
+        list.forEach(function(row, k) {
+            var legend = row.querySelector('[data-power-legend]');
+            legend.textContent = words.row.replace('{$a}', k + 1);
+            // With one window, its number says nothing to the eye: kept for a screen reader.
+            legend.classList.toggle('visually-hidden', list.length < 2);
+            legend.classList.toggle('sr-only', list.length < 2);
+            var x = row.querySelector('[data-power-remove]');
+            x.hidden = list.length < 2;
+            x.setAttribute('aria-label', words.remove.replace('{$a}', k + 1));
+            x.setAttribute('title', words.remove.replace('{$a}', k + 1));
+        });
+    };
+    var keep = function(row) {
+        var days = [];
+        row.querySelectorAll('[data-power-day][aria-pressed="true"]').forEach(function(b) {
+            days.push(b.getAttribute('data-power-day'));
+        });
+        row.querySelector('[data-power-days]').value = days.join(',');
+    };
+    var wire = function(row) {
+        row.querySelectorAll('[data-power-day]').forEach(function(b) {
+            b.addEventListener('click', function() {
+                var on = b.getAttribute('aria-pressed') !== 'true';
+                if (!on && row.querySelectorAll('[data-power-day][aria-pressed="true"]').length === 1) {
+                    return;
+                }
+                b.setAttribute('aria-pressed', on ? 'true' : 'false');
+                keep(row);
+                changed();
             });
+        });
+        row.querySelector('[data-power-remove]').addEventListener('click', function() {
+            var at = rows().indexOf(row);
+            row.remove();
+            number();
+            var next = rows()[Math.max(0, at - 1)];
+            (next ? next.querySelector('[data-power-day]') : page.querySelector('#hkp-power-more')).focus();
             changed();
         });
+        keep(row);
+    };
+    rows().forEach(wire);
+    number();
+    page.querySelector('#hkp-power-more').addEventListener('click', function() {
+        var last = -1;
+        rows().forEach(function(row) {
+            last = Math.max(last, Number(row.getAttribute('data-power-row')));
+        });
+        var i = String(last + 1);
+        var html = page.querySelector('#hkp-power-new').innerHTML.replace(/__i__/g, i);
+        var box = page.querySelector('#hkp-power-rows');
+        box.insertAdjacentHTML('beforeend', html);
+        var row = box.lastElementChild;
+        var taken = [];
+        rows().forEach(function(r) {
+            r.querySelectorAll('[data-power-day][aria-pressed="true"]').forEach(function(b) {
+                taken.push(b.getAttribute('data-power-day'));
+            });
+        });
+        var free = Array.prototype.filter.call(row.querySelectorAll('[data-power-day]'), function(b) {
+            return taken.indexOf(b.getAttribute('data-power-day')) < 0;
+        })[0] || row.querySelector('[data-power-day]');
+        free.setAttribute('aria-pressed', 'true');
+        wire(row);
+        number();
+        free.focus();
+        changed();
     });
     page.querySelector('#hkp-always').addEventListener('change', function() {
         page.querySelector('#hkp-power-bars').hidden = this.checked;
@@ -295,6 +462,7 @@
         closed.appendChild(page.querySelector('#hkp-closed-new').content.cloneNode(true));
         closed.lastElementChild.querySelector('input').focus();
     });
+    say();
     form.addEventListener('input', changed);
     form.addEventListener('change', changed);
     form.addEventListener('submit', function() {

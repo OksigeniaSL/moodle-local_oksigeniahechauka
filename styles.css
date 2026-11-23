@@ -3054,6 +3054,77 @@ dialog.hkp-dialog > footer {
     border: 0;
 }
 
+/* The power of a screen: one row a window, with its days, its two hours and its «×» while there is another. A day in
+   two windows that meet is said under the later one, which takes the red edge on its hours. */
+.hkp-power-row {
+    display: grid;
+    justify-items: start;
+    gap: .5rem;
+    margin: 0 0 1rem;
+    padding: 0;
+    border: 0;
+}
+
+.hkp-power-row > legend {
+    float: none;
+    width: auto;
+    margin: 0;
+    padding: 0;
+    color: var(--hkp-muted);
+    font-size: .8125rem;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+}
+
+.hkp-power-row .hkp-time {
+    flex-wrap: wrap;
+}
+
+.hkp-power-row.is-clash .hkp-time .form-control {
+    border-color: var(--bs-danger, #b3261e);
+    box-shadow: 0 0 0 .2rem rgba(179, 38, 30, .18);
+}
+
+.hkp-power-clash {
+    display: flex;
+    align-items: flex-start;
+    gap: .45rem;
+    margin: 0;
+    color: var(--bs-danger-text-emphasis, #8c1d18);
+    font-weight: 600;
+}
+
+.hkp-power-clash::before {
+    flex: none;
+    width: .7rem;
+    height: .7rem;
+    margin-top: .35rem;
+    border-radius: .15rem;
+    background: var(--bs-danger, #b3261e);
+    content: "";
+}
+
+.hkp-power-clash[hidden] {
+    display: none;
+}
+
+#hkp-power-more {
+    margin-bottom: .25rem;
+}
+
+/* On a phone, a window's week on one line. */
+@media (max-width: 575.98px) {
+    .hkp-power-row .hkp-days {
+        gap: .25rem;
+    }
+
+    .hkp-power-row .hkp-days button {
+        width: 2.4rem;
+        height: 2.4rem;
+    }
+}
+
 .hkp-closed {
     display: flex;
     flex-wrap: wrap;
