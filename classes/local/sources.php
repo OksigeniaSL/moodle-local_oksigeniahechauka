@@ -508,8 +508,8 @@ class sources {
 
     /**
      * The open acts of the site's admissions (Eguahe), under way and coming, as an item of the contract: the days before,
-     * the address to sign up; the day, the guide of the centre with its greeting, the turns and how many families have
-     * come (a number, never who). Nothing, if the admissions are not there or have nothing open.
+     * the address to sign up, when the centre gives it; the day, the guide of the centre with its greeting, the turns and
+     * how many families have come (a number, never who). Nothing, if the admissions are not there or have nothing open.
      *
      * @param int $now
      * @return array items of the contract
@@ -533,8 +533,9 @@ class sources {
     }
 
     /**
-     * The open acts as the contract has them, from what the admissions give: the nearest first, those with a name and an
-     * address to sign up, the centre only when they come from more than one. Pure but for the guide's picture.
+     * The open acts as the contract has them, from what the admissions give: the nearest first, those with a name and
+     * their hours, the centre only when they come from more than one. An act open to the community (a talk, a festival)
+     * may come without an address: nobody signs up to it. Pure but for the guide's picture.
      *
      * @param array[] $list what \local_oksigeniaeguahe\api::open_acts() gives
      * @return array[] the acts of the item
@@ -542,7 +543,6 @@ class sources {
     public static function acts(array $list): array {
         $list = array_values(array_filter($list, function ($act) {
             return trim((string) ($act['name'] ?? '')) !== ''
-                && preg_match('~^https?://\S+$~i', (string) ($act['url'] ?? ''))
                 && (int) ($act['timeend'] ?? 0) > (int) ($act['timestart'] ?? 0);
         }));
         usort($list, function ($a, $b) {
@@ -556,7 +556,10 @@ class sources {
         foreach ($list as $act) {
             $one = ['id' => (int) ($act['id'] ?? 0), 'kind' => ($act['kind'] ?? '') === 'openday' ? 'openday' : 'other',
                 'name' => items::plain((string) $act['name']), 'timestart' => (int) $act['timestart'],
-                'timeend' => (int) $act['timeend'], 'today' => !empty($act['today']), 'web' => (string) $act['url']];
+                'timeend' => (int) $act['timeend'], 'today' => !empty($act['today'])];
+            if (preg_match('~^https?://\S+$~i', (string) ($act['url'] ?? ''))) {
+                $one['web'] = (string) $act['url'];
+            }
             $place = items::plain((string) ($act['place'] ?? ''));
             if ($place !== '') {
                 $one['place'] = $place;

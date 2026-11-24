@@ -228,18 +228,24 @@ final class sources_test extends \advanced_testcase {
     }
 
     /**
-     * The open acts of the admissions as the screens get them: the nearest first and six at most, only those with a name
-     * and an address to sign up, how many came only on the day, and the centre only when there are several.
+     * The open acts of the admissions as the screens get them: the nearest first and six at most, only those with a name,
+     * the address to sign up only when there is one, how many came only on the day, and the centre only when there are
+     * several.
      */
     public function test_open_acts(): void {
         $this->resetAfterTest();
         $acts = sources::acts([
             $this->act(['id' => 2, 'timestart' => 2000090000, 'timeend' => 2000099000]),
             $this->act(['id' => 1, 'today' => true, 'came' => 23, 'kind' => 'talk', 'place' => '']),
-            $this->act(['id' => 3, 'url' => '']),
+            $this->act(['id' => 3, 'kind' => 'other', 'timestart' => 2000100000, 'timeend' => 2000103600, 'url' => '']),
+            $this->act(['id' => 5, 'timestart' => 2000200000, 'timeend' => 2000203600, 'url' => 'javascript:alert(1)']),
             $this->act(['id' => 4, 'name' => ' ']),
         ]);
-        $this->assertSame([1, 2], array_column($acts, 'id'));
+        $this->assertSame([1, 2, 3, 5], array_column($acts, 'id'));
+        // Open to the community, without signing up: its day, its hours and its place, and no address. Nor an odd one.
+        $this->assertArrayNotHasKey('web', $acts[2]);
+        $this->assertSame('Patio central', $acts[2]['place']);
+        $this->assertArrayNotHasKey('web', $acts[3]);
         $this->assertSame('other', $acts[0]['kind']);
         $this->assertSame(23, $acts[0]['came']);
         $this->assertArrayNotHasKey('place', $acts[0]);

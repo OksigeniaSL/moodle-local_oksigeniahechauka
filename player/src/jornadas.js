@@ -1,7 +1,8 @@
 // «Puertas abiertas»: the acts Eguahe opens to the families who are getting to know the centre (an open day, a talk, a
 // festival with open sign-up), on the centre's screens (17 November 2026). Two faces:
 //   - the days before (up to 30): an invitation in the centre's colour, the day on a calendar leaf, the hours and the place,
-//     the turns (the full ones struck out), and the QR on a white card to sign up; full, its stamp instead of the QR;
+//     the turns (the full ones struck out), and the QR on a white card to sign up; full, its stamp instead of the QR; an act
+//     open to the community, with nothing to sign up to, without any of the two;
 //   - the day, while it lasts: the welcome, with the centre's guide (its dog) waving and its words in a bubble, the hours
 //     and the turns (the one now, lit; the full ones struck out), how many families have come once they are a few, and the
 //     QR for whoever arrives without having signed up.
@@ -222,6 +223,11 @@ export function cameShows(came, signed) {
     return came >= Math.max(CAME_LEAST, Math.min(CAME_ENOUGH, Math.ceil((signed || 0) / 2)));
 }
 
+/** Whether there is where to sign up: an act open to the community may come without it. Pure. */
+export function signsUp(act) {
+    return !!(act && act.web && /^https?:\/\/\S+$/i.test(act.web));
+}
+
 /** A count in its words: {n} replaced, the «one» form for 1. Pure. */
 function counted(n, many, one) {
     return (n === 1 && one ? one : many || '').replace('{n}', String(n));
@@ -323,7 +329,7 @@ export function buildOpenAct(c, act, phase, o) {
     const full = isFull(act);
     if (day && cameShows(act.came, act.signed)) {
         words.appendChild(el('p', 'hk-pa-vinieron', counted(act.came, s.open_came, s.open_came_one)));
-    } else if (!day && !full) {
+    } else if (!day && !full && signsUp(act)) {
         const left = leftToSay(act);
         if (left) {
             words.appendChild(el('p', 'hk-pa-quedan', counted(left, s.open_left, s.open_left_one)));
@@ -335,7 +341,7 @@ export function buildOpenAct(c, act, phase, o) {
     if (!day && full) {
         side.appendChild(el('p', 'hk-pa-completo', s.open_full || ''));
         sec.classList.add('hk-pa-lleno');
-    } else if (act.web && /^https?:\/\/\S+$/i.test(act.web)) {
+    } else if (signsUp(act)) {
         const card = el('div', 'hk-pa-tarjeta');
         const ask = day ? [s.open_walkin, s.open_walkin_do] : [s.open_signup];
         if (ask[0]) {

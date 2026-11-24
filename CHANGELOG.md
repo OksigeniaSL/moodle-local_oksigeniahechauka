@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.40.6
+
+- Open days: an act open to the community (a talk, a festival) that the admissions publish without a sign-up address shows
+  on the screens with its day, hours and place, and no QR (Oksigenia Eguahe 0.120.1 and later; before, it was left out).
+
 ## 0.40.5
 
 - The birthday slide fits on a screen people touch, flat and upright, with one person or many: the face takes the room the

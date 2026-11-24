@@ -4,8 +4,8 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {OPEN_EVERY, actShows, cameShows, daysBetween, hoursOf, isFull, leftToSay, openActsNow, phaseOf, turnsOf, whenWords}
-    from '../src/jornadas.js';
+import {OPEN_EVERY, actShows, cameShows, daysBetween, hoursOf, isFull, leftToSay, openActsNow, phaseOf, signsUp, turnsOf,
+    whenWords} from '../src/jornadas.js';
 import {Composer} from '../src/compose.js';
 
 // A local moment: 2026-11-<day> at <h>:<m>, in seconds.
@@ -26,6 +26,16 @@ test('an act is shown up to thirty days before, on its day, and while it lasts; 
     assert.equal(phaseOf(act({timestart: at(21, 10) + 31 * 86400, timeend: at(21, 13) + 31 * 86400}), ms(21, 10)), null);
     assert.equal(phaseOf(act({timestart: at(21, 10) + 30 * 86400, timeend: at(21, 13) + 30 * 86400}), ms(21, 9)), 'antes');
     assert.equal(daysBetween(ms(20, 23, 50), ms(21, 0, 10)), 1, 'calendar days, not 24 hours');
+});
+
+test('an act open to the community comes without an address, and shows the same', () => {
+    const talk = act({kind: 'other', name: 'Charla para familias', web: undefined});
+    assert.ok(actShows(talk));
+    assert.equal(openActsNow({type: 'openacts', acts: [talk]}, ms(18, 12)).acts.length, 1);
+    assert.equal(signsUp(talk), false);
+    assert.equal(signsUp(act({web: ''})), false);
+    assert.equal(signsUp(act({web: 'javascript:alert(1)'})), false);
+    assert.equal(signsUp(act()), true);
 });
 
 test('an act needs its name and its start', () => {
