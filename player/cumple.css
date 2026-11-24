@@ -496,6 +496,10 @@
     overflow-wrap: break-word;
     word-wrap: break-word;
 }
+.hk .hk-cumple.is-midiendo .hk-cumple-nombre {
+    overflow-wrap: normal;
+    word-wrap: normal;
+}
 .hk .hk-cumple-nombre[data-ajuste="1"] { font-size: calc(var(--hk-t-titular) * .86); }
 .hk .hk-cumple-nombre[data-ajuste="2"] { font-size: calc(var(--hk-t-titular) * .74); }
 .hk .hk-cumple-nombre[data-ajuste="3"] { font-size: calc(var(--hk-t-titular) * .62); }
@@ -679,6 +683,131 @@
 .hk-vertical .hk-cumple-retrato {
     flex: 0 1 46rem;
     margin-bottom: 4rem;
+}
+
+/* --- A low slide (a screen people touch: the doors take their share) ----------------------------------------------- */
+/* Flat. data-alto is «bajo» under 60rem and «minimo» under 40rem (cumple.js); the script sizes the face to what is left.
+   The string of portraits, smaller, goes over the face; with the least height, it goes away. */
+.hk-horizontal .hk-cumple[data-alto="bajo"] .hk-cumple-escena,
+.hk-horizontal .hk-cumple[data-alto="minimo"] .hk-cumple-escena {
+    top: 1rem;
+}
+.hk-horizontal .hk-cumple[data-alto="bajo"] .hk-cumple-momento,
+.hk-horizontal .hk-cumple[data-alto="minimo"] .hk-cumple-momento {
+    padding-top: 1rem;
+    padding-bottom: 1.6rem;
+}
+.hk-horizontal .hk-cumple[data-alto="bajo"][data-modo="escenario"] .hk-cumple-escena {
+    top: 6rem;
+}
+/* The words, under the flags of the garland. */
+.hk-horizontal .hk-cumple[data-alto="bajo"][data-modo="escenario"] .hk-cumple-texto {
+    padding-top: 3.4rem;
+}
+.hk-horizontal .hk-cumple[data-alto="bajo"][data-modo="desfile"] .hk-cumple-escena {
+    top: 14.2rem;
+}
+.hk-horizontal .hk-cumple[data-alto="bajo"] .hk-cumple-cara-grande,
+.hk-horizontal .hk-cumple[data-alto="minimo"] .hk-cumple-cara-grande {
+    border-width: 1rem;
+    box-shadow: 0 0 0 .8rem rgba(255, 255, 255, .14), 0 1.2rem 2.4rem rgba(0, 0, 0, .22);
+}
+.hk .hk-cumple[data-alto="bajo"] .hk-cumple-adorno {
+    width: 9rem;
+    margin-left: -4.5rem;
+}
+.hk .hk-cumple[data-alto="bajo"] .hk-cumple-adorno .hk-cumple-cara,
+.hk .hk-cumple[data-alto="bajo"] .hk-cumple-adorno::after {
+    width: 9rem;
+    height: 9rem;
+}
+.hk .hk-cumple[data-alto="bajo"] .hk-cumple-adorno .hk-cumple-cara {
+    border-width: .5rem;
+}
+.hk .hk-cumple[data-alto="minimo"] .hk-cumple-cuerda,
+.hk .hk-cumple[data-alto="minimo"] .hk-cumple-guirnalda {
+    visibility: hidden;
+}
+.hk .hk-cumple[data-alto="bajo"] .hk-cumple-antetitulo,
+.hk .hk-cumple[data-alto="minimo"] .hk-cumple-antetitulo {
+    margin-bottom: .8rem;
+}
+.hk .hk-cumple[data-alto="bajo"] .hk-cumple-grupo,
+.hk .hk-cumple[data-alto="minimo"] .hk-cumple-grupo {
+    margin-top: .8rem;
+}
+/* The group photo: each face beside its name. */
+.hk .hk-cumple[data-alto="bajo"] .hk-cumple-foto,
+.hk .hk-cumple[data-alto="minimo"] .hk-cumple-foto {
+    padding: 0 3rem 1rem;
+}
+.hk .hk-cumple[data-alto="bajo"] .hk-cumple-nombre.hk-cumple-titulo,
+.hk .hk-cumple[data-alto="minimo"] .hk-cumple-nombre.hk-cumple-titulo {
+    margin-bottom: 2rem;
+}
+.hk .hk-cumple[data-alto="bajo"] .hk-cumple-retrato,
+.hk .hk-cumple[data-alto="minimo"] .hk-cumple-retrato {
+    position: relative;
+    min-height: 15rem;
+    padding: 1rem 0 1rem 17rem;
+    text-align: left;
+}
+.hk .hk-cumple[data-alto="bajo"] .hk-cumple-retrato .hk-cumple-cara,
+.hk .hk-cumple[data-alto="minimo"] .hk-cumple-retrato .hk-cumple-cara {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 15rem;
+    height: 15rem;
+    margin: -7.5rem 0 0;
+    border-width: .7rem;
+    box-shadow: 0 0 0 .6rem rgba(255, 255, 255, .12);
+}
+
+/* Upright, with the doors under it. */
+.hk-vertical .hk-cumple[data-alto="bajo"] .hk-cumple-escena {
+    top: 10rem;
+}
+.hk-vertical .hk-cumple[data-alto="bajo"][data-modo="desfile"] .hk-cumple-escena {
+    top: 15rem;
+}
+.hk-vertical .hk-cumple[data-alto="bajo"] .hk-cumple-momento {
+    padding: 1rem 5rem 3rem;
+}
+.hk-vertical .hk-cumple[data-alto="bajo"] .hk-cumple-texto {
+    margin-top: 3rem;
+}
+.hk-vertical .hk-cumple[data-alto="bajo"] .hk-cumple-retrato {
+    flex: 0 0 76rem;
+    margin-bottom: 2rem;
+}
+
+/* What goes when there is no room for everything: the group of who has the moment, the heading of the photo. */
+.hk .hk-cumple-momento.is-sin-grupo .hk-cumple-grupo,
+.hk .hk-cumple-foto.is-sin-titulo .hk-cumple-titulo {
+    display: none;
+}
+.hk[data-distancia="8"] .hk-cumple[data-alto="bajo"] .hk-cumple-nombre.hk-cumple-titulo {
+    margin-bottom: 1rem;
+}
+.hk[data-distancia="8"] .hk-cumple[data-alto="bajo"] .hk-cumple-retrato,
+.hk[data-distancia="8"] .hk-cumple[data-alto="minimo"] .hk-cumple-retrato {
+    min-height: 13rem;
+    margin-bottom: 0;
+    padding: .6rem 0 .6rem 15rem;
+}
+.hk[data-distancia="8"] .hk-cumple[data-alto="bajo"] .hk-cumple-retrato .hk-cumple-cara,
+.hk[data-distancia="8"] .hk-cumple[data-alto="minimo"] .hk-cumple-retrato .hk-cumple-cara {
+    width: 13rem;
+    height: 13rem;
+    margin-top: -6.5rem;
+}
+.hk[data-distancia="8"] .hk-cumple[data-alto="minimo"] .hk-cumple-momento {
+    padding-top: .4rem;
+    padding-bottom: 1.2rem;
+}
+.hk[data-distancia="8"] .hk-cumple[data-alto="minimo"] .hk-cumple-antetitulo {
+    margin-bottom: 0;
 }
 
 /* --- A still screen: the same moments, only fading ----------------------------------------------------------------- */

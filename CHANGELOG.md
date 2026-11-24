@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.40.5
+
+- The birthday slide fits on a screen people touch, flat and upright, with one person or many: the face takes the room the
+  doors leave and the name no longer shrinks for it. From 8 m, the group photo with long names is whole on any screen, and on
+  a flat screen the knobs of the doors are inside them.
+
 ## 0.40.4
 
 - A Samsung display hung upright shows everything upright: its app takes the orientation set in the display's own menu

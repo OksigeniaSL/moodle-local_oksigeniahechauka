@@ -256,6 +256,20 @@
 .hk-horizontal .hk-tc-portal {
     height: 22rem;
 }
+/* The leaf, as low as its doorway: one panel and the knob inside it, not under the floor. */
+.hk-horizontal .hk-tc-fachada .hk-tc-hoja::before {
+    top: 15.2rem;
+    bottom: 1.8rem;
+    height: auto;
+}
+.hk-horizontal .hk-tc-fachada .hk-tc-hoja::after {
+    display: none;
+}
+.hk-horizontal .hk-tc-fachada .hk-tc-pomo {
+    top: 13.2rem;
+    width: 2.2rem;
+    height: 2.2rem;
+}
 
 /* --- Near: the doors, and each door its room ----------------------------------------------------------------------- */
 .hk-tc-cerca {

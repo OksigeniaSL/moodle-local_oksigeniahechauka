@@ -306,11 +306,10 @@ export function buildBirthdays(c, item, page, o) {
 // The fit of a name: a step smaller each time, until it is in its lines and its box, never under the last step.
 const STEPS = ['', '1', '2', '3', '4'];
 
-function fitName(name, box, lines) {
+function fitName(name, lines, room) {
     const fits = function () {
         const lh = parseFloat(getComputedStyle(name).lineHeight) || name.offsetHeight;
-        return name.scrollWidth <= name.clientWidth + 1 && Math.round(name.offsetHeight / lh) <= lines &&
-            box.scrollHeight <= box.clientHeight + 1;
+        return name.scrollWidth <= name.clientWidth + 1 && Math.round(name.offsetHeight / lh) <= lines && room();
     };
     for (let i = 0; i < STEPS.length; i++) {
         if (STEPS[i]) {
@@ -324,6 +323,32 @@ function fitName(name, box, lines) {
     }
 }
 
+// How tall the slide is, for its styles: the doors of a screen people touch take more than half of it.
+function heightOf(tall, vertical) {
+    if (vertical) {
+        return tall < 115 ? 'bajo' : '';
+    }
+    return tall < 40 ? 'minimo' : (tall < 60 ? 'bajo' : '');
+}
+
+// The face of a moment, as large as its styles say and never more than what the words leave it: beside them on a flat
+// screen, over them on an upright one.
+function fitFace(m, vertical, rem) {
+    const big = m.querySelector('.hk-cumple-cara-grande');
+    const text = m.querySelector('.hk-cumple-texto');
+    const ms = getComputedStyle(m);
+    const inside = m.clientHeight - parseFloat(ms.paddingTop) - parseFloat(ms.paddingBottom);
+    big.style.width = big.style.height = '';
+    const wanted = big.offsetHeight;
+    // Its halo, over and under it, and the space to the words.
+    const free = inside - 2 * rem - (vertical ? text.offsetHeight + parseFloat(getComputedStyle(text).marginTop) : 0);
+    const size = Math.round(Math.max(12 * rem, Math.min(wanted, free)));
+    if (size < wanted) {
+        big.style.width = big.style.height = size + 'px';
+    }
+    return {size: size, wanted: wanted, fits: size <= free + 1 && (vertical || text.offsetHeight <= inside + 1)};
+}
+
 /**
  * Once in the page (and again when the letters arrive): each name at the largest size that fits.
  *
@@ -334,23 +359,51 @@ export function fitBirthdays(c) {
     if (!s || !s.hkPlan) {
         return;
     }
-    const vertical = s.clientHeight > s.clientWidth;
+    const vertical = !!s.closest('.hk-vertical');
+    const rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 10;
+    s.setAttribute('data-alto', heightOf(s.clientHeight / rem, vertical));
     const moments = s.querySelectorAll('.hk-cumple-momento');
     for (let i = 0; i < moments.length; i++) {
         const name = moments[i].querySelector('.hk-cumple-nombre');
         plainName(name);
-        fitName(name, moments[i], vertical ? 4 : 3);
+        moments[i].classList.remove('is-sin-grupo');
+        // Whole words while it is measured: a word cut in two would pass for one that fits.
+        s.classList.add('is-midiendo');
+        // With the words over or beside it, the face keeps at least two thirds of its size before the name gives way.
+        fitName(name, vertical ? 4 : 3, function () {
+            const face = fitFace(moments[i], vertical, rem);
+            return face.fits && (!vertical || face.size >= face.wanted * 0.66);
+        });
+        s.classList.remove('is-midiendo');
+        const face = fitFace(moments[i], vertical, rem);
+        // The last thing to go is the group: without it, the face and the name breathe.
+        moments[i].classList.toggle('is-sin-grupo', !face.fits || (vertical && face.size < face.wanted * 0.4));
         evenName(name);
+        fitFace(moments[i], vertical, rem);
     }
     const shot = s.querySelector('.hk-cumple-foto');
     if (shot) {
         const names = shot.querySelectorAll('.hk-cumple-nombre-foto');
+        const faces = shot.querySelectorAll('.hk-cumple-cara');
+        const title = shot.querySelector('.hk-cumple-titulo');
+        const row = shot.querySelector('.hk-cumple-fila');
+        // What does not fit: the box is centred, so what comes out over it is in nobody's scrollHeight.
+        const over = function () {
+            const cs = getComputedStyle(shot);
+            const head = title.offsetHeight ? title.offsetHeight + parseFloat(getComputedStyle(title).marginBottom) : 0;
+            return head + row.offsetHeight - shot.clientHeight + parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom);
+        };
+        for (let i = 0; i < faces.length; i++) {
+            faces[i].style.width = faces[i].style.height = '';
+        }
+        shot.classList.remove('is-sin-titulo');
         // The same size for all of them: the one that fits the longest.
         let worst = 0;
         for (let i = 0; i < names.length; i++) {
             plainName(names[i]);
             names[i].removeAttribute('data-ajuste');
         }
+        s.classList.add('is-midiendo');
         for (let step = 0; step < STEPS.length; step++) {
             let ok = true;
             for (let i = 0; i < names.length; i++) {
@@ -363,13 +416,29 @@ export function fitBirthdays(c) {
                 }
             }
             worst = step;
-            if (ok && shot.scrollHeight <= shot.clientHeight + 1) {
+            shot.setAttribute('data-ajuste', String(worst));
+            if (ok && over() <= 1) {
                 break;
             }
         }
-        shot.setAttribute('data-ajuste', String(worst));
+        s.classList.remove('is-midiendo');
         for (let i = 0; i < names.length; i++) {
             evenName(names[i]);
+        }
+        // With the names at their last step, the faces give way.
+        const tops = {};
+        for (let i = 0; i < faces.length; i++) {
+            tops[faces[i].parentNode.offsetTop] = true;
+        }
+        const rows = Object.keys(tops).length;
+        // Not even so: the heading goes, and the faces keep what they can.
+        shot.classList.toggle('is-sin-titulo', over() > (faces[0].offsetHeight - 12 * rem) * rows + 1);
+        const less = over() / rows;
+        if (less > 1) {
+            const size = Math.round(Math.max(12 * rem, faces[0].offsetHeight - less)) + 'px';
+            for (let i = 0; i < faces.length; i++) {
+                faces[i].style.width = faces[i].style.height = size;
+            }
         }
     }
 }
