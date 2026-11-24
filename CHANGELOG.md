@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.40.2
+
+- «Your work»: a problem of the screens is let out instead of told as nothing to show, so the dashboard (Oksigenia Tembiapo
+  0.3.0) says that they do not answer and keeps their door.
+
 ## 0.40.1
 
 - The test of the strings checks those of another plugin only where that plugin is on the site.

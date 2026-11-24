@@ -158,4 +158,18 @@ final class work_test extends \advanced_testcase {
         $alerts = work::ending((int) $publisher->id, $now);
         $this->assertSame([get_string('work_ending_many', 'local_oksigeniahechauka', 4)], array_column($alerts, 'text'));
     }
+
+    /**
+     * A problem is let out, never told as «this person runs nothing here»: the block says that the screens do not answer.
+     */
+    public function test_a_problem_is_let_out(): void {
+        global $CFG;
+        require_once($CFG->dirroot . '/local/oksigeniahechauka/lib.php');
+        $this->resetAfterTest();
+        $manager = $this->getDataGenerator()->create_user();
+        $this->give((int) $manager->id, access::MANAGER);
+        \cache::make('local_oksigeniahechauka', 'work')->set('u' . $manager->id, 'something broken');
+        $this->expectException(\Throwable::class);
+        local_oksigeniahechauka_oksigenia_work((int) $manager->id);
+    }
 }

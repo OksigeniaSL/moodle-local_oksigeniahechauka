@@ -91,11 +91,6 @@ function local_oksigeniahechauka_pluginfile($course, $cm, $context, $filearea, $
  * @return array[] the doors, as the block takes them
  */
 function local_oksigeniahechauka_oksigenia_work(int $userid): array {
-    try {
-        return \local_oksigeniahechauka\local\work::cards($userid, time());
-    } catch (\Throwable $e) {
-        // A problem of the screens never breaks the dashboard.
-        debugging('Hechauka, «Your work»: ' . $e->getMessage(), DEBUG_DEVELOPER);
-        return [];
-    }
+    // A problem is let out: the block catches it and says that the screens do not answer, which [] would hide.
+    return \local_oksigeniahechauka\local\work::cards($userid, time());
 }
