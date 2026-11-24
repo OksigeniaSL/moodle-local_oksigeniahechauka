@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.40.3
+
+- **The hour of the centre on every screen, whatever time zone its device is in.** A television that shows the right hour in
+  its own menu may tell its browser another zone: with its clock already put right with the server's time, the screen was an
+  hour ahead, and so were the menus, the agenda and the hour it goes black. The manifest says how far the centre is from
+  UTC, now and after each change of hour of the coming year (`screen.offsets`), and the player goes by it. «Another time
+  zone» is only said of a screen that shows another hour.
+
 ## 0.40.2
 
 - «Your work»: a problem of the screens is let out instead of told as nothing to show, so the dashboard (Oksigenia Tembiapo

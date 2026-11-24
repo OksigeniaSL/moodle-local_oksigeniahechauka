@@ -7,6 +7,7 @@
 import {menuKind, menuParts, isHoliday} from './lead.js';
 import {makeApi} from './api.js';
 import {realClock, simulatedClock} from './clock.js';
+import {setZone, zoneMinutes} from './zone.js';
 import {MediaStore, mediaOf} from './media.js';
 import {Played} from './played.js';
 import {pair} from './pairing.js';
@@ -76,6 +77,8 @@ class Player {
         const q = query();
         const at = this.mode === 'screen' ? null : (q.at || boot.at);
         this.clock = at ? simulatedClock(at) : realClock();
+        // A chosen moment is already written in the hour of who looks at it.
+        this.simulated = !!at;
         if (q.tema) {
             this.forcedTheme = q.tema === 'oscuro';
         }
@@ -331,6 +334,7 @@ class Player {
 
     apply(m) {
         this.manifest = m;
+        setZone(this.simulated ? null : m.screen && m.screen.offsets);
         if (this.mode === 'preview' && window.parent !== window) {
             // The panel sends what is being written once the screen is ready for it.
             window.parent.postMessage({hkPreviewReady: window.name || true}, location.origin);
@@ -1091,12 +1095,20 @@ class Player {
         return since ? Math.max(0, Math.floor((Date.now() - since) / 1000)) : 0;
     }
 
+    /** How far from UTC the hour on the screen is, in minutes east. */
+    shownMinutes() {
+        const minutes = zoneMinutes(this.clock.now());
+        return minutes === null ? -new Date().getTimezoneOffset() : minutes;
+    }
+
     heartbeat() {
         const m = this.manifest;
         const wall = this.clock.wall();
         const body = {
             time: Math.floor(Date.now() / 1000),
             tz_offset: -new Date().getTimezoneOffset(),
+            // The zone the screen is written in: the centre's, when the manifest says it (zone.js).
+            tz_shown: this.shownMinutes(),
             // What the player adds to the device's clock (clock.js), in seconds: the panel tells a television whose clock
             // is wrong but whose screen is right from one that shows the wrong time.
             skew: Math.round((this.clock.skew ? this.clock.skew() : 0) / 1000),

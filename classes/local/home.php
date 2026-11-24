@@ -427,6 +427,10 @@ class home {
             // Since 0.25.2 the player puts a wrong clock right with the server's time, and says by how much (skew): what
             // the screen shows is the device's time plus that. Only that is a warning; the device's own clock, a note.
             $drift = $device - (int) ($info['skew'] ?? 0);
+            // Since 0.40.3 it also goes by the centre's time zone: the device's own clock is what its menu shows, in its zone.
+            if (isset($info['tz_shown'], $info['tz_offset'])) {
+                $device -= ((int) $info['tz_offset'] - (int) $info['tz_shown']) * MINSECS;
+            }
             $out['device'] = abs($device) > self::DRIFT ? (int) round($device / MINSECS) : 0;
             if (abs($drift) > self::DRIFT) {
                 $minutes = (int) round(abs($drift) / MINSECS);
@@ -436,8 +440,8 @@ class home {
                     $minutes
                 ), 'drift' => $drift > 0 ? $minutes : -$minutes];
             }
-            // The player goes by the device's own wall clock: in another time zone, «today», the menus and the agenda change
-            // at the wrong hour.
+            // A player that goes by the device's own time zone (before 0.40.3, or with what it kept from then): in another one,
+            // «today», the menus and the agenda change at the wrong hour.
             $zone = self::zone_gap($info, (int) $s->lastseen);
             if ($zone) {
                 return ['key' => 'warn', 'why' => 'zone', 'label' => get_string('state_zone', $c),
@@ -457,20 +461,21 @@ class home {
     }
 
     /**
-     * The time zone of a device that is not the centre's, as both are said (UTC+1, UTC+5:30); null when they agree or the
-     * device has not said.
+     * The time zone a screen is written in when it is not the centre's, as both are said (UTC+1, UTC+5:30); null when they
+     * agree or the device has not said. Since 0.40.3 the player says the one it writes (tz_shown), apart from its device's.
      *
      * @param array $info what the device said last
      * @param int $when the moment it said it
      * @return \stdClass|null {device, centre}
      */
     public static function zone_gap(array $info, int $when): ?\stdClass {
-        if (!isset($info['tz_offset']) || !is_numeric($info['tz_offset'])) {
+        $said = $info['tz_shown'] ?? $info['tz_offset'] ?? null;
+        if (!is_numeric($said)) {
             return null;
         }
         $zone = new \DateTimeZone(\core_date::get_server_timezone());
         $centre = intdiv($zone->getOffset(new \DateTime('@' . $when)), 60);
-        $device = (int) $info['tz_offset'];
+        $device = (int) $said;
         if ($device === $centre) {
             return null;
         }

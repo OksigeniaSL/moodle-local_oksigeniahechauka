@@ -6,6 +6,8 @@
 // in a slide, and the next time it goes on where it stopped (kept on the device with the date, so that through the day
 // everybody has their moment, also after the nightly restart).
 
+import {here} from './zone.js';
+
 /** Seconds of the slide with a single person. */
 export const ALONE = 11;
 /** Seconds of each person on the stage, with two or three. */
@@ -76,9 +78,9 @@ export function keyOf(p) {
     return 'n' + String((p && p.name) || '').trim().toLowerCase() + '|' + String((p && p.group) || '').trim().toLowerCase();
 }
 
-/** The local day as YYYY-MM-DD. */
+/** The day as YYYY-MM-DD, by the clocks of the centre. */
 export function dayOf(date) {
-    const d = date || new Date();
+    const d = here(date || new Date());
     const two = function (n) {
         return (n < 10 ? '0' : '') + n;
     };

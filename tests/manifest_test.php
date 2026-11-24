@@ -108,6 +108,30 @@ final class manifest_test extends \advanced_testcase {
     }
 
     /**
+     * How far the centre is from UTC, now and after each change of hour: what a screen in another zone goes by.
+     */
+    public function test_offsets_of_the_centre(): void {
+        $this->resetAfterTest();
+        $this->setTimezone('Atlantic/Canary');
+        $now = gmmktime(13, 18, 0, 11, 24, 2026);
+        $this->assertSame([
+            ['from' => 0, 'minutes' => 0],
+            ['from' => gmmktime(1, 0, 0, 3, 28, 2027), 'minutes' => 60],
+            ['from' => gmmktime(1, 0, 0, 10, 31, 2027), 'minutes' => 0],
+        ], manifest::offsets($now));
+        // Nothing changes from one minute to the next, or every screen would take its manifest again.
+        $this->assertSame(manifest::offsets($now), manifest::offsets($now + HOURSECS));
+        $summer = manifest::offsets(gmmktime(12, 0, 0, 6, 1, 2027));
+        $this->assertSame(['from' => 0, 'minutes' => 60], $summer[0]);
+        $this->setTimezone('America/Bogota');
+        $this->assertSame([['from' => 0, 'minutes' => -300]], manifest::offsets($now));
+        $this->setTimezone('Asia/Kolkata');
+        $this->assertSame([['from' => 0, 'minutes' => 330]], manifest::offsets($now));
+        $m = manifest::build($this->screen('Hall'), $now);
+        $this->assertSame([['from' => 0, 'minutes' => 330]], $m['screen']['offsets']);
+    }
+
+    /**
      * The etag changes with the content and only with it.
      */
     public function test_etag(): void {

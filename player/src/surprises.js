@@ -18,6 +18,8 @@
 // from the frame the sheet no longer has it. One that walks may tell its own steps after its gesture (`meta.secuencia`) and
 // where it stops (`meta.parada`).
 
+import {here} from './zone.js';
+
 const LEAST_MINUTES = 15;
 // An order waits this long for the manifest that says who comes out: it may have been given right after turning them on.
 const ORDER_WAITS_MS = 5 * 60000;
@@ -1210,7 +1212,7 @@ export class Surprises {
      * @returns {{id: string, atlas: string}|null}
      */
     pick(now, ordered) {
-        const date = new Date(now);
+        const date = here(now);
         const raining = this.hooks.raining();
         const due = this.characters.filter(function (c) {
             return inSeason(c.season, date) && (c.when !== 'rain' || raining);

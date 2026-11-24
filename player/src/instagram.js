@@ -15,6 +15,7 @@
 import {fitWord, linesOf} from './lead.js';
 import {glyphSvg} from './redes.js';
 import {bindShort} from './canal.js';
+import {here} from './zone.js';
 
 /** How long each picture of a carousel stays, in seconds, and how many of its pictures the screen shows at most. */
 export const CAROUSEL = {every: 3.6, most: 5};
@@ -150,15 +151,16 @@ export function captionWords(caption) {
  * @returns {string}
  */
 export function whenWords(timestamp, now, s, lang) {
-    const t = parseStamp(timestamp);
-    if (!t) {
+    const posted = parseStamp(timestamp);
+    if (!posted) {
         return '';
     }
+    const t = here(posted);
     const w = s || {};
     const day = function (d) {
         return Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 86400000;
     };
-    const ago = Math.round(day(now) - day(t));
+    const ago = Math.round(day(here(now)) - day(t));
     if (ago === 0 && w.instagram_today) {
         return w.instagram_today;
     }

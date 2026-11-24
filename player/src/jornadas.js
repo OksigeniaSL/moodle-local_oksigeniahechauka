@@ -9,6 +9,7 @@
 // Chromium 56: flexbox, margins for gaps, no clamp, no aspect-ratio, no inset.
 import {even} from './balance.js';
 import {fitWord, linesOf} from './lead.js';
+import {here} from './zone.js';
 
 const MS_DAY = 86400000;
 
@@ -42,16 +43,16 @@ function two(n) {
     return (n < 10 ? '0' : '') + n;
 }
 
-/** «10:00» of a moment (ms), in the device's time zone. */
+/** «10:00» of a moment (ms), by the clocks of the centre. */
 export function timeOf(ms) {
-    const d = new Date(ms);
+    const d = here(ms);
     return two(d.getHours()) + ':' + two(d.getMinutes());
 }
 
-/** Days between two moments' calendar days, in the device's time zone: 0 the same day, 1 the next. */
+/** Days between two moments' calendar days, by the clocks of the centre: 0 the same day, 1 the next. */
 export function daysBetween(fromMs, toMs) {
-    const a = new Date(fromMs);
-    const b = new Date(toMs);
+    const a = here(fromMs);
+    const b = here(toMs);
     return Math.round((Date.UTC(b.getFullYear(), b.getMonth(), b.getDate()) - Date.UTC(a.getFullYear(), a.getMonth(),
         a.getDate())) / MS_DAY);
 }
@@ -144,7 +145,7 @@ export function whenWords(act, now, s, keep) {
     if (days === 1) {
         return w.open_tomorrow || '';
     }
-    const day = (w.days || [])[new Date(start).getDay()] || '';
+    const day = (w.days || [])[here(start).getDay()] || '';
     if (days <= 6 && day && w.open_this) {
         return w.open_this.replace('{day}', keep ? day : day.toLowerCase());
     }
@@ -228,7 +229,7 @@ function counted(n, many, one) {
 
 // The calendar leaf: the weekday and the month on the leaf's band and foot, the day big.
 function leafOf(act, s) {
-    const d = new Date(act.timestart * 1000);
+    const d = here(act.timestart * 1000);
     const leaf = el('div', 'hk-pa-hoja');
     leaf.appendChild(el('span', 'hk-pa-hoja-dia', ((s.days_short || [])[d.getDay()] || '').toUpperCase()));
     leaf.appendChild(el('b', 'hk-pa-hoja-num', String(d.getDate())));

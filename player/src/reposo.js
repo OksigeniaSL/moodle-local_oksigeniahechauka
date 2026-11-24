@@ -3,6 +3,8 @@
 // it. The sun of the centre's colours crosses a sky of its colours, one step a minute, over the ground that holds whose screen this
 // is and what time it is.
 
+import {here} from './zone.js';
+
 function el(tag, cls, text) {
     const n = document.createElement(tag);
     if (cls) {
@@ -143,7 +145,8 @@ export function buildIdle(into, head, o) {
          * @param {string} [symbol]
          */
         tick(d, symbol) {
-            const at = skyAt(d.getHours(), d.getMinutes(), symbol);
+            const l = here(d);
+            const at = skyAt(l.getHours(), l.getMinutes(), symbol);
             if (at.night) {
                 s.setAttribute('data-noche', '');
             } else {
@@ -179,7 +182,7 @@ export function buildIdle(into, head, o) {
                 placed = true;
             }
             if (!o.still) {
-                const t = d.getHours() * 60 + d.getMinutes();
+                const t = l.getHours() * 60 + l.getMinutes();
                 const rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 10;
                 const dx = Math.sin(t * Math.PI / 97) * rem * 1.4;
                 const dy = Math.sin(t * Math.PI / 61) * rem * .7;

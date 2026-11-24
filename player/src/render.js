@@ -29,6 +29,7 @@ import {hasPlace, placeLine, placeState, placeWords} from './sitio.js';
 import {buildStrip, fitStrip as fitBirthdayStrip, startStrip, stripKey} from './franja.js';
 import {centreAfter, centreDue, centreState} from './lema.js';
 import {wallOf} from './rules.js';
+import {here} from './zone.js';
 
 // The share of a wide zone a picture must leave free to have its words on a block beside it.
 const BESIDE_LEAST = 0.3;
@@ -525,18 +526,19 @@ export class Screen {
         }
     }
 
-    setClock(d) {
+    setClock(moment) {
+        const d = here(moment);
         const key = d.getFullYear() + '-' + d.getMonth() + '-' + d.getDate() + ' ' + d.getHours() + ':' + d.getMinutes();
         if (key === this.minute) {
             return;
         }
         this.minute = key;
         const first = !this.lastDate;
-        this.lastDate = d;
-        this.headers.forEach((p) => this.paintClock(p, d));
+        this.lastDate = moment;
+        this.headers.forEach((p) => this.paintClock(p, moment));
         let placeMoved = false;
         this.headers.forEach((p) => {
-            placeMoved = this.paintPlace(p, d) || placeMoved;
+            placeMoved = this.paintPlace(p, moment) || placeMoved;
         });
         if (placeMoved && !first) {
             this.fitHeaders();
@@ -556,7 +558,8 @@ export class Screen {
         }
     }
 
-    paintClock(p, d) {
+    paintClock(p, moment) {
+        const d = here(moment);
         clear(p.clock);
         p.clock.appendChild(document.createTextNode(two(d.getHours())));
         p.clock.appendChild(el('span', '', ':'));
@@ -763,7 +766,7 @@ export class Screen {
             return c;
         }
         if (comp === 'plazos') {
-            const now = this.lastDate || new Date();
+            const now = here(this.lastDate || new Date());
             buildDeadlines(c, extra && extra.item, (extra && extra.page) || 0, {distance: this.distance || 3, horizontal: this.horizontal,
                 glass: !!this.glass, today: now.getFullYear() + '-' + two(now.getMonth() + 1) + '-' + two(now.getDate()), s: this.s});
             return c;
@@ -1978,8 +1981,8 @@ export class Screen {
         if (item.body) {
             layer.appendChild(el('p', 'hk-urgente-texto', item.body));
         }
-        this.urgentClock = el('p', 'hk-urgente-hora', this.lastDate ? two(this.lastDate.getHours()) + ':' +
-            two(this.lastDate.getMinutes()) : '');
+        const shown = this.lastDate ? here(this.lastDate) : null;
+        this.urgentClock = el('p', 'hk-urgente-hora', shown ? two(shown.getHours()) + ':' + two(shown.getMinutes()) : '');
         layer.appendChild(this.urgentClock);
         this.frame.appendChild(layer);
         this.urgent = layer;

@@ -22,6 +22,7 @@
 // block and gives it the width of its text): inside a button, written widths and the order of the page.
 
 import {FOOD} from './comida.js';
+import {here} from './zone.js';
 
 /** The doors, in the order of the contract, each with the colour of the skin it wears and its audience. */
 export const DOORS = [
@@ -131,9 +132,9 @@ function two(n) {
     return (n < 10 ? '0' : '') + n;
 }
 
-/** «11:00» of a moment in seconds, in the device's time zone. */
+/** «11:00» of a moment in seconds, by the clocks of the centre. */
 export function hourOf(seconds) {
-    const d = new Date(seconds * 1000);
+    const d = here(seconds * 1000);
     return two(d.getHours()) + ':' + two(d.getMinutes());
 }
 
@@ -146,9 +147,9 @@ export function say(s, key, fill) {
     return w;
 }
 
-/** The calendar day of a moment (ms), «2026-11-02», in the device's time zone. */
+/** The calendar day of a moment (ms), «2026-11-02», by the clocks of the centre. */
 export function dayOf(ms) {
-    const d = new Date(ms);
+    const d = here(ms);
     return d.getFullYear() + '-' + two(d.getMonth() + 1) + '-' + two(d.getDate());
 }
 
@@ -391,7 +392,7 @@ export function doorOfSlide(choice, shown) {
  * @returns {{day: object, ev: object}|null}
  */
 export function nextOf(days, now) {
-    const d = new Date(now);
+    const d = here(now);
     const hm = two(d.getHours()) + ':' + two(d.getMinutes());
     for (let i = 0; i < days.length; i++) {
         const day = days[i];
@@ -776,7 +777,7 @@ export class Tactil {
             return null;
         }
         const card = el('div', 'hk-tc-tarjeta hk-tc-hoy');
-        const date = new Date(d.now);
+        const date = here(d.now);
         const weekday = ((d.s || this.s).days || [])[date.getDay()];
         card.appendChild(el('h2', '', later && weekday ? capital(String(weekday).toLowerCase()) + ' ' + date.getDate() :
             this.word('touch_today') + (weekday ? ', ' + String(weekday).toLowerCase() + ' ' + date.getDate() : '')));
@@ -1364,7 +1365,7 @@ export class Tactil {
         const card = el('div', 'hk-tc-tarjeta hk-tc-llena hk-tc-acto-grande');
         const end = first.timeend || first.timestart;
         const s = d.s || this.s;
-        const date = new Date(first.timestart * 1000);
+        const date = here(first.timestart * 1000);
         card.appendChild(el('span', 'hk-tc-cuando', capital((s.days || [])[date.getDay()]) + ' ' + date.getDate() + ' · ' +
             hourOf(first.timestart) + ' – ' + hourOf(end)));
         card.appendChild(el('h2', '', first.name));

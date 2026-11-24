@@ -182,6 +182,9 @@ changed, or the manifest with its `ETag` header:
   until when, or when it opens, and says it beside the clock and on a card of its own.
 - `screen.timezone`: the time zone the screen should be in. The player reports its own offset in the heartbeat, so
   the panel can warn when a device clock or zone is wrong.
+- `screen.offsets`: how far that zone is from UTC, `[{"from": 0, "minutes": 0}, {"from": 1806195600, "minutes": 60}]`:
+  now (`from` 0) and after each change of hour of the coming year (`from`, in seconds since the epoch). The player writes
+  every hour and works out every rule with it, whatever zone its device says it is in; without it, by the device's.
 - `template`: `zones` (the compositions of each slide, with «Today») or `full` (the pictures alone, never «Today»).
   The player chooses each slide's composition by the shape of its picture or video (`media.width` and
   `media.height`) and how much «Today» has. The orientation is the one of the page itself: a screen turned on its side
@@ -311,7 +314,7 @@ All fields are optional; an item without `when` is always on.
 
 ```json
 {
-  "time": 1793520060, "tz_offset": 0, "version": "0.1.0", "uptime": 86400,
+  "time": 1793520060, "tz_offset": 60, "tz_shown": 0, "version": "0.1.0", "uptime": 86400,
   "manifest": "9f2c…", "stale": false,
   "showing": [{"zone": "main", "item": "i12"}, {"zone": "side", "item": "i30"}],
   "display": {"width": 1920, "height": 1080},
@@ -323,6 +326,7 @@ All fields are optional; an item without `when` is always on.
 ```
 
 - `tz_offset`: minutes east of UTC on the device, now.
+- `tz_shown`: minutes east of UTC of the hour the screen shows, now: the centre's when the manifest says `screen.offsets`.
 - `skew`: seconds the player adds to the device's clock, because the server's answers (their `Date` header) say it is a
   minute or more off; `0` when it is right. `time` stays the device's own, so the server can tell a wrong clock that the
   screen puts right (`time + skew` is near the server's time) from a screen that shows the wrong time.

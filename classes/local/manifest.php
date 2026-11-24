@@ -34,6 +34,9 @@ class manifest {
     /** Days ahead the manifest has data for. */
     const HORIZON = 14;
 
+    /** @var int How far ahead the changes of hour come, so a screen without network goes through them. */
+    const ZONE_AHEAD = 400 * DAYSECS;
+
     /** @var int How many days ahead the events come, for the agenda that scrolls (a month, into the next one). */
     const AGENDA_DAYS = 31;
 
@@ -194,6 +197,7 @@ class manifest {
                 'width' => (int) ($display['width'] ?? 1920),
                 'height' => (int) ($display['height'] ?? 1080),
                 'timezone' => \core_date::get_server_timezone(),
+                'offsets' => self::offsets($now),
                 'lang' => current_language(),
                 'sound' => !empty($screen->sound),
                 'distance' => uses::distance($screen->distance ?? 3),
@@ -303,6 +307,22 @@ class manifest {
                 $seen[$key] = true;
             }
             $out[] = $it;
+        }
+        return $out;
+    }
+
+    /**
+     * How far the centre is from UTC, now and after each change of hour of the coming year: the screen goes by the clocks
+     * of the centre whatever time zone its device is in, also days without network.
+     *
+     * @param int $now
+     * @return array[] each {from, minutes}; the first, the one of now, from 0, so nothing changes until the hour does
+     */
+    public static function offsets(int $now): array {
+        $zone = \core_date::get_server_timezone_object();
+        $out = [['from' => 0, 'minutes' => intdiv($zone->getOffset(new \DateTime('@' . $now)), MINSECS)]];
+        foreach (array_slice($zone->getTransitions($now, $now + self::ZONE_AHEAD) ?: [], 1) as $change) {
+            $out[] = ['from' => (int) $change['ts'], 'minutes' => intdiv((int) $change['offset'], MINSECS)];
         }
         return $out;
     }

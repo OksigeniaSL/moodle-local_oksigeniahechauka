@@ -1,6 +1,8 @@
 // The schedule rules of the contract («when», power hours, the dark theme), evaluated on the wall clock of the screen.
 // Pure functions: the same code runs on the screen, in the preview of the panel and in the tests.
 
+import {here} from './zone.js';
+
 const MS_DAY = 86400000;
 
 function two(n) {
@@ -8,12 +10,13 @@ function two(n) {
 }
 
 /**
- * The wall clock of a Date, in the time zone of the device that runs the player.
+ * The wall clock of a moment, by the clocks of the centre (zone.js); by the device's until a manifest says its zone.
  *
- * @param {Date} d
+ * @param {Date} moment
  * @returns {{date: string, dow: number, min: number, stamp: string}}
  */
-export function wallOf(d) {
+export function wallOf(moment) {
+    const d = here(moment);
     const date = d.getFullYear() + '-' + two(d.getMonth() + 1) + '-' + two(d.getDate());
     const dow = d.getDay() === 0 ? 7 : d.getDay();
     const min = d.getHours() * 60 + d.getMinutes();

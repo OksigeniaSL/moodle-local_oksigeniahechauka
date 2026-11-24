@@ -121,6 +121,9 @@ final class phrases_test extends \advanced_testcase {
         $this->assertNull(home::zone_gap([], $now), 'a device that has not said');
         $gap = home::zone_gap(['tz_offset' => $centre === 330 ? 0 : 330], $now);
         $this->assertSame($centre === 330 ? 'UTC+0' : 'UTC+5:30', $gap->device);
+        // A device in another zone whose screen is written in the centre's is right.
+        $this->assertNull(home::zone_gap(['tz_offset' => $centre + 60, 'tz_shown' => $centre], $now));
+        $this->assertNotNull(home::zone_gap(['tz_offset' => $centre, 'tz_shown' => $centre + 60], $now));
     }
 
     /**
