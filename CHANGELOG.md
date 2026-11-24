@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.40.4
+
+- A Samsung display hung upright shows everything upright: its app takes the orientation set in the display's own menu
+  instead of always landscape (the app 1.0.4, which the displays take by themselves the next time they are switched on).
+
 ## 0.40.3
 
 - **The hour of the centre on every screen, whatever time zone its device is in.** A television that shows the right hour in
