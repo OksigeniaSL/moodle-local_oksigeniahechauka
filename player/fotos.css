@@ -105,12 +105,12 @@
 }
 .hk-vertical .hk-cuerpo[data-composicion="fotos-tercio"] > .hk-carrusel {
     order: -1;
-    flex: 1 1 0px;
+    flex: 1.25 1 0px;
     margin-bottom: var(--hk-hueco);
 }
 .hk.hk-vertical .hk-cuerpo[data-composicion="fotos-tercio"] > .hk-lider,
 .hk.hk-vertical .hk-cuerpo[data-composicion="fotos-tercio"] > .hk-resto {
-    flex: 2 1 0px;
+    flex: 1 1 0px;
     height: auto;
     margin-top: 0;
 }

@@ -210,6 +210,12 @@ export function buildZones(c, o) {
             const p = x[1];
             const e = add(p.box, 'foto', (p.item.caption && p.item.caption.title) || '');
             e.item.setAttribute('data-kb', p.kb);
+            // Upright, its title beside it (zonas.css); lying, only in the band under it.
+            if (e.title.textContent) {
+                e.item.appendChild(el('p', 'hk-zonas-junto', e.title.textContent));
+            } else {
+                e.item.classList.add('hk-zonas-sin-titulo');
+            }
             e.photo = p;
             e.source = p.item;
         } else {
@@ -393,11 +399,18 @@ export function fitZones(c) {
     // The titles first (the band's height counts in the column's): one line at their size, or the smaller one; in two lines
     // at the smaller one, or none.
     let highest = 0;
+    const upright = getComputedStyle(c).flexDirection === 'column';
     each(z.entries, function (e) {
         const t = e.title;
         t.removeAttribute('data-ajuste');
         t.style.display = '';
         if (!t.textContent) {
+            return;
+        }
+        // Upright, a picture says its title beside it: the band is only for the rest.
+        const beside = e.item.querySelector('.hk-zonas-junto');
+        if (upright && beside && !z.col.classList.contains('hk-zonas-col-justa')) {
+            t.style.display = 'none';
             return;
         }
         const lines = function () {
@@ -419,7 +432,18 @@ export function fitZones(c) {
         box.style.display = highest ? '' : 'none';
         // A band with nothing to say (one item, no title) does not stay as an empty strip.
         box.parentNode.style.display = highest || z.entries.length > 1 ? '' : 'none';
+        z.col.style.setProperty('--hk-zonas-pie', box.parentNode.offsetHeight + 'px');
     }
+    each(upright ? c.querySelectorAll('.hk-zonas-junto') : [], function (t) {
+        for (let step = 0; step <= 2; step++) {
+            t.setAttribute('data-ajuste', String(step));
+            if (t.scrollHeight <= t.clientHeight + 1 && t.scrollWidth <= t.clientWidth + 1) {
+                return;
+            }
+        }
+        t.style.display = 'none';
+        t.parentNode.classList.add('hk-zonas-sin-titulo');
+    });
     // The weather: today always; the next days as many as fit, and the sky in words and the rain before today's degrees.
     each(c.querySelectorAll('.hk-zonas-item > .hk-tercio-tiempo'), function (box) {
         const over = function () {

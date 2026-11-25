@@ -81,12 +81,64 @@
 .hk.hk-vertical .hk-cuerpo[data-composicion="zonas"] > .hk-zonas-ancha {
     -webkit-box-ordinal-group: 0;
     order: -1;
-    flex: none;
-    height: 56.25rem;
+    flex: 1 1 56.25rem;
+    height: auto;
+    min-height: 40rem;
+    max-height: 56.25rem;
 }
 .hk-vertical .hk-cuerpo[data-composicion="zonas"] > .hk-zonas-col {
-    flex: 1 1 0px;
+    flex: 1 1 42rem;
     margin-top: var(--hk-hueco);
+}
+/* A portrait picture in a wide tile showed a strip of it: it stands at one side, nearly whole, with its title beside it,
+   over the band of the titles (--hk-zonas-pie, its height: zonas.js). */
+.hk-vertical .hk-zonas-col:not(.hk-zonas-col-justa) {
+    z-index: 0;
+}
+.hk-vertical .hk-zonas-col:not(.hk-zonas-col-justa) > .hk-zonas-pase {
+    overflow: visible;
+}
+.hk-vertical .hk-zonas-item[data-tipo="foto"] {
+    z-index: 2;
+    height: calc(100% + var(--hk-zonas-pie, 0px));
+    background: var(--hk-superficie);
+}
+.hk-vertical .hk-zonas-item[data-tipo="foto"] > .hk-zonas-foto {
+    width: 50%;
+}
+.hk-vertical .hk-zonas-item.hk-zonas-sin-titulo > .hk-zonas-foto {
+    left: 20%;
+    width: 60%;
+}
+.hk-zonas-junto {
+    display: none;
+}
+.hk-vertical .hk-zonas-junto {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 50%;
+    height: 100%;
+    padding: 2rem 3.6rem 2rem 4.4rem;
+    overflow: hidden;
+    font-family: var(--hk-letra-titulos);
+    font-size: var(--hk-t-entrada);
+    font-weight: 800;
+    line-height: 1.08;
+    overflow-wrap: break-word;
+}
+.hk-vertical .hk-zonas-junto[data-ajuste="1"] { font-size: var(--hk-t-lista); }
+.hk-vertical .hk-zonas-junto[data-ajuste="2"] { font-size: var(--hk-t-min); }
+.hk-vertical .hk-zonas-junto::before {
+    content: "";
+    width: 6rem;
+    height: .9rem;
+    margin-bottom: 1.8rem;
+    border-radius: .45rem;
+    background: var(--hk-acento);
 }
 /* Only words in the column, on a vertical screen: the column as high as they are, the wide zone above takes the rest
    (never less than its 16:9; zonas.js keeps the column under that). */

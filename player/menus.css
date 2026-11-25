@@ -106,6 +106,9 @@
     flex: 1 1 0px;
     content: "";
 }
+.hk.hk-vertical .hk-menus-mesas::before {
+    flex: .5 1 0px;
+}
 .hk .hk-menus-mesa {
     width: calc(100% + var(--hk-menus-hueco) * 2);
     margin: calc(var(--hk-menus-hueco) * -1);
@@ -178,6 +181,14 @@
     font-size: var(--hk-t-entrada);
     font-weight: 900;
     line-height: 1.05;
+}
+/* Upright, the names of several groups share a narrow sheet: with the dishes' steps, a step smaller too. */
+.hk.hk-vertical .hk-menus[data-ajuste="1"] .hk-menus-palabra b {
+    font-size: var(--hk-t-lista);
+}
+.hk.hk-vertical .hk-menus[data-ajuste="2"] .hk-menus-palabra b,
+.hk.hk-vertical .hk-menus[data-ajuste="3"] .hk-menus-palabra b {
+    font-size: var(--hk-t-min);
 }
 .hk .hk-menus-tipo {
     display: block;
@@ -322,6 +333,11 @@
 /* --- The fit: the dishes and the letters come down by steps, never under the least that is read ------------------------- */
 .hk .hk-menus[data-ajuste="g"] {           /* and one step up, when the sheet has room to spare */
     --hk-menus-t: calc(var(--hk-t-lista) * 1.18);
+}
+.hk.hk-vertical .hk-menus[data-ajuste="gg"] {       /* upright, two: the room is in height */
+    --hk-menus-t: calc(var(--hk-t-lista) * 1.28);
+    --hk-menus-letra: calc(var(--hk-t-entrada) * 1.3);
+    --hk-menus-hueco: 2rem;
 }
 .hk .hk-menus[data-ajuste="1"] {
     --hk-menus-t: calc(var(--hk-t-lista) * .92);

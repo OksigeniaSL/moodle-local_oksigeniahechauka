@@ -535,7 +535,13 @@ function fillPage(page, items, from, to) {
  * @param {number} turn the slide's number
  */
 export function paginateRest(a, turn) {
-    if (!a || !a.hkItems || !a.hkItems.length) {
+    if (!a || !a.hkItems) {
+        return;
+    }
+    a.style.flex = '';
+    a.classList.remove('hk-resto-holgado');
+    if (!a.hkItems.length) {
+        settleRest(a, []);
         return;
     }
     const page = a.querySelector('.hk-resto-pagina');
@@ -570,6 +576,7 @@ export function paginateRest(a, turn) {
                 page.style.display = 'none';
                 dots.style.display = 'none';
                 a.hkPages = null;
+                settleRest(a, []);
                 return;
             }
             last = i;
@@ -594,6 +601,7 @@ export function paginateRest(a, turn) {
                 page.style.display = 'none';
                 dots.style.display = 'none';
                 a.hkPages = null;
+                settleRest(a, []);
                 return;
             }
             break;
@@ -602,7 +610,48 @@ export function paginateRest(a, turn) {
         i = last + 1;
     }
     a.hkPages = pages;
+    settleRest(a, pages);
     showRestPage(a, turn, false);
+}
+
+// Upright, the rest is as high as its highest page: the picture (or the lead) over it takes what it leaves. A picture never
+// goes past nearly square, so a landscape one keeps most of its width; what is left then is for bigger words.
+function settleRest(a, pages) {
+    const body = a.parentNode;
+    if (!a.closest('.hk-vertical') || !body || getComputedStyle(body).flexDirection !== 'column') {
+        return;
+    }
+    const over = body.querySelector('.hk-medio, .hk-pareja, .hk-lider');
+    if (!over || over.parentNode !== body) {
+        return;
+    }
+    const page = a.querySelector('.hk-resto-pagina');
+    const was = a.offsetHeight;
+    const room = was + over.offsetHeight;
+    const need = function () {
+        let most = 0;
+        a.style.flex = '0 0 auto';
+        (pages.length ? pages : [null]).forEach(function (p) {
+            if (p && page) {
+                fillPage(page, a.hkItems, p[0], p[1]);
+            }
+            most = Math.max(most, a.offsetHeight);
+        });
+        return most + 1;
+    };
+    const picture = over.classList.contains('hk-medio') ? a.offsetWidth / 1.15 : over.classList.contains('hk-pareja') ?
+        a.offsetWidth * 0.86 : room;
+    let high = need();
+    if (high < was && room - picture > high * 1.35) {
+        a.classList.add('hk-resto-holgado');
+        const bigger = need();
+        if (bigger > room - picture + 1) {
+            a.classList.remove('hk-resto-holgado');
+        } else {
+            high = bigger;
+        }
+    }
+    a.style.flex = high < was ? '0 0 ' + Math.round(Math.min(was, Math.max(high, room - picture))) + 'px' : '';
 }
 
 /**
@@ -702,6 +751,24 @@ export function fitAlso(lead) {
 export function linesOf(e) {
     const lh = parseFloat(window.getComputedStyle(e).lineHeight);
     return lh > 0 ? Math.round(e.offsetHeight / lh) : 1;
+}
+
+/**
+ * Whether a column holds its children whole, by where they are laid out: a part still on its way in (movimiento.css) counts
+ * where it is going, not where it is.
+ *
+ * @param {HTMLElement} box
+ * @returns {boolean}
+ */
+export function holds(box) {
+    const kids = box.children;
+    for (let i = 0; i < kids.length; i++) {
+        const base = kids[i].offsetParent === box ? 0 : box.offsetTop;
+        if (kids[i].offsetParent && kids[i].offsetTop + kids[i].offsetHeight > base + box.clientHeight + 1) {
+            return false;
+        }
+    }
+    return true;
 }
 
 /**

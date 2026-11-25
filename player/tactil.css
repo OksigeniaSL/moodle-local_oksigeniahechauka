@@ -245,6 +245,66 @@
     color: var(--hk-fondo);
 }
 
+/* Upright, the front is a third of what it was: a door 13 cm high is touched as well, and what the screen says keeps the
+   rest. Its name on a plate, white in both themes, with its letters dark: read on any colour of door. */
+.hk-vertical .hk-tc-fachada {
+    padding-top: 1rem;
+}
+.hk-vertical .hk-tc-invita {
+    margin-bottom: 1.2rem;
+    font-size: 3.4rem;
+    line-height: 4.4rem;
+}
+.hk-vertical .hk-tc-fachada .hk-tc-portal {
+    height: 22rem;
+}
+.hk-vertical .hk-tc-fachada .hk-tc-hoja {
+    transform: rotateY(-13deg);
+}
+.hk-vertical .hk-tc-fachada .hk-tc-asoma .hk-tc-hoja {
+    transform: rotateY(-32deg);
+}
+.hk-vertical .hk-tc-fachada .hk-tc-pulsado .hk-tc-hoja {
+    transform: rotateY(-70deg);
+}
+.hk-vertical .hk-tc-fachada .hk-tc-hoja::before,
+.hk-vertical .hk-tc-fachada .hk-tc-hoja::after {
+    display: none;
+}
+.hk-vertical .hk-tc-fachada .hk-tc-ventanuco {
+    top: 1.6rem;
+    width: 9rem;
+    height: 9rem;
+    margin-left: -4.5rem;
+}
+.hk-vertical .hk-tc-fachada .hk-tc-ventanuco .hk-tc-ic {
+    width: 5.2rem;
+    height: 5.2rem;
+    margin: -2.6rem 0 0 -2.6rem;
+}
+.hk-vertical .hk-tc-fachada .hk-tc-cartel {
+    position: absolute;
+    top: 16.1rem;
+    left: 1.4rem;
+    right: 1.4rem;
+    height: auto;
+    margin: 0;
+    padding: .9rem .4rem 1rem;
+    border-radius: 1.2rem;
+    background: #fff;
+    box-shadow: 0 .3rem .6rem rgba(0, 0, 0, .28);
+    color: #16191d;
+    font-size: 3.7rem;
+    line-height: 1.02;
+    transform: translateY(-50%);
+}
+.hk-vertical .hk-tc-fachada .hk-tc-pomo {
+    top: 8.6rem;
+    right: 1.2rem;
+    width: 2.2rem;
+    height: 2.2rem;
+}
+
 /* On a screen lying down, the front is lower. */
 .hk-horizontal .hk-tc-fachada {
     margin-top: 1rem;

@@ -1373,8 +1373,15 @@ export class Screen {
         }
     }
 
-    /** Once the layer is in the page: the headlines by steps and evened, the rest in its pages. */
+    /** Once the layer is in the page: measured with its parts in their place (movimiento.css). */
     adjustLayer(c) {
+        c.classList.add('hk-midiendo');
+        this.fitLayer(c);
+        c.classList.remove('hk-midiendo');
+    }
+
+    /** The headlines by steps and evened, the rest in its pages. */
+    fitLayer(c) {
         const vertical = !this.horizontal;
         const comp = c.getAttribute('data-composicion');
         const lead = c.querySelector('.hk-lider');

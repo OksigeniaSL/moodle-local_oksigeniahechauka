@@ -265,6 +265,19 @@
 .hk-resto > * {
     flex: none;
 }
+/* Upright, with room to spare under a picture: its words a step bigger, in the middle of it (lead.js). */
+.hk.hk-vertical .hk-resto-holgado {
+    --hk-t-min: 5rem;
+    --hk-t-lista: 6rem;
+    justify-content: center;
+}
+.hk.hk-vertical[data-distancia="5"] .hk-resto-holgado {
+    --hk-t-min: 6.4rem;
+    --hk-t-lista: 7.8rem;
+}
+.hk.hk-vertical .hk-resto-holgado > .hk-resto-pagina {
+    flex: 0 1 auto;
+}
 .hk-resto-pagina {
     position: relative;                   /* the player measures its lines against it */
     flex: 1 1 auto;

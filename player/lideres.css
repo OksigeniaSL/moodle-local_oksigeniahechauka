@@ -518,6 +518,19 @@
     width: 22rem;
     padding: 3rem 0 0;
 }
+/* under a carousel it is wider than it is tall: the plate beside the words */
+.hk-vertical .hk-cuerpo[data-composicion="fotos-tercio"] > .hk-lider[data-tipo="menu"] {
+    flex-direction: row;
+    align-items: stretch;
+}
+.hk.hk-vertical .hk-cuerpo[data-composicion="fotos-tercio"] > .hk-lider[data-tipo="menu"] .hk-mesa {
+    flex: none;
+    order: -1;
+    align-self: center;
+    width: 21rem;
+    padding: 0;
+    margin: 0 0 0 3.2rem;
+}
 /* a vertical screen read from afar, and the lead under a picture, have no room left for a plate or a sign */
 .hk-vertical[data-distancia="5"] .hk-lider .hk-mesa,
 .hk-vertical[data-distancia="8"] .hk-lider .hk-mesa,

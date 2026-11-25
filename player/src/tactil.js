@@ -717,10 +717,13 @@ export class Tactil {
         leaf.appendChild(el('span', 'hk-tc-pomo'));
         portal.appendChild(leaf);
         portal.appendChild(el('span', 'hk-tc-luz'));
-        // From afar the name hangs over the door; in the corridors it goes under it.
+        // From afar the name hangs over the door (upright, it is the plate of a low one); in the corridors it goes under it.
         if (attr === 'data-ir') {
             b.appendChild(portal);
             b.appendChild(sign);
+        } else if (this.frame.classList.contains('hk-vertical')) {
+            leaf.appendChild(sign);
+            b.appendChild(portal);
         } else {
             b.appendChild(sign);
             b.appendChild(portal);

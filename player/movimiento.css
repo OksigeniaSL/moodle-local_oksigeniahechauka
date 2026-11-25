@@ -41,6 +41,14 @@
     transition: none !important;
 }
 
+/* While a layer is measured upright (render.js), its parts in their place: hidden ones wait 24 px off, and what overflowed
+   only because of it made every slide take its smallest step. Nothing moves: hidden parts have no transition. */
+.hk-vertical .hk-capa.hk-midiendo[data-mv] .hk-mv[data-mv-como],
+.hk-vertical .hk-capa.hk-midiendo[data-mv] .hk-mv-renglon > span {
+    -webkit-transform: none;
+    transform: none;
+}
+
 /* --- 2. How each part comes in ------------------------------------------------------------------------------------
  * Hidden, then in its place. The delay comes from the script (the order of reading); the curve, from the level: «asienta»
  * cubic-bezier(.2, .7, .2, 1), the house's; juguetona overshoots a little, sobria travels less. */

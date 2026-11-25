@@ -12,7 +12,7 @@
 //
 // Chromium 56: flexbox, margins for gaps, no aspect-ratio, no inset; the carousel changes only opacity.
 
-import {fitWord, linesOf} from './lead.js';
+import {fitWord, holds, linesOf} from './lead.js';
 import {glyphSvg} from './redes.js';
 import {bindShort} from './canal.js';
 import {here} from './zone.js';
@@ -21,7 +21,7 @@ import {here} from './zone.js';
 export const CAROUSEL = {every: 3.6, most: 5};
 
 /** On an upright screen, the share of the poster's height the picture keeps at least. */
-const PICTURE_LEAST = 0.4;
+const PICTURE_LEAST = 0.6;
 
 /** On a wide screen, the share of the poster's width the picture may take, and the most lines its words take beside it: who
  *  passes looks at the picture, and reads three or four lines, not six (14 November 2026). */
@@ -229,7 +229,8 @@ export function buildInstagram(c, item, page, o) {
     }
     const post = postAt(item, page);
     const pictures = picturesOf(post);
-    const aspect = aspectOf(post);
+    // Upright, the cover of a reel as the feed of the app shows it, 4:5: at 9:16 it would be a strip.
+    const aspect = o.horizontal === false && post.media_type === 'VIDEO' ? Math.max(0.8, aspectOf(post)) : aspectOf(post);
     const s = el('section', 'hk-ig');
     s.setAttribute('data-forma', aspect > 1.05 ? 'h' : aspect < 0.95 ? 'v' : 'c');
     s.setAttribute('data-ajuste', '0');
@@ -272,7 +273,7 @@ export function buildInstagram(c, item, page, o) {
     glyph.innerHTML = glyphSvg(item.network || 'instagram');
     who.appendChild(glyph);
     who.appendChild(el('span', 'hk-ig-cuenta', String(item.name || '').trim()));
-    (vertical ? side : text).appendChild(who);
+    text.appendChild(who);
     const words = captionWords(post.caption);
     if (words) {
         const caption = el('p', 'hk-ig-pie', words);
@@ -373,6 +374,18 @@ export function fitInstagram(c, horizontal) {
     title.style.fontSize = '';
     s.setAttribute('data-ajuste', '0');
     s.classList.remove('hk-ig-sin-pie');
+    if (!horizontal) {
+        // Who posts, in one line beside its sign: a long name a step smaller at a time, broken only under seven tenths.
+        const name = s.querySelector('.hk-ig-cuenta');
+        s.style.removeProperty('--hk-ig-qr');
+        who.style.fontSize = '';
+        who.classList.remove('hk-ig-quien-larga');
+        const whole = px(who, 'fontSize');
+        for (let k = 1; k >= 0.7 && name.scrollWidth > name.clientWidth + 1; k -= 0.05) {
+            who.style.fontSize = Math.floor(whole * k) + 'px';
+        }
+        who.classList.toggle('hk-ig-quien-larga', name.scrollWidth > name.clientWidth + 1);
+    }
     const setFrame = function (size) {
         frame.style.width = size.w + 'px';
         frame.style.height = size.h + 'px';
@@ -389,7 +402,13 @@ export function fitInstagram(c, horizontal) {
         // Upright, first the words with the picture at its least (two fifths of the poster): the picture grows after them.
         setFrame(frameOf(roomW, roomH * PICTURE_LEAST, s.hkAspect, true, 0));
     }
+    const row = s.querySelector('.hk-ig-sigue');
     const fits = function () {
+        if (!horizontal) {
+            const name = s.querySelector('.hk-ig-cuenta');
+            return (who.classList.contains('hk-ig-quien-larga') || name.scrollWidth <= name.clientWidth + 1) && holds(text) && text.scrollWidth <= text.clientWidth + 1 && (!row || holds(column) &&
+                column.offsetHeight <= row.clientHeight + 1 && row.offsetTop + row.offsetHeight <= side.offsetTop + side.offsetHeight + 1);
+        }
         return text.scrollHeight <= text.clientHeight + 1 && side.scrollWidth <= side.clientWidth + 1 &&
             s.scrollHeight <= s.clientHeight + 1 && (!horizontal || !caption || linesOf(caption) <= CAPTION_LINES);
     };
@@ -434,9 +453,22 @@ export function fitInstagram(c, horizontal) {
         const used = side.offsetHeight + px(side, 'marginTop') + dotsH;
         side.style.flex = '';
         text.style.flex = '';
-        setFrame(frameOf(roomW, Math.max(roomH * PICTURE_LEAST, roomH - used), s.hkAspect, true, 0));
-        if (!fits()) {
-            setFrame(frameOf(roomW, roomH * PICTURE_LEAST, s.hkAspect, true, 0));
+        let tall = Math.max(roomH * PICTURE_LEAST, roomH - used);
+        setFrame(frameOf(roomW, tall, s.hkAspect, true, 0));
+        while (!fits() && tall > roomH * PICTURE_LEAST) {
+            tall = Math.max(roomH * PICTURE_LEAST, tall - roomH * 0.015);
+            setFrame(frameOf(roomW, tall, s.hkAspect, true, 0));
+        }
+        // A landscape picture takes the whole width and leaves height: the card takes some, up to as big as it can be read.
+        const rem = px(document.documentElement, 'fontSize') || 10;
+        const code = s.querySelector('.hk-qr');
+        const now = code ? code.offsetWidth : 0;
+        for (let size = 30 * rem; code && size > now + rem; size -= 2 * rem) {
+            s.style.setProperty('--hk-ig-qr', size + 'px');
+            if (fits()) {
+                return;
+            }
+            s.style.removeProperty('--hk-ig-qr');
         }
     }
 }

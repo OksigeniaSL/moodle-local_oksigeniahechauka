@@ -150,6 +150,31 @@
 .hk-vertical > .hk-cabecera.hk-con-tiempo {
     height: calc(var(--hk-t-min) * 1.3 + var(--hk-t-cifra));
 }
+/* The logo, the weather and the clock on the same middle; the clock's block as high as the header. */
+.hk-vertical > .hk-cabecera img,
+.hk-vertical > .hk-cabecera.hk-con-tiempo img {
+    -webkit-align-self: center;
+    align-self: center;
+    height: calc(var(--hk-t-cifra) * .82);
+    max-width: 22rem;
+    margin-top: 0;
+    object-fit: contain;
+    object-position: 0 50%;
+}
+.hk-vertical > .hk-cabecera:not(.hk-fecha-larga) .hk-fecha {
+    white-space: nowrap;
+}
+.hk.hk-vertical > .hk-credito-tiempo {
+    top: calc(var(--hk-t-min) * 1.3 + var(--hk-t-cifra) + 3.3rem);
+    line-height: 2.2rem;
+}
+.hk.hk-vertical[data-distancia="5"] > .hk-credito-tiempo,
+.hk.hk-vertical > .hk-cabecera.hk-fecha-larga ~ .hk-credito-tiempo {
+    top: calc(var(--hk-t-min) * 2.5 + var(--hk-t-cifra) + 3.3rem);
+}
+.hk.hk-vertical[data-zona-segura] > .hk-credito-tiempo {
+    margin-top: 1.4rem;
+}
 .hk-vertical .hk-tiempo-icono {
     width: calc(var(--hk-t-cifra) * .9);
     height: calc(var(--hk-t-cifra) * .9);

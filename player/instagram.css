@@ -279,16 +279,39 @@
 
 /* --- Vertical: the picture on top, the words and the card under it ------------------------------------------------ */
 .hk.hk-vertical .hk-ig {
-    --hk-ig-qr: 32rem;
+    --hk-ig-qr: 22rem;                  /* 14 cm on a 55": read from a metre and a half; what leads is the picture */
+    --hk-ig-cola: 2rem;
     flex-direction: column;
-    padding: 5.2rem;
+    padding: 4rem;
+}
+.hk.hk-vertical.hk-tactil .hk-ig {
+    --hk-ig-qr: 18rem;                  /* people touch it: they are beside it */
 }
 .hk.hk-vertical .hk-ig-foto {
     align-self: center;
 }
 .hk.hk-vertical .hk-ig-lado {
-    margin-top: 4rem;
+    margin-top: 3rem;
     margin-left: 0;
+}
+.hk.hk-vertical .hk-ig-quien {
+    flex-wrap: nowrap;
+}
+.hk.hk-vertical .hk-ig-cuenta {
+    flex: 1 1 auto;
+    overflow: hidden;
+    white-space: nowrap;
+}
+.hk.hk-vertical .hk-ig-quien-larga .hk-ig-cuenta {
+    white-space: normal;
+}
+.hk.hk-vertical .hk-ig-titular {
+    padding-top: 1.6rem;
+    font-size: calc(var(--hk-t-entrada) * .92);
+    line-height: 1.06;
+}
+.hk.hk-vertical .hk-ig-tarjeta {
+    padding: 1.8rem 1.8rem 1.6rem;
 }
 .hk.hk-vertical .hk-ig-lado {
     flex-direction: column;
@@ -297,10 +320,9 @@
     display: flex;
     flex: 1 1 auto;
     min-height: 0;
-    margin-top: 2.4rem;
 }
 .hk .hk-ig-sigue .hk-ig-pie {
-    margin-top: 0;
+    margin-top: 1.6rem;
 }
 .hk.hk-vertical[data-distancia="8"] .hk-ig {
     padding: 4.4rem;

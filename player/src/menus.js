@@ -447,6 +447,40 @@ export function buildMenus(c, data, turn, o) {
     c.appendChild(s);
 }
 
+// Upright, what the tables leave goes to their rows, up to a line of air each: never a table floating in an empty sheet.
+function spread(s, tables, fits) {
+    let used = 0;
+    const each = tables.querySelectorAll('.hk-menus-mesa');
+    for (let i = 0; i < each.length; i++) {
+        used += each[i].offsetHeight;
+    }
+    const rows = tables.querySelectorAll('tbody tr');
+    const cells = tables.querySelectorAll('tbody .hk-menus-celda');
+    const left = tables.clientHeight - used;
+    if (!rows.length || left <= 0) {
+        return;
+    }
+    const line = parseFloat(window.getComputedStyle(tables.querySelector('.hk-menus-mesa')).fontSize) || 40;
+    const base = [];
+    for (let i = 0; i < cells.length; i++) {
+        const cs = window.getComputedStyle(cells[i]);
+        base.push([parseFloat(cs.paddingTop) || 0, parseFloat(cs.paddingBottom) || 0]);
+    }
+    for (let air = Math.min(line * 1.3, left * 0.9 / rows.length / 2); air > 2; air *= 0.7) {
+        for (let i = 0; i < cells.length; i++) {
+            cells[i].style.paddingTop = base[i][0] + air + 'px';
+            cells[i].style.paddingBottom = base[i][1] + air + 'px';
+        }
+        if (fits()) {
+            return;
+        }
+    }
+    for (let i = 0; i < cells.length; i++) {
+        cells[i].style.paddingTop = '';
+        cells[i].style.paddingBottom = '';
+    }
+}
+
 /**
  * Fitted after it is on the screen: the dishes go down by steps (0.9, 0.8 and 0.72 of their size) until the tables fit;
  * then the legend goes, and last the «= …» of the dishes shared with other menus (their tint still says it); never
@@ -459,6 +493,12 @@ export function fitMenus(c) {
     if (!s) {
         return;
     }
+    const upright = !!s.closest('.hk-vertical');
+    const set = s.querySelectorAll('.hk-menus-celda');
+    for (let i = 0; i < set.length; i++) {
+        set[i].style.paddingTop = '';
+        set[i].style.paddingBottom = '';
+    }
     const tables = s.querySelector('.hk-menus-mesas');
     const all = ['hk-menus-sin-leyenda', 'hk-menus-sin-iguales'];
     const clear = function () {
@@ -467,8 +507,21 @@ export function fitMenus(c) {
         });
     };
     clear();
+    // The table goes out of its box by its border-spacing (menus.css): counted upright, where the steps are for the words.
     const fits = function () {
-        return s.scrollHeight <= s.clientHeight + 1 && tables.scrollWidth <= tables.clientWidth + 1;
+        const table = upright && tables.querySelector('.hk-menus-mesa');
+        const out = table ? Math.max(0, -parseFloat(window.getComputedStyle(table).marginRight) || 0) : 0;
+        if (upright && tables.scrollHeight > tables.clientHeight + out + 1) {
+            return false;
+        }
+        // A word wider than its column does not widen a table of fixed columns: it goes over the next one.
+        const dishes = upright ? s.querySelectorAll('.hk-menus-plato .hk-menus-celda') : [];
+        for (let i = 0; i < dishes.length; i++) {
+            if (dishes[i].scrollWidth > dishes[i].clientWidth + 1) {
+                return false;
+            }
+        }
+        return s.scrollHeight <= s.clientHeight + 1 && tables.scrollWidth <= tables.clientWidth + out + 1;
     };
     const states = [[], ['hk-menus-sin-leyenda'], all];
     for (let n = 0; n < states.length; n++) {
@@ -476,10 +529,14 @@ export function fitMenus(c) {
         states[n].forEach(function (cls) {
             s.classList.add(cls);
         });
-        // A step up first, «g», where the sheet has room to spare (two short menus at 3 m left half of it white).
-        for (let step = n ? 0 : -1; step <= 3; step++) {
-            s.setAttribute('data-ajuste', step < 0 ? 'g' : String(step));
+        // A step up first, «g», where the sheet has room to spare (two short menus at 3 m left half of it white); upright,
+        // where the room is in height, another one before it.
+        for (let step = n ? 0 : (upright ? -2 : -1); step <= 3; step++) {
+            s.setAttribute('data-ajuste', step < 0 ? 'ggg'.slice(0, -step) : String(step));
             if (fits()) {
+                if (upright) {
+                    spread(s, tables, fits);
+                }
                 return;
             }
         }

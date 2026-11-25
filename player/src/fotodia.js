@@ -5,11 +5,12 @@
 // know…?» for a child, in big letters. The frame is measured here from the picture's own shape and the room: the words
 // keep their share, and a picture of the other shape than the screen takes the room it needs, not a cut.
 // Chromium 56: flexbox, margins for gaps; the picture settles with a transform only.
-import {fitWord} from './lead.js';
+import {fitWord, holds} from './lead.js';
+import {cutWords} from './instagram.js';
 
 // The share of the body the words keep, by the screen and the picture's shape, at 3 and 5 m; at 8 m the words are bigger
 // and keep a little more.
-const SHARE = {h: {h: 0.32, v: 0.44}, v: {h: 0.34, v: 0.36}};
+const SHARE = {h: {h: 0.32, v: 0.44}, v: {h: 0.34, v: 0.32}};
 const SHARE_FAR = 0.08;
 
 // A pictogram for each kind, in the line of the screen's icons: 24 units, a stroke of 2.
@@ -163,7 +164,7 @@ export function fitPhotoday(c, horizontal) {
     };
     const base = SHARE[horizontal ? 'h' : 'v'][s.getAttribute('data-forma')] + (far ? SHARE_FAR : 0);
     const fits = function () {
-        return side.scrollHeight <= side.clientHeight + 1 && side.scrollWidth <= side.clientWidth + 1;
+        return (horizontal ? side.scrollHeight <= side.clientHeight + 1 : holds(side)) && side.scrollWidth <= side.clientWidth + 1;
     };
     const place = function (share) {
         let creditH = creditOf();
@@ -172,11 +173,18 @@ export function fitPhotoday(c, horizontal) {
             const f = frameOf(horizontal ? w - gap : w, room, s.hkAspect, horizontal, share);
             box.style.width = f.w + 'px';
             box.style.height = f.h + 'px';
-            frame.style.width = f.w + 'px';
+            frame.style.width = (horizontal ? f.w : w) + 'px';
             creditH = creditOf();
         }
     };
-    for (let more = 0; more <= 0.15001; more += 0.05) {
+    const note = s.querySelector('.hk-fdd-pie');
+    if (note && !note.hkWords) {
+        note.hkWords = note.textContent;
+    }
+    if (note) {
+        note.textContent = note.hkWords;
+    }
+    for (let more = 0; more <= (horizontal ? 0.15001 : 0.30001); more += 0.05) {
         place(base + more);
         for (let step = -2; step <= 3; step++) {
             s.setAttribute('data-ajuste', String(step));
@@ -184,6 +192,18 @@ export function fitPhotoday(c, horizontal) {
                 return;
             }
         }
+    }
+    if (!horizontal && note) {
+        // Upright and from afar a long note does not fit even so: as many of its words as do, never a line cut in two.
+        place(base + 0.2);
+        const words = note.hkWords.split(' ');
+        for (let k = words.length - 1; k > 0 && !fits(); k--) {
+            note.textContent = cutWords(words, k);
+        }
+        if (fits()) {
+            return;
+        }
+        note.textContent = '';
     }
     const title = s.querySelector('.hk-fdd-titulo');
     if (title) {

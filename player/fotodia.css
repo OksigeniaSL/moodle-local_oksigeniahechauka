@@ -40,6 +40,10 @@
 }
 .hk.hk-vertical .hk-fdd-marco {
     align-self: center;
+    align-items: center;
+}
+.hk.hk-vertical .hk-fdd-credito {
+    text-align: center;
 }
 .hk .hk-fdd-lamina {
     overflow: hidden;
