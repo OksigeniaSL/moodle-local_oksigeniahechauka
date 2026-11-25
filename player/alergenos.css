@@ -65,6 +65,8 @@
 }
 .hk-alergeno-beef { background-image: url(alergenos/beef.svg); }
 .hk-alergeno-meat { background-image: url(alergenos/meat.svg); }
+.hk-alergeno-chicken { background-image: url(alergenos/chicken.svg); }
+.hk-alergeno-turkey { background-image: url(alergenos/turkey.svg); }
 .hk-alergeno-pork { background-image: url(alergenos/pork.svg); }
 .hk-alergeno-celery { background-image: url(alergenos/celery.svg); }
 .hk-alergeno-crustaceans { background-image: url(alergenos/crustaceans.svg); }

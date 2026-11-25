@@ -1,8 +1,8 @@
-// An allergen of a dish (or one of the marks some diets leave out: meat, pork, beef) on the screen: its drawing on a white disc
+// An allergen of a dish (or one of the marks some diets leave out: meat, and which meat) on the screen: its drawing on a white disc
 // (alergenos.css); its name, where the screen has no drawing for it. Never an empty disc: it would say something and not what.
 
 const DRAWN = ['celery', 'crustaceans', 'eggs', 'fish', 'gluten', 'lupin', 'milk', 'molluscs', 'mustard', 'nuts', 'peanuts',
-    'sesame', 'soy', 'sulphites', 'meat', 'pork', 'beef'];
+    'sesame', 'soy', 'sulphites', 'meat', 'pork', 'beef', 'chicken', 'turkey'];
 
 /** Whether there is a drawing for it. */
 export function drawn(code) {

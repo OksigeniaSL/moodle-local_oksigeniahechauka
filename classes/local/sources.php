@@ -28,6 +28,9 @@ namespace local_oksigeniahechauka\local;
  * Each source gives items of the contract, ready for the manifest, with their own «when».
  */
 class sources {
+    /** @var string[] The marks of Meals that say which meat a dish has, besides «meat». */
+    const MEATS = ['pork', 'beef', 'chicken', 'turkey'];
+
     /** @var string The library's plugin. */
     const BOOKS = 'local_oksigeniaayvurenda';
 
@@ -251,18 +254,15 @@ class sources {
     }
 
     /**
-     * A dish's allergens as a screen says them: the marks some diets leave out (meat, pork, beef) after the allergens, and meat
-     * only when it is not said already by pork or beef, as Meals does in its own pages.
+     * A dish's allergens as a screen says them: the marks some diets leave out (meat, and which meat) after the allergens, and
+     * meat only when which one it is does not say it already, as Meals does in its own pages.
      *
      * @param string[] $codes
      * @return string[]
      */
     public static function allergens_shown(array $codes): array {
-        $marks = array_values(array_intersect(['pork', 'beef', 'meat'], $codes));
-        if (count($marks) > 1) {
-            $marks = array_values(array_diff($marks, ['meat']));
-        }
-        return array_merge(array_values(array_diff($codes, ['pork', 'beef', 'meat'])), $marks);
+        $marks = array_values(array_intersect(self::MEATS, $codes)) ?: array_values(array_intersect(['meat'], $codes));
+        return array_merge(array_values(array_diff($codes, self::MEATS, ['meat'])), $marks);
     }
 
     /**

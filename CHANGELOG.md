@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.40.9
+
+- The menu: chicken and turkey have their drawing (Oksigenia Meals 0.120.0 and later), and «meat» is not said again beside them.
+
 ## 0.40.8
 
 - **Upright screens, looked at again.** The doors of a touch screen take half the height, each with its name on a plate, and the

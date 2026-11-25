@@ -90,6 +90,7 @@ final class menus_test extends \advanced_testcase {
         $this->assertSame(['gluten', 'soy', 'meat'], sources::allergens_shown(['gluten', 'meat', 'soy']));
         $this->assertSame(['sulphites', 'pork'], sources::allergens_shown(['meat', 'pork', 'sulphites']));
         $this->assertSame(['pork', 'beef'], sources::allergens_shown(['beef', 'meat', 'pork']));
+        $this->assertSame(['milk', 'chicken', 'turkey'], sources::allergens_shown(['meat', 'turkey', 'milk', 'chicken']));
         $this->assertSame(['eggs'], sources::allergens_shown(['eggs']));
         $this->assertSame([], sources::allergens_shown([]));
     }
