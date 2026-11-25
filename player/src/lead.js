@@ -639,10 +639,14 @@ function settleRest(a, pages) {
         });
         return most + 1;
     };
-    const picture = over.classList.contains('hk-medio') ? a.offsetWidth / 1.15 : over.classList.contains('hk-pareja') ?
+    // A poster shown whole, never taller than it is: what it would have over and under it is only a blur of itself.
+    const slide = over.classList.contains('hk-medio-contener') ? over.querySelector('.hk-diapo') : null;
+    const m = (slide && slide.hkItem && slide.hkItem.media) || {};
+    const whole = m.width > 0 && m.height > 0 && m.width > m.height ? a.offsetWidth * m.height / m.width : 0;
+    const picture = whole || over.classList.contains('hk-medio') ? whole || a.offsetWidth / 1.15 : over.classList.contains('hk-pareja') ?
         a.offsetWidth * 0.86 : room;
     let high = need();
-    if (high < was && room - picture > high * 1.35) {
+    if ((high < was || whole) && room - picture > high * 1.35) {
         a.classList.add('hk-resto-holgado');
         const bigger = need();
         if (bigger > room - picture + 1) {
@@ -651,7 +655,8 @@ function settleRest(a, pages) {
             high = bigger;
         }
     }
-    a.style.flex = high < was ? '0 0 ' + Math.round(Math.min(was, Math.max(high, room - picture))) + 'px' : '';
+    const most = whole ? room : was;
+    a.style.flex = high < was || whole ? '0 0 ' + Math.round(Math.min(most, Math.max(high, room - picture))) + 'px' : '';
 }
 
 /**

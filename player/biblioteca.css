@@ -224,9 +224,14 @@
     font-weight: 700;
     line-height: 1.05;
 }
-/* --- Vertical: its words on top, the books at the bottom, on the plank --- */
+/* --- Vertical: its words on top, the books at the bottom, on the plank (as tall as the words leave: biblioteca.js) --- */
 .hk.hk-vertical .hk-biblio {
     --hk-libro-alto: 60rem;
+    --hk-libro-otros: 21rem;
+    --hk-biblio-qr: 26rem;
+}
+.hk.hk-vertical.hk-tactil .hk-biblio {
+    --hk-biblio-qr: 22rem;                /* people touch it: they are beside it */
 }
 .hk.hk-vertical[data-distancia="5"] .hk-biblio {
     --hk-libro-alto: 52rem;
@@ -238,7 +243,7 @@
     position: relative;
     flex-direction: column-reverse;
     align-items: stretch;
-    padding: 4rem 4rem 0;
+    padding: 3.6rem 4rem 0;
 }
 .hk.hk-vertical .hk-libro-grande {
     flex: none;
@@ -250,6 +255,12 @@
     min-height: 0;
     margin-bottom: 3rem;
 }
+.hk.hk-vertical .hk-biblio-holgada .hk-biblio-lado {
+    justify-content: center;
+}
+.hk.hk-vertical .hk-biblio-holgada .hk-biblio-autor {
+    font-size: var(--hk-t-entrada);
+}
 .hk.hk-vertical .hk-biblio-otros {
     position: absolute;
     right: 4rem;
@@ -257,17 +268,63 @@
     margin: 0;
     padding: 0;
 }
+.hk.hk-vertical .hk-biblio-otros .hk-libro {
+    width: calc(var(--hk-libro-otros) * .667);
+    height: var(--hk-libro-otros);
+    margin-right: 2rem;
+}
+.hk.hk-vertical .hk-biblio-otros .hk-libro:last-child {
+    margin-right: 0;
+}
 /* Its code beside the book, over the others: the title takes the whole width, or a long word does not fit */
 .hk.hk-vertical .hk-biblio .hk-qr {
     position: absolute;
     right: 4rem;
-    bottom: calc(var(--hk-libro-alto) * .345 + 3rem);
-    width: 32rem;
+    bottom: calc(var(--hk-libro-otros) + 3.4rem);
+    width: var(--hk-biblio-qr);
     margin: 0;
+    padding: 2rem 2rem 1.8rem;
 }
 .hk.hk-vertical .hk-biblio.hk-biblio-sin-otros .hk-qr,
 .hk.hk-vertical[data-distancia="8"] .hk-biblio .hk-qr {
-    bottom: 1.6rem;
+    bottom: 2rem;
+}
+/* A cover drawn here, big: its title as a title, and a printer's frame, so it is a book and not a block of colour. */
+.hk.hk-vertical .hk-libro-grande .hk-libro-dibujado {
+    position: relative;
+    justify-content: center;
+    padding: 18% 14% 18% 17%;
+    text-align: center;
+}
+.hk.hk-vertical .hk-libro-grande .hk-libro-dibujado::before {
+    content: "";
+    position: absolute;
+    top: 5%;
+    right: 6.5%;
+    bottom: 5%;
+    left: 11%;
+    border: calc(var(--hk-libro-alto) * .008) solid;
+    border-radius: calc(var(--hk-libro-alto) * .014);
+    box-shadow: inset 0 0 0 calc(var(--hk-libro-alto) * .008) transparent, inset 0 0 0 calc(var(--hk-libro-alto) * .011);
+    opacity: .4;
+}
+.hk.hk-vertical .hk-libro-grande .hk-libro-dibujado-titulo {
+    position: relative;
+    font-size: calc(var(--hk-libro-alto) * .088);
+}
+.hk.hk-vertical .hk-libro-grande .hk-libro-dibujado-titulo::after {
+    content: "";
+    display: block;
+    width: 22%;
+    height: calc(var(--hk-libro-alto) * .012);
+    margin: calc(var(--hk-libro-alto) * .05) auto;
+    border-radius: 1rem;
+    background: currentColor;
+    opacity: .55;
+}
+.hk.hk-vertical .hk-libro-grande .hk-libro-dibujado-autor {
+    position: relative;
+    font-size: calc(var(--hk-libro-alto) * .046);
 }
 .hk .hk-biblio-otros .hk-libro-dibujado-titulo,
 .hk .hk-biblio-otros .hk-libro-dibujado-autor {

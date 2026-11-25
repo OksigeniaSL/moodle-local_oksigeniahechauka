@@ -299,6 +299,9 @@
     flex-direction: column;
     padding: 5.6rem 5.6rem 4.8rem;
 }
+.hk.hk-vertical.hk-tactil .hk-canal {
+    --hk-canal-qr: 42rem;
+}
 .hk.hk-vertical .hk-canal-texto {
     flex: none;
     justify-content: flex-start;
@@ -834,6 +837,9 @@
 }
 .hk.hk-vertical [data-objeto="hoja"] .hk-canal-tarjeta {
     border-radius: .4rem 0 .4rem .4rem;   /* tall, the corner turned down is the top right: the plane crosses the band */
+}
+.hk.hk-vertical [data-objeto="hoja"] .hk-canal-nombre {
+    padding-right: 5.4rem;                /* clear of the corner */
 }
 .hk.hk-vertical [data-p="oreja"] {
     left: auto;

@@ -187,6 +187,26 @@ export function buildMoments(c, item, page, o) {
     s.hkMoment = m;
 }
 
+// Upright, the rosette (or the cover) grows with the height the words leave, so the card is full and not its upper half.
+function growPrize(party, side) {
+    let words = 0;
+    for (let i = 0; i < side.children.length; i++) {
+        const k = side.children[i];
+        if (k.offsetHeight) {
+            words = Math.max(words, k.offsetTop + k.offsetHeight - side.offsetTop);
+        }
+    }
+    const spare = side.clientHeight - words;
+    const rosette = party.querySelector('.hk-celebra-escarapela:not(.hk-celebra-escarapela-prendida)');
+    const cover = party.querySelector('.hk-celebra-portada');
+    const rem = parseFloat(window.getComputedStyle(document.documentElement).fontSize) || 10;
+    if (cover) {
+        party.style.setProperty('--hk-libro-alto', Math.floor(Math.min(cover.offsetHeight + spare, 84 * rem)) + 'px');
+    } else if (rosette) {
+        party.style.setProperty('--hk-escarapela', Math.floor(Math.min((rosette.offsetHeight + spare) / 1.31, 62 * rem)) + 'px');
+    }
+}
+
 /**
  * Once in the page: the sentence by steps, never under the distance's minimum; then the place goes, and last a smaller cover.
  *
@@ -223,14 +243,36 @@ export function fitMoments(c, horizontal) {
         }
     }
     const states = [[], ['hk-celebra-sin-sitio'], ['hk-celebra-sin-sitio', 'hk-celebra-menor']];
-    for (let n = 0; n < states.length; n++) {
-        party.classList.remove('hk-celebra-sin-sitio', 'hk-celebra-menor');
-        states[n].forEach(function (cls) {
-            party.classList.add(cls);
-        });
-        for (let step = 0; step <= 3; step++) {
-            party.setAttribute('data-ajuste', String(step));
-            if (linesOf(text) <= most && side.scrollHeight <= side.clientHeight + 1 && text.scrollWidth <= text.clientWidth + 1) {
+    const fits = function () {
+        for (let n = 0; n < states.length; n++) {
+            party.classList.remove('hk-celebra-sin-sitio', 'hk-celebra-menor');
+            states[n].forEach(function (cls) {
+                party.classList.add(cls);
+            });
+            for (let step = 0; step <= 3; step++) {
+                party.setAttribute('data-ajuste', String(step));
+                if (linesOf(text) <= most && side.scrollHeight <= side.clientHeight + 1 && text.scrollWidth <= text.clientWidth + 1) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    };
+    if (fits()) {
+        if (!horizontal) {
+            growPrize(party, side);
+        }
+        return;
+    }
+    // Upright, the words before the prize: a smaller one, as far as four tenths, before they lose a line.
+    if (!horizontal) {
+        const prize = party.querySelector('.hk-celebra-portada') || party.querySelector('.hk-celebra-escarapela:not(.hk-celebra-escarapela-prendida)');
+        const book = prize && prize.classList.contains('hk-celebra-portada');
+        const full = prize ? prize.offsetHeight / (book ? 1 : 1.31) : 0;
+        for (let k = 17; full && k >= 8; k -= 3) {
+            party.style.setProperty(book ? '--hk-libro-alto' : '--hk-escarapela', Math.floor(full * k / 20) + 'px');
+            if (fits()) {
+                growPrize(party, side);
                 return;
             }
         }

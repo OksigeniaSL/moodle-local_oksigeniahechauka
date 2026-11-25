@@ -228,12 +228,16 @@
     padding: 6rem 6rem 7rem;
 }
 .hk.hk-vertical .hk-celebra-objeto {
-    margin: 0 0 5rem;
+    align-self: center;
+    margin: 0 0 4rem;
 }
 .hk.hk-vertical .hk-celebra-lado {
     flex: 1 1 0px;
+    align-self: stretch;
+    align-items: center;
     justify-content: flex-start;
     min-height: 0;
+    text-align: center;
 }
 .hk.hk-vertical .hk-celebra-con-portada {
     --hk-libro-alto: 56rem;
@@ -246,7 +250,7 @@
     display: none;
 }
 .hk.hk-vertical .hk-celebra-sala {
-    padding-bottom: 14rem;
+    padding: 4.4rem 6rem 5rem;
 }
 /* A low card (the birthday strip above, from afar): no streamers, which would cross the words; the strip brings the party. */
 .hk .hk-celebra-baja .hk-celebra-serpentina {

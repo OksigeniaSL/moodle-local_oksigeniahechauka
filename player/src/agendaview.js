@@ -407,6 +407,17 @@ function goToStop(c, n, animated) {
         }
     }
     const track = A.track;
+    // Upright, a stop that is a short list is not left up at the top of an empty screen: it goes towards the middle.
+    let y = p.y;
+    const list = c.querySelector('.hk-agenda-lista');
+    if (c.closest('.hk-vertical') && list && !p.part && p.from >= 0 && track.children[p.from] && track.children[p.to]) {
+        const top = track.children[p.from];
+        const bottom = track.children[p.to];
+        const spare = list.clientHeight - (bottom.offsetTop + bottom.offsetHeight - top.offsetTop);
+        if (spare > list.clientHeight * 0.38) {
+            y -= Math.round(spare * 0.36);
+        }
+    }
     const setBlocks = function () {
         for (let i = 0; i < track.children.length; i++) {
             const inPart = p.part && p.part.block === i;
@@ -419,12 +430,12 @@ function goToStop(c, n, animated) {
     };
     const back = n === A.firstList && A.current > n;
     if (!animated || (!A.byPage && !back)) {
-        placeTrack(track, p.y, animated);
+        placeTrack(track, y, animated);
         setBlocks();
     } else {
         track.classList.add('hk-agenda-cambiando');
         setTimeout(function () {
-            placeTrack(track, p.y, false);
+            placeTrack(track, y, false);
             setBlocks();
             track.classList.remove('hk-agenda-cambiando');
         }, 500);
@@ -447,6 +458,10 @@ export function startAgenda(c, o) {
         return 12;
     }
     const list = c.querySelector('.hk-agenda-lista');
+    // Upright, whatever fits whole at the large size is shown at it: never a short list at the top of an empty screen.
+    if (!c.getAttribute('data-densidad') && c.closest('.hk-vertical') && track.lastChild) {
+        c.setAttribute('data-densidad', 'poca');
+    }
     // A thin month that does not fit large goes on as any other.
     if (c.getAttribute('data-densidad') === 'poca' && track.offsetHeight > list.clientHeight) {
         c.removeAttribute('data-densidad');

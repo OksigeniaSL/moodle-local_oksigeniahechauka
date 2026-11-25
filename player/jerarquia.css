@@ -278,6 +278,12 @@
 .hk.hk-vertical .hk-resto-holgado > .hk-resto-pagina {
     flex: 0 1 auto;
 }
+.hk.hk-vertical .hk-resto-holgado > .hk-aviso-fijo {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    justify-content: center;
+}
 .hk-resto-pagina {
     position: relative;                   /* the player measures its lines against it */
     flex: 1 1 auto;

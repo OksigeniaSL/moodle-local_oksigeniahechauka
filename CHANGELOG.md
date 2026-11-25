@@ -2,6 +2,9 @@
 
 ## 0.40.9
 
+- Upright screens, the rest of the slides: the library's book grows with the room there is, «the library celebrates» never loses
+  its last line, a wide poster keeps its shape, the QR of a channel is bigger where people touch, and the agenda goes in big
+  letters when it all fits.
 - The menu: chicken and turkey have their drawing (Oksigenia Meals 0.120.0 and later), and «meat» is not said again beside them.
 
 ## 0.40.8
