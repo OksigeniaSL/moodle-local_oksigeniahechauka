@@ -43,6 +43,7 @@
 
 /* While a layer is measured upright (render.js), its parts in their place: hidden ones wait 24 px off, and what overflowed
    only because of it made every slide take its smallest step. Nothing moves: hidden parts have no transition. */
+.hk-capa.hk-midiendo[data-mv="menus"] .hk-mv[data-mv-como],
 .hk-vertical .hk-capa.hk-midiendo[data-mv] .hk-mv[data-mv-como],
 .hk-vertical .hk-capa.hk-midiendo[data-mv] .hk-mv-renglon > span {
     -webkit-transform: none;

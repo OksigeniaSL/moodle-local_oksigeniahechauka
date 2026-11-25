@@ -507,15 +507,15 @@ export function fitMenus(c) {
         });
     };
     clear();
-    // The table goes out of its box by its border-spacing (menus.css): counted upright, where the steps are for the words.
+    // The table goes out of its box by its border-spacing (menus.css): counted, or no table ever fits.
     const fits = function () {
-        const table = upright && tables.querySelector('.hk-menus-mesa');
+        const table = tables.querySelector('.hk-menus-mesa');
         const out = table ? Math.max(0, -parseFloat(window.getComputedStyle(table).marginRight) || 0) : 0;
-        if (upright && tables.scrollHeight > tables.clientHeight + out + 1) {
+        if (tables.scrollHeight > tables.clientHeight + out + 1) {
             return false;
         }
         // A word wider than its column does not widen a table of fixed columns: it goes over the next one.
-        const dishes = upright ? s.querySelectorAll('.hk-menus-plato .hk-menus-celda') : [];
+        const dishes = s.querySelectorAll('.hk-menus-plato .hk-menus-celda');
         for (let i = 0; i < dishes.length; i++) {
             if (dishes[i].scrollWidth > dishes[i].clientWidth + 1) {
                 return false;

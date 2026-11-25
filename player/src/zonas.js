@@ -434,8 +434,23 @@ export function fitZones(c) {
         box.parentNode.style.display = highest || z.entries.length > 1 ? '' : 'none';
         z.col.style.setProperty('--hk-zonas-pie', box.parentNode.offsetHeight + 'px');
     }
+    // Each picture whole: as wide as its shape asks of the tile's height, never over three fifths of it when it has words.
+    each(upright ? z.entries : [], function (e) {
+        const m = (e.source && e.source.media) || {};
+        if (!e.photo || !e.item.clientHeight) {
+            return;
+        }
+        const shape = m.width > 0 && m.height > 0 ? m.width / m.height : 2 / 3;
+        const words = e.item.querySelector('.hk-zonas-junto');
+        e.item.classList.toggle('hk-zonas-apaisada', shape >= 0.95);
+        const wide = shape >= 0.95 ? 1 : Math.min(words ? 0.6 : 1, e.item.clientHeight * shape / e.item.clientWidth);
+        e.photo.box.style.width = Math.round(wide * 1000) / 10 + '%';
+        if (words) {
+            words.style.width = shape >= 0.95 ? '' : Math.round((1 - wide) * 1000) / 10 + '%';
+        }
+    });
     each(upright ? c.querySelectorAll('.hk-zonas-junto') : [], function (t) {
-        for (let step = 0; step <= 2; step++) {
+        for (let step = 0; step <= 3; step++) {
             t.setAttribute('data-ajuste', String(step));
             if (t.scrollHeight <= t.clientHeight + 1 && t.scrollWidth <= t.clientWidth + 1) {
                 return;

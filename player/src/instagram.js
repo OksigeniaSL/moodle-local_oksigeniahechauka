@@ -343,6 +343,24 @@ function cutTo(p, fits) {
     p.textContent = cutWords(words, lo);
 }
 
+// Upright, the address under the code: in one line, smaller to be so, or not at all; the code says it.
+function fitAddress(s) {
+    const web = s.querySelector('.hk-qr-web');
+    if (!web) {
+        return;
+    }
+    web.style.fontSize = '';
+    web.style.display = '';
+    const size = parseFloat(window.getComputedStyle(web).fontSize);
+    for (let k = 1; k >= 0.6; k -= 0.05) {
+        web.style.fontSize = Math.floor(size * k) + 'px';
+        if (web.scrollWidth <= web.clientWidth + 1) {
+            return;
+        }
+    }
+    web.style.display = 'none';
+}
+
 /**
  * Once in the page: the picture as big as the words' share lets it, whole; the caption the biggest of its steps that fits (the
  * lead's second line, a list's line, the least that is read), and if even at the least it does not, cut at a word with «…». A
@@ -385,6 +403,7 @@ export function fitInstagram(c, horizontal) {
             who.style.fontSize = Math.floor(whole * k) + 'px';
         }
         who.classList.toggle('hk-ig-quien-larga', name.scrollWidth > name.clientWidth + 1);
+        fitAddress(s);
     }
     const setFrame = function (size) {
         frame.style.width = size.w + 'px';
@@ -465,10 +484,12 @@ export function fitInstagram(c, horizontal) {
         const now = code ? code.offsetWidth : 0;
         for (let size = 30 * rem; code && size > now + rem; size -= 2 * rem) {
             s.style.setProperty('--hk-ig-qr', size + 'px');
+            fitAddress(s);
             if (fits()) {
                 return;
             }
             s.style.removeProperty('--hk-ig-qr');
+            fitAddress(s);
         }
     }
 }

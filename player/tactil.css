@@ -259,7 +259,13 @@
     height: 22rem;
 }
 .hk-vertical .hk-tc-fachada .hk-tc-hoja {
-    transform: rotateY(-13deg);
+    z-index: 1;                           /* the light in the gap behind it, never over its plate */
+    transform: rotateY(-18deg);
+}
+.hk-vertical .hk-tc-fachada .hk-tc-portal::after {
+    z-index: 0;
+    right: .2rem;
+    width: 2.4rem;
 }
 .hk-vertical .hk-tc-fachada .hk-tc-asoma .hk-tc-hoja {
     transform: rotateY(-32deg);
@@ -285,11 +291,11 @@
 .hk-vertical .hk-tc-fachada .hk-tc-cartel {
     position: absolute;
     top: 16.1rem;
-    left: 1.4rem;
-    right: 1.4rem;
+    left: 1.6rem;
+    right: 1.6rem;
     height: auto;
     margin: 0;
-    padding: .9rem .4rem 1rem;
+    padding: .9rem 1.2rem 1rem;
     border-radius: 1.2rem;
     background: #fff;
     box-shadow: 0 .3rem .6rem rgba(0, 0, 0, .28);

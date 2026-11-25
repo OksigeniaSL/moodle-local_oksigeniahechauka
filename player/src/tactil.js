@@ -313,6 +313,20 @@ export function doorsShown(d) {
     });
 }
 
+// A name on its plate: two lines at most and no word wider than it, smaller to be so.
+function fitPlate(sign) {
+    sign.style.fontSize = '';
+    const cs = window.getComputedStyle(sign);
+    const size = parseFloat(cs.fontSize);
+    const air = parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom);
+    for (let k = 1; k >= 0.7; k -= 0.05) {
+        sign.style.fontSize = k === 1 ? '' : Math.floor(size * k) + 'px';
+        if (sign.scrollWidth <= sign.clientWidth + 1 && sign.offsetHeight <= size * k * 2.3 + air) {
+            return;
+        }
+    }
+}
+
 /**
  * The doors of the front, from afar: up to three, the first two of the families and the first of the visitors (or
  * whatever there is), and «Más puertas» when more are left. Pure.
@@ -751,6 +765,9 @@ export class Tactil {
             row.appendChild(this.doorNode({key: 'puertas', more: true, colour: 'mas'}, 'data-abre'));
         }
         this.front.appendChild(row);
+        if (this.frame.classList.contains('hk-vertical')) {
+            Array.prototype.forEach.call(row.querySelectorAll('.hk-tc-cartel'), fitPlate);
+        }
         this.front.setAttribute('data-n', String(f.doors.length + (f.more ? 1 : 0)));
     }
 

@@ -313,6 +313,15 @@
 .hk.hk-vertical .hk-ig-tarjeta {
     padding: 1.8rem 1.8rem 1.6rem;
 }
+.hk.hk-vertical .hk-ig .hk-qr-web {
+    white-space: nowrap;
+}
+.hk.hk-vertical .hk-ig .hk-qr-web wbr {
+    display: none;
+}
+.hk.hk-vertical .hk-ig .hk-qr-llamada {
+    font-size: 2.6rem;
+}
 .hk.hk-vertical .hk-ig-lado {
     flex-direction: column;
 }
