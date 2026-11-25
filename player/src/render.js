@@ -133,7 +133,7 @@ export class Screen {
      * @param {object} strings texts of the site (labels, day and month names)
      * @param {object} media the media store
      * @param {object} hooks {videoEnded(item), mediaFailed(item), videos: how the videos get here (videos.js), or nothing:
-     *     {memory(), moved(memory), failed()}}
+     *     {ways(), moved(way), failed()}}
      */
     constructor(root, strings, media, hooks) {
         this.root = root;
@@ -664,18 +664,14 @@ export class Screen {
                 if (ways && !d.hkMoved && v.currentTime > 0.2) {
                     d.hkMoved = true;
                     clearTimeout(d.hkWatch);
-                    ways.moved(!!d.hkMemory);
+                    ways.moved(d.hkWay);
                 }
             });
             d.appendChild(v);
             d.hkVideo = v;
             d.hkFail = fail;
-            if (ways && ways.memory()) {
-                this.fromMemory(d);
-            } else {
-                d.hkMemory = /^blob:/.test(src || '');
-                v.src = src;
-            }
+            d.hkWays = ways ? ways.ways() : ['kept'];
+            this.giveVideo(d);
         } else {
             const img = el('img');
             img.alt = '';
@@ -732,42 +728,60 @@ export class Screen {
         }, STUCK_MS);
     }
 
-    // The file itself, out of the device's store, in place of the address the worker answers.
-    fromMemory(d) {
+    // Gives the video the next way it has to try (videos.js).
+    giveVideo(d) {
         const self = this;
-        d.hkMemory = true;
-        this.media.object(d.hkItem.media).then(function (url) {
+        const media = d.hkItem.media;
+        const way = d.hkWays.shift();
+        const give = function (url) {
             if (d.hkGone) {
-                if (url) {
-                    URL.revokeObjectURL(url);
-                }
                 return;
             }
             if (!url) {
-                d.hkFail();
+                // Not this way here (the file gone from the store, a server that gives no such address): the next.
+                self.trouble(d);
                 return;
             }
-            d.hkObject = url;
+            d.hkWay = way;
             d.hkVideo.src = url;
             if (d.hkVideo.hkStarted) {
                 self.playVideo(d);
             }
+        };
+        if (way === 'stream') {
+            give(media.stream);
+            return;
+        }
+        if (way !== 'memory') {
+            d.hkWay = way;
+            d.hkVideo.src = this.media.url(media);
+            if (d.hkVideo.hkStarted) {
+                this.playVideo(d);
+            }
+            return;
+        }
+        this.media.object(media).then(function (url) {
+            if (d.hkGone && url) {
+                URL.revokeObjectURL(url);
+                return;
+            }
+            d.hkObject = url;
+            give(url);
         });
     }
 
-    // A video that does not play or does not move: given the other way; and if that was it, its slide does without.
+    // A video that does not play or does not move: given the next way; and if that was the last, its slide does without.
     trouble(d) {
-        const ways = this.hooks.videos;
         clearTimeout(d.hkWatch);
         if (d.hkGone) {
             return;
         }
-        if (ways && !d.hkMemory && this.media.hasCache) {
-            this.fromMemory(d);
+        if (d.hkWays.length) {
+            this.giveVideo(d);
             return;
         }
-        if (ways) {
-            ways.failed();
+        if (this.hooks.videos) {
+            this.hooks.videos.failed();
         }
         d.hkFail();
     }

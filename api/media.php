@@ -34,9 +34,28 @@ use local_oksigeniahechauka\local\files;
 use local_oksigeniahechauka\local\items;
 
 endpoint::method('GET');
-$screen = endpoint::screen();
 $fileid = required_param('f', PARAM_INT);
+$signed = optional_param('t', '', PARAM_ALPHANUM);
+if ($signed !== '' && endpoint::key() === '') {
+    // A display whose own player asks for a video, without the key (files::stream).
+    $screen = files::stream_screen(
+        $fileid,
+        optional_param('s', 0, PARAM_INT),
+        optional_param('u', '', PARAM_ALPHANUMEXT),
+        $signed,
+        time()
+    );
+    if (!$screen) {
+        endpoint::fail(401, 'nokey');
+    }
+} else {
+    $signed = '';
+    $screen = endpoint::screen();
+}
 $file = get_file_storage()->get_file_by_id($fileid);
+if ($signed !== '' && $file && strpos((string) $file->get_mimetype(), 'video/') !== 0) {
+    endpoint::fail(404, 'notfound');
+}
 if (!$file || !files::readable($file)) {
     endpoint::fail(404, 'notfound');
 }

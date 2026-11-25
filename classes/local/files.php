@@ -178,6 +178,53 @@ class files {
     }
 
     /**
+     * An address for a video that needs no key: for the displays whose own player asks for it (player/src/videos.js). Signed with
+     * the screen's, for that file only and for a few days, it dies with the screen's key.
+     *
+     * @param int $fileid
+     * @param \stdClass $screen {id, keyhash}
+     * @param string $until the last day it is good for, YYYY-MM-DD
+     * @return string
+     */
+    public static function stream(int $fileid, \stdClass $screen, string $until): string {
+        return (new \moodle_url('/local/oksigeniahechauka/api/media.php', ['f' => $fileid, 's' => (int) $screen->id,
+            'u' => $until, 't' => self::stream_sign($fileid, $screen, $until)]))->out(false);
+    }
+
+    /**
+     * The signature of such an address; empty for a screen without a key.
+     *
+     * @param int $fileid
+     * @param \stdClass $screen
+     * @param string $until
+     * @return string
+     */
+    protected static function stream_sign(int $fileid, \stdClass $screen, string $until): string {
+        $key = (string) ($screen->keyhash ?? '');
+        return $key === '' ? '' : substr(hash_hmac('sha256', 'stream|' . $fileid . '|' . $screen->id . '|' . $until, $key), 0, 40);
+    }
+
+    /**
+     * The screen a signed address was made for, if it is good.
+     *
+     * @param int $fileid
+     * @param int $screenid
+     * @param string $until
+     * @param string $sign
+     * @param int $now
+     * @return \stdClass|null
+     */
+    public static function stream_screen(int $fileid, int $screenid, string $until, string $sign, int $now): ?\stdClass {
+        global $DB;
+        if (!preg_match('/^\d{4}-\d\d-\d\d$/', $until) || $until < schedule::day($now)) {
+            return null;
+        }
+        $screen = $DB->get_record('local_oksigeniahechauka_screen', ['id' => $screenid]);
+        $good = $screen ? self::stream_sign($fileid, $screen, $until) : '';
+        return $good !== '' && hash_equals($good, $sign) ? $screen : null;
+    }
+
+    /**
      * The logo of the Moodle site, which the screens use until the centre sets one of its own: the first day, they already
      * look like the centre's.
      *

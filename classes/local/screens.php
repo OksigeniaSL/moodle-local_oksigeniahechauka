@@ -507,7 +507,7 @@ class screens {
         $video = $beat['video'] ?? null;
         if (is_array($video)) {
             $keep['video'] = [
-                'way' => ($video['way'] ?? '') === 'memory' ? 'memory' : 'kept',
+                'way' => in_array($video['way'] ?? '', ['memory', 'stream'], true) ? $video['way'] : 'kept',
                 'moved' => $int($video['moved'] ?? null),
                 'stuck' => $int($video['stuck'] ?? null),
                 'rest' => !empty($video['rest']),

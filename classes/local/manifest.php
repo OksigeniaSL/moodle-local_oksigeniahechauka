@@ -34,6 +34,9 @@ class manifest {
     /** Days ahead the manifest has data for. */
     const HORIZON = 14;
 
+    /** @var int Days a video's address without a key is good for; the manifest brings a new one every day. */
+    const STREAM_DAYS = 3;
+
     /** @var int How far ahead the changes of hour come, so a screen without network goes through them. */
     const ZONE_AHEAD = 400 * DAYSECS;
 
@@ -284,6 +287,14 @@ class manifest {
             return links::apply($m, $now);
         }, $m, null);
         self::note_failures($config, $now);
+        // Videos, also at an address that needs no key, for the displays whose own player asks for them (files::stream).
+        $until = schedule::day($now, self::STREAM_DAYS);
+        foreach ($m['items'] as &$item) {
+            if (($item['type'] ?? '') === 'video' && !empty($item['media']['id']) && !empty($screen->keyhash)) {
+                $item['media']['stream'] = files::stream((int) $item['media']['id'], $screen, $until);
+            }
+        }
+        unset($item);
         $m['etag'] = self::etag($m);
         return $m;
     }

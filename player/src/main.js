@@ -144,11 +144,11 @@ class Player {
             },
             // How the videos get to this screen, learned as they play (videos.js). Nothing to learn in a preview.
             videos: this.videoWay && {
-                memory: function () {
-                    return self.videoWay.memory;
+                ways: function () {
+                    return self.videoWay.ways();
                 },
-                moved: function (memory) {
-                    self.videoWay.moved(memory);
+                moved: function (way) {
+                    self.videoWay.moved(way);
                 },
                 failed: function () {
                     if (self.videoWay.failed(self.clock.wall().date)) {

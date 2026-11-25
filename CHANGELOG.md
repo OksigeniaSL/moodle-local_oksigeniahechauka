@@ -7,6 +7,9 @@
   they did not fit. The Instagram slide is its photo, with the words and a small QR; the photo of the day is big and its words
   are never cut; the thirds and the two zones show their photos nearly whole; the menus lose no row and have the legend of
   their allergens; logo, weather and clock stand at one height.
+- **Videos on displays with a player of their own (Samsung with Tizen 4)**: where neither the kept file nor the file itself moves,
+  the display takes the video from the server, at an address signed for that screen and that file. Until now these displays
+  stood on the still of the video for as long as it lasted.
 - The menus on a flat screen are as big as they fit and have the legend of their allergens (they always went in the smallest
   letter and without it).
 

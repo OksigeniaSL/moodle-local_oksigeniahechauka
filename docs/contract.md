@@ -291,6 +291,10 @@ A **media** object, wherever it appears:
  "width": 1080, "height": 1920, "duration": 31.5}
 ```
 
+A video may bring `stream` too: an address of the server's that answers without the key header (and to `Range`), signed for
+this screen and this file and good for a few days; a new one comes every day, and it dies with the key. Only for displays whose
+own player asks for the video by itself, past what the screen keeps.
+
 The player caches media by `sha1` and deletes what no manifest references any more. Videos should arrive as H.264 in
 MP4, 1080p at most and 30 fps; the server converts them on upload when it can.
 
@@ -338,9 +342,9 @@ All fields are optional; an item without `when` is always on.
   listens: a screen that turns its picture but not its touch shows it here. Far fewer clicks than touches: fingers the browser
   did not take for taps (the player attends to them all the same).
 - `video`, once there is anything to say: how the videos get to this screen (`way`: `kept`, from the address the service worker
-  answers; `memory`, the file itself, on televisions whose own player asks the network for that address, past the worker), how
-  many moved and how many stood still since the page opened, and `rest`, whether they are left out until tomorrow because none
-  moved either way.
+  answers; `memory`, the file itself, on televisions whose own player asks the network for that address, past the worker;
+  `stream`, from the media's `stream`, where that player cannot read the file either), how many moved and how many stood still
+  since the page opened, and `rest`, whether they are left out until tomorrow because none moved any way.
 - `played`, every ten heartbeats and only if there is anything: what came out large since the last one, `{"i12": [times, seconds]}`. The server adds it up for the monthly report and tells nothing back. A screen people touch adds `door-<door>` (`door-menu`…), each door opened and the seconds it stayed open, and `touch`, each time someone began to touch and how long until it went back.
 
 Answer:
