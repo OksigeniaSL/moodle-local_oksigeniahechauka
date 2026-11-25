@@ -2045,3 +2045,332 @@
 .hk-vertical .hk-tc-holgada.hk-tc-sin-plano .hk-tc-como p {
     font-size: 5.8rem;
 }
+
+/* More than six albums: drawn down with the finger. */
+.hk-tc-albumes.hk-tc-muchos {
+    align-content: flex-start;
+    overflow-y: auto;
+    touch-action: pan-y;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* --- A flat screen: the head and the foot lower, and the room in two columns --------------------------------------------- */
+.hk-horizontal .hk-tc-casa,
+.hk-horizontal .hk-tc-sala {
+    padding: 3rem 5.6rem 16rem;
+}
+.hk-horizontal .hk-tc-casa h1,
+.hk-horizontal .hk-tc-sala-cabeza h1 {
+    font-size: 7.4rem;
+}
+.hk-horizontal .hk-tc-sala-cabeza {
+    min-height: 13.6rem;
+    margin: -3rem -5.6rem 2.6rem;
+    padding: 2rem 5.6rem;
+}
+.hk-horizontal .hk-tc-llevar {
+    padding: .8rem 1rem .8rem 2.2rem;
+}
+.hk-horizontal .hk-tc-llevar > span {
+    width: auto;
+    max-width: none;
+    font-size: 3rem;
+}
+.hk-horizontal .hk-tc-llevar .hk-qr {
+    width: 11rem;
+}
+.hk-horizontal .hk-tc-barra {
+    height: 14rem;
+    padding-bottom: 1.6rem;
+}
+.hk-horizontal .hk-tc-boton {
+    height: 10.4rem;
+    border-radius: 5.2rem;
+    line-height: 10.4rem;
+}
+.hk-horizontal .hk-tc-cerrar {
+    height: 9rem;
+    line-height: 9rem;
+}
+.hk-horizontal .hk-tc-vuelta {
+    bottom: 15rem;
+}
+.hk-horizontal .hk-tc-ayuda {
+    margin-top: 1rem;
+    font-size: 3.6rem;
+}
+.hk-horizontal .hk-tc-hoy {
+    margin-top: 2.2rem;
+    padding: 2rem 4.4rem 2.4rem;
+}
+.hk-horizontal .hk-tc-hoy h2 {
+    margin-bottom: 1rem;
+}
+.hk-tc-columnas {
+    display: -webkit-box;
+    display: flex;
+    flex: 1 1 0px;
+    min-height: 0;
+}
+.hk-horizontal .hk-tc-sala > .hk-tc-columnas {
+    flex: 1 1 0px;
+    margin-top: 0;
+}
+.hk-tc-columna {
+    display: -webkit-box;
+    display: flex;
+    flex: 1 1 0px;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+}
+.hk-tc-columna + .hk-tc-columna {
+    margin-left: 2.6rem;
+}
+.hk-tc-columna > * {
+    flex: none;
+}
+.hk-tc-columna > * + * {
+    margin-top: 2.6rem;
+}
+.hk-tc-columna:first-child > *,
+.hk-tc-columna > .hk-tc-llena {
+    flex: 1 1 0px;
+    min-height: 0;
+    margin-bottom: 0;
+}
+/* What is touched takes the height its days leave, and is drawn down with the finger when it is more. */
+.hk-tc-columna > .hk-tc-platos,
+.hk-tc-columna > .hk-tc-agenda-dia,
+.hk-tc-columna > .hk-tc-datos {
+    flex: 1 1 0px;
+    min-height: 0;
+    overflow-y: auto;
+    touch-action: pan-y;
+    -webkit-overflow-scrolling: touch;
+}
+.hk-horizontal .hk-tc-dia {
+    height: 13rem;
+}
+.hk-horizontal .hk-tc-dia b {
+    padding-top: 2.4rem;
+}
+/* The canteen: the drawings, as wide as their column leaves them. */
+.hk-horizontal .hk-tc-comida {
+    left: -13rem;
+    width: 26rem;
+    height: 26rem;
+    margin-top: 0;
+}
+.hk-horizontal .hk-tc-plato-grande b {
+    font-size: 4rem;
+}
+.hk-horizontal .hk-tc-justa .hk-tc-plato {
+    min-height: 9.6rem;
+    padding-top: 1.2rem;
+    padding-bottom: 1.2rem;
+}
+/* The agenda: the leaf over what comes next. */
+.hk-horizontal .hk-tc-proximo {
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 8rem 4.4rem 3.4rem;
+}
+.hk-horizontal .hk-tc-proximo .hk-tc-hoja-cal {
+    margin: 0 0 2.6rem;
+}
+.hk-horizontal .hk-tc-proximo-que strong {
+    font-size: 7.4rem;
+}
+.hk-horizontal .hk-tc-media .hk-tc-proximo-que strong {
+    font-size: 6rem;
+}
+.hk-horizontal .hk-tc-justa .hk-tc-proximo-que strong {
+    font-size: 5rem;
+}
+.hk-horizontal .hk-tc-justa .hk-tc-hoja-cal span {
+    padding: .6rem 0 1.2rem;
+    font-size: 9rem;
+}
+/* The visit. */
+.hk-horizontal .hk-tc-columna > .hk-tc-como {
+    justify-content: center;
+}
+.hk-horizontal .hk-tc-holgada .hk-tc-columna .hk-tc-quien b {
+    font-size: 10rem;
+}
+.hk-horizontal .hk-tc-holgada .hk-tc-columna .hk-tc-quien small,
+.hk-horizontal .hk-tc-holgada .hk-tc-columna .hk-tc-quien span,
+.hk-horizontal .hk-tc-holgada .hk-tc-columna .hk-tc-quien q {
+    font-size: 4.4rem;
+}
+.hk-horizontal .hk-tc-holgada.hk-tc-sin-plano .hk-tc-como h2 {
+    font-size: 6.6rem;
+}
+.hk-horizontal .hk-tc-holgada.hk-tc-sin-plano .hk-tc-como p {
+    font-size: 5rem;
+}
+.hk-horizontal .hk-tc-columna .hk-tc-como h2 .hk-tc-punto {
+    display: none;
+}
+.hk-horizontal .hk-tc-columna .hk-tc-como h2 small {
+    display: block;
+    margin-top: 1rem;
+    font-size: 4.4rem;
+}
+.hk-horizontal .hk-tc-justa .hk-tc-quien b {
+    font-size: 6.4rem;
+}
+/* Getting to know the centre. */
+.hk-horizontal .hk-tc-columna > .hk-tc-conoce {
+    display: -webkit-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.hk-horizontal .hk-tc-holgada .hk-tc-conoce p {
+    font-size: 5.6rem;
+}
+.hk-horizontal .hk-tc-holgada .hk-tc-etapas span {
+    font-size: 3.6rem;
+}
+.hk-horizontal .hk-tc-flecha-t {
+    height: 11rem;
+    border-radius: 5.5rem;
+}
+.hk-horizontal .hk-tc-visor-foto img {
+    object-fit: contain;
+}
+.hk-horizontal .hk-tc-columna .hk-tc-momento .hk-qr {
+    width: 30rem;
+    margin-top: 3rem;
+}
+/* Getting there. */
+.hk-horizontal .hk-tc-llevame .hk-qr {
+    width: 42rem;
+}
+.hk-horizontal .hk-tc-llevame {
+    padding: 2.4rem 4rem;
+}
+/* The albums: one, two or three to a row, as tall as it goes; up to six, in two rows of three. */
+.hk-horizontal .hk-tc-albumes .hk-tc-album {
+    width: calc(33.333% - 2.4rem);
+}
+.hk-horizontal .hk-tc-albumes .hk-tc-album img {
+    width: 100%;
+    height: 23rem;
+}
+.hk-horizontal .hk-tc-albumes .hk-tc-album-nombre {
+    padding: 1.4rem 2.4rem 1.6rem;
+    font-size: 3.6rem;
+}
+.hk-horizontal .hk-tc-albumes[data-n="1"],
+.hk-horizontal .hk-tc-albumes[data-n="2"],
+.hk-horizontal .hk-tc-albumes[data-n="3"],
+.hk-horizontal .hk-tc-albumes[data-n="4"] {   /* one row, in the middle, on Chromium 56 too */
+    align-content: stretch;
+    align-items: center;
+    justify-content: center;
+}
+.hk-horizontal .hk-tc-albumes[data-n="1"] .hk-tc-album,
+.hk-horizontal .hk-tc-albumes[data-n="2"] .hk-tc-album {
+    width: calc(50% - 2.4rem);
+}
+.hk-horizontal .hk-tc-albumes[data-n="1"] .hk-tc-album img,
+.hk-horizontal .hk-tc-albumes[data-n="2"] .hk-tc-album img,
+.hk-horizontal .hk-tc-albumes[data-n="3"] .hk-tc-album img {
+    height: 50rem;
+}
+.hk-horizontal .hk-tc-albumes[data-n="4"] .hk-tc-album {
+    width: calc(25% - 2.4rem);
+}
+.hk-horizontal .hk-tc-albumes[data-n="4"] .hk-tc-album img {
+    height: 44rem;
+}
+.hk-horizontal .hk-tc-justa .hk-tc-albumes .hk-tc-album img {
+    height: 20.4rem;
+}
+.hk-horizontal .hk-tc-justa .hk-tc-albumes .hk-tc-album-nombre {
+    padding: 1rem 2rem 1.2rem;
+    font-size: 3.4rem;
+}
+/* The library: up to three, beside their names; up to six, in one row. */
+.hk-horizontal .hk-tc-portadas {
+    flex-wrap: nowrap;
+}
+.hk-horizontal .hk-tc-portadas .hk-tc-libro {
+    flex: 1 1 0px;
+    width: auto;
+    min-width: 0;
+}
+.hk-horizontal .hk-tc-portadas .hk-tc-libro img,
+.hk-horizontal .hk-tc-portadas .hk-tc-lomo {
+    width: 26rem;
+    height: 38rem;
+    font-size: 3.4rem;
+}
+.hk-horizontal .hk-tc-portadas[data-n="1"] .hk-tc-libro,
+.hk-horizontal .hk-tc-portadas[data-n="2"] .hk-tc-libro,
+.hk-horizontal .hk-tc-portadas[data-n="3"] .hk-tc-libro {
+    display: -webkit-box;
+    display: flex;
+    align-items: center;
+}
+.hk-horizontal .hk-tc-portadas[data-n="1"] .hk-tc-libro > span,
+.hk-horizontal .hk-tc-portadas[data-n="2"] .hk-tc-libro > span,
+.hk-horizontal .hk-tc-portadas[data-n="3"] .hk-tc-libro > span {
+    flex: 1 1 0px;
+    min-width: 0;
+    margin: 0 0 0 3rem;
+    font-size: 4.6rem;
+}
+.hk-horizontal .hk-tc-portadas[data-n="3"] .hk-tc-libro img,
+.hk-horizontal .hk-tc-portadas[data-n="3"] .hk-tc-lomo {
+    flex: none;
+    width: 30rem;
+    height: 43rem;
+}
+.hk-horizontal .hk-tc-portadas[data-n="1"] .hk-tc-libro img,
+.hk-horizontal .hk-tc-portadas[data-n="1"] .hk-tc-lomo,
+.hk-horizontal .hk-tc-portadas[data-n="2"] .hk-tc-libro img,
+.hk-horizontal .hk-tc-portadas[data-n="2"] .hk-tc-lomo {
+    flex: none;
+    width: 38rem;
+    height: 55rem;
+    font-size: 4.6rem;
+}
+.hk-horizontal .hk-tc-portadas[data-n="1"] .hk-tc-libro > span,
+.hk-horizontal .hk-tc-portadas[data-n="2"] .hk-tc-libro > span {
+    margin-left: 4rem;
+    font-size: 6.4rem;
+}
+.hk-horizontal .hk-tc-portadas[data-n="1"] .hk-tc-libro small,
+.hk-horizontal .hk-tc-portadas[data-n="2"] .hk-tc-libro small,
+.hk-horizontal .hk-tc-portadas[data-n="3"] .hk-tc-libro small {
+    margin-top: 1rem;
+    font-size: 3.4rem;
+}
+/* The notices: lower, in two columns from four. */
+.hk-horizontal .hk-tc-avisos li {
+    margin-bottom: 1.6rem;
+    padding: 2rem 4.4rem;
+}
+.hk-horizontal .hk-tc-avisos[data-n="4"],
+.hk-horizontal .hk-tc-avisos[data-n="5"] {
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin-right: -1.6rem;
+}
+.hk-horizontal .hk-tc-avisos[data-n="4"] li,
+.hk-horizontal .hk-tc-avisos[data-n="5"] li {
+    flex: 1 1 auto;
+    width: calc(50% - 1.6rem);
+    margin-right: 1.6rem;
+}
+.hk-horizontal .hk-tc-holgada .hk-tc-avisos b {
+    font-size: 6.4rem;
+}
+.hk-horizontal .hk-tc-holgada .hk-tc-avisos small {
+    font-size: 4.4rem;
+}

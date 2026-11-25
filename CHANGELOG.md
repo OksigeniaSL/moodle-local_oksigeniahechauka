@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.40.10
+
+- Upright screens: an act without sign-up shows its day as big as the room allows (the leaf lies down, or becomes a strip), and
+  the showcase without a QR shows the photo with the headline at its foot. The rooms of a touch screen take the size their
+  content needs, and nothing is cut: long notices, many albums and the doors' words shrink, or are drawn down with the finger.
+- Flat touch screens: the rooms in two columns, what is looked at on the left and what is touched on the right. Until now the
+  menu, the agenda and how to get there left their first block as a line, and photos and books went over the header.
+- A centre with a long name and no logo no longer goes out of the header from 8 m, where the date is in two whole lines. No
+  ticker when the centre's sentence does not fit and there is nothing else.
+
 ## 0.40.9
 
 - Upright screens, the rest of the slides: the library's book grows with the room there is, «the library celebrates» never loses

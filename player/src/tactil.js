@@ -194,12 +194,32 @@ export function menuWeek(items, today, most) {
     });
 }
 
+// A flat screen has the width: what is looked at (the room's first block) at one side, and what is touched at the other.
+function columns(room) {
+    const blocks = [].filter.call(room.children, function (n) {
+        return !n.classList.contains('hk-tc-sala-cabeza') && !n.classList.contains('hk-tc-alergia') &&
+            !n.classList.contains('hk-tc-visor') && !n.classList.contains('hk-tc-albumes');
+    });
+    if (blocks.length < 2) {
+        return;
+    }
+    const both = el('div', 'hk-tc-columnas');
+    const left = el('div', 'hk-tc-columna');
+    const right = el('div', 'hk-tc-columna');
+    blocks.forEach(function (n, i) {
+        (i ? right : left).appendChild(n);
+    });
+    both.appendChild(left);
+    both.appendChild(right);
+    room.appendChild(both);
+}
+
 // How much room there is: the larger measures (upright, where there is height to spare: hk-tc-holgada, hk-tc-media), the ones
 // of always, or the tight ones (hk-tc-justa); the first in which all that is there is seen whole.
 const ROOMS = ['hk-tc-holgada', 'hk-tc-media', '', 'hk-tc-justa'];
 
 function roomy(node) {
-    const parts = node.querySelectorAll('.hk-tc-llena, .hk-tc-tarjeta, .hk-tc-puertas');
+    const parts = node.querySelectorAll('.hk-tc-llena, .hk-tc-tarjeta, .hk-tc-puertas, .hk-tc-columna');
     const over = function () {
         // Its foot is kept for the two buttons: what goes into it is as hidden as what goes out of the screen.
         const last = node.lastElementChild;
@@ -927,6 +947,9 @@ export class Tactil {
         room.setAttribute('data-c', door.colour);
         room.appendChild(this.roomHead(key, d));
         this.fill(room, key, d, what || {});
+        if (this.frame.classList.contains('hk-horizontal')) {
+            columns(room);
+        }
         clear(this.rooms);
         this.rooms.appendChild(room);
         roomy(room);
@@ -1165,6 +1188,7 @@ export class Tactil {
         });
         const grid = el('div', 'hk-tc-llena hk-tc-albumes');
         grid.setAttribute('data-n', String(albums.length));
+        grid.classList.toggle('hk-tc-muchos', albums.length > 6);
         albums.forEach(function (a) {
             const b = el('button', 'hk-tc-tarjeta hk-tc-album');
             b.setAttribute('data-album', a.id);
@@ -1244,6 +1268,7 @@ export class Tactil {
 
     noticesRoom(room, d) {
         const ul = el('ul', 'hk-tc-llena hk-tc-avisos');
+        ul.setAttribute('data-n', String(Math.min(5, (d.notices || []).length)));
         (d.notices || []).slice(0, 5).forEach(function (n) {
             const li = el('li', 'hk-tc-tarjeta' + (n.tone === 'important' ? ' hk-tc-importante' : ''));
             li.appendChild(el('b', '', n.title));

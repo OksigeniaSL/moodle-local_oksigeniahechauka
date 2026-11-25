@@ -606,6 +606,16 @@ export class Screen {
             for (let i = 0; i < steps.length && !fits(); i++) {
                 p.node.classList.add(steps[i]);
             }
+            // A centre without a logo and with a long name: smaller, down to the half, rather than out of the header.
+            // (The air over its first line and under its last is no overflow: a seventh more than the header.)
+            p.place.style.fontSize = '';
+            const most = p.node.clientHeight * 1.14;
+            if (most && p.place.offsetHeight > most) {
+                const size = parseFloat(window.getComputedStyle(p.place).fontSize);
+                for (let k = 19; k >= 10 && p.place.offsetHeight > most; k--) {
+                    p.place.style.fontSize = Math.round(size * k / 20) + 'px';
+                }
+            }
         });
     }
 
