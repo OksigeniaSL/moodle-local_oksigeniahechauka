@@ -194,6 +194,42 @@ export function menuWeek(items, today, most) {
     });
 }
 
+// How much room there is: the larger measures (upright, where there is height to spare: hk-tc-holgada, hk-tc-media), the ones
+// of always, or the tight ones (hk-tc-justa); the first in which all that is there is seen whole.
+const ROOMS = ['hk-tc-holgada', 'hk-tc-media', '', 'hk-tc-justa'];
+
+function roomy(node) {
+    const parts = node.querySelectorAll('.hk-tc-llena, .hk-tc-tarjeta, .hk-tc-puertas');
+    const over = function () {
+        // Its foot is kept for the two buttons: what goes into it is as hidden as what goes out of the screen.
+        const last = node.lastElementChild;
+        if (node.scrollHeight > node.clientHeight + 1 || (last && last.offsetHeight && last.offsetTop + last.offsetHeight >
+                node.clientHeight - parseFloat(window.getComputedStyle(node).paddingBottom) + 1)) {
+            return true;
+        }
+        for (let i = 0; i < parts.length; i++) {
+            const p = parts[i];
+            // Sideways, only the doors: a shelf's own margins stick out of it. Upwards too: what is laid from the foot.
+            if (p.scrollHeight > p.clientHeight + 1 ||
+                    (p.classList.contains('hk-tc-puertas') && p.scrollWidth > p.clientWidth + 1) ||
+                    (p.classList.contains('hk-tc-albumes') && p.firstChild && p.firstChild.offsetTop < p.offsetTop)) {
+                return true;
+            }
+        }
+        return false;
+    };
+    for (let k = 0; k < ROOMS.length; k++) {
+        ROOMS.forEach(function (cls) {
+            if (cls) {
+                node.classList.toggle(cls, cls === ROOMS[k]);
+            }
+        });
+        if (!over()) {
+            return;
+        }
+    }
+}
+
 /**
  * The visit to welcome now: of today's, the first whose welcome is on (from an hour before it starts until it ends). Pure.
  *
@@ -755,6 +791,7 @@ export class Tactil {
         }
         this.frontKey = key;
         clear(this.front);
+        this.front.classList.toggle('hk-tc-sin-puertas', !key);
         this.front.appendChild(el('p', 'hk-tc-invita', this.word('touch_invite')));
         const row = el('div', 'hk-tc-puertas');
         const self = this;
@@ -795,10 +832,12 @@ export class Tactil {
             doors.forEach(function (door) {
                 row.appendChild(self.doorNode(door, 'data-ir'));
             });
+            row.setAttribute('data-n', String(doors.length));
             hall.appendChild(row);
             halls.appendChild(hall);
         });
         this.home.appendChild(halls);
+        roomy(this.home);
     }
 
     // Today in three lines, to look at: the first dish, what comes next, the important notice.
@@ -864,6 +903,7 @@ export class Tactil {
         this.goNear();
         this.paintHome(this.data());
         this.home.classList.add('hk-tc-ve');
+        roomy(this.home);
     }
 
     /** A door, with what it was touched for. */
@@ -889,6 +929,7 @@ export class Tactil {
         this.fill(room, key, d, what || {});
         clear(this.rooms);
         this.rooms.appendChild(room);
+        roomy(room);
         this.room = room;
         this.door = key;
         this.doorSince = Date.now();
@@ -1123,6 +1164,7 @@ export class Tactil {
             return a.photos.length;
         });
         const grid = el('div', 'hk-tc-llena hk-tc-albumes');
+        grid.setAttribute('data-n', String(albums.length));
         albums.forEach(function (a) {
             const b = el('button', 'hk-tc-tarjeta hk-tc-album');
             b.setAttribute('data-album', a.id);
@@ -1390,7 +1432,8 @@ export class Tactil {
         const how = el('div', 'hk-tc-tarjeta hk-tc-llena hk-tc-como');
         const h2 = el('h2', '', this.word('touch_visit_how'));
         const end = v.timeend || (v.timestart + (v.minutes || 60) * 60);
-        h2.appendChild(el('small', '', ' · ' + this.word('touch_from_to', {a: hourOf(v.timestart), b: hourOf(end)})));
+        h2.appendChild(el('small', 'hk-tc-punto', ' · '));
+        h2.appendChild(el('small', '', this.word('touch_from_to', {a: hourOf(v.timestart), b: hourOf(end)})));
         how.appendChild(h2);
         const plan = v.plan ? this.o.media(v.plan) : null;
         if (plan) {
@@ -1398,6 +1441,8 @@ export class Tactil {
             im.alt = '';
             im.src = plan;
             how.appendChild(im);
+        } else {
+            room.classList.add('hk-tc-sin-plano');
         }
         if (v.where) {
             how.appendChild(el('p', '', v.where));

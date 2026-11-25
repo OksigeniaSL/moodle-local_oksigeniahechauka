@@ -134,6 +134,9 @@
 .hk:not(.hk-vertical)[data-distancia="8"] .hk-fecha b {
     display: block;
 }
+.hk:not(.hk-vertical)[data-distancia="8"] .hk-fecha {
+    white-space: nowrap;
+}
 /* On a vertical screen at 5 m the date goes in two lines over the clock; at 8 m only the weekday. */
 .hk.hk-vertical[data-distancia="5"] .hk-fecha b {
     display: block;

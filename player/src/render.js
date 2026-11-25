@@ -1823,12 +1823,18 @@ export class Screen {
         } else {
             full.setAttribute('data-sin-pie', '1');
         }
+        let coded = false;
         if (item.web) {
             // An address too long for a code gives nothing to put: the slide goes on without it.
             const code = this.qrBox(item.web, false, item.webqr);
             if (code.nodeType === 1) {
                 put(code);
+                coded = true;
             }
+        }
+        full.classList.toggle('hk-sin-codigo', !coded);
+        if (pie && !coded) {
+            pie.classList.add('hk-pie-sin-codigo');
         }
         const h2 = pie && pie.querySelector('h2');
         if (h2) {
@@ -2136,6 +2142,9 @@ export class Screen {
         this.phrases = texts.length ? this.preparePhrases(texts) : [];
         this.centreLine = centre ? this.measureCentre(centre) : null;
         this.tickerTexts = texts;
+        if (centre && !this.phrases.length && !this.centreLine && !this.phrasesStale) {
+            this.frame.classList.add('hk-sin-cinta');
+        }
         if (this.phrases.length || this.centreLine) {
             this.nextPhrase();
         }
@@ -2323,6 +2332,9 @@ export class Screen {
             const texts = this.tickerTexts || [];
             this.phrases = texts.length ? this.preparePhrases(texts) : [];
             this.centreLine = this.centreText ? this.measureCentre(this.centreText) : null;
+            if (this.centreText && !this.phrases.length && !this.centreLine && !this.phrasesStale) {
+                this.frame.classList.add('hk-sin-cinta');
+            }
         }
         const list = this.phrases || [];
         const centre = this.centreLine;

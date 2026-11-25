@@ -356,6 +356,9 @@
 .hk-tactil .hk-urgente {
     z-index: 45;
 }
+.hk .hk-tc-fachada.hk-tc-sin-puertas {
+    display: none;
+}
 .hk-tc-casa,
 .hk-tc-sala {
     position: absolute;
@@ -1761,3 +1764,284 @@
 .hk-tc-comida-wrap { -webkit-mask-image: url(comida/wrap.svg); mask-image: url(comida/wrap.svg); }
 .hk-tc-comida-yogurt { -webkit-mask-image: url(comida/yogurt.svg); mask-image: url(comida/yogurt.svg); }
 .hk-tc-comida-zucchini { -webkit-mask-image: url(comida/zucchini.svg); mask-image: url(comida/zucchini.svg); }
+
+/* --- Upright, the height to spare (hk-tc-holgada, tactil.js): larger, while all of it is still seen whole --------------- */
+/* The doors: taller, up to five in a row. */
+.hk-vertical .hk-tc-holgada .hk-tc-pasillo {
+    padding-bottom: 3.6rem;
+}
+.hk-vertical .hk-tc-holgada .hk-tc-pasillo-rotulo {
+    margin-bottom: 1.8rem;
+    font-size: 3.8rem;
+}
+.hk-vertical .hk-tc-holgada .hk-tc-pasillo .hk-tc-cartel {
+    height: 7.4rem;
+    margin-top: 2.2rem;
+    font-size: 3.2rem;
+}
+.hk-vertical .hk-tc-holgada .hk-tc-pasillo .hk-tc-puerta,
+.hk-vertical .hk-tc-holgada .hk-tc-pasillo .hk-tc-portal {
+    width: 16.6rem;
+}
+.hk-vertical .hk-tc-holgada .hk-tc-pasillo .hk-tc-portal {
+    height: 32rem;
+    border-radius: 8.3rem 8.3rem 0 0;
+}
+.hk-vertical .hk-tc-holgada .hk-tc-pasillo .hk-tc-hoja {
+    border-radius: 8.3rem 8.3rem 0 0;
+}
+.hk-vertical .hk-tc-holgada .hk-tc-pasillo .hk-tc-ventanuco {
+    top: 2rem;
+    width: 9rem;
+    height: 9rem;
+    margin-left: -4.5rem;
+}
+.hk-vertical .hk-tc-holgada .hk-tc-pasillo .hk-tc-ventanuco .hk-tc-ic {
+    width: 5.2rem;
+    height: 5.2rem;
+    margin: -2.6rem 0 0 -2.6rem;
+}
+.hk-vertical .hk-tc-holgada .hk-tc-pasillo .hk-tc-hoja::before {
+    top: 12.4rem;
+    height: 6.4rem;
+}
+.hk-vertical .hk-tc-holgada .hk-tc-pasillo .hk-tc-hoja::after {
+    top: 20.4rem;
+}
+.hk-vertical .hk-tc-holgada .hk-tc-pasillo .hk-tc-pomo {
+    top: 17rem;
+}
+/* A notice never cut: tight, smaller, and what is still too much is drawn down with the finger. */
+.hk-tc-avisos {
+    overflow-y: auto;
+    /* The frame lets the browser take no finger (tactil.js); here it may take the ones that go up and down. */
+    touch-action: pan-y;
+    -webkit-overflow-scrolling: touch;
+}
+.hk-tc-avisos li {
+    flex: 1 0 auto;
+}
+.hk-tc-justa .hk-tc-avisos li {
+    margin-bottom: 1.4rem;
+    padding: 2rem 4rem;
+}
+.hk-tc-justa .hk-tc-avisos b {
+    font-size: 4.4rem;
+}
+.hk-tc-justa .hk-tc-avisos small {
+    margin-top: .6rem;
+    font-size: 3.2rem;
+}
+/* Six albums with long names: lower pictures rather than over the head. */
+.hk-tc-albumes {
+    align-items: flex-start;
+}
+.hk-tc-justa .hk-tc-album img {
+    height: 29rem;
+}
+.hk-tc-justa .hk-tc-album-nombre {
+    padding: 1.4rem 2.2rem 1.8rem;
+    font-size: 3.4rem;
+}
+/* Today's card with long lines, over the doors. */
+.hk-tc-justa .hk-tc-hoy {
+    margin-top: 2.6rem;
+    padding: 2.4rem 4.4rem;
+}
+.hk-tc-justa .hk-tc-hoy p {
+    font-size: 3.5rem;
+}
+/* A flat screen: the two corridors side by side, or the second one would be under the foot. */
+.hk-horizontal .hk-tc-pasillos {
+    display: -webkit-box;
+    display: flex;
+}
+.hk-horizontal .hk-tc-pasillo {
+    flex: 1 1 auto;
+}
+.hk-horizontal .hk-tc-pasillo + .hk-tc-pasillo {
+    margin-left: 2.6rem;
+}
+.hk-horizontal .hk-tc-justa .hk-tc-hoy {
+    margin-top: 1.8rem;
+    padding: 1.8rem 4.4rem 2.2rem;
+}
+.hk-horizontal .hk-tc-justa .hk-tc-hoy h2 {
+    margin-bottom: .8rem;
+    font-size: 4.4rem;
+}
+.hk-horizontal .hk-tc-justa .hk-tc-hoy p {
+    margin-top: .6rem;
+    font-size: 3.4rem;
+}
+.hk-horizontal .hk-tc-justa .hk-tc-ayuda {
+    margin-top: .6rem;
+    font-size: 3.4rem;
+}
+/* The notices, read from a step further. */
+.hk-vertical .hk-tc-holgada .hk-tc-avisos b {
+    font-size: 7.4rem;
+}
+.hk-vertical .hk-tc-holgada .hk-tc-avisos small {
+    margin-top: 1.6rem;
+    font-size: 4.8rem;
+}
+/* One album fills the room's width; two, one over the other; the first of three; four, taller. */
+.hk-vertical .hk-tc-holgada .hk-tc-albumes[data-n="1"] {   /* in the middle, on Chromium 56 too */
+    align-content: stretch;
+    align-items: center;
+}
+.hk-vertical .hk-tc-holgada .hk-tc-albumes[data-n="1"] .hk-tc-album,
+.hk-vertical .hk-tc-holgada .hk-tc-albumes[data-n="2"] .hk-tc-album,
+.hk-vertical .hk-tc-holgada .hk-tc-albumes[data-n="3"] .hk-tc-album:first-child {
+    width: calc(100% - 2.4rem);
+}
+.hk-vertical .hk-tc-holgada .hk-tc-albumes .hk-tc-album img {
+    width: 100%;
+}
+.hk-vertical .hk-tc-holgada .hk-tc-albumes[data-n="1"] .hk-tc-album img {
+    height: 96rem;
+}
+.hk-vertical .hk-tc-holgada .hk-tc-albumes[data-n="2"] .hk-tc-album img,
+.hk-vertical .hk-tc-holgada .hk-tc-albumes[data-n="3"] .hk-tc-album:first-child img {
+    height: 54rem;
+}
+.hk-vertical .hk-tc-holgada .hk-tc-albumes[data-n="3"] .hk-tc-album img {
+    height: 46rem;
+}
+.hk-vertical .hk-tc-holgada .hk-tc-albumes[data-n="4"] .hk-tc-album img {
+    height: 50rem;
+}
+.hk-vertical .hk-tc-holgada .hk-tc-albumes[data-n="1"] .hk-tc-album-nombre,
+.hk-vertical .hk-tc-holgada .hk-tc-albumes[data-n="2"] .hk-tc-album-nombre {
+    padding: 2.6rem 3.4rem 3rem;
+    font-size: 5.4rem;
+}
+.hk-vertical .hk-tc-holgada .hk-tc-albumes[data-n="1"] .hk-tc-album-nombre small,
+.hk-vertical .hk-tc-holgada .hk-tc-albumes[data-n="2"] .hk-tc-album-nombre small {
+    margin-top: .6rem;
+    font-size: 3.6rem;
+}
+/* Three books or fewer, each on its shelf with its name beside it, the covers whole. */
+.hk-vertical .hk-tc-holgada .hk-tc-portadas[data-n="1"],
+.hk-vertical .hk-tc-holgada .hk-tc-portadas[data-n="2"],
+.hk-vertical .hk-tc-holgada .hk-tc-portadas[data-n="3"] {
+    flex-direction: column;
+    flex-wrap: nowrap;
+}
+.hk-vertical .hk-tc-holgada .hk-tc-portadas[data-n="1"] .hk-tc-libro,
+.hk-vertical .hk-tc-holgada .hk-tc-portadas[data-n="2"] .hk-tc-libro,
+.hk-vertical .hk-tc-holgada .hk-tc-portadas[data-n="3"] .hk-tc-libro {
+    display: -webkit-box;
+    display: flex;
+    align-items: center;
+    width: auto;
+    margin: 0 1.2rem;
+    padding: 2.4rem 0;
+    border-bottom: .4rem solid var(--hk-linea);
+}
+.hk-vertical .hk-tc-holgada .hk-tc-portadas[data-n="1"] .hk-tc-libro:last-child,
+.hk-vertical .hk-tc-holgada .hk-tc-portadas[data-n="2"] .hk-tc-libro:last-child,
+.hk-vertical .hk-tc-holgada .hk-tc-portadas[data-n="3"] .hk-tc-libro:last-child {
+    border-bottom: 0;
+}
+.hk-vertical .hk-tc-holgada .hk-tc-portadas[data-n="3"] .hk-tc-libro img,
+.hk-vertical .hk-tc-holgada .hk-tc-portadas[data-n="3"] .hk-tc-lomo {
+    flex: none;
+    width: 26.6rem;
+    height: 38.6rem;
+    font-size: 3.6rem;
+}
+.hk-vertical .hk-tc-holgada .hk-tc-portadas[data-n="2"] .hk-tc-libro img,
+.hk-vertical .hk-tc-holgada .hk-tc-portadas[data-n="2"] .hk-tc-lomo {
+    flex: none;
+    width: 38rem;
+    height: 56rem;
+    font-size: 4.8rem;
+}
+.hk-vertical .hk-tc-holgada .hk-tc-portadas[data-n="1"] .hk-tc-libro img,
+.hk-vertical .hk-tc-holgada .hk-tc-portadas[data-n="1"] .hk-tc-lomo {
+    flex: none;
+    width: 46rem;
+    height: 68rem;
+    font-size: 5.6rem;
+}
+.hk-vertical .hk-tc-holgada .hk-tc-portadas[data-n="1"] .hk-tc-libro > span,
+.hk-vertical .hk-tc-holgada .hk-tc-portadas[data-n="2"] .hk-tc-libro > span,
+.hk-vertical .hk-tc-holgada .hk-tc-portadas[data-n="3"] .hk-tc-libro > span {
+    flex: 1 1 0px;
+    min-width: 0;
+    margin: 0 0 0 5rem;
+    font-size: 6.2rem;
+    line-height: 1.08;
+}
+.hk-vertical .hk-tc-holgada .hk-tc-portadas[data-n="1"] .hk-tc-libro small,
+.hk-vertical .hk-tc-holgada .hk-tc-portadas[data-n="2"] .hk-tc-libro small,
+.hk-vertical .hk-tc-holgada .hk-tc-portadas[data-n="3"] .hk-tc-libro small {
+    margin-top: 1.4rem;
+    font-size: 4rem;
+}
+/* The visit without its plan: who receives them and how it goes share the room. */
+.hk-vertical .hk-tc-holgada.hk-tc-sin-plano .hk-tc-quien,
+.hk-vertical .hk-tc-media.hk-tc-sin-plano .hk-tc-quien,
+.hk-vertical .hk-tc-holgada.hk-tc-sin-plano .hk-tc-como,
+.hk-vertical .hk-tc-media.hk-tc-sin-plano .hk-tc-como {
+    flex: 1 1 auto;
+}
+.hk-vertical .hk-tc-holgada.hk-tc-sin-plano .hk-tc-quien img {
+    width: 34rem;
+    height: 34rem;
+}
+.hk-vertical .hk-tc-holgada.hk-tc-sin-plano .hk-tc-quien small {
+    font-size: 4.8rem;
+}
+.hk-vertical .hk-tc-holgada.hk-tc-sin-plano .hk-tc-quien b {
+    margin: 1.4rem 0;
+    font-size: 12rem;
+}
+.hk-vertical .hk-tc-holgada.hk-tc-sin-plano .hk-tc-quien span {
+    font-size: 5rem;
+}
+.hk-vertical .hk-tc-holgada.hk-tc-sin-plano .hk-tc-quien q {
+    margin-top: 4rem;
+    font-size: 5rem;
+}
+.hk-vertical .hk-tc-holgada.hk-tc-sin-plano .hk-tc-como,
+.hk-vertical .hk-tc-media.hk-tc-sin-plano .hk-tc-como {
+    justify-content: center;
+}
+.hk-vertical .hk-tc-holgada.hk-tc-sin-plano .hk-tc-como h2 .hk-tc-punto,
+.hk-vertical .hk-tc-media.hk-tc-sin-plano .hk-tc-como h2 .hk-tc-punto {
+    display: none;
+}
+.hk-vertical .hk-tc-media.hk-tc-sin-plano .hk-tc-quien b {
+    font-size: 9.6rem;
+}
+.hk-vertical .hk-tc-media.hk-tc-sin-plano .hk-tc-quien small,
+.hk-vertical .hk-tc-media.hk-tc-sin-plano .hk-tc-quien span,
+.hk-vertical .hk-tc-media.hk-tc-sin-plano .hk-tc-quien q {
+    font-size: 4.2rem;
+}
+.hk-vertical .hk-tc-media.hk-tc-sin-plano .hk-tc-como h2 {
+    font-size: 6.4rem;
+}
+.hk-vertical .hk-tc-media.hk-tc-sin-plano .hk-tc-como h2 small {
+    display: block;
+    margin-top: 1rem;
+    font-size: 4.8rem;
+}
+.hk-vertical .hk-tc-media.hk-tc-sin-plano .hk-tc-como p {
+    font-size: 4.8rem;
+}
+.hk-vertical .hk-tc-holgada.hk-tc-sin-plano .hk-tc-como h2 {
+    margin-bottom: 3.4rem;
+    font-size: 8rem;
+}
+.hk-vertical .hk-tc-holgada.hk-tc-sin-plano .hk-tc-como h2 small {
+    display: block;
+    margin-top: 1.4rem;
+    font-size: 5.4rem;
+}
+.hk-vertical .hk-tc-holgada.hk-tc-sin-plano .hk-tc-como p {
+    font-size: 5.8rem;
+}

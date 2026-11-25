@@ -238,7 +238,12 @@ function counted(n, many, one) {
 function leafOf(act, s) {
     const d = here(act.timestart * 1000);
     const leaf = el('div', 'hk-pa-hoja');
-    leaf.appendChild(el('span', 'hk-pa-hoja-dia', ((s.days_short || [])[d.getDay()] || '').toUpperCase()));
+    const day = el('span', 'hk-pa-hoja-dia');
+    const short = ((s.days_short || [])[d.getDay()] || '').toUpperCase();
+    day.appendChild(el('span', 'hk-pa-hoja-corto', short));
+    // Lying, the leaf has room for the weekday whole.
+    day.appendChild(el('span', 'hk-pa-hoja-largo', ((s.days || [])[d.getDay()] || '').toUpperCase() || short));
+    leaf.appendChild(day);
     leaf.appendChild(el('b', 'hk-pa-hoja-num', String(d.getDate())));
     leaf.appendChild(el('span', 'hk-pa-hoja-mes', ((s.months_short || [])[d.getMonth()] || '').toUpperCase()));
     return leaf;
@@ -426,6 +431,10 @@ function cardFits(sec) {
     return card.offsetHeight <= side.clientHeight + 1 && card.offsetWidth <= side.clientWidth + 1;
 }
 
+// The leaf's sizes, and how big the headline is at each step (jornadas.css's hk-pa-suelto), for the two to grow together.
+const LEAVES = [0.85, 1, 1.15, 1.3, 1.45, 1.6, 1.8, 2, 2.2, 2.4, 2.7, 3];
+const TITLES = [1.4, 1.24, 1.08, 0.92, 0.78, 0.64];
+
 // What the leaf may measure: whole in the slide, with the corners its turn takes out; beside the words, under two fifths of
 // the width; on an upright screen, under them.
 function leafFits(sec, horizontal) {
@@ -441,7 +450,8 @@ function leafFits(sec, horizontal) {
         return tall <= room && leaf.offsetWidth <= wide * 0.4;
     }
     const text = sec.querySelector('.hk-pa-texto');
-    return tall + text.offsetHeight + room * 0.05 <= room && leaf.offsetWidth <= wide * 0.82;
+    return tall + text.offsetHeight + room * 0.05 <= room &&
+        leaf.offsetWidth <= wide * (sec.classList.contains('hk-pa-ancha') || sec.classList.contains('hk-pa-tira') ? 0.94 : 0.82);
 }
 
 /**
@@ -482,6 +492,7 @@ export function fitOpenAct(c, horizontal) {
     });
     const last = drops.length - 1;
     const withLeaf = !!sec.querySelector('.hk-pa-hoja');
+    sec.classList.remove('hk-pa-ancha', 'hk-pa-tira');
     const withGuide = !!sec.querySelector('.hk-pa-guia');
     // The day, its welcome gone, its name is its headline.
     const name = sec.querySelector('.hk-pa-nombre');
@@ -493,14 +504,16 @@ export function fitOpenAct(c, horizontal) {
     sec.classList.remove('hk-pa-sin-web', 'hk-pa-sin-lado');
     const code = sec.querySelector('.hk-pa-tarjeta .hk-qr svg, .hk-pa-tarjeta .hk-qr img');
     const wanted = code ? Math.round(code.getBoundingClientRect().width) : 0;
-    const leaf = function (k) {
+    const leaf = function (k, way) {
+        sec.classList.toggle('hk-pa-ancha', way === 1);
+        sec.classList.toggle('hk-pa-tira', way === 2);
         if (k === 1) {
             sec.style.removeProperty('--hk-pa-k');
         } else {
             sec.style.setProperty('--hk-pa-k', String(k));
         }
     };
-    const put = function (n, step, qr, k) {
+    const put = function (n, step, qr, k, way) {
         drops[last].forEach(function (cls) {
             sec.classList.remove(cls);
         });
@@ -519,7 +532,7 @@ export function fitOpenAct(c, horizontal) {
         } else {
             sec.style.removeProperty('--hk-pa-qr');
         }
-        leaf(k);
+        leaf(k, way);
         if (title) {
             even(title);
         }
@@ -565,6 +578,8 @@ export function fitOpenAct(c, horizontal) {
                         if (fits()) {
                             if (alone && withLeaf && leaves[l] === 1 && n === 0) {
                                 grow(list[i]);
+                            } else if (!alone && withLeaf && !horizontal && n < last) {
+                                growBeside(n, list[i], sizes[q], leaves[l]);
                             }
                             return true;
                         }
@@ -578,6 +593,11 @@ export function fitOpenAct(c, horizontal) {
     const least = [7, 6, 8, 9];
     const steps = [0, 1, 2, 3, 4, 5];
     const leafFrom = withLeaf ? last - 1 : last;
+    // Upright: alone, the leaf is the poster's drawing; with its card, a code a little smaller (still read from a step away)
+    // rather than a headline smaller than its place.
+    if (!horizontal && withLeaf && (alone ? poster() : tries(0, 0, steps.slice(0, 3)))) {
+        return;
+    }
     if (tries(0, last, steps)) {
         return;
     }
@@ -614,5 +634,58 @@ export function fitOpenAct(c, horizontal) {
             }
         }
         put(0, step, 0, 1);
+    }
+
+    // Beside its card, as big as the card leaves it.
+    function growBeside(n, step, qr, size) {
+        for (let k = 2; k > size; k = Math.round((k - 0.1) * 10) / 10) {
+            leaf(k);
+            if (fits()) {
+                return;
+            }
+        }
+        put(n, step, qr, size);
+    }
+
+    // The biggest leaf that fits with the headline at a step: 0 when not even its least.
+    function biggest(n, step, way) {
+        const list = way === 2 ? [0.7].concat(LEAVES) : LEAVES;
+        let low = -1;
+        let high = list.length;
+        while (high - low > 1) {
+            const mid = low < 0 ? 0 : Math.floor((low + high) / 2);
+            put(n, step, 0, list[mid], way);
+            if (fits()) {
+                low = mid;
+            } else {
+                high = mid;
+            }
+            if (low < 0) {
+                return 0;
+            }
+        }
+        return list[low];
+    }
+
+    // The words and the leaf, the two as big as they go together: standing or lying (the month beside the number), under
+    // the words, where it is the height that is short; and as a strip, its weekday beside them, when neither fits.
+    function poster() {
+        for (let n = 0; n < last; n++) {
+            let best = null;
+            for (let way = 0; way < 3 && !(way === 2 && best); way++) {
+                for (let i = 0; i < TITLES.length; i++) {
+                    const k = biggest(n, i, way);
+                    const score = Math.pow(TITLES[i], 0.7) * Math.min(k, 1.8);
+                    if (k && (!best || score > best.score + 0.02)) {
+                        best = {step: i, k: k, way: way, score: score};
+                    }
+                }
+            }
+            if (best) {
+                put(n, best.step, 0, best.k, best.way);
+                return true;
+            }
+        }
+        return false;
     }
 }

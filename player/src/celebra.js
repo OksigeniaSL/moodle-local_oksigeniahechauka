@@ -187,6 +187,27 @@ export function buildMoments(c, item, page, o) {
     s.hkMoment = m;
 }
 
+// A streamer that would cross the words is not drawn: looked at line by line, where they are now.
+function clearStreamers(party) {
+    const text = party.querySelector('.hk-celebra-texto');
+    const curls = party.querySelectorAll('.hk-celebra-serpentina');
+    if (!text || !curls.length || !text.firstChild) {
+        return;
+    }
+    const range = document.createRange();
+    range.selectNodeContents(text);
+    const lines = range.getClientRects();
+    for (let i = 0; i < curls.length; i++) {
+        const c = curls[i].getBoundingClientRect();
+        let crossed = false;
+        for (let j = 0; j < lines.length && !crossed; j++) {
+            const l = lines[j];
+            crossed = l.width > 0 && l.left < c.right - 4 && l.right > c.left + 4 && l.top < c.bottom - 4 && l.bottom > c.top + 4;
+        }
+        curls[i].style.visibility = crossed ? 'hidden' : '';
+    }
+}
+
 // Upright, the rosette (or the cover) grows with the height the words leave, so the card is full and not its upper half.
 function growPrize(party, side) {
     let words = 0;
@@ -214,6 +235,14 @@ function growPrize(party, side) {
  * @param {boolean} horizontal
  */
 export function fitMoments(c, horizontal) {
+    fitWords(c, horizontal);
+    const party = c.querySelector('.hk-celebra');
+    if (party) {
+        clearStreamers(party);
+    }
+}
+
+function fitWords(c, horizontal) {
     const party = c.querySelector('.hk-celebra');
     if (!party) {
         return;

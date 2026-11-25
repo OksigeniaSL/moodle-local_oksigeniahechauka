@@ -167,6 +167,9 @@
     bottom: 74rem;
     padding: 0 0 0 6.4rem;
 }
+.hk-vertical .hk-completa .hk-pie-sin-codigo {   /* no code under it: at the foot, and the picture clear above */
+    bottom: 10rem;
+}
 
 /* --- The QR: dark on white, about 20 cm on a 55" screen; its words are read from where one scans (2.5 m) ----- */
 .hk-completa .hk-qr {
@@ -439,6 +442,9 @@
 }
 .hk-vertical[data-composicion="escaparate"] .hk-completa-velo::after {
     background: linear-gradient(to top, rgba(0, 0, 0, .9), rgba(0, 0, 0, .72) 45%, rgba(0, 0, 0, .5) 75%, rgba(0, 0, 0, .2) 90%, rgba(0, 0, 0, 0));
+}
+.hk-vertical[data-composicion="escaparate"] .hk-sin-codigo .hk-completa-velo::after {
+    background: linear-gradient(to top, rgba(0, 0, 0, .88), rgba(0, 0, 0, .76) 28%, rgba(0, 0, 0, .56) 44%, rgba(0, 0, 0, .18) 60%, rgba(0, 0, 0, 0) 74%);
 }
 .hk-completa[data-sin-pie] .hk-completa-velo::after {
     opacity: 0;

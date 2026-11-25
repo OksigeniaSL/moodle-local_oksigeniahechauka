@@ -531,6 +531,60 @@
     margin: 0 0 1.4rem;
 }
 
+/* The leaf lying: the weekday whole on its band, and the month beside the number. */
+.hk .hk-pa-hoja-largo,
+.hk .hk-pa-ancha .hk-pa-hoja-corto {
+    display: none;
+}
+.hk .hk-pa-ancha .hk-pa-hoja-largo {
+    display: inline;
+}
+.hk.hk-vertical .hk-pa-ancha .hk-pa-hoja {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: center;
+    width: calc(var(--hk-t-titular) * 4.3 * var(--hk-pa-k, 1));
+}
+.hk.hk-vertical .hk-pa-ancha .hk-pa-hoja-dia {
+    flex: 0 0 100%;
+}
+.hk.hk-vertical .hk-pa-ancha .hk-pa-hoja-num {
+    margin: .1em 0 .14em;
+}
+.hk.hk-vertical .hk-pa-ancha .hk-pa-hoja-mes {
+    margin: 0 0 0 .3em;
+    font-size: calc(var(--hk-t-titular) * .78 * var(--hk-pa-k, 1));
+    letter-spacing: .03em;
+}
+.hk.hk-vertical[data-distancia="8"] .hk-pa-ancha .hk-pa-hoja {
+    width: calc(var(--hk-t-titular) * 3.5 * var(--hk-pa-k, 1));
+}
+.hk.hk-vertical[data-distancia="8"] .hk-pa-ancha .hk-pa-hoja-mes {
+    font-size: calc(var(--hk-t-titular) * .64 * var(--hk-pa-k, 1));
+}
+/* And as a strip, where the words leave next to no height: the weekday on its band at the side. */
+.hk.hk-vertical .hk-pa-tira .hk-pa-hoja {
+    flex-direction: row;
+    align-items: center;
+    width: auto;
+    margin: 0 0 1rem;
+}
+.hk.hk-vertical .hk-pa-tira .hk-pa-hoja-dia {   /* its words keep their size: only the number follows the leaf's */
+    display: flex;
+    align-items: center;
+    padding: 0 .55em;
+    font-size: calc(var(--hk-t-lista) * .9);
+}
+.hk.hk-vertical .hk-pa-tira .hk-pa-hoja-num {
+    margin: .1em 0 .14em .22em;
+    line-height: .86;
+}
+.hk.hk-vertical .hk-pa-tira .hk-pa-hoja-mes {
+    margin: 0 .5em 0 .4em;
+    font-size: calc(var(--hk-t-lista) * 1.1);
+}
+
 .hk.hk-vertical .hk-pa-suelto .hk-pa-guia {   /* alone on its day, the guide has what the card would */
     width: 60rem;
     height: calc(80rem * var(--hk-pa-k, 1));
