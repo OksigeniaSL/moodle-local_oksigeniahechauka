@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.40.8
+
+- **Upright screens, looked at again.** The doors of a touch screen take half the height, each with its name on a plate, and the
+  content gets the rest. The slides are measured where they stand, not while they are still coming in: most of them thought
+  they did not fit. The Instagram slide is its photo, with the words and a small QR; the photo of the day is big and its words
+  are never cut; the thirds and the two zones show their photos nearly whole; the menus lose no row and have the legend of
+  their allergens; logo, weather and clock stand at one height.
+- The menus on a flat screen are as big as they fit and have the legend of their allergens (they always went in the smallest
+  letter and without it).
+
 ## 0.40.7
 
 - **A touch screen attends to every finger.** On an infrared frame a finger shakes and is held, and the browser made a tap of
