@@ -12,6 +12,7 @@
 // are spread evenly over the pages (5 at 3 m: 3 and 2, never 4 and 1), each turn the next page, with its marks (never
 // «y N más»). Chromium 56: a <table> (no grid there), flexbox, margins for gaps.
 import {PLATE, fitWord, menuKind} from './lead.js';
+import {allergenNode, drawn} from './alergenos.js';
 
 // How many menus a table holds, and how many tables a page.
 const PER_TABLE = {h: {3: 4, 5: 3, 8: 1}, v: {3: 2, 5: 2, 8: 1}};
@@ -192,13 +193,13 @@ function sharing(data, key, dish) {
     return out;
 }
 
-function allergenRow(codes) {
+function allergenRow(codes, names) {
     if (!codes.length) {
         return null;
     }
     const d = el('span', 'hk-alergenos hk-menus-alergenos');
     codes.forEach(function (code) {
-        d.appendChild(el('i', 'hk-alergeno hk-alergeno-' + code));
+        d.appendChild(allergenNode(code, names));
     });
     return d;
 }
@@ -223,10 +224,10 @@ function nameOf(m, box) {
 let ALSO = '';
 
 // What goes in a dish's cell: the dish, its allergens after it on the same line, and who else has it.
-function dishBox(dish, same) {
+function dishBox(dish, same, names) {
     const box = el('div', 'hk-menus-celda');
     box.appendChild(el('span', 'hk-menus-texto', dish.text));
-    const codes = allergenRow(dish.allergens);
+    const codes = allergenRow(dish.allergens, names);
     if (codes) {
         box.appendChild(codes);
     }
@@ -278,7 +279,7 @@ function buildSign(data, group, tints) {
             }
             td.className += ' hk-menus-igual hk-menus-igual-' + tints.map[k];
         }
-        td.appendChild(dishBox(dish, others));
+        td.appendChild(dishBox(dish, others, data.allergenNames));
         tr.appendChild(td);
         body.appendChild(tr);
     });
@@ -348,7 +349,7 @@ function buildTable(data, table, tints) {
             }
             // What is in a cell goes in a box of its own: it is what moves as it comes in (a table's cells do not move
             // well in Chromium 56), over the cell's tint.
-            td.appendChild(dishBox(cell.dish, others));
+            td.appendChild(dishBox(cell.dish, others, data.allergenNames));
             tr.appendChild(td);
         });
         body.appendChild(tr);
@@ -432,7 +433,9 @@ export function buildMenus(c, data, turn, o) {
         }
         named.forEach(function (code) {
             const x = el('span', 'hk-menus-leyenda-uno');
-            x.appendChild(el('i', 'hk-alergeno hk-alergeno-' + code));
+            if (drawn(code)) {
+                x.appendChild(allergenNode(code));
+            }
             x.appendChild(document.createTextNode(data.allergenNames[code]));
             legend.appendChild(x);
         });

@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.40.7
+
+- **A touch screen attends to every finger.** On an infrared frame a finger shakes and is held, and the browser made a tap of
+  few of them: now a finger that goes down and up is a tap, however long it stays and with a few centimetres of shake. Sliding
+  over the photos works too.
+- **Videos on displays whose own player asks the network for them** (Samsung with Tizen 4), past what the screen keeps: if one
+  stands still, the screen gives it the file itself, remembers the way that works and, if none does, leaves the videos out
+  until the next day and says so. The heartbeat tells which way each screen plays them.
+- The menu: a dish with meat, pork or beef shows Meals' drawing of it, after the allergens, instead of an empty disc; anything
+  the screen has no drawing for goes by its name.
+
 ## 0.40.6
 
 - Open days: an act open to the community (a talk, a festival) that the admissions publish without a sign-up address shows

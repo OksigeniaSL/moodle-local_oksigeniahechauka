@@ -489,7 +489,7 @@ class screens {
                 'ratio' => is_numeric($touch['ratio'] ?? null) ? round((float) $touch['ratio'], 2) : null,
             ];
             if (is_array($touch['events'] ?? null)) {
-                foreach (['pointerdown', 'touchstart', 'mousedown'] as $type) {
+                foreach (['pointerdown', 'touchstart', 'mousedown', 'pointercancel', 'click'] as $type) {
                     $keep['touch']['events'][$type] = (int) $int($touch['events'][$type] ?? 0);
                 }
             }
@@ -502,6 +502,16 @@ class screens {
                     'kind' => (string) $text($last['kind'] ?? '', 8), 'x' => $share($last['x'] ?? null),
                     'y' => $share($last['y'] ?? null)];
             }
+        }
+        // How the videos get to this screen, and whether they move (player/src/videos.js).
+        $video = $beat['video'] ?? null;
+        if (is_array($video)) {
+            $keep['video'] = [
+                'way' => ($video['way'] ?? '') === 'memory' ? 'memory' : 'kept',
+                'moved' => $int($video['moved'] ?? null),
+                'stuck' => $int($video['stuck'] ?? null),
+                'rest' => !empty($video['rest']),
+            ];
         }
         $cache = $beat['cache'] ?? null;
         if (is_array($cache)) {

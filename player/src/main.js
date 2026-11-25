@@ -22,6 +22,7 @@ import {menusData} from './menus.js';
 import {dayNumber, isDark, isLive, isPowerOn, liveItems, urgentOf, useOf, weekdayOf} from './rules.js';
 import {Screen} from './render.js';
 import {store} from './store.js';
+import {VideoWay} from './videos.js';
 import {filesOf, isRaining, Surprises} from './surprises.js';
 import {countToday} from './today.js';
 import {Touches} from './touch.js';
@@ -113,6 +114,7 @@ class Player {
     run() {
         const self = this;
         this.media = new MediaStore(this.mode === 'screen' ? this.api : null);
+        this.videoWay = this.mode === 'screen' ? new VideoWay(store) : null;
         this.screen = new Screen(this.root, this.strings, this.media, {
             videoEnded: function (item) {
                 if (self.isShowing(item)) {
@@ -140,6 +142,20 @@ class Player {
                     self.next();
                 }
             },
+            // How the videos get to this screen, learned as they play (videos.js). Nothing to learn in a preview.
+            videos: this.videoWay && {
+                memory: function () {
+                    return self.videoWay.memory;
+                },
+                moved: function (memory) {
+                    self.videoWay.moved(memory);
+                },
+                failed: function () {
+                    if (self.videoWay.failed(self.clock.wall().date)) {
+                        self.note('videos: they do not move on this screen; none until tomorrow');
+                    }
+                },
+            },
             // A slide whose every part failed (the two zones with nothing left): the next one.
             emptied: function () {
                 self.next();
@@ -163,6 +179,7 @@ class Player {
                 return screen.qrBox(url, false, null);
             },
             played: this.played,
+            fingers: this.mode === 'screen',
             data: function () {
                 return self.touchData();
             },
@@ -396,8 +413,12 @@ class Player {
         const media = this.media;
         const bad = this.bad;
         const now = Date.now();
+        const noVideos = !!this.videoWay && !this.videoWay.goes(wall.date);
         const live = liveItems(this.manifest.items || [], 'main', wall).filter(function (it) {
             if (bad[it.id] && now - bad[it.id] < 10 * 60000) {
+                return false;
+            }
+            if (noVideos && it.type === 'video') {
                 return false;
             }
             return media.ready(it.media);
@@ -1126,6 +1147,10 @@ class Player {
             cache: this.media ? this.media.usage() : {files: 0, bytes: 0},
             errors: this.errors.concat(this.media ? this.media.errors() : []).slice(-5),
         };
+        const video = this.videoWay && this.videoWay.report(wall.date);
+        if (video) {
+            body.video = video;
+        }
         const played = this.played.take();
         if (played) {
             body.played = played;

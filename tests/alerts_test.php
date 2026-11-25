@@ -137,8 +137,12 @@ final class alerts_test extends \advanced_testcase {
             'ratio' => 2.004, 'events' => ['pointerdown' => 3, 'touchstart' => '2', 'other' => 9],
             'last' => ['type' => 'pointerdown', 'kind' => 'touch', 'x' => 1.7, 'y' => 0.256, 'extra' => 'x']]]);
         $this->assertSame(['points' => 10, 'pointer' => true, 'ratio' => 2.0,
-            'events' => ['pointerdown' => 3, 'touchstart' => 2, 'mousedown' => 0],
+            'events' => ['pointerdown' => 3, 'touchstart' => 2, 'mousedown' => 0, 'pointercancel' => 0, 'click' => 0],
             'last' => ['type' => 'pointerdown', 'kind' => 'touch', 'x' => 1.0, 'y' => 0.26]], $kept['touch']);
+        $video = \local_oksigeniahechauka\local\screens::clean_beat(['video' => ['way' => 'memory', 'moved' => 4, 'stuck' => '1',
+            'rest' => 1, 'extra' => 'x']]);
+        $this->assertSame(['way' => 'memory', 'moved' => 4, 'stuck' => 1, 'rest' => true], $video['video']);
+        $this->assertArrayNotHasKey('video', \local_oksigeniahechauka\local\screens::clean_beat([]));
         $quiet = \local_oksigeniahechauka\local\screens::clean_beat(['touch' => ['points' => 0, 'pointer' => false,
             'ratio' => 1]]);
         $this->assertSame(['points' => 0, 'pointer' => false, 'ratio' => 1.0], $quiet['touch']);

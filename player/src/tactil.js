@@ -21,6 +21,7 @@
 // Chrome 56 (Tizen 4): no CSS Grid, no gap, and never a flex box inside a <button> (Chrome 56 lays its content out as a
 // block and gives it the width of its text): inside a button, written widths and the order of the page.
 
+import {allergenNode, drawn} from './alergenos.js';
 import {FOOD} from './comida.js';
 import {here} from './zone.js';
 
@@ -450,6 +451,27 @@ export class IdleClock {
     }
 }
 
+/** How far a finger may go between down and up and still be a tap, as a share of the screen's shorter side: some 4 cm on 55". */
+const TAP_SHARE = 0.06;
+
+/** After a tap, how long the click the browser makes of it may take: that one is the same finger. */
+const SAME_FINGER_MS = 700;
+
+/**
+ * Whether a finger that went down and up was a tap, however long it stayed. The browser's own click is stricter: a finger on an
+ * infrared frame shakes and is held, and most of its taps gave none. Pure.
+ *
+ * @param {{x: number, y: number}} from
+ * @param {{x: number, y: number}} to
+ * @param {number} side the shorter side of the screen, in the same pixels
+ * @returns {boolean}
+ */
+export function isTap(from, to, side) {
+    const dx = to.x - from.x;
+    const dy = to.y - from.y;
+    return Math.sqrt(dx * dx + dy * dy) <= side * TAP_SHARE;
+}
+
 // ---------- The icons of the doors: a line of 2 on 24 x 24, as the rest of the screen ----------
 const ICON = {
     menu: '<circle cx="12" cy="13" r="6.5"/><circle cx="12" cy="13" r="3.2"/><path d="M3 4v5.5a1.5 1.5 0 0 0 3 0V4M4.5 9.5V20M21 4c-1.8 1.2-2.5 3.5-2.5 6v2H21V20"/>',
@@ -551,6 +573,9 @@ export class Tactil {
         const self = this;
         this.frame = o.frame;
         this.frame.classList.add('hk-tactil');
+        // On the screen every finger is ours: the browser would take one that slides for itself, and it would do nothing. In the
+        // panel's preview the page around goes on moving with it.
+        this.frame.style.touchAction = this.o.fingers ? 'none' : '';
         this.welcome = el('section', 'hk-tc-bienvenida');
         this.welcome.setAttribute('data-ir', 'visit');
         o.header.parentNode.insertBefore(this.welcome, o.header.nextSibling);
@@ -593,6 +618,10 @@ export class Tactil {
             });
             this.frame.addEventListener('pointerup', function (e) {
                 self.up(e);
+            });
+            this.frame.addEventListener('pointercancel', function () {
+                self.press = null;
+                self.swipeFrom = null;
             });
             this.frame.addEventListener('contextmenu', function (e) {
                 if (self.touch) {
@@ -957,7 +986,7 @@ export class Tactil {
                     b.appendChild(el('span', 'hk-tc-plato-nombre', dish.text));
                     const al = el('span', 'hk-alergenos hk-tc-alergenos');
                     dish.allergens.forEach(function (code) {
-                        al.appendChild(el('i', 'hk-alergeno hk-alergeno-' + code));
+                        al.appendChild(allergenNode(code, day.names));
                     });
                     b.appendChild(al);
                     b.appendChild(icon('next', 'hk-tc-flecha'));
@@ -988,7 +1017,9 @@ export class Tactil {
                 const ul = el('ul');
                 dish.allergens.forEach(function (code) {
                     const li = el('li');
-                    li.appendChild(el('i', 'hk-alergeno hk-alergeno-' + code));
+                    if (drawn(code)) {
+                        li.appendChild(allergenNode(code));
+                    }
                     li.appendChild(el('span', '', day.names[code] || code));
                     ul.appendChild(li);
                 });
@@ -1487,17 +1518,27 @@ export class Tactil {
                 b.classList.remove('hk-tc-pulsado');
             }, 180);
         }
+        this.swiped = false;
+        this.press = e.button > 0 ? null : {id: e.pointerId, x: e.clientX, y: e.clientY, target: e.target};
         // A finger on the photo or on a day here may swipe.
         this.swipeFrom = (e.target.closest('.hk-tc-visor-foto') || e.target.closest('.hk-tc-momento')) ? e.clientX : null;
     }
 
     up(e) {
-        if (!this.touch || this.swipeFrom === null || this.swipeFrom === undefined || !e.isPrimary) {
+        if (!this.touch || !e.isPrimary) {
             return;
         }
-        const dx = e.clientX - this.swipeFrom;
+        const press = this.press;
+        const from = this.swipeFrom;
+        this.press = null;
         this.swipeFrom = null;
+        const dx = from === null || from === undefined ? 0 : e.clientX - from;
         if (Math.abs(dx) < 60) {
+            if (press && press.id === e.pointerId && isTap(press, {x: e.clientX, y: e.clientY},
+                    Math.min(this.frame.clientWidth, this.frame.clientHeight))) {
+                this.tappedAt = Date.now();
+                this.tap(press.target);
+            }
             return;
         }
         this.swiped = true;
@@ -1512,6 +1553,10 @@ export class Tactil {
         if (!this.touch) {
             return;
         }
+        // The click of a finger that was already attended to when it went up.
+        if (this.tappedAt && Date.now() - this.tappedAt < SAME_FINGER_MS) {
+            return;
+        }
         // The OK key of a remote clicks without a finger down: it is somebody there too, and the doors stay open.
         if (this.near && this.clock) {
             this.clock.touched(Date.now());
@@ -1520,7 +1565,11 @@ export class Tactil {
             this.swiped = false;
             return;
         }
-        const t = e.target;
+        this.tap(e.target);
+    }
+
+    /** What was touched does its thing. */
+    tap(t) {
         const at = function (sel) {
             return t.closest ? t.closest(sel) : null;
         };

@@ -30,6 +30,7 @@ import {buildStrip, fitStrip as fitBirthdayStrip, startStrip, stripKey} from './
 import {centreAfter, centreDue, centreState} from './lema.js';
 import {wallOf} from './rules.js';
 import {here} from './zone.js';
+import {STUCK_MS} from './videos.js';
 
 // The share of a wide zone a picture must leave free to have its words on a block beside it.
 const BESIDE_LEAST = 0.3;
@@ -131,7 +132,8 @@ export class Screen {
      * @param {HTMLElement} root
      * @param {object} strings texts of the site (labels, day and month names)
      * @param {object} media the media store
-     * @param {object} hooks {videoEnded(item), mediaFailed(item)}
+     * @param {object} hooks {videoEnded(item), mediaFailed(item), videos: how the videos get here (videos.js), or nothing:
+     *     {memory(), moved(memory), failed()}}
      */
     constructor(root, strings, media, hooks) {
         this.root = root;
@@ -649,15 +651,31 @@ export class Screen {
             if (poster) {
                 v.poster = poster;
             }
-            v.src = src;
             v.style.objectFit = contain ? 'contain' : 'cover';
             const self = this;
+            const ways = this.hooks.videos;
             v.addEventListener('ended', function () {
                 self.hooks.videoEnded(item);
             });
-            v.addEventListener('error', fail);
+            v.addEventListener('error', function () {
+                self.trouble(d);
+            });
+            v.addEventListener('timeupdate', function () {
+                if (ways && !d.hkMoved && v.currentTime > 0.2) {
+                    d.hkMoved = true;
+                    clearTimeout(d.hkWatch);
+                    ways.moved(!!d.hkMemory);
+                }
+            });
             d.appendChild(v);
             d.hkVideo = v;
+            d.hkFail = fail;
+            if (ways && ways.memory()) {
+                this.fromMemory(d);
+            } else {
+                d.hkMemory = /^blob:/.test(src || '');
+                v.src = src;
+            }
         } else {
             const img = el('img');
             img.alt = '';
@@ -688,20 +706,84 @@ export class Screen {
         if (!d.hkVideo) {
             return;
         }
+        const self = this;
         const band = comp === 'apaisado' || comp === 'tiempo-tercio';
         d.hkTimer = setTimeout(function () {
             d.classList.add('hk-reproduciendo');
-            d.hkVideo.hkStarted = true;
-            quiet(d.hkVideo.play());
+            self.playVideo(d);
         }, band ? 300 : CAPTION_MS);
+    }
+
+    // Plays, and looks a moment later whether it moves: a television may keep its still with no error (videos.js).
+    playVideo(d) {
+        const self = this;
+        const v = d.hkVideo;
+        v.hkStarted = true;
+        quiet(v.play());
+        clearTimeout(d.hkWatch);
+        if (!this.hooks.videos || d.hkMoved) {
+            return;
+        }
+        d.hkWatch = setTimeout(function () {
+            const off = self.dark.style.display === 'block' || document.visibilityState !== 'visible';
+            if (!off && !d.hkMoved) {
+                self.trouble(d);
+            }
+        }, STUCK_MS);
+    }
+
+    // The file itself, out of the device's store, in place of the address the worker answers.
+    fromMemory(d) {
+        const self = this;
+        d.hkMemory = true;
+        this.media.object(d.hkItem.media).then(function (url) {
+            if (d.hkGone) {
+                if (url) {
+                    URL.revokeObjectURL(url);
+                }
+                return;
+            }
+            if (!url) {
+                d.hkFail();
+                return;
+            }
+            d.hkObject = url;
+            d.hkVideo.src = url;
+            if (d.hkVideo.hkStarted) {
+                self.playVideo(d);
+            }
+        });
+    }
+
+    // A video that does not play or does not move: given the other way; and if that was it, its slide does without.
+    trouble(d) {
+        const ways = this.hooks.videos;
+        clearTimeout(d.hkWatch);
+        if (d.hkGone) {
+            return;
+        }
+        if (ways && !d.hkMemory && this.media.hasCache) {
+            this.fromMemory(d);
+            return;
+        }
+        if (ways) {
+            ways.failed();
+        }
+        d.hkFail();
     }
 
     stopSlide(slide) {
         clearTimeout(slide.hkTimer);
+        clearTimeout(slide.hkWatch);
+        slide.hkGone = true;
         if (slide.hkVideo) {
             slide.hkVideo.pause();
             slide.hkVideo.removeAttribute('src');
             slide.hkVideo.load();
+        }
+        if (slide.hkObject) {
+            URL.revokeObjectURL(slide.hkObject);
+            slide.hkObject = null;
         }
     }
 
@@ -1510,13 +1592,13 @@ export class Screen {
         if (this.weather) {
             this.full.appendChild(el('p', 'hk-credito-tiempo', this.credit.textContent));
         }
+        const player = this;
         if (d.hkVideo) {
             d.hkTimer = setTimeout(function () {
                 if (pie) {
                     pie.style.opacity = '0';
                 }
-                d.hkVideo.hkStarted = true;
-                quiet(d.hkVideo.play());
+                player.playVideo(d);
             }, CAPTION_MS + 400);
         }
     }
@@ -1748,13 +1830,12 @@ export class Screen {
                 }
             });
         });
+        const self = this;
         if (d.hkVideo) {
             d.hkTimer = setTimeout(function () {
-                d.hkVideo.hkStarted = true;
-                quiet(d.hkVideo.play());
+                self.playVideo(d);
             }, 400);
         }
-        const self = this;
         setTimeout(function () {
             olds.forEach(function (n) {
                 if (n.classList.contains('hk-saliendo') && n.parentNode) {

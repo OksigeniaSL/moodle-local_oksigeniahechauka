@@ -156,6 +156,31 @@ export class MediaStore {
         return {files, bytes};
     }
 
+    /**
+     * A kept file as an object of the page's, for what cannot reach it at the worker's address (videos.js). Whoever asks
+     * lets it go.
+     *
+     * @param {object} media
+     * @returns {Promise<string|null>}
+     */
+    object(media) {
+        if (!media || !this.api) {
+            return Promise.resolve(null);
+        }
+        if (this.blobs[media.sha1]) {
+            return Promise.resolve(URL.createObjectURL(this.blobs[media.sha1]));
+        }
+        return this.open().then(function (cache) {
+            return cache ? cache.match(mediaAddress(media.sha1)) : null;
+        }).then(function (hit) {
+            return hit ? hit.blob() : null;
+        }).then(function (blob) {
+            return blob ? URL.createObjectURL(blob) : null;
+        }).catch(function () {
+            return null;
+        });
+    }
+
     open() {
         if (!this.hasCache) {
             return Promise.resolve(null);

@@ -216,7 +216,7 @@ changed, or the manifest with its `ETag` header:
   - `{"type": "deadlines", "label": "…", "words": {"due": "…", "quiz": "…"}, "days": [{"date": "YYYY-MM-DD", "items": [{"course": "…", "activity": "…", "kind": "due|quiz", "time": "HH:MM", "color": 2}]}]}`: `color` is the centre's category of the course, when it has one.
   - `{"type": "table", "title": "…", "head": ["…"], "rows": [["…"]]}`: a table of the centre, up to 6 columns and 100 rows, each cell as plain text.
   - `{"type": "channel", "network": "instagram|tiktok|youtube|facebook|x|linkedin|threads|bluesky|telegram|whatsapp|web|other", "title": "…", "text": "…", "name": "…", "web": "https://…", "members": 120}`: «Follow us», with the QR of `web`. One for each of the centre's networks switched on, and one for the channel of Oksigenia Marandu; the screen shows one each turn, in their order. `name` is the account as its network writes it («@…»), or the web's host; it may be empty. `text` and `members` may be missing. `other` is a channel the server does not recognise.
-- In a `menu` item, `menus[].courses[].allergens` is a list per dish, aligned with `dishes`, of codes of Regulation (EU) 1169/2011, and `allergennames` gives their names. An empty list says nothing about the dish: never that it has none.
+- In a `menu` item, `menus[].courses[].allergens` is a list per dish, aligned with `dishes`, of codes of Regulation (EU) 1169/2011, and `allergennames` gives their names. After them may come the marks some diets leave out (`meat`, `pork`, `beef`), drawn as the others; a code the player has no drawing for goes by its name. An empty list says nothing about the dish: never that it has none.
 - In a `menu` item, `menus[].courses[].icons`, when the canteen has a dictionary of drawings (Oksigenia Meals): one per dish, aligned with `dishes`, the name of its drawing, or `''`. A screen draws only the names it has.
 - An `event` may have `icon`: a name of `player/actividad-iconos.js`, or `none`. Without it, the player chooses by the words of its title.
 - `sample`: true when the manifest carries example data; the screen says so in a corner.
@@ -318,8 +318,9 @@ All fields are optional; an item without `when` is always on.
   "manifest": "9f2c…", "stale": false,
   "showing": [{"zone": "main", "item": "i12"}, {"zone": "side", "item": "i30"}],
   "display": {"width": 1920, "height": 1080},
-  "touch": {"points": 10, "pointer": true, "ratio": 1, "events": {"pointerdown": 3, "touchstart": 3, "mousedown": 0},
+  "touch": {"points": 10, "pointer": true, "ratio": 1, "events": {"pointerdown": 3, "touchstart": 3, "mousedown": 0, "pointercancel": 0, "click": 3},
             "last": {"type": "pointerdown", "kind": "touch", "x": 0.12, "y": 0.9}},
+  "video": {"way": "kept", "moved": 6, "stuck": 0, "rest": false},
   "cache": {"files": 14, "bytes": 182334112},
   "errors": ["media 45: 404"]
 }
@@ -334,7 +335,12 @@ All fields are optional; an item without `when` is always on.
 - `touch`: what the device says about touch (`points`, its `navigator.maxTouchPoints`; `pointer`, whether it has
   Pointer Events; `ratio`, its `devicePixelRatio`) and, once anything has been touched since the page opened, how many
   events of each kind reached it and where the last one fell, as a share of the page from its top left corner. It only
-  listens: a screen that turns its picture but not its touch shows it here.
+  listens: a screen that turns its picture but not its touch shows it here. Far fewer clicks than touches: fingers the browser
+  did not take for taps (the player attends to them all the same).
+- `video`, once there is anything to say: how the videos get to this screen (`way`: `kept`, from the address the service worker
+  answers; `memory`, the file itself, on televisions whose own player asks the network for that address, past the worker), how
+  many moved and how many stood still since the page opened, and `rest`, whether they are left out until tomorrow because none
+  moved either way.
 - `played`, every ten heartbeats and only if there is anything: what came out large since the last one, `{"i12": [times, seconds]}`. The server adds it up for the monthly report and tells nothing back. A screen people touch adds `door-<door>` (`door-menu`…), each door opened and the seconds it stayed open, and `touch`, each time someone began to touch and how long until it went back.
 
 Answer:

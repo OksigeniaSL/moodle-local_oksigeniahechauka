@@ -82,4 +82,15 @@ final class menus_test extends \advanced_testcase {
             'dishes' => [['part' => 'Primero', 'name' => 'Arroz']]]]]]];
         $this->assertNull(sources::menu_of(['type' => 'menu'], $day, true, null));
     }
+
+    /**
+     * The marks some diets leave out go after the allergens, and meat only when pork or beef do not say it already.
+     */
+    public function test_allergens_shown(): void {
+        $this->assertSame(['gluten', 'soy', 'meat'], sources::allergens_shown(['gluten', 'meat', 'soy']));
+        $this->assertSame(['sulphites', 'pork'], sources::allergens_shown(['meat', 'pork', 'sulphites']));
+        $this->assertSame(['pork', 'beef'], sources::allergens_shown(['beef', 'meat', 'pork']));
+        $this->assertSame(['eggs'], sources::allergens_shown(['eggs']));
+        $this->assertSame([], sources::allergens_shown([]));
+    }
 }

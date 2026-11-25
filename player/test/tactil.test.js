@@ -5,8 +5,7 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {
     DOORS, IdleClock, contactHas, aboutHas, doorOfSlide, doorsShown, frontDoors, hourOf, linkOf, menuWeek, nextOf, say,
-    visitToWelcome, visitsLeft,
-} from '../src/tactil.js';
+    visitToWelcome, visitsLeft, isTap} from '../src/tactil.js';
 import {FOOD} from '../src/comida.js';
 import {Played} from '../src/played.js';
 import {readdirSync} from 'node:fs';
@@ -161,4 +160,12 @@ test('what comes next: today, the first not started yet; else the next day', () 
     assert.equal(nextOf(days, new Date(2026, 10, 2, 9, 0).getTime()).ev.title, 'Teatro');
     assert.equal(nextOf(days, new Date(2026, 10, 2, 18, 0).getTime()).ev.title, 'Residencia');
     assert.equal(nextOf([], NOW), null);
+});
+
+test('a finger that shakes a little is a tap; one that goes is not', () => {
+    const from = {x: 500, y: 1500};
+    assert.equal(isTap(from, {x: 500, y: 1500}, 1080), true);
+    assert.equal(isTap(from, {x: 540, y: 1470}, 1080), true);
+    assert.equal(isTap(from, {x: 575, y: 1500}, 1080), false);
+    assert.equal(isTap(from, {x: 500, y: 1400}, 1080), false);
 });

@@ -56,6 +56,9 @@ export const store = {
     revoked: function () {
         return get('revoked') === '1';
     },
+    /** Anything else a part of the player keeps, under its name. */
+    get: get,
+    set: set,
     manifest: function () {
         const raw = get('manifest');
         if (!raw) {

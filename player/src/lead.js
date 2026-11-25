@@ -6,6 +6,7 @@
 
 import {dayNumber, weekdayOf} from './rules.js';
 import {stage} from './today.js';
+import {allergenNode} from './alergenos.js';
 
 const IMPORTANT_EVERY = 12;
 
@@ -176,7 +177,7 @@ export function allergensOf(course) {
 }
 
 // A row of allergens, each its drawing on a white disc (alergenos.css). Null when there are none.
-function allergensRow(codes, cls, label) {
+function allergensRow(codes, names, cls, label) {
     if (!codes || !codes.length) {
         return null;
     }
@@ -185,7 +186,7 @@ function allergensRow(codes, cls, label) {
         d.appendChild(el('span', 'hk-alergenos-rotulo', label));
     }
     codes.forEach(function (code) {
-        d.appendChild(el('i', 'hk-alergeno hk-alergeno-' + code));
+        d.appendChild(allergenNode(code, names));
     });
     return d;
 }
@@ -283,7 +284,7 @@ export function buildLead(p, today, l) {
         } else {
             const parts = menuParts(m);
             b.appendChild(el('h2', 'hk-lider-titular', parts.main));
-            const inMain = allergensRow(parts.mainAllergens, 'hk-lider-alergenos', l.allergens);
+            const inMain = allergensRow(parts.mainAllergens, m.allergenNames, 'hk-lider-alergenos', l.allergens);
             if (inMain) {
                 b.appendChild(inMain);
             }
@@ -294,7 +295,7 @@ export function buildLead(p, today, l) {
                     x.appendChild(el('small', '', o.label));
                     // In the same line of text: they flow after the dish, and the dish does not wrap to leave them a column.
                     const dish = el('span', 'hk-plato-texto', o.text);
-                    const inDish = allergensRow(o.allergens, 'hk-plato-alergenos');
+                    const inDish = allergensRow(o.allergens, m.allergenNames, 'hk-plato-alergenos');
                     if (inDish) {
                         dish.appendChild(inDish);
                     }
@@ -472,7 +473,8 @@ export function buildRest(today, lead, l, turn) {
             items.push({group: m.label || '', colour: ['menu', 'menu'], make: function () {
                 const row = line(null, main, null);
                 // Those of the dish it names: the menu's whole list under one dish would say what is not so.
-                const codes = allergensRow(m.closed ? [] : menuParts(m).mainAllergens, 'hk-linea-alergenos');
+                const codes = allergensRow(m.closed ? [] : menuParts(m).mainAllergens, m.allergenNames,
+                    'hk-linea-alergenos');
                 if (codes) {
                     row.querySelector('.hk-linea-texto').appendChild(codes);
                 }

@@ -232,7 +232,7 @@ class sources {
                             $codes[] = (string) $allergen['code'];
                             $names[$allergen['code']] = items::plain((string) $allergen['name']);
                         }
-                        $courses[$part]['allergens'][] = $codes;
+                        $courses[$part]['allergens'][] = self::allergens_shown($codes);
                     }
                 }
                 if ($courses) {
@@ -248,6 +248,21 @@ class sources {
             $item['allergennames'] = $names;
         }
         return $item;
+    }
+
+    /**
+     * A dish's allergens as a screen says them: the marks some diets leave out (meat, pork, beef) after the allergens, and meat
+     * only when it is not said already by pork or beef, as Meals does in its own pages.
+     *
+     * @param string[] $codes
+     * @return string[]
+     */
+    public static function allergens_shown(array $codes): array {
+        $marks = array_values(array_intersect(['pork', 'beef', 'meat'], $codes));
+        if (count($marks) > 1) {
+            $marks = array_values(array_diff($marks, ['meat']));
+        }
+        return array_merge(array_values(array_diff($codes, ['pork', 'beef', 'meat'])), $marks);
     }
 
     /**

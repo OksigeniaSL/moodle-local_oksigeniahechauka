@@ -3,6 +3,9 @@
 // and the server can tell whether a touch screen's touches get to the player and whether they turn with the picture.
 
 const EVENTS = ['pointerdown', 'touchstart', 'mousedown'];
+// Only counted: a finger the browser took for its own gesture, and the click the browser makes of a touch. Far fewer clicks
+// than touches: the frame of the screen moves or holds the finger too much for the browser to call it a tap.
+const COUNTED = ['pointercancel', 'click'];
 
 // The place of an event, as a share of the page from its top left corner, rounded to two decimals.
 export function shareOf(x, y, width, height) {
@@ -23,7 +26,7 @@ export class Touches {
     listen() {
         const self = this;
         const doc = this.win.document;
-        EVENTS.forEach(function (type) {
+        EVENTS.concat(COUNTED).forEach(function (type) {
             doc.addEventListener(type, function (e) {
                 self.seen(e);
             }, {capture: true, passive: true});
@@ -36,6 +39,9 @@ export class Touches {
         // One touch comes as several events (a pointer, a touch, then a mouse of the browser's own): the last place is
         // the one of the richest kind the page gets, which says whether it was a finger.
         const counts = this.counts;
+        if (COUNTED.indexOf(e.type) !== -1) {
+            return;
+        }
         if (EVENTS.slice(0, EVENTS.indexOf(e.type)).some(function (type) {
             return counts[type];
         })) {
@@ -60,7 +66,7 @@ export class Touches {
         const counts = this.counts;
         if (Object.keys(counts).length) {
             out.events = {};
-            EVENTS.forEach(function (type) {
+            EVENTS.concat(COUNTED).forEach(function (type) {
                 out.events[type] = counts[type] || 0;
             });
             out.last = this.last;

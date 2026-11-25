@@ -50,6 +50,22 @@
 .hk .hk-linea-alergenos .hk-alergeno {
     box-shadow: 0 0 0 .2rem var(--hk-linea);
 }
+/* One without a drawing here: its name */
+.hk .hk-alergeno-nombre {
+    display: inline-block;
+    flex: none;
+    margin: 0 .6rem .4rem 0;
+    padding: .1em .55em;
+    border-radius: 1em;
+    background: #fff;
+    color: #111;
+    font-size: calc(var(--hk-alergeno, var(--hk-t-min)) * .72);
+    font-weight: 700;
+    line-height: 1.25;
+}
+.hk-alergeno-beef { background-image: url(alergenos/beef.svg); }
+.hk-alergeno-meat { background-image: url(alergenos/meat.svg); }
+.hk-alergeno-pork { background-image: url(alergenos/pork.svg); }
 .hk-alergeno-celery { background-image: url(alergenos/celery.svg); }
 .hk-alergeno-crustaceans { background-image: url(alergenos/crustaceans.svg); }
 .hk-alergeno-eggs { background-image: url(alergenos/eggs.svg); }
