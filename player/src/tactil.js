@@ -1361,24 +1361,71 @@ export class Tactil {
     }
 
     openactsRoom(room, d) {
-        const first = d.openacts.acts[0].act;
-        const card = el('div', 'hk-tc-tarjeta hk-tc-llena hk-tc-acto-grande');
-        const end = first.timeend || first.timestart;
         const s = d.s || this.s;
-        const date = here(first.timestart * 1000);
-        card.appendChild(el('span', 'hk-tc-cuando', capital((s.days || [])[date.getDay()]) + ' ' + date.getDate() + ' · ' +
-            hourOf(first.timestart) + ' – ' + hourOf(end)));
-        card.appendChild(el('h2', '', first.name));
+        const acts = d.openacts.acts.map(function (x) {
+            return x.act;
+        });
+        const first = acts[0];
+        const web = webOf(first.web);
+        // The leaf of the day, as on the slide: with nothing to sign up to, it fills the card.
+        const leafOf = function (act) {
+            const date = here(act.timestart * 1000);
+            const leaf = el('div', 'hk-tc-acto-hoja');
+            leaf.appendChild(el('span', '', ((s.days_short || [])[date.getDay()] || '').toUpperCase()));
+            leaf.appendChild(el('b', '', String(date.getDate())));
+            leaf.appendChild(el('small', '', ((s.months_short || [])[date.getMonth()] || '').toUpperCase()));
+            return leaf;
+        };
+        const whenOf = function (act) {
+            return hourOf(act.timestart) + (act.timeend > act.timestart ? ' – ' + hourOf(act.timeend) : '');
+        };
+        const dayOfIt = function (act) {
+            const date = here(act.timestart * 1000);
+            return capital((s.days || [])[date.getDay()]) + ' ' + date.getDate();
+        };
+        const placeOf = function (act) {
+            const p = el('p', 'hk-tc-acto-donde');
+            p.appendChild(icon('centre'));
+            p.appendChild(document.createTextNode(act.place));
+            return p;
+        };
+        const place = el('div', 'hk-tc-llena hk-tc-acto-sitio' + (acts.length > 1 ? ' hk-tc-con-mas' : ''));
+        const card = el('div', 'hk-tc-tarjeta hk-tc-acto-grande' + (web ? '' : ' hk-tc-acto-suelto'));
+        card.appendChild(leafOf(first));
+        const words = el('div', 'hk-tc-acto-texto');
+        words.appendChild(el('span', 'hk-tc-cuando', dayOfIt(first) + ' · ' + whenOf(first)));
+        // A word of a letter or two never ends a line, nor a dash starts one.
+        words.appendChild(el('h2', '', first.name.replace(/\s([-–—])\s/g, '\u00a0$1 ').replace(/(\s[^\s–—-]{1,2})\s/g,
+            '$1\u00a0')));
         if (first.place) {
-            card.appendChild(el('p', '', first.place));
+            words.appendChild(placeOf(first));
         }
-        if (webOf(first.web)) {
+        card.appendChild(words);
+        if (web) {
             const qr = el('div', 'hk-tc-qr-grande');
             qr.appendChild(this.o.qr(first.web));
             qr.appendChild(el('b', '', this.word('touch_signup')));
             card.appendChild(qr);
         }
-        room.appendChild(card);
+        place.appendChild(card);
+        // The next ones, up to three, each with its leaf.
+        if (acts.length > 1) {
+            const next = el('div', 'hk-tc-actos');
+            acts.slice(1, 4).forEach(function (act) {
+                const one = el('div', 'hk-tc-tarjeta hk-tc-acto-otro');
+                one.appendChild(leafOf(act));
+                const says = el('div');
+                says.appendChild(el('b', '', act.name));
+                says.appendChild(el('span', '', dayOfIt(act) + ' · ' + whenOf(act)));
+                if (act.place) {
+                    says.appendChild(el('span', '', act.place));
+                }
+                one.appendChild(says);
+                next.appendChild(one);
+            });
+            place.appendChild(next);
+        }
+        room.appendChild(place);
     }
 
     /** Without a map of its own, the address of the way here (contact.geo), for its code large in the room. */

@@ -1255,12 +1255,230 @@
 }
 
 /* The open act: when, its name and the code to sign up. */
+/* Open days: the next act, with its leaf of the calendar, what it is and where, and the code to sign up, if it has one; with
+   nothing to sign up to, the leaf grows. The ones after it, beside it (under it on an upright screen). */
+.hk-tc-acto-sitio {
+    display: -webkit-box;
+    display: flex;
+    align-items: stretch;
+}
 .hk-tc-acto-grande {
     display: -webkit-box;
     display: flex;
+    flex: 1.7 1 0px;
+    align-items: center;
+    min-width: 0;
+    padding: 3.6rem 4.4rem;
+}
+.hk-tc-acto-texto {
+    flex: 1 1 0px;
+    min-width: 0;
+}
+.hk-tc-acto-hoja {
+    display: -webkit-box;
+    display: flex;
+    flex: none;
     flex-direction: column;
+    align-items: center;
+    width: 27rem;
+    margin-right: 4.6rem;
+    overflow: hidden;
+    border-radius: 2.4rem;
+    background: #fff;
+    box-shadow: 0 1rem 3rem rgba(0, 0, 0, .24);
+    color: #16191d;
+    font-family: var(--hk-letra-titulos);
+    font-size: 1.5rem;                  /* what is in it grows with it */
+    font-weight: 800;
+    line-height: 1;
+    transform: rotate(-2deg);
+}
+.hk-tc-acto-hoja span {
+    align-self: stretch;
+    padding: .34em 0 .3em;
+    background: var(--hk-acento);
+    color: var(--hk-sobre-acento);
+    font-size: 3.6em;
+    letter-spacing: .06em;
+    text-align: center;
+}
+.hk-tc-acto-hoja b {
+    margin-top: .1em;
+    font-size: 10.6em;
+    font-weight: 800;
+    letter-spacing: -.04em;
+    line-height: .92;
+}
+.hk-tc-acto-hoja small {
+    margin: .2em 0 .5em;
+    color: #4b5563;
+    font-size: 3.2em;
+    letter-spacing: .08em;
+}
+.hk-tc-acto-suelto .hk-tc-acto-hoja {
+    width: 36rem;
+    margin-right: 6rem;
+    font-size: 2rem;
+}
+.hk-tc-con-mas .hk-tc-acto-grande h2 {
+    font-size: 6.8rem;
+}
+.hk-tc-con-mas .hk-tc-acto-suelto .hk-tc-acto-hoja {
+    width: 30rem;
+    margin-right: 4.6rem;
+    font-size: 1.68rem;
+}
+.hk-tc-acto-donde {
+    display: -webkit-box;
+    display: flex;
+    align-items: flex-start;
+    color: var(--hk-texto-suave);
+    font-size: 4.2rem;
+    font-weight: 700;
+    line-height: 1.15;
+}
+.hk-tc-acto-donde svg {
+    flex: none;
+    width: 1.1em;
+    height: 1.1em;
+    margin: .02em .35em 0 0;
+}
+.hk-tc-qr-grande {
+    flex: none;
+    width: 27rem;
+    margin-left: 4rem;
+    text-align: center;
+}
+.hk-tc-con-mas .hk-tc-qr-grande {
+    width: 22rem;
+}
+.hk-tc-qr-grande .hk-qr {
+    width: 100%;
+    margin: 0;
+}
+.hk-tc-qr-grande b {
+    display: block;
+    margin-top: 1.4rem;
+    font-family: var(--hk-letra-titulos);
+    font-size: 3.4rem;
+    font-weight: 800;
+    line-height: 1.1;
+}
+.hk-tc-actos {
+    display: -webkit-box;
+    display: flex;
+    flex: 1 1 0px;
+    flex-direction: column;
+    min-width: 0;
+    margin-left: 2.6rem;
+}
+.hk-tc-acto-otro {
+    display: -webkit-box;
+    display: flex;
+    flex: 1 1 auto;
+    align-items: center;
+    min-width: 0;
+    min-height: 0;
+    padding: 1.6rem 2.4rem;
+}
+.hk-tc-acto-otro + .hk-tc-acto-otro {
+    margin-top: 2rem;
+}
+.hk-tc-acto-otro > div:last-child {
+    flex: 1 1 0px;
+    min-width: 0;
+}
+.hk-tc-acto-otro > div:last-child b {
+    display: block;
+    font-size: 3.2rem;
+    line-height: 1.1;
+}
+.hk-tc-acto-otro > div:last-child span {
+    display: block;
+    margin-top: .5rem;
+    color: var(--hk-texto-suave);
+    font-size: 2.6rem;
+    line-height: 1.15;
+}
+.hk-tc-acto-otro .hk-tc-acto-hoja {
+    width: 11rem;
+    margin-right: 2.4rem;
+    border-radius: 1.2rem;
+    font-size: .62rem;
+}
+
+/* Upright: the act over the ones after it; its code under its words. */
+.hk-vertical .hk-tc-acto-sitio {
+    flex-direction: column;
+}
+.hk-vertical .hk-tc-acto-grande {
+    flex: 1 1 auto;
+    flex-wrap: wrap;
+    align-content: center;
+    min-height: 0;
+}
+.hk-vertical .hk-tc-acto-grande h2 {
+    font-size: 7.6rem;
+}
+.hk-vertical .hk-tc-qr-grande,
+.hk-vertical .hk-tc-con-mas .hk-tc-qr-grande {
+    display: -webkit-box;
+    display: flex;
+    flex: 0 0 100%;
+    align-items: center;
+    width: 100%;
+    margin: 5rem 0 0;
+    text-align: left;
+}
+.hk-vertical .hk-tc-qr-grande .hk-qr {
+    flex: none;
+    width: 40rem;
+    margin: 0 4rem 0 0;
+}
+.hk-vertical .hk-tc-con-mas .hk-tc-qr-grande {
+    margin-top: 3rem;
+}
+.hk-vertical .hk-tc-con-mas .hk-tc-qr-grande .hk-qr {
+    width: 30rem;
+}
+.hk-vertical .hk-tc-qr-grande b {
+    flex: 1 1 0px;
+    min-width: 0;
+    margin: 0;
+    font-size: 5rem;
+}
+.hk-vertical .hk-tc-acto-sitio:not(.hk-tc-con-mas) .hk-tc-acto-suelto h2 {
+    font-size: 9.6rem;
+}
+.hk-vertical .hk-tc-acto-suelto {
+    flex-direction: column;
+    flex-wrap: nowrap;
     justify-content: center;
-    padding: 4.4rem;
+    text-align: center;
+}
+.hk-vertical .hk-tc-acto-suelto .hk-tc-acto-hoja {
+    width: 48rem;
+    margin: 0 0 5rem;
+    font-size: 2.7rem;
+}
+.hk-vertical .hk-tc-con-mas .hk-tc-acto-suelto .hk-tc-acto-hoja {
+    width: 30rem;
+    margin: 0 0 3rem;
+    font-size: 1.68rem;
+}
+.hk-vertical .hk-tc-acto-suelto .hk-tc-acto-texto {
+    flex: none;
+    width: 100%;
+}
+.hk-vertical .hk-tc-acto-suelto .hk-tc-acto-donde {
+    justify-content: center;
+}
+.hk-vertical .hk-tc-actos {
+    flex: none;
+    margin: 2.6rem 0 0;
+}
+.hk-vertical .hk-tc-acto-otro {
+    flex: none;
 }
 .hk-tc-cuando {
     display: inline-block;
@@ -1279,27 +1497,6 @@
     font-size: 10rem;
     font-weight: 800;
     line-height: 1;
-}
-.hk-tc-acto-grande p {
-    color: var(--hk-texto-suave);
-    font-size: 3.8rem;
-}
-.hk-tc-qr-grande {
-    display: -webkit-box;
-    display: flex;
-    align-items: center;
-    margin-top: 4rem;
-}
-.hk-tc-qr-grande .hk-qr {
-    flex: none;
-    width: 42rem;
-    margin: 0 4rem 0 0;
-}
-.hk-tc-qr-grande b {
-    font-family: var(--hk-letra-titulos);
-    font-size: 5.6rem;
-    font-weight: 800;
-    line-height: 1.1;
 }
 
 /* Getting there: the centre's map, if it has one; if not, the code of the way here large; and its lines with their icons. */

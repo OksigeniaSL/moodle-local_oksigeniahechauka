@@ -15,8 +15,10 @@
  * An invitation in the centre's main colour, as «Síguenos en …»: the day on a white calendar leaf; the words; and the QR in
  * black on a white card, never on the colour. The day itself, the centre's guide waving with its words in a white bubble.
  * The turns are chips: the full ones struck out, the gone ones faint, the one now in the accent. jornadas.js sets
- * --hk-pa-qr when the card needs a smaller QR, and drops, in this order, the note (places left, families come), the turns
- * and the place (hk-pa-sin-*).
+ * --hk-pa-qr when the card needs a smaller QR, and drops, in this order, the note (places left, families come), the turns,
+ * the guide's bubble, the guide, the welcome and the leaf (hk-pa-sin-*); the day, the hours and the place never go. Without a card (hk-pa-suelto) the leaf takes its room:
+ * --hk-pa-k is how many times its size. A low body (hk-pa-baja, with the doors of a touch screen) keeps less margin and a
+ * smaller card.
  *
  * Chromium 56: flexbox only, margins instead of gap, no clamp, no aspect-ratio, no inset. */
 .hk-cuerpo[data-composicion="jornadas"] {
@@ -45,7 +47,7 @@
     flex: none;
     flex-direction: column;
     align-items: center;
-    width: calc(var(--hk-t-titular) * 2.4);   /* grows with the distance, as its letters */
+    width: calc(var(--hk-t-titular) * 2.4 * var(--hk-pa-k, 1));   /* grows with the distance, as its letters */
     margin-right: 5.6rem;
     overflow: hidden;
     border-radius: calc(2.4rem * var(--hk-esquina));
@@ -56,20 +58,20 @@
 }
 .hk .hk-pa-hoja-dia {
     align-self: stretch;
-    padding: 1.4rem 0 1.2rem;
+    padding: .28em 0 .24em;
     background: var(--hk-acento);
     color: var(--hk-sobre-acento);
     font-family: var(--hk-letra-titulos);
-    font-size: var(--hk-t-lista);
+    font-size: calc(var(--hk-t-lista) * var(--hk-pa-k, 1));
     font-weight: 800;
     letter-spacing: .06em;
     line-height: 1;
     text-align: center;
 }
 .hk .hk-pa-hoja-num {
-    margin-top: 1.6rem;
+    margin-top: .1em;
     font-family: var(--hk-letra-titulos);
-    font-size: calc(var(--hk-t-titular) * 1.55);
+    font-size: calc(var(--hk-t-titular) * 1.55 * var(--hk-pa-k, 1));
     font-weight: 800;
     letter-spacing: -.04em;
     line-height: .9;
@@ -79,15 +81,15 @@
     padding-bottom: 3rem;
 }
 .hk[data-distancia="8"] .hk-pa-hoja {   /* from afar, the words need the width: the leaf narrower, its day still big */
-    width: calc(var(--hk-t-titular) * 1.9);
+    width: calc(var(--hk-t-titular) * 1.9 * var(--hk-pa-k, 1));
 }
 .hk[data-distancia="8"] .hk-pa-hoja-num {
-    font-size: calc(var(--hk-t-titular) * 1.25);
+    font-size: calc(var(--hk-t-titular) * 1.25 * var(--hk-pa-k, 1));
 }
 .hk .hk-pa-hoja-mes {
-    margin: .8rem 0 2.4rem;
+    margin: .16em 0 .48em;
     color: #4b5563;
-    font-size: var(--hk-t-lista);
+    font-size: calc(var(--hk-t-lista) * var(--hk-pa-k, 1));
     font-weight: 800;
     letter-spacing: .08em;
     line-height: 1;
@@ -264,10 +266,13 @@
 .hk .hk-pa-sin-nota .hk-pa-quedan,
 .hk .hk-pa-sin-nota .hk-pa-vinieron,
 .hk .hk-pa-sin-turnos .hk-pa-turnos,
-.hk .hk-pa-sin-donde .hk-pa-donde,
 .hk .hk-pa-sin-bocadillo .hk-pa-bocadillo,
 .hk .hk-pa-sin-guia .hk-pa-guia,
 .hk .hk-pa-sin-hoja .hk-pa-hoja,
+.hk .hk-pa-sin-bienvenida .hk-pa-nombre,
+.hk .hk-pa-sin-web .hk-qr-web,
+.hk .hk-pa-sin-lado .hk-pa-lado,
+.hk .hk-pa-fecha,
 .hk[data-distancia="5"] .hk-pa-tarjeta-sub,
 .hk[data-distancia="8"] .hk-pa-tarjeta-sub {         /* from 5 m the question and the code say it */
     display: none;
@@ -381,7 +386,7 @@
     justify-content: flex-start;
 }
 .hk.hk-vertical .hk-pa-hoja {
-    width: calc(var(--hk-t-titular) * 1.7);
+    width: calc(var(--hk-t-titular) * 1.95 * var(--hk-pa-k, 1));   /* «14» keeps its white at its sides */
     margin: 0 0 2rem 1rem;
 }
 .hk.hk-vertical .hk-pa-guia {
@@ -402,4 +407,206 @@
     justify-content: flex-end;
     align-self: flex-end;
     margin: 4rem 0 0 3rem;
+}
+
+/* --- The date on the tag, when the leaf is not there and «Faltan 12 días» does not say which day ---------------------- */
+.hk .hk-pa-sin-hoja .hk-pa-lejos .hk-pa-cerca {
+    display: none;
+}
+.hk .hk-pa-sin-hoja .hk-pa-fecha {
+    display: inline;
+}
+
+/* The place, a step smaller with the headline before anything else gives up its room. */
+.hk .hk-pa[data-ajuste="3"] .hk-pa-donde,
+.hk .hk-pa[data-ajuste="4"] .hk-pa-donde,
+.hk .hk-pa[data-ajuste="5"] .hk-pa-donde,
+.hk .hk-pa[data-ajuste="4"] .hk-pa-nombre,
+.hk .hk-pa[data-ajuste="5"] .hk-pa-nombre {
+    margin-top: 1.6rem;
+    font-size: var(--hk-t-lista);
+}
+
+.hk .hk-pa-donde,
+.hk .hk-pa-nombre {                     /* its descenders inside its box: they are not an overflow */
+    padding-bottom: .1em;
+}
+
+/* --- A body too low for all of it: the words down to the least that is read -------------------------------------------- */
+.hk .hk-pa[data-ajuste="6"] .hk-pa-titular,
+.hk[data-distancia="8"] .hk-pa[data-ajuste="6"] .hk-pa-titular {
+    margin-top: .8rem;
+    font-size: calc(var(--hk-t-titular) * .5);
+}
+.hk .hk-pa[data-ajuste="6"] .hk-pa-cuando {
+    padding: .12em .5em .14em;
+    font-size: var(--hk-t-lista);
+}
+.hk .hk-pa[data-ajuste="6"] .hk-pa-donde,
+.hk .hk-pa[data-ajuste="6"] .hk-pa-nombre,
+.hk .hk-pa[data-ajuste="7"] .hk-pa-donde,
+.hk .hk-pa[data-ajuste="7"] .hk-pa-nombre,
+.hk .hk-pa[data-ajuste="8"] .hk-pa-donde,
+.hk .hk-pa[data-ajuste="8"] .hk-pa-nombre,
+.hk .hk-pa[data-ajuste="9"] .hk-pa-donde,
+.hk .hk-pa[data-ajuste="9"] .hk-pa-nombre {
+    margin: .6rem 0 0;
+    font-size: var(--hk-t-min);
+}
+/* The last three: the headline over the hours and the place, on the same line. */
+.hk .hk-pa[data-ajuste="7"] .hk-pa-texto,
+.hk .hk-pa[data-ajuste="8"] .hk-pa-texto,
+.hk .hk-pa[data-ajuste="9"] .hk-pa-texto {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-content: center;
+    align-items: baseline;
+    justify-content: flex-start;
+}
+.hk .hk-pa[data-ajuste="7"] .hk-pa-titular,
+.hk .hk-pa[data-ajuste="8"] .hk-pa-titular,
+.hk .hk-pa[data-ajuste="9"] .hk-pa-titular {
+    flex: 0 0 100%;
+    order: -1;
+    margin: 0 0 .8rem;
+}
+.hk .hk-pa[data-ajuste="7"] .hk-pa-titular,
+.hk[data-distancia="8"] .hk-pa[data-ajuste="7"] .hk-pa-titular {
+    font-size: calc(var(--hk-t-titular) * .76);
+}
+.hk .hk-pa[data-ajuste="8"] .hk-pa-titular,
+.hk[data-distancia="8"] .hk-pa[data-ajuste="8"] .hk-pa-titular {
+    font-size: calc(var(--hk-t-titular) * .5);
+}
+.hk .hk-pa[data-ajuste="9"] .hk-pa-titular,
+.hk[data-distancia="8"] .hk-pa[data-ajuste="9"] .hk-pa-titular {
+    font-size: var(--hk-t-lista);
+}
+.hk .hk-pa[data-ajuste="7"] .hk-pa-cuando,
+.hk .hk-pa[data-ajuste="8"] .hk-pa-cuando,
+.hk .hk-pa[data-ajuste="9"] .hk-pa-cuando,
+.hk[data-distancia="8"] .hk-pa-suelto[data-ajuste="7"] .hk-pa-cuando,
+.hk[data-distancia="8"] .hk-pa-suelto[data-ajuste="8"] .hk-pa-cuando,
+.hk[data-distancia="8"] .hk-pa-suelto[data-ajuste="9"] .hk-pa-cuando {
+    margin-right: 2.4rem;
+    padding: .1em .45em .12em;
+    font-size: var(--hk-t-min);
+}
+.hk .hk-pa[data-ajuste="7"] .hk-pa-nombre,
+.hk .hk-pa[data-ajuste="8"] .hk-pa-nombre,
+.hk .hk-pa[data-ajuste="9"] .hk-pa-nombre {
+    margin-right: 2.4rem;
+}
+
+/* --- Nothing to sign up to: the leaf and the words have the slide, as a poster of the day ------------------------------ */
+.hk .hk-pa-suelto {
+    padding-right: 6rem;
+}
+.hk .hk-pa-suelto .hk-pa-hoja {
+    margin-right: 7rem;
+}
+.hk .hk-pa-suelto[data-ajuste="0"] .hk-pa-titular { font-size: calc(var(--hk-t-titular) * 1.4); }
+.hk .hk-pa-suelto[data-ajuste="1"] .hk-pa-titular { font-size: calc(var(--hk-t-titular) * 1.24); }
+.hk .hk-pa-suelto[data-ajuste="2"] .hk-pa-titular { font-size: calc(var(--hk-t-titular) * 1.08); }
+.hk .hk-pa-suelto[data-ajuste="3"] .hk-pa-titular { font-size: calc(var(--hk-t-titular) * .92); }
+.hk .hk-pa-suelto[data-ajuste="4"] .hk-pa-titular { font-size: calc(var(--hk-t-titular) * .78); }
+.hk .hk-pa-suelto[data-ajuste="5"] .hk-pa-titular { font-size: calc(var(--hk-t-titular) * .64); }
+.hk .hk-pa-suelto[data-ajuste="0"] .hk-pa-cuando,
+.hk .hk-pa-suelto[data-ajuste="1"] .hk-pa-cuando,
+.hk .hk-pa-suelto[data-ajuste="2"] .hk-pa-cuando {
+    font-size: calc(var(--hk-t-lista) * 1.2);
+}
+.hk[data-distancia="8"] .hk-pa-suelto .hk-pa-cuando {
+    font-size: var(--hk-t-lista);
+}
+.hk .hk-pa-suelto .hk-pa-donde,
+.hk .hk-pa-suelto .hk-pa-nombre {
+    margin-top: 3rem;
+}
+.hk.hk-vertical .hk-pa-suelto {
+    justify-content: center;
+}
+.hk.hk-vertical .hk-pa-suelto .hk-pa-hoja {
+    width: calc(var(--hk-t-titular) * 2.3 * var(--hk-pa-k, 1));
+    margin: 0 0 1.4rem;
+}
+
+.hk.hk-vertical .hk-pa-suelto .hk-pa-guia {   /* alone on its day, the guide has what the card would */
+    width: 60rem;
+    height: calc(80rem * var(--hk-pa-k, 1));
+    margin: 4rem 0 0;
+}
+
+/* --- A low body: the doors of a touch screen take the rest of it -------------------------------------------------------- */
+.hk .hk-pa.hk-pa-baja {
+    --hk-pa-qr: 23rem;
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+}
+.hk .hk-pa-baja .hk-pa-titular {
+    margin-top: 1.8rem;
+}
+.hk.hk-horizontal .hk-pa-baja .hk-pa-guia {   /* as wide as the guide it can hold */
+    width: 36rem;
+}
+.hk .hk-pa-baja .hk-pa-donde,
+.hk .hk-pa-baja .hk-pa-nombre {
+    margin-top: 1.4rem;
+}
+.hk .hk-pa-baja .hk-pa-tarjeta {
+    width: 26rem;
+    padding: 2rem;
+}
+.hk .hk-pa-baja .hk-pa-tarjeta-t {
+    font-size: var(--hk-t-min);
+}
+.hk .hk-pa-baja .hk-qr {
+    margin-top: 1.4rem;
+}
+.hk .hk-pa-baja .hk-qr-web,
+.hk .hk-pa-baja .hk-pa-tarjeta-sub {
+    display: none;
+}
+/* From afar, or upright, the card lies down: its words beside the code, which is as big as the body lets it. */
+.hk[data-distancia="5"] .hk-pa.hk-pa-baja,
+.hk[data-distancia="8"] .hk-pa.hk-pa-baja {
+    --hk-pa-qr: 20rem;
+    padding-top: 1.8rem;
+    padding-bottom: 1.8rem;
+}
+.hk.hk-vertical .hk-pa-baja .hk-pa-guia {
+    height: calc(40rem * var(--hk-pa-k, 1));
+}
+.hk.hk-vertical .hk-pa.hk-pa-baja {
+    --hk-pa-qr: 28rem;
+    padding-top: 4rem;
+    padding-bottom: 4rem;
+}
+.hk[data-distancia="5"] .hk-pa-baja .hk-pa-tarjeta,
+.hk[data-distancia="8"] .hk-pa-baja .hk-pa-tarjeta,
+.hk.hk-vertical .hk-pa-baja .hk-pa-tarjeta {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: auto;
+    padding: 1.6rem 2rem;
+}
+.hk[data-distancia="5"] .hk-pa-baja .hk-qr,
+.hk[data-distancia="8"] .hk-pa-baja .hk-qr,
+.hk.hk-vertical .hk-pa-baja .hk-qr {
+    margin: 0 0 0 2rem;
+}
+.hk.hk-vertical .hk-pa-baja .hk-pa-lado {
+    margin-top: 2rem;
+}
+.hk[data-distancia="5"] .hk-pa.hk-pa-baja .hk-pa-tarjeta-t,
+.hk[data-distancia="8"] .hk-pa.hk-pa-baja .hk-pa-tarjeta-t,
+.hk.hk-vertical .hk-pa.hk-pa-baja .hk-pa-tarjeta-t {     /* read from a step away, as the code beside it */
+    max-width: 24rem;
+    font-size: 4rem;
+}
+.hk .hk-pa-baja .hk-pa-completo {
+    margin: 1rem 1.4rem;
+    border-width: .9rem;
+    font-size: var(--hk-t-lista);
 }

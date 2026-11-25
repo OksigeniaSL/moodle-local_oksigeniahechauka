@@ -2,7 +2,8 @@
 // festival with open sign-up), on the centre's screens (17 November 2026). Two faces:
 //   - the days before (up to 30): an invitation in the centre's colour, the day on a calendar leaf, the hours and the place,
 //     the turns (the full ones struck out), and the QR on a white card to sign up; full, its stamp instead of the QR; an act
-//     open to the community, with nothing to sign up to, without any of the two;
+//     open to the community, with nothing to sign up to, without any of the two: then the leaf grows to fill what they
+//     leave, as a poster of the day. The day, the hours and the place never go;
 //   - the day, while it lasts: the welcome, with the centre's guide (its dog) waving and its words in a bubble, the hours
 //     and the turns (the one now, lit; the full ones struck out), how many families have come once they are a few, and the
 //     QR for whoever arrives without having signed up.
@@ -243,6 +244,12 @@ function leafOf(act, s) {
     return leaf;
 }
 
+/** «Sáb 7 nov», in one piece. */
+function dateOf(act, s) {
+    const d = here(act.timestart * 1000);
+    return [(s.days_short || [])[d.getDay()] || '', d.getDate(), (s.months_short || [])[d.getMonth()] || ''].join('\u00a0').trim();
+}
+
 // The turns: each hour in its chip, the full ones struck out, the one now lit.
 function turnsList(turns, s) {
     const list = el('ul', 'hk-pa-turnos');
@@ -293,19 +300,28 @@ export function buildOpenAct(c, act, phase, o) {
         im.src = guide;
         fig.appendChild(im);
         sec.appendChild(fig);
-    } else if (!day) {
+    } else if (!day || !signsUp(act)) {
+        // Alone on its day, without a guide or a code, the leaf stays: the slide is never half empty.
         sec.appendChild(leafOf(act, s));
     }
     const words = el('div', 'hk-pa-texto');
     // How near and the hours, on the tag: what never goes, from any distance. The hours whole on their line.
     const tag = el('p', 'hk-pa-cuando');
     const near = day ? (s.open_today || '') : whenWords(act, now, s, o.capitalDays);
+    const far = !day && daysBetween(now, act.timestart * 1000) > 6;
     if (near) {
-        tag.appendChild(document.createTextNode(near + ' · '));
+        tag.appendChild(el('span', 'hk-pa-cerca', near + ' · '));
+    }
+    // «Faltan 12 días» does not say which day: without its leaf, the date takes its place.
+    if (far) {
+        tag.classList.add('hk-pa-lejos');
+        tag.appendChild(el('span', 'hk-pa-fecha', dateOf(act, s) + ' · '));
     }
     tag.appendChild(el('span', 'hk-pa-horas', hoursOf(act, s)));
     words.appendChild(tag);
     if (day && !guide && s.open_welcome) {
+        sec.classList.add('hk-pa-bienvenida');
+        sec.setAttribute('data-bienvenida', s.open_welcome);
         words.appendChild(el('h2', 'hk-pa-titular', s.open_welcome));
         words.appendChild(el('p', 'hk-pa-nombre', act.name));
     } else {
@@ -361,6 +377,8 @@ export function buildOpenAct(c, act, phase, o) {
     }
     if (side.firstChild) {
         sec.appendChild(side);
+    } else {
+        sec.classList.add('hk-pa-suelto');
     }
     c.appendChild(sec);
 }
@@ -370,10 +388,12 @@ export function buildOpenAct(c, act, phase, o) {
 function wordsFit(sec, most) {
     const text = sec.querySelector('.hk-pa-texto');
     const title = sec.querySelector('.hk-pa-titular');
-    // The guide's words in their bubble, never over the card, and never taking more than half of the guide's column.
+    // The guide's words in their bubble, never over the card, and never taking more than half of the guide's column nor
+    // leaving the guide less than nearly the other half.
     const bubble = sec.querySelector('.hk-pa-bocadillo');
     if (bubble && bubble.offsetWidth && (bubble.scrollWidth > bubble.clientWidth + 1 ||
-            bubble.offsetHeight > bubble.parentNode.clientHeight * 0.5)) {
+            bubble.offsetHeight > bubble.parentNode.clientHeight * 0.5 ||
+            bubble.nextSibling.offsetHeight < bubble.parentNode.clientHeight * 0.45)) {
         return false;
     }
     // A couple of pixels of the headline's descenders and the turns' rounding are not an overflow.
@@ -406,11 +426,32 @@ function cardFits(sec) {
     return card.offsetHeight <= side.clientHeight + 1 && card.offsetWidth <= side.clientWidth + 1;
 }
 
+// What the leaf may measure: whole in the slide, with the corners its turn takes out; beside the words, under two fifths of
+// the width; on an upright screen, under them.
+function leafFits(sec, horizontal) {
+    const leaf = sec.querySelector('.hk-pa-hoja');
+    if (!leaf || !leaf.offsetHeight) {
+        return true;
+    }
+    const style = window.getComputedStyle(sec);
+    const room = sec.clientHeight - parseFloat(style.paddingTop) - parseFloat(style.paddingBottom);
+    const wide = sec.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
+    const tall = leaf.offsetHeight + leaf.offsetWidth * 0.035;
+    if (horizontal) {
+        return tall <= room && leaf.offsetWidth <= wide * 0.4;
+    }
+    const text = sec.querySelector('.hk-pa-texto');
+    return tall + text.offsetHeight + room * 0.05 <= room && leaf.offsetWidth <= wide * 0.82;
+}
+
 /**
- * Once in the page: the words take the biggest of their six steps that fits; then the QR gets a little smaller (to 84, 76
- * and 68 %, still read from a step away) before anything goes; and then what says least goes first (the places left or the
- * families come, then the turns, all of them, then the place, and from afar the guide's bubble, the guide, when its column
- * leaves the words too narrow, and last the leaf: the tag above the headline still says the day and the hours). The guide's picture takes what its column leaves, whole.
+ * Once in the page: the words take the biggest of their first six steps that fits; then the QR gets a little smaller (to
+ * 84, 76 and 68 %, still read from a step away) before anything goes; and then what says least goes first (the places left or the
+ * families come, then the turns, all of them, and from afar the guide's bubble, the guide, when its column leaves the words
+ * too narrow, the welcome, for the name to be the headline, and last the leaf: the tag above the headline then says the
+ * date). The day, the hours and the place never go. In a body too low even so, the words go down four steps more, to the
+ * least that is read, and then the card. The guide's picture takes what its column leaves, whole. Without a card, the leaf
+ * gets smaller before it goes, and takes what the words leave.
  *
  * @param {HTMLElement} c the layer
  * @param {boolean} horizontal
@@ -423,46 +464,155 @@ export function fitOpenAct(c, horizontal) {
     const title = sec.querySelector('.hk-pa-titular');
     // The headline in three lines; from 8 m, where its letters are biggest, in four.
     const most = sec.closest('[data-distancia="8"]') ? 4 : 3;
-    const drops = [[], ['hk-pa-sin-nota'], ['hk-pa-sin-nota', 'hk-pa-sin-turnos'],
-        ['hk-pa-sin-nota', 'hk-pa-sin-turnos', 'hk-pa-sin-donde'],
-        ['hk-pa-sin-nota', 'hk-pa-sin-turnos', 'hk-pa-sin-donde', 'hk-pa-sin-bocadillo'],
-        ['hk-pa-sin-nota', 'hk-pa-sin-turnos', 'hk-pa-sin-donde', 'hk-pa-sin-bocadillo', 'hk-pa-sin-guia'],
-        ['hk-pa-sin-nota', 'hk-pa-sin-turnos', 'hk-pa-sin-donde', 'hk-pa-sin-bocadillo', 'hk-pa-sin-guia', 'hk-pa-sin-hoja']];
+    // What goes, in this order, of what the act has: dropping what is not there would only be measured for nothing.
+    // In a low body, the guide's bubble goes the first: over it, there would be no guide.
+    const gone = [];
+    const drops = [[]];
+    const bubble = ['hk-pa-sin-bocadillo', '.hk-pa-bocadillo'];
+    const note = [['hk-pa-sin-nota', '.hk-pa-quedan, .hk-pa-vinieron'], ['hk-pa-sin-turnos', '.hk-pa-turnos']];
+    // A low body, under the doors of a touch screen.
+    const low = sec.clientHeight < sec.clientWidth * (horizontal ? 0.3 : 0.9);
+    sec.classList.toggle('hk-pa-baja', low);
+    (low ? [bubble].concat(note) : note.concat([bubble])).concat([['hk-pa-sin-guia', '.hk-pa-guia'],
+        ['hk-pa-sin-bienvenida', '.hk-pa-nombre'], ['hk-pa-sin-hoja', '.hk-pa-hoja']]).forEach(function (d) {
+        if (sec.querySelector(d[1])) {
+            gone.push(d[0]);
+            drops.push(gone.slice());
+        }
+    });
+    const last = drops.length - 1;
+    const withLeaf = !!sec.querySelector('.hk-pa-hoja');
+    const withGuide = !!sec.querySelector('.hk-pa-guia');
+    // The day, its welcome gone, its name is its headline.
+    const name = sec.querySelector('.hk-pa-nombre');
+    const alone = sec.classList.contains('hk-pa-suelto');
     // The code's own side (its address goes under it at the card's width), measured at its size: fitted again when the
     // letters arrive, it must not start from the size the first fitting left.
     sec.style.removeProperty('--hk-pa-qr');
+    sec.style.removeProperty('--hk-pa-k');
+    sec.classList.remove('hk-pa-sin-web', 'hk-pa-sin-lado');
     const code = sec.querySelector('.hk-pa-tarjeta .hk-qr svg, .hk-pa-tarjeta .hk-qr img');
     const wanted = code ? Math.round(code.getBoundingClientRect().width) : 0;
-    const put = function (n, step, qr) {
-        drops[drops.length - 1].forEach(function (cls) {
+    const leaf = function (k) {
+        if (k === 1) {
+            sec.style.removeProperty('--hk-pa-k');
+        } else {
+            sec.style.setProperty('--hk-pa-k', String(k));
+        }
+    };
+    const put = function (n, step, qr, k) {
+        drops[last].forEach(function (cls) {
             sec.classList.remove(cls);
         });
         drops[n].forEach(function (cls) {
             sec.classList.add(cls);
         });
+        if (name) {
+            // As its words, for even() to break them again.
+            title.hkWords = sec.classList.contains('hk-pa-sin-bienvenida') ? name.textContent :
+                sec.getAttribute('data-bienvenida');
+            title.textContent = title.hkWords;
+        }
         sec.setAttribute('data-ajuste', String(step));
         if (qr) {
             sec.style.setProperty('--hk-pa-qr', qr + 'px');
         } else {
             sec.style.removeProperty('--hk-pa-qr');
         }
+        leaf(k);
         if (title) {
             even(title);
         }
     };
+    const fits = function () {
+        return wordsFit(sec, most) && cardFits(sec) && leafFits(sec, horizontal);
+    };
     fitCardTitle(sec);
-    const sizes = wanted ? [0, Math.round(wanted * 0.84), Math.round(wanted * 0.76), Math.round(wanted * 0.68)] : [0];
-    for (let n = 0; n < drops.length; n++) {
-        for (let q = 0; q < sizes.length; q++) {
-            for (let step = 0; step <= 5; step++) {
-                put(n, step, sizes[q]);
-                if (wordsFit(sec, most) && cardFits(sec)) {
-                    return;
+    let sizes = wanted ? [0, Math.round(wanted * 0.84), Math.round(wanted * 0.76), Math.round(wanted * 0.68)] : [0];
+    // The card fits or not whatever the words do: only the sizes it fits in, and its address goes before the code gets any
+    // smaller than that.
+    const whole = function (qr) {
+        if (qr) {
+            sec.style.setProperty('--hk-pa-qr', qr + 'px');
+        } else {
+            sec.style.removeProperty('--hk-pa-qr');
+        }
+        return cardFits(sec);
+    };
+    if (wanted) {
+        let fitting = sizes.filter(whole);
+        if (!fitting.length) {
+            sec.classList.add('hk-pa-sin-web');
+            fitting = sizes.filter(whole);
+        }
+        sizes = fitting.length ? fitting : sizes.slice(-1);
+    }
+    // The leaf's words never under the least that is read (a list's line is a fifth over it). Upright and alone, the guide
+    // gets smaller before it goes, down to a half.
+    const scalesOf = function (n) {
+        if (withLeaf && n < last) {
+            return [1, 0.85];
+        }
+        return alone && withGuide && !horizontal && drops[n].indexOf('hk-pa-sin-guia') < 0 ? [1, 0.85, 0.7, 0.55] : [1];
+    };
+    const tries = function (from, until, list) {
+        for (let n = from; n <= until; n++) {
+            const leaves = scalesOf(n);
+            for (let q = 0; q < sizes.length; q++) {
+                for (let l = 0; l < leaves.length; l++) {
+                    for (let i = 0; i < list.length; i++) {
+                        put(n, list[i], sizes[q], leaves[l]);
+                        if (fits()) {
+                            if (alone && withLeaf && leaves[l] === 1 && n === 0) {
+                                grow(list[i]);
+                            }
+                            return true;
+                        }
+                    }
                 }
             }
+        }
+        return false;
+    };
+    // A body too low for all of it: the words down to the least that is read, with the leaf and without it.
+    const least = [7, 6, 8, 9];
+    const steps = [0, 1, 2, 3, 4, 5];
+    const leafFrom = withLeaf ? last - 1 : last;
+    if (tries(0, last, steps)) {
+        return;
+    }
+    // Upright, the code's address leaves the words a couple of lines.
+    if (wanted && !sec.classList.contains('hk-pa-sin-web')) {
+        sec.classList.add('hk-pa-sin-web');
+        if (tries(leafFrom, last, steps)) {
+            return;
+        }
+    }
+    if (tries(leafFrom, last, least)) {
+        return;
+    }
+    // Nor so, under the doors of a touch screen: the code is behind its door, and the day, the hours and the place stay.
+    if (sec.classList.contains('hk-pa-baja') && sec.querySelector('.hk-pa-tarjeta')) {
+        sec.classList.add('hk-pa-sin-lado');
+        if (tries(last, last, steps) || tries(last, last, least)) {
+            return;
         }
     }
     if (title) {
         fitWord(title);
+    }
+
+    // Alone, the leaf takes what the words leave: as big as it goes without making them smaller.
+    function grow(step) {
+        for (let k = 3; k > 1; k = Math.round((k - 0.1) * 10) / 10) {
+            leaf(k);
+            if (title) {
+                even(title);
+            }
+            if (fits()) {
+                return;
+            }
+        }
+        put(0, step, 0, 1);
     }
 }

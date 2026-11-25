@@ -4,6 +4,10 @@
 
 - Open days: an act open to the community (a talk, a festival) that the admissions publish without a sign-up address shows
   on the screens with its day, hours and place, and no QR (Oksigenia Eguahe 0.120.1 and later; before, it was left out).
+- That slide without a QR is a poster of the day: the calendar leaf grows, or the centre's guide does. With or without it, the
+  day, the hours and the place are never left out any more, not even from 8 m or with the doors of a touch screen; there,
+  the QR's card lies down and no longer touches the edges, and on the day of the act at 8 m it is whole.
+- The room «Open days» of a touch screen: the act with its leaf and its place, and the three that come after it.
 
 ## 0.40.5
 
