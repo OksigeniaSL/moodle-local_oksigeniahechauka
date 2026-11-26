@@ -464,6 +464,8 @@ export function buildRest(today, lead, l, turn) {
     if (important.length) {
         a.appendChild(fixedNotice(important[turn % important.length], l));
         a.hkImportant = important;
+        a.hkLabels = l;
+        a.hkShown = turn % important.length;
     }
     const items = [];
     if (today.menu && !(lead && lead.type === 'menu')) {
@@ -527,32 +529,55 @@ function fillPage(page, items, from, to) {
     }
 }
 
+// The page of lines as it was measured: only its first line may go without its second one.
+function fillPageOf(page, items, p) {
+    for (let k = p[0]; k < p[1]; k++) {
+        items[k].short = k === p[0] && !!p[2];
+    }
+    fillPage(page, items, p[0], p[1]);
+}
+
+function fixedOf(a) {
+    return a.querySelector('.hk-aviso-fijo');
+}
+
+// The important notice in the fixed place is this one.
+function putFixed(a, f) {
+    const now = fixedOf(a);
+    if (f && now && now !== f) {
+        a.replaceChild(f, now);
+    }
+}
+
+// The page and its dots, shown or not.
+function showPage(a, on) {
+    a.querySelector('.hk-resto-pagina').style.display = on ? '' : 'none';
+    a.querySelector('.hk-resto-paginas').style.display = on ? '' : 'none';
+}
+
 /**
- * The pages of the rest, measured with the layer in the page: as many whole lines as fit, and the next page starts
- * there; at most six. Then the page of this slide.
+ * The pages under the important notice in place, in the box as it is: as many whole lines as fit, and the next page starts
+ * there; at most six. Null when not even one line fits at a readable size (what does not fit does not come out).
  *
- * @param {HTMLElement|null} a the rest
- * @param {number} turn the slide's number
+ * @param {HTMLElement} a the rest
+ * @returns {Array|null} [from, to, first line without its second] for each page
  */
-export function paginateRest(a, turn) {
-    if (!a || !a.hkItems) {
-        return;
-    }
-    a.style.flex = '';
-    a.classList.remove('hk-resto-holgado');
-    if (!a.hkItems.length) {
-        settleRest(a, []);
-        return;
-    }
+function pagesUnder(a) {
     const page = a.querySelector('.hk-resto-pagina');
     const items = a.hkItems;
     const pages = [];
     let i = 0;
+    items.forEach(function (x) {
+        x.short = false;
+    });
     // Measured with the page dots in place, so the page does not shrink once they appear.
     const dots = a.querySelector('.hk-resto-paginas');
     clear(dots);
     dots.appendChild(el('i'));
-    dots.style.display = '';
+    showPage(a, true);
+    const over = function () {
+        return page.scrollHeight > page.clientHeight + 1 || page.scrollWidth > page.clientWidth + 1;
+    };
     while (i < items.length && pages.length < MAX_PAGES) {
         fillPage(page, items, i, items.length);
         const high = page.clientHeight;
@@ -567,25 +592,17 @@ export function paginateRest(a, turn) {
             }
         }
         if (last < i) {
-            // Not even one line fits whole: without its second line; if not even so, the page does not show (what does
-            // not fit at a readable size does not come out).
+            // Not even one line fits whole: without its second line.
             items[i].short = true;
             fillPage(page, items, i, i + 1);
             const n1 = items[i].node;
             if (n1.offsetTop + n1.offsetHeight > high + 1) {
-                page.style.display = 'none';
-                dots.style.display = 'none';
-                a.hkPages = null;
-                settleRest(a, []);
-                return;
+                break;
             }
             last = i;
         }
         // Whole, also with the margin of its last line.
         fillPage(page, items, i, last + 1);
-        const over = function () {
-            return page.scrollHeight > page.clientHeight + 1 || page.scrollWidth > page.clientWidth + 1;
-        };
         while (last > i && over()) {
             last--;
             fillPage(page, items, i, last + 1);
@@ -596,27 +613,49 @@ export function paginateRest(a, turn) {
             fillPage(page, items, i, i + 1);
         }
         if (over()) {
-            // What does not fit at a readable size does not come out.
-            if (!pages.length) {
-                page.style.display = 'none';
-                dots.style.display = 'none';
-                a.hkPages = null;
-                settleRest(a, []);
-                return;
-            }
             break;
         }
-        pages.push([i, last + 1]);
+        pages.push([i, last + 1, items[i].short]);
         i = last + 1;
     }
-    a.hkPages = pages;
-    settleRest(a, pages);
-    showRestPage(a, turn, false);
+    return pages.length ? pages : null;
+}
+
+/**
+ * The pages of the rest, measured with the layer in the page, then the page of this slide. Important notices that take
+ * turns do it over the same box without measuring again (turnFixed): each one has the pages measured under it, and the
+ * box is as high as the one that needs most.
+ *
+ * @param {HTMLElement|null} a the rest
+ * @param {number} turn the slide's number
+ */
+export function paginateRest(a, turn) {
+    if (!a || !a.hkItems) {
+        return;
+    }
+    a.style.flex = '';
+    a.classList.remove('hk-resto-holgado');
+    const fixed = fixedOf(a);
+    // Each one measured new: the one in place may still be fading in or out.
+    const notices = fixed && a.hkImportant.length > 1 ? a.hkImportant.map(function (n) {
+        return fixedNotice(n, a.hkLabels);
+    }) : [fixed];
+    a.hkPagesOf = notices.map(function (f) {
+        putFixed(a, f);
+        return a.hkItems.length ? pagesUnder(a) : null;
+    });
+    a.hkNotices = notices;
+    settleRest(a);
+    putFixed(a, fixed);
+    if (a.hkItems.length) {
+        a.hkSet = undefined;
+        showRestPage(a, turn, false);
+    }
 }
 
 // Upright, the rest is as high as its highest page: the picture (or the lead) over it takes what it leaves. A picture never
 // goes past nearly square, so a landscape one keeps most of its width; what is left then is for bigger words.
-function settleRest(a, pages) {
+function settleRest(a) {
     const body = a.parentNode;
     if (!a.closest('.hk-vertical') || !body || getComputedStyle(body).flexDirection !== 'column') {
         return;
@@ -628,14 +667,22 @@ function settleRest(a, pages) {
     const page = a.querySelector('.hk-resto-pagina');
     const was = a.offsetHeight;
     const room = was + over.offsetHeight;
+    // Under every important notice that takes its turn here, each with its own pages.
     const need = function () {
         let most = 0;
         a.style.flex = '0 0 auto';
-        (pages.length ? pages : [null]).forEach(function (p) {
-            if (p && page) {
-                fillPage(page, a.hkItems, p[0], p[1]);
+        a.hkNotices.forEach(function (f, k) {
+            putFixed(a, f);
+            const pages = a.hkPagesOf[k];
+            if (page) {
+                showPage(a, !!pages);
             }
-            most = Math.max(most, a.offsetHeight);
+            (pages || [null]).forEach(function (p) {
+                if (p) {
+                    fillPageOf(page, a.hkItems, p);
+                }
+                most = Math.max(most, a.offsetHeight);
+            });
         });
         return most + 1;
     };
@@ -645,45 +692,54 @@ function settleRest(a, pages) {
     const whole = m.width > 0 && m.height > 0 && m.width > m.height ? a.offsetWidth * m.height / m.width : 0;
     const picture = whole || over.classList.contains('hk-medio') ? whole || a.offsetWidth / 1.15 : over.classList.contains('hk-pareja') ?
         a.offsetWidth * 0.86 : room;
+    const most = whole ? room : was;
     let high = need();
     if ((high < was || whole) && room - picture > high * 1.35) {
         a.classList.add('hk-resto-holgado');
         const bigger = need();
-        if (bigger > room - picture + 1) {
+        // Into the box it gets, which is never higher than its own: accepted against what the picture leaves, it came out cut.
+        if (bigger > Math.min(most, room - picture) + 1) {
             a.classList.remove('hk-resto-holgado');
         } else {
             high = bigger;
         }
     }
-    const most = whole ? room : was;
     a.style.flex = high < was || whole ? '0 0 ' + Math.round(Math.min(most, Math.max(high, room - picture))) + 'px' : '';
 }
 
 /**
- * One page of the rest; with a fade when the layer stays from one slide to the next.
+ * One page of the rest, of those measured under the important notice that shows; with a fade when the layer stays from
+ * one slide to the next.
  *
  * @param {HTMLElement|null} a
  * @param {number} n
  * @param {boolean} fade
  */
 export function showRestPage(a, n, fade) {
-    if (!a || !a.hkPages) {
+    if (!a || !a.hkPagesOf || !a.hkItems.length) {
         return;
     }
     const page = a.querySelector('.hk-resto-pagina');
-    const p = a.hkPages[n % a.hkPages.length];
+    const pages = a.hkPagesOf[a.hkNotices.length > 1 ? a.hkShown : 0];
+    const p = pages ? pages[n % pages.length] : null;
     const paint = function () {
-        fillPage(page, a.hkItems, p[0], p[1]);
+        a.hkSet = pages;
+        if (!p) {
+            showPage(a, false);
+            return;
+        }
+        fillPageOf(page, a.hkItems, p);
         const dots = a.querySelector('.hk-resto-paginas');
         clear(dots);
-        if (a.hkPages.length > 1) {
-            a.hkPages.forEach(function (x) {
+        if (pages.length > 1) {
+            pages.forEach(function (x) {
                 dots.appendChild(el('i', x === p ? 'hk-pagina-actual' : ''));
             });
         }
-        dots.style.display = a.hkPages.length > 1 ? '' : 'none';
+        page.style.display = '';
+        dots.style.display = pages.length > 1 ? '' : 'none';
     };
-    if (!fade || a.hkPages.length < 2) {
+    if (!fade || (a.hkSet === pages && (!pages || pages.length < 2))) {
         paint();
         return;
     }
@@ -695,7 +751,8 @@ export function showRestPage(a, n, fade) {
 }
 
 /**
- * The next important notice in the fixed place, with its fade (when the layer stays from one slide to the next).
+ * The next important notice in the fixed place, with its fade (when the layer stays from one slide to the next). Before
+ * showRestPage(): the page that comes is one of those measured under it.
  *
  * @param {HTMLElement|null} a
  * @param {number} turn
@@ -705,12 +762,17 @@ export function turnFixed(a, turn, l) {
     if (!a || !a.hkImportant || a.hkImportant.length < 2) {
         return;
     }
-    const old = a.querySelector('.hk-aviso-fijo');
+    const k = turn % a.hkImportant.length;
+    if (k === a.hkShown) {
+        return;
+    }
+    a.hkShown = k;
+    const old = fixedOf(a);
     old.classList.add('hk-cambiando');
     setTimeout(function () {
-        const fresh = fixedNotice(a.hkImportant[turn % a.hkImportant.length], l);
+        const fresh = fixedNotice(a.hkImportant[k], l);
         fresh.classList.add('hk-cambiando');
-        a.replaceChild(fresh, old);
+        a.replaceChild(fresh, fixedOf(a));
         void fresh.offsetWidth;
         fresh.classList.remove('hk-cambiando');
     }, 450);

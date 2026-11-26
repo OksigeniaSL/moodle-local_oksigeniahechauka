@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.40.11
+
+- Upright screens: the lines under a photo no longer lose their last one. Where there was room left they took bigger letters,
+  measured against more height than the box ever got; now the bigger letters come only where they fit whole.
+- Important notices that take turns over the same photo: each one has the lines that fit under it, and the box is as high as
+  the one that needs most. Until now the lines were measured under the first notice, and a longer one coming after it pushed
+  the last line out.
+
 ## 0.40.10
 
 - Upright screens: an act without sign-up shows its day as big as the room allows (the leaf lies down, or becomes a strip), and

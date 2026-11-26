@@ -1972,8 +1972,8 @@ export class Screen {
                 }, 900);
             }
             this.fitCaptions(this.layer, comp);
-            showRestPage(this.layer.hkRest, this.turn, true);
             turnFixed(this.layer.hkRest, this.turn, this.labelsLead());
+            showRestPage(this.layer.hkRest, this.turn, true);
             return;
         }
         const old = this.layer;
