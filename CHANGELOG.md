@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.41.0
+
+- The mails of the notices in the common look of the organisation, by the way of Oksigenia Marandu (0.70 and later, on
+  Moodle 5.3 and later): its name, its colour and its logo, a button that says what it does and a text version. A screen that
+  stops giving signs of life says since when, what may be going on and, if the screen sends pictures of itself, the last one;
+  several at once, their names one under the other. The month's report, a row for each screen. A new permission, the panel,
+  the guide and the name of who gave it. The birthday mail stays off unless each person turns it on.
+- Without Marandu, the notices go as they always did.
+
 ## 0.40.11
 
 - Upright screens: the lines under a photo no longer lose their last one. Where there was room left they took bigger letters,

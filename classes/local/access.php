@@ -237,7 +237,45 @@ class access {
         $message->notification = 1;
         $message->contexturl = $panel->out(false);
         $message->contexturlname = $strings->get_string('panel_title', $c, null, $lang);
+        $giver = isloggedin() && !isguestuser() ? fullname($USER) : '';
+        commonmail::notice($message, self::letter($user, $what, (string) $message->subject, $a, $giver, $lang));
         return (bool) message_send($message);
+    }
+
+    /**
+     * The mail of a new permission: what one can do now, a button to the panel, the guide for a first time and, when a
+     * person gave it, their name under it.
+     *
+     * @param \stdClass $user Who reads it.
+     * @param string $what group, everywhere or manager
+     * @param string $subject
+     * @param \stdClass $a group, panel and guide
+     * @param string $giver Who gave it; empty if nobody did by hand.
+     * @param string|null $lang The reader's language.
+     * @return array The pieces of the common mail.
+     */
+    public static function letter(
+        \stdClass $user,
+        string $what,
+        string $subject,
+        \stdClass $a,
+        string $giver,
+        ?string $lang
+    ): array {
+        $c = self::COMPONENT;
+        $strings = get_string_manager();
+        $say = fn(string $key, $b = null): string => $strings->get_string($key, $c, $b, $lang);
+        $blocks = [
+            ['paragraph' => $say('permission_' . $what . '_mail', $a)],
+            ['paragraph' => $say('permission_mail_preview')],
+            ['action' => ['actionurl' => $a->panel, 'actiontext' => $say('mail_open_panel')]],
+            ['link' => ['linkbefore' => $say('mail_guide_before'), 'linkurl' => $a->guide, 'linktext' => $say('mail_guide_link')]],
+        ];
+        $pieces = commonmail::letter($user, $subject, $say('permission_mail_reason', commonmail::site()), $blocks, $lang);
+        if ($giver !== '') {
+            $pieces['signature'] = ['signer' => $giver];
+        }
+        return $pieces;
     }
 
     /**

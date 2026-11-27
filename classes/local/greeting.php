@@ -194,6 +194,8 @@ class greeting {
             try {
                 $called = $person['firstname'] !== '' ? $person['firstname'] : $person['name'];
                 $message = self::message($user, $called, $person['student']);
+                // Its mail is off unless the person turns it on: a centre may already send its own.
+                commonmail::notice($message, self::letter($user, $message));
             } finally {
                 force_current_language($old);
             }
@@ -230,5 +232,25 @@ class greeting {
         $message->contexturl = (new \moodle_url('/my/'))->out(false);
         $message->contexturlname = get_string('greeting_link', $c);
         return $message;
+    }
+
+    /**
+     * The mail of the greeting, in the language in force: its words and a button to the card in Moodle.
+     *
+     * @param \stdClass $user Who has their birthday.
+     * @param \core\message\message $message The notice, as message() makes it.
+     * @return array The pieces of the common mail.
+     */
+    public static function letter(\stdClass $user, \core\message\message $message): array {
+        $c = 'local_oksigeniahechauka';
+        $blocks = [
+            ['paragraph' => (string) $message->fullmessage],
+            ['action' => ['actionurl' => (string) $message->contexturl, 'actiontext' => (string) $message->contexturlname]],
+        ];
+        $reason = get_string('greeting_mail_reason', $c, commonmail::site());
+        $pieces = commonmail::letter($user, (string) $message->subject, $reason, $blocks, null);
+        // The subject already calls them by their name.
+        unset($pieces['hello']);
+        return $pieces;
     }
 }

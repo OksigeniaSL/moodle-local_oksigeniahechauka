@@ -148,6 +148,7 @@ class alerts {
             $message->notification = 1;
             $message->contexturl = $url->out(false);
             $message->contexturlname = $a->name;
+            commonmail::notice($message, self::letter($user, $screen, $kind, (string) $message->subject, $a, $lang));
             message_send($message);
         }
     }
@@ -164,9 +165,12 @@ class alerts {
         $c = 'local_oksigeniahechauka';
         $strings = get_string_manager();
         $url = new \moodle_url('/local/oksigeniahechauka/index.php');
-        $names = implode(', ', array_map(function ($screen) {
-            return '«' . items::plain((string) $screen->name) . '»';
-        }, $screens));
+        $list = array_map(function ($screen) {
+            return items::plain((string) $screen->name);
+        }, $screens);
+        $names = implode(', ', array_map(function ($name) {
+            return '«' . $name . '»';
+        }, $list));
         $a = (object) ['count' => count($screens), 'names' => $names, 'url' => $url->out(false)];
         foreach (self::recipients() as $user) {
             $user = \core_user::get_user($user->id);
@@ -187,7 +191,108 @@ class alerts {
             $message->notification = 1;
             $message->contexturl = $url->out(false);
             $message->contexturlname = $strings->get_string('pluginname', $c, null, $lang);
+            commonmail::notice($message, self::letter_many($user, $list, $kind, (string) $message->subject, $a->url, $lang));
             message_send($message);
         }
+    }
+
+    /**
+     * The mail of a warning about one screen: when it was last heard of, what may be going on and, if the screen sends
+     * pictures of itself, the last one, with a button to its page.
+     *
+     * @param \stdClass $user Who reads it.
+     * @param \stdClass $screen
+     * @param string $kind down or back
+     * @param string $subject
+     * @param \stdClass $a name, since and url
+     * @param string|null $lang The reader's language.
+     * @return array The pieces of the common mail.
+     */
+    public static function letter(
+        \stdClass $user,
+        \stdClass $screen,
+        string $kind,
+        string $subject,
+        \stdClass $a,
+        ?string $lang
+    ): array {
+        $c = 'local_oksigeniahechauka';
+        $strings = get_string_manager();
+        $say = fn(string $key, $b = null): string => $strings->get_string($key, $c, $b, $lang);
+        if ($kind === 'down') {
+            $blocks = [
+                ['paragraph' => $say('alert_down_mail')],
+                ['data' => [
+                    ['label' => $say('mail_screen'), 'value' => $a->name],
+                    ['label' => $say('mail_since'), 'value' => $a->since],
+                ]],
+            ];
+            // What it showed last, when the screen sends pictures of itself: a frozen picture, a notice of the TV in
+            // front, or a black screen tell at a glance what to do.
+            $shot = files::first(files::SHOT, (int) $screen->id);
+            $bytes = commonmail::picture($shot);
+            if ($bytes !== null) {
+                $blocks[] = ['picture' => [
+                    'picturebytes' => $bytes,
+                    'picturealt' => $say('alert_mail_shot_alt', $a->name),
+                    'picturecaption' => $say('alert_mail_shot', userdate(
+                        $shot->get_timemodified(),
+                        $strings->get_string('strftimedaydatetime', 'langconfig', null, $lang),
+                        $user->timezone
+                    )),
+                ]];
+            }
+            $blocks[] = ['note' => [
+                'notetitle' => $say('alert_down_mail_hours_title'),
+                'notetext' => $say('alert_down_mail_hours'),
+            ]];
+        } else {
+            $blocks = [
+                ['paragraph' => $say('alert_back_mail', $a->name)],
+                ['data' => [
+                    ['label' => $say('mail_screen'), 'value' => $a->name],
+                    ['label' => $say('mail_back_since'), 'value' => $a->since],
+                ]],
+            ];
+        }
+        $blocks[] = ['action' => ['actionurl' => $a->url, 'actiontext' => $say('alert_mail_open')]];
+        $blocks[] = ['small' => $say($kind === 'down' ? 'alert_down_mail_back' : 'alert_back_mail_report')];
+        return commonmail::letter($user, $subject, $say('mail_reason_runs', commonmail::site()), $blocks, $lang);
+    }
+
+    /**
+     * The mail of a warning about several screens at once: their names, one under the other, and a button to the panel.
+     *
+     * @param \stdClass $user Who reads it.
+     * @param string[] $names The names of the screens.
+     * @param string $kind down or back
+     * @param string $subject
+     * @param string $url The panel.
+     * @param string|null $lang The reader's language.
+     * @return array The pieces of the common mail.
+     */
+    public static function letter_many(
+        \stdClass $user,
+        array $names,
+        string $kind,
+        string $subject,
+        string $url,
+        ?string $lang
+    ): array {
+        $c = 'local_oksigeniahechauka';
+        $strings = get_string_manager();
+        $say = fn(string $key, $b = null): string => $strings->get_string($key, $c, $b, $lang);
+        $blocks = [
+            ['paragraph' => $say('alert_' . $kind . '_many_mail')],
+            ['items' => array_values($names)],
+        ];
+        if ($kind === 'down') {
+            $blocks[] = ['paragraph' => $say('alert_down_many_mail_why')];
+        }
+        $blocks[] = ['action' => ['actionurl' => $url, 'actiontext' => $say('mail_open_panel')]];
+        if ($kind === 'down') {
+            $blocks[] = ['small' => $say('alert_down_many_mail_back')];
+        }
+        return commonmail::letter($user, $subject, $say('mail_reason_runs', commonmail::site()), $blocks, $lang);
     }
 }

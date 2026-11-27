@@ -313,17 +313,23 @@ class report {
             $lang = $user->lang ?: null;
             $decsep = $strings->get_string('decsep', 'langconfig', null, $lang);
             $lines = [];
+            $rows = [];
             foreach ($data['screens'] as $screen) {
                 if ($screen['percent'] === null) {
                     continue;
                 }
                 $cuts = count($screen['cuts']);
-                $lines[] = $strings->get_string('report_line', $c, (object) [
+                $b = (object) [
                     'name' => $screen['name'],
                     'percent' => self::say_percent($screen['percent'], $decsep),
                     'cuts' => !$cuts ? $strings->get_string('report_cuts_none', $c, null, $lang) :
                         $strings->get_string($cuts === 1 ? 'report_cuts_one' : 'report_cuts_many', $c, $cuts, $lang),
-                ], $lang);
+                ];
+                $lines[] = $strings->get_string('report_line', $c, $b, $lang);
+                $rows[] = [
+                    'label' => commonmail::plain($b->name),
+                    'value' => $strings->get_string('report_mail_row', $c, $b, $lang),
+                ];
             }
             $a = (object) [
                 'month' => userdate(self::bounds($month)[0], $strings->get_string('report_month_format', $c, null, $lang)),
@@ -344,10 +350,35 @@ class report {
             $message->notification = 1;
             $message->contexturl = $url->out(false);
             $message->contexturlname = get_string('report_title', $c);
+            commonmail::notice($message, self::letter($user, (string) $message->subject, $a, $rows, $lang), true);
             message_send($message);
             $told++;
         }
         return $told;
+    }
+
+    /**
+     * The mail of the month: how each screen did, one row each, and a button to the whole report.
+     *
+     * @param \stdClass $user Who reads it.
+     * @param string $subject
+     * @param \stdClass $a month, percent and url
+     * @param array[] $rows label (the screen) and value (how it did)
+     * @param string|null $lang The reader's language.
+     * @return array The pieces of the common mail.
+     */
+    public static function letter(\stdClass $user, string $subject, \stdClass $a, array $rows, ?string $lang): array {
+        $c = 'local_oksigeniahechauka';
+        $strings = get_string_manager();
+        $blocks = [['paragraph' => $strings->get_string('report_mail_lead', $c, $a->month, $lang)]];
+        if ($rows) {
+            $blocks[] = ['data' => $rows];
+        }
+        $blocks[] = ['small' => $strings->get_string('report_mail_cuts', $c, null, $lang)];
+        $open = $strings->get_string('report_mail_open', $c, null, $lang);
+        $blocks[] = ['action' => ['actionurl' => $a->url, 'actiontext' => $open]];
+        $reason = $strings->get_string('mail_reason_runs', $c, commonmail::site(), $lang);
+        return commonmail::letter($user, $subject, $reason, $blocks, $lang);
     }
 
     /**
